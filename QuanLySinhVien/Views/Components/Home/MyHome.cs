@@ -7,6 +7,7 @@ namespace QuanLySinhVien.Views.Components.Home;
 
 public class MyHome : Form
 {
+    private int IndexButton = 0;
     public MyHome()
     {
         Init();
@@ -102,6 +103,7 @@ public class MyHome : Form
             "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
             "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
         };
+        Button[] buttonArray = new Button[labels.Length];
         for (int i = 0; i < labels.Length; i++)
         {
             var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
@@ -115,14 +117,28 @@ public class MyHome : Form
                 Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
                 TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(12,0,0,0), 
                 Margin = new Padding(0,5,0,0), 
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
             };
             btn.FlatAppearance.BorderSize = 0;
             btn.Image = icon;
             btn.ImageAlign = ContentAlignment.MiddleLeft;  
             btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             navList.Controls.Add(btn);
+            buttonArray[i] = btn;
         }
+        buttonArray[0].BackColor = MyColor.Gray;
+        for (int i = 0; i < buttonArray.Length; i++)
+        {
+            int pos = i;
+            buttonArray[pos].Click += (s, e) =>
+            {
+                buttonArray[IndexButton].BackColor = Color.Transparent;
+                IndexButton = pos;
+                buttonArray[IndexButton].BackColor = MyColor.Gray;
+            };
+        }
+        
         // logout
         var logout = new Panel
         {
@@ -148,6 +164,11 @@ public class MyHome : Form
             ImageAlign = ContentAlignment.MiddleLeft,
             TextImageRelation = TextImageRelation.ImageBeforeText,
             Padding = new  Padding(20,0,0,0),
+            Cursor = Cursors.Hand
+        };
+        logoutButton.Click += (s, e) =>
+        {
+            this.Dispose();
         };
         logoutButton.FlatAppearance.BorderSize = 0;
         logout.Controls.Add(logoutButton);
