@@ -116,7 +116,6 @@ public class MyHome : Form
             "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
             "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
         };
-        List<Button> listButton = new List<Button>();
         for (int i = 0; i < labels.Length; i++)
         {
             var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
@@ -136,7 +135,6 @@ public class MyHome : Form
             btn.Image = icon;
             btn.ImageAlign = ContentAlignment.MiddleLeft;  
             btn.TextImageRelation = TextImageRelation.ImageBeforeText;
-            listButton.Add(btn);
             navList.Controls.Add(btn);
         }
 
@@ -254,7 +252,7 @@ public class MyHome : Form
         textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         var userTextName = new Label
         {
-            Text = "truy vấn sql",
+            Text = "truy vấn sql",  
             Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
             AutoSize = true
         };
