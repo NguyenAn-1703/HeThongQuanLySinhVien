@@ -1,12 +1,14 @@
 // using QuanLySinhVien.Views;
 
 using System.Security.Policy;
+using QuanLySinhVien.Models;
 using Svg;
 
 namespace QuanLySinhVien.Views.Components.Home;
 
 public class MyHome : Form
 {
+    private NavListController navListController = new NavListController();
     public MyHome()
     {
         Init();
@@ -15,7 +17,7 @@ public class MyHome : Form
     private void Init()
     {
         // Client
-        Text = "Trang Chủ";
+        Text = "Hệ thống quản lí sinh viên";
         StartPosition = FormStartPosition.CenterScreen;
         ClientSize = new Size(1600, 1000);
 
@@ -34,12 +36,24 @@ public class MyHome : Form
             BackColor = Color.White
         };
 
-        // right panel
+        /* right panel => chia thành 2 thành phần top và bottom
+         * mục đích xử lí navList khi chọn vào button (các phần còn lại để nguyên chỉ có thành phần bottom là bị thay đổi)
+         * TODO: Sử dụng cái gì để xử lí? dùng Map để lưu các thành phần?
+        */ 
         var right = new Panel
         {
             Dock = DockStyle.Fill,
         };
-
+        var rightTop = new Panel
+        {
+            Dock = DockStyle.Top,
+            Height = 100,
+        };
+        /* TODO: rightBottomChange = new TrangChu() hay 1 thành phần nào đó được button click
+         * vậy thì trong cái button phải lưu trử 1 cái gì đó để truy xuất đến được <Button text = Trang Chủ -> TrangChu>
+         * 
+         */
+        var rightBottomChange = new TrangChu();
         // left panel
         var left = new Panel
         {
@@ -102,6 +116,7 @@ public class MyHome : Form
             "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
             "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
         };
+        List<Button> listButton = new List<Button>();
         for (int i = 0; i < labels.Length; i++)
         {
             var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
@@ -121,8 +136,12 @@ public class MyHome : Form
             btn.Image = icon;
             btn.ImageAlign = ContentAlignment.MiddleLeft;  
             btn.TextImageRelation = TextImageRelation.ImageBeforeText;
+            listButton.Add(btn);
             navList.Controls.Add(btn);
         }
+
+        //navListController.getDataButton();
+        
         // logout
         var logout = new Panel
         {
@@ -158,21 +177,6 @@ public class MyHome : Form
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             Height = 100,
         };
-        // center
-        var center = new Panel
-        {
-            Dock = DockStyle.Top,
-            BackColor = Color.White,
-            Height = 80,
-        };
-        
-        //bottom
-        var bottom = new Panel
-        {
-            Dock = DockStyle.Top,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 820,
-        };
         
         var functionTopRightLeft = new Panel
         {
@@ -203,33 +207,19 @@ public class MyHome : Form
         searchWrap.Controls.Add(txtSearch);
         searchWrap.Controls.Add(iconSearch);
         functionTopRightLeft.Controls.Add(searchWrap);
-        var comboList = new[] {"huhu" , "2" , "3" , "4"} ;
+        var comboList = new[] {"1" , "2" , "3" , "4"} ;
         var filter = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDown,
             AutoCompleteMode = AutoCompleteMode.SuggestAppend,
-            Location = new Point(550, 30),
+            Location = new Point(550, 35),
             Font = new Font("JetBrains Mono", 10f),
-            Width = 200,
-            DrawMode = DrawMode.OwnerDrawFixed,
+            Size = new Size(200, 0),
+            DrawMode = DrawMode.Normal,
             ItemHeight = 35,                
-            DropDownHeight = 200,             
+            //DropDownHeight = 200,             
             IntegralHeight = false,
-        };
-        filter.DrawItem += (s, e) =>
-        {
-            if (e.Index < 0) return;
-            e.DrawBackground();
-            var text = filter.Items[e.Index].ToString();
-            TextRenderer.DrawText(
-                e.Graphics,
-                text,
-                filter.Font,
-                e.Bounds,
-                SystemColors.ControlText,
-                TextFormatFlags.VerticalCenter | TextFormatFlags.Left
-            );
-            e.DrawFocusRectangle();
+            SelectedText = "Lọc",
         };
         filter.Items.AddRange(comboList);
         
@@ -239,10 +229,57 @@ public class MyHome : Form
         var functionTopRightRight = new Panel
         {
             Dock = DockStyle.Right,
-            BackColor = Color.Cyan,
+            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             Width = 400,
         };
         
+        var pathIconAccount = Path.Combine(AppContext.BaseDirectory, "img", "user.svg");
+        var userIcon = new PictureBox
+        {
+            Image = SvgDocument.Open(pathIconAccount).Draw(50, 50),
+            AutoSize = true,
+            Dock = DockStyle.Left,
+            Margin = new Padding(0),
+            Padding = new Padding(0),
+        };
+
+        var textAccount = new TableLayoutPanel {
+            ColumnCount = 1,
+            RowCount = 2,
+            Dock = DockStyle.Fill,
+            Padding = new Padding(0),
+            Margin = new Padding(8, 0, 0, 0),
+        };
+        textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        var userTextName = new Label
+        {
+            Text = "truy vấn sql",
+            Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
+            AutoSize = true
+        };
+
+        var userTextGmail = new Label
+        {   
+            Text = "truyvấnsql@gmail.com",
+            Font = new Font("JetBrains Mono",10f, FontStyle.Regular),
+            AutoSize = true,
+            ForeColor = Color.Gray,
+        };
+        
+        textAccount.Controls.Add(userTextName, 0, 0);
+        textAccount.Controls.Add(userTextGmail, 0, 1);
+        
+        var fullUserAccount = new Panel
+        {
+            Size = new Size(400, 50),
+            Padding = new Padding(8, 4, 8, 4)
+            //BackColor = Color.Red,
+        };
+        fullUserAccount.Controls.Add(textAccount);
+        fullUserAccount.Controls.Add(userIcon);
+        fullUserAccount.Location = new Point(30, 25);
+        functionTopRightRight.Controls.Add(fullUserAccount);
         // border
          parLeft.Padding = new Padding(10);
          parRight.Padding = new Padding(10);
@@ -251,10 +288,11 @@ public class MyHome : Form
         taskbar.Controls.Add(functionTopRightLeft);
         taskbar.Controls.Add(functionTopRightRight);
         
-        right.Controls.Add(bottom);
-        right.Controls.Add(center);
-        right.Controls.Add(taskbar);
-        
+        // right.Controls.Add(bottom);
+        // right.Controls.Add(center);
+        rightTop.Controls.Add(taskbar);
+        right.Controls.Add(rightTop);
+        right.Controls.Add(rightBottomChange);
         left.Controls.Add(logout);
         left.Controls.Add(navList);
         left.Controls.Add(logo);

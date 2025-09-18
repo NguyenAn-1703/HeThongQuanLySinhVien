@@ -19,7 +19,6 @@
 
     <ItemGroup>
       <Folder Include="Controllers\" />
-      <Folder Include="Models\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -119,6 +118,10 @@
       </Content>
       <None Remove="img\search.svg" />
       <Content Include="img\search.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\user.svg" />
+      <Content Include="img\user.svg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
