@@ -10,26 +10,27 @@ public class SinhVien : Panel
     private void Init()
     {
         //BackColor = Color.Blue;
-        Dock = DockStyle.Bottom;
+        Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
         var borderTop = new Panel
         {
-            Dock = DockStyle.Fill,
-            Padding = new  Padding(0 , 30 , 0 , 0),
+            Dock = DockStyle.Bottom,
+            //Padding = new  Padding(0 , 110 , 0 , 0),
         };
         borderTop.Controls.Add(Top());
-        Controls.Add(Bottom());
+        
         Controls.Add(borderTop);
+        Controls.Add(Bottom());
     }
 
     private Panel Top()
     {
         Panel mainTop = new Panel
         {
-            Dock = DockStyle.Top,
+            Dock = DockStyle.Bottom,
             // BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            BackColor = Color.Red,
-            Height = 80,
+            BackColor = Color.Blue,
+            Height = 90,
         };
         return mainTop;
     }
@@ -39,7 +40,7 @@ public class SinhVien : Panel
         Panel mainBot = new Panel
         {
             Dock = DockStyle.Bottom,
-            BackColor = Color.Green,
+            BackColor = Color.Pink,
             Height = 780,
         };
         return mainBot;

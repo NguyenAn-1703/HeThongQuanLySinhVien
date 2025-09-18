@@ -15,21 +15,21 @@ public class NhapDiem : Panel
         var borderTop = new Panel
         {
             Dock = DockStyle.Fill,
-            Padding = new  Padding(0 , 30 , 0 , 0),
+            // Padding = new  Padding(0 , 30 , 0 , 0),
         };
         borderTop.Controls.Add(Top());
-        Controls.Add(Bottom());
         Controls.Add(borderTop);
+        Controls.Add(Bottom());
     }
 
     private Panel Top()
     {
         Panel mainTop = new Panel
         {
-            Dock = DockStyle.Top,
+            Dock = DockStyle.Bottom,
             // BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             BackColor = Color.Red,
-            Height = 80,
+            Height = 90,
         };
         return mainTop;
     }

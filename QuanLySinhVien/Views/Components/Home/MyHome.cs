@@ -1,6 +1,5 @@
 // using QuanLySinhVien.Views;
 
-using System.Security.Policy;
 using QuanLySinhVien.Models;
 using Svg;
 
@@ -9,6 +8,7 @@ namespace QuanLySinhVien.Views.Components.Home;
 public class MyHome : Form
 {
     private int IndexButton = 0;
+    private string ButtonClickNavList = "";
     private NavListController navListController = new NavListController();
     public MyHome()
     {
@@ -50,11 +50,15 @@ public class MyHome : Form
             Dock = DockStyle.Top,
             Height = 100,
         };
+        var rightBottomHost = new Panel
+        {
+            Dock = DockStyle.Fill,
+        };
         /* TODO: rightBottomChange = new TrangChu() hay 1 thành phần nào đó được button click
          * vậy thì trong cái button phải lưu trử 1 cái gì đó để truy xuất đến được <Button text = Trang Chủ -> TrangChu>
          * 
          */
-        var rightBottomChange = new TrangChu();
+        Panel rightBottomChange = new TrangChu();
         // left panel
         var left = new Panel
         {
@@ -140,6 +144,7 @@ public class MyHome : Form
             navList.Controls.Add(btn);
             buttonArray[i] = btn;
         }
+        
         buttonArray[0].BackColor = MyColor.Gray;
         for (int i = 0; i < buttonArray.Length; i++)
         {
@@ -149,11 +154,25 @@ public class MyHome : Form
                 buttonArray[IndexButton].BackColor = Color.Transparent;
                 IndexButton = pos;
                 buttonArray[IndexButton].BackColor = MyColor.Gray;
+                ButtonClickNavList = buttonArray[IndexButton].Text;
+                Console.WriteLine(ButtonClickNavList);
+                rightBottomHost.SuspendLayout();
+                rightBottomHost.Controls.Clear();
+                String change = navListController.getDataButton(ButtonClickNavList);
+                Console.WriteLine(change);
+                rightBottomChange = navListController.update(change);
+                if (rightBottomChange != null)
+                {
+                    rightBottomChange.Dock = DockStyle.Fill;
+                    rightBottomHost.Controls.Add(rightBottomChange);
+                }
+                rightBottomHost.ResumeLayout(true);
+                rightBottomHost.Invalidate();
+                rightBottomHost.Refresh();
             };
         }
         
 
-        //navListController.getDataButton();
         
         // logout
         var logout = new Panel
@@ -310,7 +329,9 @@ public class MyHome : Form
         // right.Controls.Add(center);
         rightTop.Controls.Add(taskbar);
         right.Controls.Add(rightTop);
-        right.Controls.Add(rightBottomChange);
+        right.Controls.Add(rightBottomHost);
+        rightBottomChange.Dock = DockStyle.Fill;
+        rightBottomHost.Controls.Add(rightBottomChange);
         left.Controls.Add(logout);
         left.Controls.Add(navList);
         left.Controls.Add(logo);
