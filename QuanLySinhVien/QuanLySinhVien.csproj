@@ -8,4 +8,39 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Update="MyComponent\MyForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+      <Compile Update="Components\MyForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Fonts\Montserrat-Black.ttf" />
+      <None Remove="Fonts\Montserrat-BlackItalic.ttf" />
+      <None Remove="Fonts\Montserrat-BoldItalic.ttf" />
+      <None Remove="Fonts\Montserrat-Bold.ttf" />
+      <None Remove="Fonts\Montserrat-ExtraBold.ttf" />
+      <None Remove="Fonts\Montserrat-ExtraBoldItalic.ttf" />
+      <None Remove="Fonts\Montserrat-ExtraLight.ttf" />
+      <None Remove="Fonts\Montserrat-ExtraLightItalic.ttf" />
+      <None Remove="Fonts\Montserrat-Italic.ttf" />
+      <None Remove="Fonts\Montserrat-Light.ttf" />
+      <None Remove="Fonts\Montserrat-LightItalic.ttf" />
+      <None Remove="Fonts\Montserrat-Medium.ttf" />
+      <None Remove="Fonts\Montserrat-MediumItalic.ttf" />
+      <None Remove="Fonts\Montserrat-Regular.ttf" />
+      <None Remove="Fonts\Montserrat-SemiBold.ttf" />
+      <None Remove="Fonts\Montserrat-SemiBoldItalic.ttf" />
+      <None Remove="Fonts\Montserrat-Thin.ttf" />
+      <None Remove="Fonts\Montserrat-ThinItalic.ttf" />
+    </ItemGroup>
+
 </Project>
