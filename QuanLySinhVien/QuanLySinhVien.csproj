@@ -43,4 +43,84 @@
       <None Remove="Fonts\Montserrat-ThinItalic.ttf" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Svg" Version="3.4.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="img\trangchu.svg" />
+      <Content Include="img\trangchu.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\chuongtrinhdaotao.svg" />
+      <Content Include="img\chuongtrinhdaotao.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\giangvien.svg" />
+      <Content Include="img\giangvien.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\hocphan.svg" />
+      <Content Include="img\hocphan.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\hocphi.svg" />
+      <Content Include="img\hocphi.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\khoa.svg" />
+      <Content Include="img\khoa.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\modangkyhocphan.svg" />
+      <Content Include="img\modangkyhocphan.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\nganh.svg" />
+      <Content Include="img\nganh.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\nhapdiem.svg" />
+      <Content Include="img\nhapdiem.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\phanquyen.svg" />
+      <Content Include="img\phanquyen.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\phonghoc.svg" />
+      <Content Include="img\phonghoc.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\sinhvien.svg" />
+      <Content Include="img\sinhvien.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\taikhoan.svg" />
+      <Content Include="img\taikhoan.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\thongke.svg" />
+      <Content Include="img\thongke.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\tochucthi.svg" />
+      <Content Include="img\tochucthi.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\Png\Logo-DH-Sai-Gon-SGU.png" />
+      <None Remove="img\png\Logo ĐH Sài Gòn - SGU.png" />
+      <Content Include="img\png\Logo ĐH Sài Gòn - SGU.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\dangxuat.svg" />
+      <Content Include="img\dangxuat.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\search.svg" />
+      <Content Include="img\search.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

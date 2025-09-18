@@ -1,5 +1,6 @@
 using System.Drawing.Text;
-using QuanLySinhVien.Views.Forms;
+using QuanLySinhVien.Views.Components;
+using QuanLySinhVien.Views.Components.Home;
 
 namespace QuanLySinhVien;
 
@@ -25,6 +26,6 @@ static class Program
         // }
 
         
-        Application.Run(new FLogin());
+        Application.Run(new MyHome());
     }
 }
