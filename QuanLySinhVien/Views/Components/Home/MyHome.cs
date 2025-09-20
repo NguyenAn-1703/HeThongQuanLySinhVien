@@ -169,7 +169,7 @@ public class MyHome : Form
                 Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
                 // Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
                 // Dock = DockStyle.Top,
-                // Width = 300,
+                Width = 250,
                 TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(12,0,0,0), 
                 Margin = new Padding(0,5,0,0), 
                 FlatStyle = FlatStyle.Flat
