@@ -124,6 +124,22 @@
       <Content Include="img\user.svg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="img\plus.svg" />
+      <Content Include="img\plus.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\plus_circle.svg" />
+      <Content Include="img\plus_circle.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\fix.svg" />
+      <Content Include="img\fix.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\trashbin.svg" />
+      <Content Include="img\trashbin.svg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
