@@ -1,7 +1,11 @@
 // using QuanLySinhVien.Views;
 
+using System.Drawing.Text;
 using QuanLySinhVien.Models;
 using Svg;
+using QuanLySinhVien.Views.Components.GetFont;
+using QuanLySinhVien.Views.Components.ViewComponents;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.Home;
 
@@ -17,6 +21,20 @@ public class MyHome : Form
 
     private void Init()
     {
+        #region mainLayout
+        // Chia layout co dãn theo kích thước window
+        // Bố cục 2 phần trái, phải, kích thước theo component bên trong
+        #endregion
+        TableLayoutPanel mainLayout = new TableLayoutPanel
+        {
+            ColumnCount = 2,
+            Dock = DockStyle.Fill,
+        };
+        mainLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single; //debug
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        
         // Client
         Text = "Hệ thống quản lí sinh viên";
         StartPosition = FormStartPosition.CenterScreen;
@@ -25,15 +43,14 @@ public class MyHome : Form
         // layout border
         var parLeft = new Panel
         {
-            Dock = DockStyle.Left,
-            BackColor = Color.White,
-            Width = 400
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            BackColor = MyColor.GrayBackGround
         };
 
         var parRight = new Panel
         {
-            Dock = DockStyle.Right,
-            Width = 1200,
+            Dock = DockStyle.Fill,
             BackColor = Color.White
         };
 
@@ -60,57 +77,75 @@ public class MyHome : Form
          */
         Panel rightBottomChange = new TrangChu();
         // left panel
-        var left = new Panel
+        var left = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
-            Width = 400,
+            AutoSize = true,
+            RowCount = 3
         };
+        left.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // left.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)),
+        
+        //hàng 1, 3 auto, hàng 2 chiếm tâst cả
+        left.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        left.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        left.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         
         // logo
-        var logo = new Panel
+        var logo = new TableLayoutPanel()
         {
             Dock = DockStyle.Top,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 200,
+            BackColor = MyColor.GrayBackGround,
+            RowCount = 2,
+            AutoSize = true,
         };
+
+        logo.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single; //debug
+        logo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        logo.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        logo.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         var logoSguPath = Path.Combine(Path.Combine(AppContext.BaseDirectory, "img" , "png" ,  "Logo ĐH Sài Gòn - SGU.png"));
         var iconLogo = Image.FromFile(logoSguPath);
 
         var logoPb = new PictureBox
         {
-            Size = new Size(150, 150),
-            Location = new Point(100 ,  0),
+            Size = new Size(70, 70),
             SizeMode = PictureBoxSizeMode.Zoom,
+            Anchor = AnchorStyles.None,
             Image = iconLogo,
         };
 
         var logoText = new Label
         {
             Text = "Sài Gòn University",
-            Font = new Font("JetBrains Mono", 17f, FontStyle.Bold),
-            ForeColor = ColorTranslator.FromHtml("#1E40AF"),
-            AutoSize = true,
+            Font = new GetFont.GetFont().GetMainFont(20, FontType.Black),
+            ForeColor = ColorTranslator.FromHtml("#07689F"),
             BackColor = Color.Transparent,
-            Location = new Point(20, 150),
             BorderStyle = BorderStyle.None,
+            AutoSize = true,
         };
         
-        logo.Controls.Add(logoText);
         logo.Controls.Add(logoPb);
+        logo.Controls.Add(logoText);
+
         // navList 
-        var navList = new FlowLayoutPanel
+        var navList = new TableLayoutPanel()
         {
-            Dock = DockStyle.Top,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 700,
-            Width = 400,
-            FlowDirection = FlowDirection.TopDown,
-            WrapContents = false,
-            //AutoScroll = true,
-            Padding = new Padding(30, 0 , 30 , 0),
-            Margin = Padding.Empty
+            BackColor = MyColor.GrayBackGround,
+            AutoSize = true,
+            ColumnCount = 1,
         };
+        
+        
+        var navListContainer = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+        };
+        
+        
+        navList.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        
         var labels = new[]
         {
             "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học",
@@ -121,18 +156,20 @@ public class MyHome : Form
             "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
             "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
         };
-        Button[] buttonArray = new Button[labels.Length];
+        RoundButton[] buttonArray = new RoundButton[labels.Length];
         for (int i = 0; i < labels.Length; i++)
         {
             var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
             var icon = SvgDocument.Open(svgPath).Draw(20, 20);
-            var btn = new Button
+            var btn = new RoundButton
             {
                 Text = labels[i], 
                 AutoSize = false, 
                 Height = 40, 
                 Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
-                Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
+                // Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
+                // Dock = DockStyle.Top,
+                // Width = 300,
                 TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(12,0,0,0), 
                 Margin = new Padding(0,5,0,0), 
                 FlatStyle = FlatStyle.Flat
@@ -172,34 +209,33 @@ public class MyHome : Form
             };
         }
         
+        navListContainer.Controls.Add(navList);
 
         
         // logout
         var logout = new Panel
         {
             Dock = DockStyle.Bottom,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            // BackColor = Color.Red,
-            Padding = new Padding(30, 0 , 30 , 0),
+            BackColor = MyColor.GrayBackGround,
+            
             Height = 100,
         };
         var pathLog = Path.Combine(AppContext.BaseDirectory, "img", "dangxuat.svg");
         var iconLog = SvgDocument.Open(pathLog).Draw(25, 25);
         var logoutButton = new Button
         {
-            Text = "Đăng Xuất",
+            Text = "Đăng xuất",
             AutoSize = true,
-            Location = new Point(40 , 30),
-            BackColor = Color.Red,
+            BackColor = MyColor.Red,
             Height = 40,
             Width = 300,
-            Font =  new Font("JetBrains Mono", 12f, FontStyle.Regular),
+            Font =  new GetFont.GetFont().GetMainFont(14, FontType.Regular),
             FlatStyle = FlatStyle.Flat,
             Image = iconLog,
             ImageAlign = ContentAlignment.MiddleLeft,
             TextImageRelation = TextImageRelation.ImageBeforeText,
-            Padding = new  Padding(20,0,0,0),
-            Cursor = Cursors.Hand
+            Cursor = Cursors.Hand,
+            Anchor = AnchorStyles.None
         };
         logoutButton.Click += (s, e) =>
         {
@@ -320,27 +356,34 @@ public class MyHome : Form
         // border
          parLeft.Padding = new Padding(10);
          parRight.Padding = new Padding(10);
+
+         // add
+         taskbar.Controls.Add(functionTopRightLeft);
+         taskbar.Controls.Add(functionTopRightRight);
         
-        // add
-        taskbar.Controls.Add(functionTopRightLeft);
-        taskbar.Controls.Add(functionTopRightRight);
+         // right.Controls.Add(bottom);
+         // right.Controls.Add(center);
+         rightTop.Controls.Add(taskbar);
+         right.Controls.Add(rightTop);
+         right.Controls.Add(rightBottomHost);
+         rightBottomChange.Dock = DockStyle.Fill;
+         rightBottomHost.Controls.Add(rightBottomChange);
+         
+         left.Controls.Add(logo);
+         left.Controls.Add(navListContainer);
+         left.Controls.Add(logout);
         
-        // right.Controls.Add(bottom);
-        // right.Controls.Add(center);
-        rightTop.Controls.Add(taskbar);
-        right.Controls.Add(rightTop);
-        right.Controls.Add(rightBottomHost);
-        rightBottomChange.Dock = DockStyle.Fill;
-        rightBottomHost.Controls.Add(rightBottomChange);
-        left.Controls.Add(logout);
-        left.Controls.Add(navList);
-        left.Controls.Add(logo);
-        
-        parLeft.Controls.Add(left);
-        parRight.Controls.Add(right);
-        Controls.Add(parLeft);
-        Controls.Add(parRight);
+         parLeft.Controls.Add(left);
+         parRight.Controls.Add(right);
+         
+         mainLayout.Controls.Add(parLeft);
+         mainLayout.Controls.Add(parRight);
+         Controls.Add(mainLayout);
+         
+        MessageBox.Show($"nav list contaier width: {navListContainer.Width}");
+        MessageBox.Show($"nav list width: {navList.Width}");
         
         ResumeLayout(performLayout: true);
+        
     }
 }
