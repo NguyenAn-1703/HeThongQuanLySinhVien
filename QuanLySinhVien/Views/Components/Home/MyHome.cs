@@ -393,9 +393,7 @@ public class MyHome : Form
          mainLayout.Controls.Add(parRight);
          Controls.Add(mainLayout);
         
-         Console.WriteLine("Kích thước rộng left: " + left.Width);
-         Console.WriteLine("Kích thước rộng navbarcontainer: " + navListContainer.Width);
-         Console.WriteLine("Kích thươớc rộng của navBar : " + navBar.Width);
+         // Console.WriteLine("Kích thước rộng left: " + left.Width);
         
          ResumeLayout(performLayout: true);
         
