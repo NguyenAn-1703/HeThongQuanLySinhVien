@@ -29,7 +29,7 @@ public class MyHome : Form
     private Panel parLeft;
     private TableLayoutPanel left;
     private Panel logout;
-    private Button logoutButton;
+    private logoutButton logoutButton;
     
     public MyHome()
     {
@@ -150,7 +150,7 @@ public class MyHome : Form
         
         //Nút thu gọn
         toggleButton = new ToggleButton();
-        toggleButton.Location = new Point(navBar.Right, 40);
+        toggleButton.Location = new Point(logoPb.Location.X + 130, 40);
         toggleButton.OnClick += UpdateToggleNavbar;
         
 
@@ -197,35 +197,37 @@ public class MyHome : Form
         navListContainer.Controls.Add(navBar);
         
         // logout
-        logout = new Panel
-        {
-            Dock = DockStyle.Bottom,
-            BackColor = MyColor.GrayBackGround,
-            Height = 100,
-        };
-        var pathLog = Path.Combine(AppContext.BaseDirectory, "img", "dangxuat.svg");
-        var iconLog = SvgDocument.Open(pathLog).Draw(25, 25);
-        logoutButton = new Button
-        {
-            Text = "Đăng xuất",
-            AutoSize = true,
-            BackColor = MyColor.Red,
-            Height = 40,
-            Width = 300,
-            Font =  new GetFont.GetFont().GetMainFont(14, FontType.Regular),
-            FlatStyle = FlatStyle.Flat,
-            Image = iconLog,
-            ImageAlign = ContentAlignment.MiddleLeft,
-            TextImageRelation = TextImageRelation.ImageBeforeText,
-            Cursor = Cursors.Hand,
-            Anchor = AnchorStyles.None
-        };
-        logoutButton.Click += (s, e) =>
-        {
-            this.Dispose();
-        };
-        logoutButton.FlatAppearance.BorderSize = 0;
-        logout.Controls.Add(logoutButton);
+        // logout = new Panel
+        // {
+        //     Dock = DockStyle.Bottom,
+        //     BackColor = MyColor.GrayBackGround,
+        //     Height = 100,
+        // };
+        // var pathLog = Path.Combine(AppContext.BaseDirectory, "img", "dangxuat.svg");
+        // var iconLog = SvgDocument.Open(pathLog).Draw(25, 25);
+        // logoutButton = new Button
+        // {
+        //     Text = "Đăng xuất",
+        //     AutoSize = true,
+        //     BackColor = MyColor.Red,
+        //     Height = 40,
+        //     Width = 300,
+        //     Font =  new GetFont.GetFont().GetMainFont(14, FontType.Regular),
+        //     FlatStyle = FlatStyle.Flat,
+        //     Image = iconLog,
+        //     ImageAlign = ContentAlignment.MiddleLeft,
+        //     TextImageRelation = TextImageRelation.ImageBeforeText,
+        //     Cursor = Cursors.Hand,
+        //     Anchor = AnchorStyles.None
+        // };
+        // logoutButton.Click += (s, e) =>
+        // {
+        //     this.Dispose();
+        // };
+        // logoutButton.FlatAppearance.BorderSize = 0;
+        // logout.Controls.Add(logoutButton);
+        
+        logoutButton = new logoutButton();
         
         
         //taskbar
@@ -358,7 +360,7 @@ public class MyHome : Form
          
          left.Controls.Add(logo);
          left.Controls.Add(navListContainer);
-         // left.Controls.Add(logout); 
+         left.Controls.Add(logoutButton); 
         
          parLeft.Controls.Add(left);
          parRight.Controls.Add(right);
@@ -413,11 +415,10 @@ public class MyHome : Form
         logoPb.Size = new Size(40, 40);
         logoText.Visible = false;
 
-        toggleButton.Location = new Point(left.Right, 40);
+        toggleButton.Location = new Point(logoPb.Location.X + 20, 40);
         toggleButton.ChangeImg("toggle2.svg");
         
-        // logout.Width = 40;
-        // logoutButton.Text = "";
+        logoutButton.Controls[1].Visible = false;
         
         navBar.ResumeLayout();
         navBar.Refresh();
@@ -435,11 +436,10 @@ public class MyHome : Form
         logoPb.Size = new Size(70, 70);
         logoText.Visible = true;
         
-        toggleButton.Location = new Point(navBar.Right, 40);
+        toggleButton.Location = new Point(logoPb.Location.X + 130, 40);
         toggleButton.ChangeImg("toggle.svg");
         
-        // logoutButton.Text = "Đăng xuất";
-        // logoutButton.Width = 300;
+        logoutButton.Controls[1].Visible = true;
         
         navBar.ResumeLayout();
         navBar.Refresh();
