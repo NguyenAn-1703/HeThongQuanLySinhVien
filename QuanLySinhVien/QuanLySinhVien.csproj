@@ -140,6 +140,9 @@
       <Content Include="img\trashbin.svg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+	<Content Include="img\**\*.*">
+   		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</Content>
     </ItemGroup>
 
 </Project>

@@ -6,6 +6,8 @@ using Svg;
 using QuanLySinhVien.Views.Components.GetFont;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
+using System.Windows.Forms;
+using Timer = System.Windows.Forms.Timer;
 
 namespace QuanLySinhVien.Views.Components.Home;
 
@@ -17,6 +19,17 @@ public class MyHome : Form
     //Trang bắt đầu
     Panel rightBottomChange = new TrangChu();
     private Panel rightBottomHost;
+    private NavBar navBar;
+    //Cho phan thu gon navbar
+    private Boolean _isToggle = false;
+    private Label logoText;
+    private PictureBox logoPb;
+    private ToggleButton toggleButton;
+    private TableLayoutPanel navListContainer;
+    private Panel parLeft;
+    private TableLayoutPanel left;
+    private Panel logout;
+    private Button logoutButton;
     
     public MyHome()
     {
@@ -34,7 +47,6 @@ public class MyHome : Form
             ColumnCount = 2,
             Dock = DockStyle.Fill,
         };
-        mainLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single; //debug
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
@@ -45,7 +57,7 @@ public class MyHome : Form
         ClientSize = new Size(1600, 1000);
 
         // layout border
-        var parLeft = new Panel
+        parLeft = new Panel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -77,13 +89,12 @@ public class MyHome : Form
         };
         
         // left panel
-        var left = new TableLayoutPanel()
+        left = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             RowCount = 3
         };
-        left.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         // left.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)),
         
         //hàng 1, 3 auto, hàng 2 chiếm tâst cả
@@ -99,8 +110,7 @@ public class MyHome : Form
             RowCount = 2,
             AutoSize = true,
         };
-
-        logo.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single; //debug
+        
         logo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         logo.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         logo.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -108,7 +118,7 @@ public class MyHome : Form
         var logoSguPath = Path.Combine(Path.Combine(AppContext.BaseDirectory, "img" , "png" ,  "Logo ĐH Sài Gòn - SGU.png"));
         var iconLogo = Image.FromFile(logoSguPath);
 
-        var logoPb = new PictureBox
+        logoPb = new PictureBox
         {
             Size = new Size(70, 70),
             SizeMode = PictureBoxSizeMode.Zoom,
@@ -116,7 +126,7 @@ public class MyHome : Form
             Image = iconLogo,
         };
 
-        var logoText = new Label
+        logoText = new Label
         {
             Text = "Sài Gòn University",
             Font = new GetFont.GetFont().GetMainFont(20, FontType.Black),
@@ -129,14 +139,20 @@ public class MyHome : Form
         logo.Controls.Add(logoPb);
         logo.Controls.Add(logoText);
         
-        NavBar navBar = new NavBar();
+        navBar = new NavBar();
         
-        var navListContainer = new TableLayoutPanel
+        navListContainer = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             Padding = new Padding(0, 15, 0, 0)
         };
+        
+        //Nút thu gọn
+        toggleButton = new ToggleButton();
+        toggleButton.Location = new Point(navBar.Right, 40);
+        toggleButton.OnClick += UpdateToggleNavbar;
+        
 
         // for (int i = 0; i < buttonArray.Length; i++)
         // {
@@ -178,21 +194,18 @@ public class MyHome : Form
         navBar.OnSelect1Item += this.UpdateRightBottomHost;
         
         
-        
-        
         navListContainer.Controls.Add(navBar);
         
         // logout
-        var logout = new Panel
+        logout = new Panel
         {
             Dock = DockStyle.Bottom,
             BackColor = MyColor.GrayBackGround,
-            
             Height = 100,
         };
         var pathLog = Path.Combine(AppContext.BaseDirectory, "img", "dangxuat.svg");
         var iconLog = SvgDocument.Open(pathLog).Draw(25, 25);
-        var logoutButton = new Button
+        logoutButton = new Button
         {
             Text = "Đăng xuất",
             AutoSize = true,
@@ -213,6 +226,8 @@ public class MyHome : Form
         };
         logoutButton.FlatAppearance.BorderSize = 0;
         logout.Controls.Add(logoutButton);
+        
+        
         //taskbar
         var taskbar = new Panel
         {
@@ -324,7 +339,7 @@ public class MyHome : Form
         fullUserAccount.Location = new Point(30, 25);
         functionTopRightRight.Controls.Add(fullUserAccount);
         // border
-         parLeft.Padding = new Padding(10);
+         parLeft.Padding = new Padding(5);
          parRight.Padding = new Padding(10);
 
          // add
@@ -339,9 +354,11 @@ public class MyHome : Form
          rightBottomChange.Dock = DockStyle.Fill;
          rightBottomHost.Controls.Add(rightBottomChange);
          
+         Controls.Add(toggleButton);
+         
          left.Controls.Add(logo);
          left.Controls.Add(navListContainer);
-         left.Controls.Add(logout);
+         // left.Controls.Add(logout); 
         
          parLeft.Controls.Add(left);
          parRight.Controls.Add(right);
@@ -373,4 +390,60 @@ public class MyHome : Form
         rightBottomHost.Invalidate();
         rightBottomHost.Refresh();
     }
+
+    
+    public void UpdateToggleNavbar()
+    {
+        if (_isToggle)
+            UnToggleNavbar();
+        else
+            ToggleNavbar();
+        _isToggle = !_isToggle;
+    }
+
+    public void ToggleNavbar()
+    {
+        navBar.SuspendLayout();
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].Visible = false;
+            item.Dock = DockStyle.None;
+        }
+
+        logoPb.Size = new Size(40, 40);
+        logoText.Visible = false;
+
+        toggleButton.Location = new Point(left.Right, 40);
+        toggleButton.ChangeImg("toggle2.svg");
+        
+        // logout.Width = 40;
+        // logoutButton.Text = "";
+        
+        navBar.ResumeLayout();
+        navBar.Refresh();
+    }
+    
+    public void UnToggleNavbar()
+    {
+        navBar.SuspendLayout();
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].Visible = true;
+            item.Dock = DockStyle.Fill;
+        }
+        
+        logoPb.Size = new Size(70, 70);
+        logoText.Visible = true;
+        
+        toggleButton.Location = new Point(navBar.Right, 40);
+        toggleButton.ChangeImg("toggle.svg");
+        
+        // logoutButton.Text = "Đăng xuất";
+        // logoutButton.Width = 300;
+        
+        navBar.ResumeLayout();
+        navBar.Refresh();
+        
+    }
+
 }

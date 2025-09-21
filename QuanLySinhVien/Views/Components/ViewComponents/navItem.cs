@@ -24,15 +24,17 @@ public class NavItem : RoundTLP
 
     void Init()
     {
+        this.TopLeft = this.TopRight = this.BottomLeft = this.BottomRight = false;
         this.BackColor = MyColor.GrayBackGround;
-        Margin = new Padding(0, 5, 0, 0);
-        this.Padding = new Padding(0, 5, 5, 5);
+        this.Margin = new Padding(0, 5, 0, 0);
+        this.Padding = new Padding(0, 5, 0, 5);
         this.Dock = DockStyle.Fill;
         this.AutoSize = true;
         this.ColumnCount = 3;
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        this.Cursor = Cursors.Hand;
         try
         {
             if (Path.GetExtension(path).ToLower() != ".svg")
@@ -47,12 +49,13 @@ public class NavItem : RoundTLP
         Bitmap btm = svgDocument.Draw();
 
         tag.BackColor = MyColor.GrayBackGround;
-        tag.Size = new Size(5, 24);
-        tag.Margin = new Padding(0, 0, 0, 0);
+        tag.Size = new Size(5, 27);
+        tag.Margin = new Padding(0, 0, 5, 0);
         tag.Anchor = AnchorStyles.Left;
         
         PictureBox pb = new PictureBox
         {
+            Margin = new Padding(3, 3, 10, 3),
             Anchor = AnchorStyles.None,
             Size = new Size(20, 20),
             SizeMode = PictureBoxSizeMode.Zoom,
@@ -61,6 +64,7 @@ public class NavItem : RoundTLP
 
         Label content = new Label
         {
+            Margin = new Padding(0, 3, 3, 3),
             Anchor = AnchorStyles.None,
             Dock = DockStyle.Fill,
             AutoSize = true,

@@ -5,7 +5,7 @@ public class NavBar: TableLayoutPanel
     private String[] _labels;
     private String[] _imgText;
     
-    private List<NavItem> _buttonArray;
+    public List<NavItem> ButtonArray;
     //item đang được chọn
     public NavItem SelectedItem;
 
@@ -22,7 +22,7 @@ public class NavBar: TableLayoutPanel
             "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
             "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
         };
-        _buttonArray = new List<NavItem>();
+        ButtonArray = new List<NavItem>();
         this.Init();
     }
 
@@ -38,12 +38,12 @@ public class NavBar: TableLayoutPanel
         {
             NavItem navItem = new NavItem(i,_imgText[i] + ".svg", _labels[i]);
             navItem.OnClickThisItem += this.UpdateStatusNavBar;
-            _buttonArray.Add(navItem);
-            this.Controls.Add(_buttonArray[i]);
+            ButtonArray.Add(navItem);
+            this.Controls.Add(ButtonArray[i]);
         }
 
         //Mặc định item đầu được chọn
-        SelectedItem = _buttonArray[0];
+        SelectedItem = ButtonArray[0];
         SelectedItem.ChangeToSelectStatus();
     }
     
@@ -53,8 +53,8 @@ public class NavBar: TableLayoutPanel
         if (SelectedItem.Index != index)
         {
             SelectedItem.ChangeToNormalStatus();
-            _buttonArray[index].ChangeToSelectStatus();
-            SelectedItem = _buttonArray[index];
+            ButtonArray[index].ChangeToSelectStatus();
+            SelectedItem = ButtonArray[index];
             //call back ra MyHome
             OnSelect1Item?.Invoke(SelectedItem.Text);
         }
