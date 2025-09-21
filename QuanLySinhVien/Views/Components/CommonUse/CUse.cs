@@ -13,7 +13,7 @@ public class CUse
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             BackgroundColor = Color.White,
             BorderStyle = BorderStyle.Fixed3D,
-            Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
             RowHeadersVisible = false,
             GridColor = ColorTranslator.FromHtml("#2f4f4f"),
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,

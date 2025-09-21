@@ -46,7 +46,7 @@ public class MoDangKyHocPhan : Panel
         var textNavList = new Label
         {
             Text = "Mở đăng ký học phần",
-            Font = new Font("JetBrains Mono", 16f , FontStyle.Bold),
+            // Font = new Font("JetBrains Mono", 16f , FontStyle.Bold),
             Size = new Size(400, 40),
             Location = new Point(20 , 10),
         };
@@ -54,7 +54,7 @@ public class MoDangKyHocPhan : Panel
         var textHk = new Label
         {
             Text = "Học Kỳ:",
-            Font = new Font("JetBrains Mono", 12f , FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 12f , FontStyle.Regular),
             Size = new Size(100, 60),
             Margin = new Padding(0, 12, 8, 0)
         };
@@ -63,7 +63,7 @@ public class MoDangKyHocPhan : Panel
         {
             DropDownStyle = ComboBoxStyle.DropDown,
             AutoCompleteMode = AutoCompleteMode.SuggestAppend,
-            Font = new Font("JetBrains Mono", 10f),
+            // Font = new Font("JetBrains Mono", 10f),
             Size = new Size(300, 0),
             DrawMode = DrawMode.Normal,
             Margin = new Padding(0, 12, 8, 0),
@@ -103,7 +103,7 @@ public class MoDangKyHocPhan : Panel
             Location = new Point(1040, 60),
             TextAlign = ContentAlignment.MiddleLeft,
             Padding = new Padding(8, 0, 0, 0),
-            Font = new Font("JetBrains Mono", 10f , FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 10f , FontStyle.Regular),
         };
         btnAdd.ImageAlign = ContentAlignment.MiddleLeft;
         btnAdd.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -112,7 +112,7 @@ public class MoDangKyHocPhan : Panel
         var textClmdk = new Label()
         {
             Text = "Các lớp mở đăng ký",
-            Font = new Font("JetBrains Mono", 10f , FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 10f , FontStyle.Regular),
             Location = new Point(20 , 80),
             Size = new Size(200, 40),
         };
@@ -282,7 +282,7 @@ public class MoDangKyHocPhan : Panel
             BackColor = ColorTranslator.FromHtml("#07689F"),
             ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
             //ForeColor = Color.White,
-            Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
+            // Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
     }

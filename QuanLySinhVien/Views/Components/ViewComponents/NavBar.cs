@@ -1,27 +1,28 @@
-using System.Drawing.Printing;
-
 namespace QuanLySinhVien.Views.Components.ViewComponents;
 
 public class NavBar: TableLayoutPanel
 {
-    private String[] labels;
-    private String[] imgText;
+    private String[] _labels;
+    private String[] _imgText;
     
-    private List<NavItem> buttonArray = new List<NavItem>();
+    private List<NavItem> _buttonArray;
     //item đang được chọn
-    private NavItem selectedItem;
+    public NavItem SelectedItem;
+
+    public event Action<String> OnSelect1Item;
     public NavBar()
     {
-        labels = new[]
+        _labels = new[]
         {
             "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học",
             "Tổ chức thi", "Nhập điểm", "Học phí", "Mở đăng ký học phần", "Quản lí tài khoản", "Phân quyền", "Thống kê"
         };
-        imgText = new[]
+        _imgText = new[]
         {
             "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
             "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
         };
+        _buttonArray = new List<NavItem>();
         this.Init();
     }
 
@@ -33,27 +34,29 @@ public class NavBar: TableLayoutPanel
         Margin = new Padding(0);
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
-        for (int i = 0; i < labels.Length; i++)
+        for (int i = 0; i < _labels.Length; i++)
         {
-            NavItem navItem = new NavItem(i,imgText[i] + ".svg", labels[i]);
+            NavItem navItem = new NavItem(i,_imgText[i] + ".svg", _labels[i]);
             navItem.OnClickThisItem += this.UpdateStatusNavBar;
-            buttonArray.Add(navItem);
-            this.Controls.Add(buttonArray[i]);
+            _buttonArray.Add(navItem);
+            this.Controls.Add(_buttonArray[i]);
         }
 
         //Mặc định item đầu được chọn
-        selectedItem = buttonArray[0];
-        selectedItem.ChangeToSelectStatus();
+        SelectedItem = _buttonArray[0];
+        SelectedItem.ChangeToSelectStatus();
     }
     
     //Hàm được gọi call back để caapj nhật lại item được chonj mỗi khi 1 item đươc click
     void UpdateStatusNavBar(int index)
     {
-        if (selectedItem.Index != index)
+        if (SelectedItem.Index != index)
         {
-            selectedItem.ChangeToNormalStatus();
-            buttonArray[index].ChangeToSelectStatus();
-            selectedItem = buttonArray[index];
+            SelectedItem.ChangeToNormalStatus();
+            _buttonArray[index].ChangeToSelectStatus();
+            SelectedItem = _buttonArray[index];
+            //call back ra MyHome
+            OnSelect1Item?.Invoke(SelectedItem.Text);
         }
     }
 }

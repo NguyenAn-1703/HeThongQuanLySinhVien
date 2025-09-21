@@ -14,6 +14,10 @@ public class MyHome : Form
     private int IndexButton = 0;
     private string ButtonClickNavList = "";
     private NavListController navListController = new NavListController();
+    //Trang bắt đầu
+    Panel rightBottomChange = new TrangChu();
+    private Panel rightBottomHost;
+    
     public MyHome()
     {
         Init();
@@ -67,15 +71,11 @@ public class MyHome : Form
             Dock = DockStyle.Top,
             Height = 100,
         };
-        var rightBottomHost = new Panel
+        rightBottomHost = new Panel
         {
             Dock = DockStyle.Fill,
         };
-        /* TODO: rightBottomChange = new TrangChu() hay 1 thành phần nào đó được button click
-         * vậy thì trong cái button phải lưu trử 1 cái gì đó để truy xuất đến được <Button text = Trang Chủ -> TrangChu>
-         * 
-         */
-        Panel rightBottomChange = new TrangChu();
+        
         // left panel
         var left = new TableLayoutPanel()
         {
@@ -128,14 +128,6 @@ public class MyHome : Form
         
         logo.Controls.Add(logoPb);
         logo.Controls.Add(logoText);
-
-        // navList 
-        // var navList = new TableLayoutPanel()
-        // {
-        //     BackColor = MyColor.GrayBackGround,
-        //     AutoSize = true,
-        //     ColumnCount = 1,
-        // };
         
         NavBar navBar = new NavBar();
         
@@ -145,57 +137,7 @@ public class MyHome : Form
             AutoSize = true,
             Padding = new Padding(0, 15, 0, 0)
         };
-        
-        
-        // navList.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        //
-        // var labels = new[]
-        // {
-        //     "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học",
-        //     "Tổ chức thi", "Nhập điểm", "Học phí", "Mở đăng ký học phần", "Quản lí tài khoản", "Phân quyền", "Thống kê"
-        // };
-        // var imgText = new[]
-        // {
-        //     "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
-        //     "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
-        // };
-        // NavItem[] buttonArray = new NavItem[labels.Length];
-        //
-        // for (int i = 0; i < labels.Length; i++)
-        // {
-        //     NavItem navItem = new NavItem(imgText[i] + ".svg", labels[i]);
-        //     buttonArray[i] = navItem;
-        //     navList.Controls.Add(buttonArray[i]);
-        // }
-        
-        
-        
-        // for (int i = 0; i < labels.Length; i++)
-        // {
-        //     var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
-        //     var icon = SvgDocument.Open(svgPath).Draw(20, 20);
-        //     var btn = new RoundButton
-        //     {
-        //         Text = labels[i], 
-        //         AutoSize = false, 
-        //         Height = 40, 
-        //         Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
-        //         // Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
-        //         // Dock = DockStyle.Top,
-        //         Width = 250,
-        //         TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(12,0,0,0), 
-        //         Margin = new Padding(0,5,0,0), 
-        //         FlatStyle = FlatStyle.Flat
-        //     };
-        //     btn.FlatAppearance.BorderSize = 0;
-        //     btn.Image = icon;
-        //     btn.ImageAlign = ContentAlignment.MiddleLeft;  
-        //     btn.TextImageRelation = TextImageRelation.ImageBeforeText;
-        //     navList.Controls.Add(btn);
-        //     buttonArray[i] = btn;
-        // }
-        //
-        // buttonArray[0].BackColor = MyColor.Gray;
+
         // for (int i = 0; i < buttonArray.Length; i++)
         // {
         //     int pos = i;
@@ -206,24 +148,39 @@ public class MyHome : Form
         //         buttonArray[IndexButton].BackColor = MyColor.Gray;
         //         ButtonClickNavList = buttonArray[IndexButton].Text;
         //         Console.WriteLine(ButtonClickNavList);
+        
         //         rightBottomHost.SuspendLayout();
         //         rightBottomHost.Controls.Clear();
+        
         //         String change = navListController.getDataButton(ButtonClickNavList);
+        
         //         Console.WriteLine(change);
+        
         //         rightBottomChange = navListController.update(change);
         //         if (rightBottomChange != null)
         //         {
         //             rightBottomChange.Dock = DockStyle.Fill;
         //             rightBottomHost.Controls.Add(rightBottomChange);
         //         }
+        
         //         rightBottomHost.ResumeLayout(true);
         //         rightBottomHost.Invalidate();
         //         rightBottomHost.Refresh();
         //     };
         // }
         
+        /* TODO: rightBottomChange = new TrangChu() hay 1 thành phần nào đó được button click
+         * vậy thì trong cái button phải lưu trử 1 cái gì đó để truy xuất đến được <Button text = Trang Chủ -> TrangChu>
+         *
+         */
+        
+        //set Panel bên phải
+        navBar.OnSelect1Item += this.UpdateRightBottomHost;
+        
+        
+        
+        
         navListContainer.Controls.Add(navBar);
-
         
         // logout
         var logout = new Panel
@@ -393,9 +350,27 @@ public class MyHome : Form
          mainLayout.Controls.Add(parRight);
          Controls.Add(mainLayout);
         
-         // Console.WriteLine("Kích thước rộng left: " + left.Width);
-        
          ResumeLayout(performLayout: true);
         
+    }
+    public void UpdateRightBottomHost(string function)
+    {
+        rightBottomHost.SuspendLayout();
+        rightBottomHost.Controls.Clear();
+        
+        String change = navListController.getDataButton(function);
+        
+        Console.WriteLine(change);
+        
+        rightBottomChange = navListController.update(change);
+        if (rightBottomChange != null)
+        {
+            rightBottomChange.Dock = DockStyle.Fill;
+            rightBottomHost.Controls.Add(rightBottomChange);
+        }
+        
+        rightBottomHost.ResumeLayout(true);
+        rightBottomHost.Invalidate();
+        rightBottomHost.Refresh();
     }
 }

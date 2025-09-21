@@ -43,7 +43,7 @@ public class NhapDiem : Panel
         var textNavList = new Label
         {
             Text = "Nhập Điểm",
-            Font = new Font("JetBrains Mono", 16f , FontStyle.Bold),
+            // Font = new Font("JetBrains Mono", 16f , FontStyle.Bold),
             Size = new Size(200, 40),
             Location = new Point(20 , 10),
             UseCompatibleTextRendering = false,
@@ -53,13 +53,13 @@ public class NhapDiem : Panel
         var textHp = new Label
         {
             Text = "Học phần",
-            Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
             Width = 120,
             Dock = DockStyle.Left,
         };
         var textBoxHp = new TextBox
         {
-            Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
             Dock = DockStyle.Right,
             Width = 250,
         };
@@ -77,14 +77,14 @@ public class NhapDiem : Panel
         var textLop = new Label
         {
             Text = "Lớp",
-            Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
             Width = 80,
             Dock = DockStyle.Left,
         };
 
         var textBoxLop = new TextBox
         {   
-            Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
+            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
             Dock = DockStyle.Right,
             Width = 240,
         };
@@ -179,7 +179,7 @@ public class NhapDiem : Panel
             BackColor = ColorTranslator.FromHtml("#07689F"),
             ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
             //ForeColor = Color.White,
-            Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
+            // Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
     }

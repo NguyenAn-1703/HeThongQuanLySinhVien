@@ -29,10 +29,10 @@ public class RoundTLP : TableLayoutPanel
             if(TopRight) path.AddArc(rect.Right - BorderRadius, rect.Y, BorderRadius, BorderRadius, 270, 90);
             else path.AddLine(rect.Right, rect.Y, rect.Right, rect.Y);
             
-            if(BottomRight) path.AddArc(rect.Right - BorderRadius , rect.Bottom - BorderRadius, BorderRadius, BorderRadius, 0, 90);
+            if(BottomRight) path.AddArc(rect.Right - BorderRadius, rect.Bottom - BorderRadius, BorderRadius, BorderRadius, 0, 90);
             else path.AddLine(rect.Right, rect.Bottom, rect.Right, rect.Bottom);
             
-            if(BottomLeft) path.AddArc(rect.X, rect.Bottom - BorderRadius, BorderRadius, BorderRadius, 90, 90);
+            if(BottomLeft) path.AddArc(rect.X, rect.Bottom - BorderRadius - 1, BorderRadius, BorderRadius, 90, 90);
             else path.AddLine(rect.X, rect.Bottom, rect.X, rect.Bottom);
             
             path.CloseFigure();

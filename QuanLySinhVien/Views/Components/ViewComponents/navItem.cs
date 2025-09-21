@@ -8,7 +8,7 @@ public class NavItem : RoundTLP
     public int Index { get; set; }
     public Boolean IsSelected { get; set; } = false;
     private String path { get; set; }
-    private String text { get; set; }
+    public String Text { get; set; }
 
     public event Action<int> OnClickThisItem;
     
@@ -18,7 +18,7 @@ public class NavItem : RoundTLP
     {
         this.Index = index;        
         this.path = Path.Combine(AppContext.BaseDirectory, "img", path);
-        this.text = text;
+        this.Text = text;
         this.Init();
     }
 
@@ -47,7 +47,7 @@ public class NavItem : RoundTLP
         Bitmap btm = svgDocument.Draw();
 
         tag.BackColor = MyColor.GrayBackGround;
-        tag.Size = new Size(7, 24);
+        tag.Size = new Size(5, 24);
         tag.Margin = new Padding(0, 0, 0, 0);
         tag.Anchor = AnchorStyles.Left;
         
@@ -64,7 +64,7 @@ public class NavItem : RoundTLP
             Anchor = AnchorStyles.None,
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Text = this.text,
+            Text = this.Text,
             Font = new GetFont.GetFont().GetMainFont(14, FontType.SemiBold)
         };
         

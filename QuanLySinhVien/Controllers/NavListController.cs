@@ -28,6 +28,7 @@ public class NavListController
         buttonClickTrans["Thống kê"] = "ThongKe";
         buttonClickTrans["Chương trình đào tạo"] = "ChuongTrinhDaoTao";
     }
+    
     public String getDataButton(string key)
     {
         if (!buttonClickTrans.ContainsKey(key))
