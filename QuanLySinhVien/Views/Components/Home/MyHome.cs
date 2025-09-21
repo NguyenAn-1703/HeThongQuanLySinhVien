@@ -196,39 +196,10 @@ public class MyHome : Form
         
         navListContainer.Controls.Add(navBar);
         
-        // logout
-        // logout = new Panel
-        // {
-        //     Dock = DockStyle.Bottom,
-        //     BackColor = MyColor.GrayBackGround,
-        //     Height = 100,
-        // };
-        // var pathLog = Path.Combine(AppContext.BaseDirectory, "img", "dangxuat.svg");
-        // var iconLog = SvgDocument.Open(pathLog).Draw(25, 25);
-        // logoutButton = new Button
-        // {
-        //     Text = "Đăng xuất",
-        //     AutoSize = true,
-        //     BackColor = MyColor.Red,
-        //     Height = 40,
-        //     Width = 300,
-        //     Font =  new GetFont.GetFont().GetMainFont(14, FontType.Regular),
-        //     FlatStyle = FlatStyle.Flat,
-        //     Image = iconLog,
-        //     ImageAlign = ContentAlignment.MiddleLeft,
-        //     TextImageRelation = TextImageRelation.ImageBeforeText,
-        //     Cursor = Cursors.Hand,
-        //     Anchor = AnchorStyles.None
-        // };
-        // logoutButton.Click += (s, e) =>
-        // {
-        //     this.Dispose();
-        // };
-        // logoutButton.FlatAppearance.BorderSize = 0;
-        // logout.Controls.Add(logoutButton);
+        
         
         logoutButton = new logoutButton();
-        
+        logoutButton.OnClick += LogOut;
         
         //taskbar
         var taskbar = new Panel
@@ -372,6 +343,8 @@ public class MyHome : Form
          ResumeLayout(performLayout: true);
         
     }
+    
+    //update xem item nào được chọn
     public void UpdateRightBottomHost(string function)
     {
         rightBottomHost.SuspendLayout();
@@ -387,12 +360,15 @@ public class MyHome : Form
             rightBottomChange.Dock = DockStyle.Fill;
             rightBottomHost.Controls.Add(rightBottomChange);
         }
-        
         rightBottomHost.ResumeLayout(true);
         rightBottomHost.Invalidate();
         rightBottomHost.Refresh();
     }
 
+    public void LogOut()
+    {
+        this.Dispose();
+    }
     
     public void UpdateToggleNavbar()
     {
