@@ -130,86 +130,99 @@ public class MyHome : Form
         logo.Controls.Add(logoText);
 
         // navList 
-        var navList = new TableLayoutPanel()
-        {
-            BackColor = MyColor.GrayBackGround,
-            AutoSize = true,
-            ColumnCount = 1,
-        };
+        // var navList = new TableLayoutPanel()
+        // {
+        //     BackColor = MyColor.GrayBackGround,
+        //     AutoSize = true,
+        //     ColumnCount = 1,
+        // };
         
+        NavBar navBar = new NavBar();
         
         var navListContainer = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
+            AutoSize = true,
+            Padding = new Padding(0, 15, 0, 0)
         };
         
         
-        navList.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        // navList.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        //
+        // var labels = new[]
+        // {
+        //     "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học",
+        //     "Tổ chức thi", "Nhập điểm", "Học phí", "Mở đăng ký học phần", "Quản lí tài khoản", "Phân quyền", "Thống kê"
+        // };
+        // var imgText = new[]
+        // {
+        //     "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
+        //     "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
+        // };
+        // NavItem[] buttonArray = new NavItem[labels.Length];
+        //
+        // for (int i = 0; i < labels.Length; i++)
+        // {
+        //     NavItem navItem = new NavItem(imgText[i] + ".svg", labels[i]);
+        //     buttonArray[i] = navItem;
+        //     navList.Controls.Add(buttonArray[i]);
+        // }
         
-        var labels = new[]
-        {
-            "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học",
-            "Tổ chức thi", "Nhập điểm", "Học phí", "Mở đăng ký học phần", "Quản lí tài khoản", "Phân quyền", "Thống kê"
-        };
-        var imgText = new[]
-        {
-            "trangchu" , "sinhvien" , "giangvien" , "khoa" , "nganh" , "chuongtrinhdaotao" , "hocphan" , "phonghoc",
-            "tochucthi" , "nhapdiem" , "hocphi" , "modangkyhocphan" , "sinhvien" , "phanquyen" , "thongke"
-        };
-        RoundButton[] buttonArray = new RoundButton[labels.Length];
-        for (int i = 0; i < labels.Length; i++)
-        {
-            var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
-            var icon = SvgDocument.Open(svgPath).Draw(20, 20);
-            var btn = new RoundButton
-            {
-                Text = labels[i], 
-                AutoSize = false, 
-                Height = 40, 
-                Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
-                // Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
-                // Dock = DockStyle.Top,
-                Width = 250,
-                TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(12,0,0,0), 
-                Margin = new Padding(0,5,0,0), 
-                FlatStyle = FlatStyle.Flat
-            };
-            btn.FlatAppearance.BorderSize = 0;
-            btn.Image = icon;
-            btn.ImageAlign = ContentAlignment.MiddleLeft;  
-            btn.TextImageRelation = TextImageRelation.ImageBeforeText;
-            navList.Controls.Add(btn);
-            buttonArray[i] = btn;
-        }
         
-        buttonArray[0].BackColor = MyColor.Gray;
-        for (int i = 0; i < buttonArray.Length; i++)
-        {
-            int pos = i;
-            buttonArray[pos].Click += (s, e) =>
-            {
-                buttonArray[IndexButton].BackColor = Color.Transparent;
-                IndexButton = pos;
-                buttonArray[IndexButton].BackColor = MyColor.Gray;
-                ButtonClickNavList = buttonArray[IndexButton].Text;
-                Console.WriteLine(ButtonClickNavList);
-                rightBottomHost.SuspendLayout();
-                rightBottomHost.Controls.Clear();
-                String change = navListController.getDataButton(ButtonClickNavList);
-                Console.WriteLine(change);
-                rightBottomChange = navListController.update(change);
-                if (rightBottomChange != null)
-                {
-                    rightBottomChange.Dock = DockStyle.Fill;
-                    rightBottomHost.Controls.Add(rightBottomChange);
-                }
-                rightBottomHost.ResumeLayout(true);
-                rightBottomHost.Invalidate();
-                rightBottomHost.Refresh();
-            };
-        }
         
-        navListContainer.Controls.Add(navList);
+        // for (int i = 0; i < labels.Length; i++)
+        // {
+        //     var svgPath = Path.Combine(AppContext.BaseDirectory, "img", imgText[i] + ".svg");
+        //     var icon = SvgDocument.Open(svgPath).Draw(20, 20);
+        //     var btn = new RoundButton
+        //     {
+        //         Text = labels[i], 
+        //         AutoSize = false, 
+        //         Height = 40, 
+        //         Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
+        //         // Width = navList.ClientSize.Width - navList.Padding.Horizontal, 
+        //         // Dock = DockStyle.Top,
+        //         Width = 250,
+        //         TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(12,0,0,0), 
+        //         Margin = new Padding(0,5,0,0), 
+        //         FlatStyle = FlatStyle.Flat
+        //     };
+        //     btn.FlatAppearance.BorderSize = 0;
+        //     btn.Image = icon;
+        //     btn.ImageAlign = ContentAlignment.MiddleLeft;  
+        //     btn.TextImageRelation = TextImageRelation.ImageBeforeText;
+        //     navList.Controls.Add(btn);
+        //     buttonArray[i] = btn;
+        // }
+        //
+        // buttonArray[0].BackColor = MyColor.Gray;
+        // for (int i = 0; i < buttonArray.Length; i++)
+        // {
+        //     int pos = i;
+        //     buttonArray[pos].Click += (s, e) =>
+        //     {
+        //         buttonArray[IndexButton].BackColor = Color.Transparent;
+        //         IndexButton = pos;
+        //         buttonArray[IndexButton].BackColor = MyColor.Gray;
+        //         ButtonClickNavList = buttonArray[IndexButton].Text;
+        //         Console.WriteLine(ButtonClickNavList);
+        //         rightBottomHost.SuspendLayout();
+        //         rightBottomHost.Controls.Clear();
+        //         String change = navListController.getDataButton(ButtonClickNavList);
+        //         Console.WriteLine(change);
+        //         rightBottomChange = navListController.update(change);
+        //         if (rightBottomChange != null)
+        //         {
+        //             rightBottomChange.Dock = DockStyle.Fill;
+        //             rightBottomHost.Controls.Add(rightBottomChange);
+        //         }
+        //         rightBottomHost.ResumeLayout(true);
+        //         rightBottomHost.Invalidate();
+        //         rightBottomHost.Refresh();
+        //     };
+        // }
+        
+        navListContainer.Controls.Add(navBar);
 
         
         // logout
@@ -379,11 +392,12 @@ public class MyHome : Form
          mainLayout.Controls.Add(parLeft);
          mainLayout.Controls.Add(parRight);
          Controls.Add(mainLayout);
-         
-        MessageBox.Show($"nav list contaier width: {navListContainer.Width}");
-        MessageBox.Show($"nav list width: {navList.Width}");
         
-        ResumeLayout(performLayout: true);
+         Console.WriteLine("Kích thước rộng left: " + left.Width);
+         Console.WriteLine("Kích thước rộng navbarcontainer: " + navListContainer.Width);
+         Console.WriteLine("Kích thươớc rộng của navBar : " + navBar.Width);
+        
+         ResumeLayout(performLayout: true);
         
     }
 }

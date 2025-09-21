@@ -15,5 +15,6 @@ public static class MyColor
     public static Color MainColor = ColorTranslator.FromHtml("#07689F");
     public static Color GrayBackGround = ColorTranslator.FromHtml("#E5E7EB");
     public static Color GraySelectColor = ColorTranslator.FromHtml("#B0BEC5");
+    public static Color GrayHoverColor = ColorTranslator.FromHtml("#CFD5E2");
     public static Color Red = ColorTranslator.FromHtml("#F87171");
 }

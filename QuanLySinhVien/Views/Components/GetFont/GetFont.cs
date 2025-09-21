@@ -13,6 +13,9 @@ public class GetFont
             case FontType.Regular:
                 pfc.AddFontFile("font/Montserrat-Regular.ttf");
                 break;
+            case FontType.SemiBold:
+                pfc.AddFontFile("font/Montserrat-SemiBold.ttf");
+                break;
             case FontType.Bold:
                 pfc.AddFontFile("font/Montserrat-Bold.ttf");
                 break;
