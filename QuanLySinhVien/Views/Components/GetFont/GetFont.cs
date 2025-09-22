@@ -5,29 +5,52 @@ namespace QuanLySinhVien.Views.Components.GetFont;
 
 public class GetFont
 {
-    public Font GetMainFont(int size, FontType type)
+    static PrivateFontCollection pfc = new PrivateFontCollection();
+    static GetFont()
     {
-        PrivateFontCollection pfc = new PrivateFontCollection();
+        try
+        {
+            pfc.AddFontFile("font/Montserrat-Regular.ttf");
+            pfc.AddFontFile("font/Montserrat-SemiBold.ttf");
+            pfc.AddFontFile("font/Montserrat-ExtraBold.ttf");
+            pfc.AddFontFile("font/Montserrat-Black.ttf");
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
+
+        for (int i = 0; i < 4; i++)
+        {
+            Console.WriteLine(pfc.Families[i].Name);
+        }
+    }
+    static public Font GetMainFont(float size, FontType type)
+    {
+        
+        Font font;
         switch (type)
         {
             case FontType.Regular:
-                pfc.AddFontFile("font/Montserrat-Regular.ttf");
+                font = new Font(pfc.Families[0], size, FontStyle.Regular);;
                 break;
             case FontType.SemiBold:
-                pfc.AddFontFile("font/Montserrat-SemiBold.ttf");
+                font = new Font(pfc.Families[3], size, FontStyle.Regular);;
                 break;
             case FontType.Bold:
-                pfc.AddFontFile("font/Montserrat-Bold.ttf");
+                font = new Font(pfc.Families[0], size, FontStyle.Bold);;
                 break;
             case FontType.ExtraBold:
-                pfc.AddFontFile("font/Montserrat-ExtraBold.ttf");
+                font = new Font(pfc.Families[2], size, FontStyle.Regular);;
                 break;
             case FontType.Black:
-                pfc.AddFontFile("font/Montserrat-Black.ttf");
+                font = new Font(pfc.Families[1], size, FontStyle.Regular);;
                 break;
-            default: return null;
+            default: throw new Exception("Font type not supported");
         }
-        Font font = new Font(pfc.Families[0], size, FontStyle.Regular, GraphicsUnit.Pixel);
         return font;
     }
+
+ 
 }
