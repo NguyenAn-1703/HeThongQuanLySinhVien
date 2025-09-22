@@ -29,7 +29,7 @@ public class MyHome : Form
     private Panel parLeft;
     private TableLayoutPanel left;
     private Panel logout;
-    private logoutButton logoutButton;
+    private LogoutButton logoutButton;
     
     public MyHome()
     {
@@ -129,11 +129,12 @@ public class MyHome : Form
         logoText = new Label
         {
             Text = "Sài Gòn University",
-            Font = new GetFont.GetFont().GetMainFont(20, FontType.Black),
+            Font = GetFont.GetFont.GetMainFont(13, FontType.Black),
             ForeColor = ColorTranslator.FromHtml("#07689F"),
             BackColor = Color.Transparent,
             BorderStyle = BorderStyle.None,
             AutoSize = true,
+            Anchor = AnchorStyles.None
         };
         
         logo.Controls.Add(logoPb);
@@ -154,6 +155,7 @@ public class MyHome : Form
         toggleButton.OnClick += UpdateToggleNavbar;
         
 
+        
         // for (int i = 0; i < buttonArray.Length; i++)
         // {
         //     int pos = i;
@@ -198,7 +200,7 @@ public class MyHome : Form
         
         
         
-        logoutButton = new logoutButton();
+        logoutButton = new LogoutButton();
         logoutButton.OnClick += LogOut;
         
         //taskbar

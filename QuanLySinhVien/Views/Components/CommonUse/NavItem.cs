@@ -69,7 +69,7 @@ public class NavItem : RoundTLP
             Dock = DockStyle.Fill,
             AutoSize = true,
             Text = this.Text,
-            Font = new GetFont.GetFont().GetMainFont(14, FontType.SemiBold)
+            Font = GetFont.GetFont.GetMainFont(10, FontType.SemiBold)
         };
         
         this.Controls.Add(tag);

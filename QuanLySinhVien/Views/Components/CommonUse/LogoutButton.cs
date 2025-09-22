@@ -2,10 +2,10 @@ using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.ViewComponents;
 
-public class logoutButton : RoundTLP
+public class LogoutButton : RoundTLP
 {
     public event Action OnClick;
-    public logoutButton()
+    public LogoutButton()
     {
         Init();
 
@@ -34,7 +34,7 @@ public class logoutButton : RoundTLP
         {
             Dock = DockStyle.Fill,
             Text = "Đăng xuất",
-            Font = new GetFont.GetFont().GetMainFont(17, FontType.SemiBold),
+            Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
         };
         
         this.Controls.Add(pb);

@@ -1,3 +1,5 @@
+using QuanLySinhVien.Views.Enums;
+
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CUse
@@ -14,6 +16,7 @@ public class CUse
             BackgroundColor = Color.White,
             BorderStyle = BorderStyle.Fixed3D,
             // Font = new Font("JetBrains Mono", 10f, FontStyle.Regular),
+            // Font = new GetFont.GetFont().GetMainFont(10, FontType.Regular),
             RowHeadersVisible = false,
             GridColor = ColorTranslator.FromHtml("#2f4f4f"),
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
@@ -25,4 +28,9 @@ public class CUse
             AllowUserToResizeRows = false,
         };
     }
+
+    // public DataGridView GetTable(String[], )
+    // {
+    //     
+    // }
 }
