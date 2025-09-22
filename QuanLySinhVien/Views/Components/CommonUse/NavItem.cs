@@ -27,7 +27,7 @@ public class NavItem : RoundTLP
         this.TopLeft = this.TopRight = this.BottomLeft = this.BottomRight = false;
         this.BackColor = MyColor.GrayBackGround;
         this.Margin = new Padding(0, 5, 0, 0);
-        this.Padding = new Padding(0, 5, 0, 5);
+        // this.Padding = new Padding(0, 5, 0, 5);
         this.Dock = DockStyle.Fill;
         this.AutoSize = true;
         this.ColumnCount = 3;

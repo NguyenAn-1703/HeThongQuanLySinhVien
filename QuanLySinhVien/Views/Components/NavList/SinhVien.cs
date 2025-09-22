@@ -1,7 +1,10 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+
 namespace QuanLySinhVien.Views.Components;
 
 public class SinhVien : Panel
 {
+    private String[] columns;
     public SinhVien()
     {
         Init();
@@ -43,6 +46,7 @@ public class SinhVien : Panel
             BackColor = Color.Pink,
             Height = 780,
         };
+        mainBot.Controls.Add(new CUse().GetTable(new String[] { "SinhVien" }));
         return mainBot;
     }
     
