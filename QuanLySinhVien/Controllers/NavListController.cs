@@ -67,7 +67,7 @@ public class NavListController
         }
         else if (s.Equals("Nganh"))
         {
-            ans = new Nganh();
+            ans = new NganhPanel();
         }
         else if (s.Equals("PhongHoc"))
         {
