@@ -15,7 +15,6 @@ static class Program
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
         
-        
         // using (InstalledFontCollection fontsCollection = new InstalledFontCollection())
         // {
         //     foreach (var family in fontsCollection.Families)
@@ -23,10 +22,7 @@ static class Program
         //         Console.WriteLine(family.Name);
         //     }
         // }
-
         
         Application.Run(new FLogin());
-        
-        
     }
 }
