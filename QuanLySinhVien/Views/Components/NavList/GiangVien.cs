@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class GiangVien : Panel
+public class GiangVien : NavBase
 {
     public GiangVien()
     {
@@ -42,5 +44,10 @@ public class GiangVien : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

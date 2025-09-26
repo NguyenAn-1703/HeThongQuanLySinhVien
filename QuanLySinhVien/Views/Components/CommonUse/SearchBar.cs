@@ -7,9 +7,12 @@ public class SearchBar: TableLayoutPanel
 {
     // private TextBox _searchBox;
     private ComboBox Filter;
+
+    private List<String> listSelection;
     
     public SearchBar()
     {
+        listSelection = new List<string>();
         Init();
     }
 
@@ -79,5 +82,16 @@ public class SearchBar: TableLayoutPanel
         ComboBox filter = new ComboBox();
         filter.Margin = new Padding(10, 35, 10, 0);
         return filter;
+    }
+
+    public void UpdateListCombobox(List<String> list)
+    {
+        this.listSelection = list;
+        this.Filter.Items.Clear();
+        
+        foreach (string i in  listSelection)
+        {
+            this.Filter.Items.Add(i);
+        }
     }
 }

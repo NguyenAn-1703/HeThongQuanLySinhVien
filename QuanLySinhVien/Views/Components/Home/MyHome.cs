@@ -9,6 +9,7 @@ using QuanLySinhVien.Views.Enums;
 using System.Windows.Forms;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
 using Timer = System.Windows.Forms.Timer;
 
 namespace QuanLySinhVien.Views.Components.Home;
@@ -19,7 +20,7 @@ public class MyHome : Form
     private string ButtonClickNavList = "";
     private NavListController navListController = new NavListController();
     //Trang bắt đầu
-    Panel rightBottomChange = new TrangChu();
+    NavBase rightBottomChange = new TrangChu();
     private Panel rightBottomHost;
     private NavBar navBar;
     //Cho phan thu gon navbar
@@ -138,7 +139,7 @@ public class MyHome : Form
          */
         
         //set Panel bên trái
-        navBar.OnSelect1Item += this.UpdateRightBottomHost;
+        navBar.OnSelect1Item += this.OnChangeItemNavBar;
         navListContainer.Controls.Add(navBar);
         
         logoutButton = new LogoutButton();
@@ -182,8 +183,6 @@ public class MyHome : Form
         //     SelectedText = "Lọc",
         // };
         // filter.Items.AddRange(comboList);
-        
-
         
         var parRight = new TableLayoutPanel     //////////////////////ddang lamf
         {
@@ -235,8 +234,7 @@ public class MyHome : Form
          
          parRight.Controls.Add(rightTop);
          parRight.Controls.Add(rightBottomHost);
-
-         
+        
          Controls.Add(toggleButton);
          
          left.Controls.Add(logo);
@@ -253,18 +251,24 @@ public class MyHome : Form
         
     }
     
-    //update xem item nào được chọn
-    public void UpdateRightBottomHost(string function)
+    //update khi 1 item khác được chọn
+    public void OnChangeItemNavBar(string function)
+    {
+        ChangePanel(function);
+        UpdateSearchCombobox(function);
+    }
+    
+    //Đổi rightbottom sang bảng chức năng khác
+    void ChangePanel(string function)
     {
         rightBottomHost.SuspendLayout();
         rightBottomHost.Controls.Clear();
         
         String change = navListController.getDataButton(function);
-        
         Console.WriteLine(change);
-        
         rightBottomChange = navListController.update(change);
         Console.WriteLine(rightBottomChange);
+        
         rightBottomChange.Dock = DockStyle.Fill;
         rightBottomHost.Controls.Add(rightBottomChange);
         rightBottomHost.ResumeLayout(true);
@@ -272,61 +276,18 @@ public class MyHome : Form
         rightBottomHost.Refresh();
     }
 
+    void UpdateSearchCombobox(string function)
+    {
+        String change = navListController.getDataButton(function);
+        rightBottomChange = navListController.update(change);
+        
+        
+        
+    }
+
     public void LogOut()
     {
         this.Dispose();
-    }
-    
-    public void UpdateToggleNavbar()
-    {
-        if (_isToggle)
-            UnToggleNavbar();
-        else
-            ToggleNavbar();
-        _isToggle = !_isToggle;
-    }
-
-    public void ToggleNavbar()
-    {
-        navBar.SuspendLayout();
-        foreach(NavItem item in navBar.ButtonArray)
-        {
-            item.Controls[2].Visible = false;
-            item.Dock = DockStyle.None;
-        }
-
-        logoPb.Size = new Size(40, 40);
-        logoText.Visible = false;
-
-        toggleButton.Location = new Point(logoPb.Location.X + 20, 40);
-        toggleButton.ChangeImg("toggle2.svg");
-        
-        logoutButton.Controls[1].Visible = false;
-        
-        navBar.ResumeLayout();
-        navBar.Refresh();
-    }
-    
-    public void UnToggleNavbar()
-    {
-        navBar.SuspendLayout();
-        foreach(NavItem item in navBar.ButtonArray)
-        {
-            item.Controls[2].Visible = true;
-            item.Dock = DockStyle.Fill;
-        }
-        
-        logoPb.Size = new Size(70, 70);
-        logoText.Visible = true;
-        
-        toggleButton.Location = new Point(logoPb.Location.X + 130, 40);
-        toggleButton.ChangeImg("toggle.svg");
-        
-        logoutButton.Controls[1].Visible = true;
-        
-        navBar.ResumeLayout();
-        navBar.Refresh();
-        
     }
 
     TableLayoutPanel getAcountInfo()
@@ -383,6 +344,58 @@ public class MyHome : Form
         AccountInfo.Controls.Add(textAccount);
         
         return AccountInfo;
+    }
+    
+    public void UpdateToggleNavbar()
+    {
+        if (_isToggle)
+            UnToggleNavbar();
+        else
+            ToggleNavbar();
+        _isToggle = !_isToggle;
+    }
+    
+    public void ToggleNavbar()
+    {
+        navBar.SuspendLayout();
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].Visible = false;
+            item.Dock = DockStyle.None;
+        }
+
+        logoPb.Size = new Size(40, 40);
+        logoText.Visible = false;
+
+        toggleButton.Location = new Point(logoPb.Location.X + 20, 40);
+        toggleButton.ChangeImg("toggle2.svg");
+        
+        logoutButton.Controls[1].Visible = false;
+        
+        navBar.ResumeLayout();
+        navBar.Refresh();
+    }
+    
+    public void UnToggleNavbar()
+    {
+        navBar.SuspendLayout();
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].Visible = true;
+            item.Dock = DockStyle.Fill;
+        }
+        
+        logoPb.Size = new Size(70, 70);
+        logoText.Visible = true;
+        
+        toggleButton.Location = new Point(logoPb.Location.X + 130, 40);
+        toggleButton.ChangeImg("toggle.svg");
+        
+        logoutButton.Controls[1].Visible = true;
+        
+        navBar.ResumeLayout();
+        navBar.Refresh();
+        
     }
 
 }

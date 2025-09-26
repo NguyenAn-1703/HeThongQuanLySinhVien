@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class HocPhi : Panel
+public class HocPhi : NavBase
 {
     public HocPhi()
     {
@@ -43,5 +45,10 @@ public class HocPhi : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

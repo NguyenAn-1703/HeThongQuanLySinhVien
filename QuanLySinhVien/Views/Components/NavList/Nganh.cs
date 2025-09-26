@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class Nganh : Panel
+public class Nganh : NavBase
 {
     public Nganh()
     {
@@ -43,5 +45,10 @@ public class Nganh : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -40,9 +40,9 @@ public class NavListController
         return buttonClickTrans[key];
     }
 
-    public Panel update(string s)
+    public NavBase update(string s)
     {
-        Panel ans;
+        NavBase ans;
         if (s.Equals("TrangChu"))
         {
             ans = new TrangChu();

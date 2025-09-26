@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class ChuongTrinhDaoTao : Panel
+public class ChuongTrinhDaoTao : NavBase
 {
     public ChuongTrinhDaoTao()
     {
@@ -43,5 +45,10 @@ public class ChuongTrinhDaoTao : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

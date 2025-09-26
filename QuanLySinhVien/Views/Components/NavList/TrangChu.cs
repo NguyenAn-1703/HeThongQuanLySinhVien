@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class TrangChu : Panel
+public class TrangChu : NavBase
 {
     public TrangChu()
     {
@@ -43,5 +45,10 @@ public class TrangChu : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

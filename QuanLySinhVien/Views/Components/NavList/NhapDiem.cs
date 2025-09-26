@@ -1,8 +1,9 @@
 using System.Data;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
 
 namespace QuanLySinhVien.Views.Components;
-public class NhapDiem : Panel
+public class NhapDiem : NavBase
 {
     private DataGridView dataGridView1;
     private DataTable table;
@@ -182,5 +183,10 @@ public class NhapDiem : Panel
             // Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

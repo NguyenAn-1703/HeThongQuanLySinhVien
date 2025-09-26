@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class ToChucThi : Panel
+public class ToChucThi : NavBase
 {
     public ToChucThi()
     {
@@ -43,5 +45,10 @@ public class ToChucThi : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

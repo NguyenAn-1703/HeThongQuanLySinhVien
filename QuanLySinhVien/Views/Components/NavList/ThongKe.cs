@@ -1,6 +1,6 @@
 namespace QuanLySinhVien.Views.Components.NavList;
 
-public class ThongKe : Panel
+public class ThongKe : NavBase
 {
 
     // private void Init()
@@ -76,5 +76,10 @@ public class ThongKe : Panel
         TableLayoutPanel panel = new TableLayoutPanel();
         panel.BackColor = MyColor.GrayBackGround;
         return panel;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

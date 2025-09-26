@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class PhongHoc : Panel
+public class PhongHoc : NavBase
 {
     public PhongHoc()
     {
@@ -43,5 +45,10 @@ public class PhongHoc : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

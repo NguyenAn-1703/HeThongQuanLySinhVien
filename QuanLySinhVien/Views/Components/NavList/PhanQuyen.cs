@@ -1,6 +1,8 @@
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class PhanQuyen : Panel
+public class PhanQuyen : NavBase
 {
     public PhanQuyen()
     {
@@ -43,5 +45,10 @@ public class PhanQuyen : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
     }
 }

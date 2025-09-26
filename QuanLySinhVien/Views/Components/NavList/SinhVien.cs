@@ -1,10 +1,14 @@
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
 
 namespace QuanLySinhVien.Views.Components;
 
-public class SinhVien : Panel
+public class SinhVien : NavBase
 {
     private String[] columns;
+    
+    private string[] _listSelectionForComboBox = new []{"Mã sinh viên", "Tên sinh viên"};
+    
     public SinhVien()
     {
         Init();
@@ -49,5 +53,9 @@ public class SinhVien : Panel
         mainBot.Controls.Add(new CUse().GetTable(new String[] { "SinhVien" }));
         return mainBot;
     }
-    
+
+    public override List<string> getComboboxList()
+    {
+        throw new NotImplementedException();
+    }
 }
