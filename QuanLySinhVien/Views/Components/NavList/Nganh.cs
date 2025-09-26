@@ -1,3 +1,4 @@
+using QuanLySinhVien.DAO;
 using QuanLySinhVien.DB;
 using QuanLySinhVien.Models;
 using Svg;
@@ -11,6 +12,8 @@ public class NganhPanel : NavBase
 {
     private DataGridView dataGrid;
     private TableLayoutPanel tableLayout;
+    
+    private NganhDAO nganhDAO = new NganhDAO();
 
     int iconSize = 24;
     int spacing = 25;
@@ -96,8 +99,22 @@ public class NganhPanel : NavBase
             addButton.BackColor = Color.White;
         };
 
-
-        addButton.MouseClick += (sender, e) => { MessageBox.Show("Thêm"); };
+        addButton.MouseClick += (sender, e) =>
+        {
+            var newNganh = ShowNganhDialog(null);
+            if (newNganh != null)
+            {
+                try
+                {
+                    nganhDAO.addNganh(newNganh);
+                    LoadData();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi khi thêm ngành: {ex.Message}");
+                }
+            }
+        };
 
         mainTop.Controls.Add(title);
         mainTop.Controls.Add(addButton);
@@ -261,13 +278,54 @@ public class NganhPanel : NavBase
             {
                 var cellRect = dataGrid.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
                 var clickX = dataGrid.PointToClient(Cursor.Position).X - cellRect.X;
+                int totalWidth = iconSize * 2 + spacing;
 
                 if (clickX >= (cellRect.Width - totalWidth) / 2 &&
                     clickX <= (cellRect.Width - totalWidth) / 2 + iconSize)
-                    MessageBox.Show("Sửa");
+                {
+                    // Edit action
+                    var row = dataGrid.Rows[e.RowIndex];
+                    var nganh = row.DataBoundItem as QuanLySinhVien.Models.Nganh;
+                    if (nganh != null)
+                    {
+                        var updatedNganh = ShowNganhDialog(nganh);
+                        if (updatedNganh != null)
+                        {
+                            try
+                            {
+                                nganhDAO.updateNganh(updatedNganh);
+                                LoadData();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Lỗi khi cập nhật ngành: {ex.Message}");
+                            }
+                        }
+                    }
+                }
                 else if (clickX >= (cellRect.Width - totalWidth) / 2 + iconSize + spacing &&
                          clickX <= (cellRect.Width - totalWidth) / 2 + totalWidth)
-                    MessageBox.Show("Xóa");
+                {
+                    // Delete action
+                    var row = dataGrid.Rows[e.RowIndex];
+                    var nganh = row.DataBoundItem as QuanLySinhVien.Models.Nganh;
+                    if (nganh != null)
+                    {
+                        var confirm = MessageBox.Show($"Bạn có chắc muốn xóa ngành '{nganh.TenNganh}'?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                        if (confirm == DialogResult.Yes)
+                        {
+                            try
+                            {
+                                nganhDAO.deleteNganh(nganh.MaNganh);
+                                LoadData();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Lỗi khi xóa ngành: {ex.Message}");
+                            }
+                        }
+                    }
+                }
             }
         };
 
@@ -278,21 +336,189 @@ public class NganhPanel : NavBase
 
     private void LoadData()
     {
-        using (var db = new AppDbContext())
+        var nganhs = nganhDAO.getAllNganh();
+        dataGrid.DataSource = nganhs;
+    }
+
+    // Dialog for add/edit Nganh
+    private Nganh ShowNganhDialog(Nganh nganh)
+    {
+        var dialog = new Form
         {
-            db.Database.EnsureCreated();
+            Text = string.Empty,
+            Size = new Size(420, 350),
+            FormBorderStyle = FormBorderStyle.None,
+            StartPosition = FormStartPosition.CenterParent,
+            // BackColor = Color.FromArgb(0, 0, 0, 0), // Transparent for rounded effect
+            ShowInTaskbar = false
+        };
 
-            // Nếu chưa có dữ liệu, thêm mẫu
-            if (!db.nganh.Any())
-            {
-                db.nganh.Add(new Nganh { MaKhoa = 1, TenNganh = "Công nghệ thông tin" });
-                db.nganh.Add(new Nganh { MaKhoa = 2, TenNganh = "Kế toán" });
-                db.SaveChanges();
-            }
+        // Header panel
+        var headerPanel = new Panel
+        {
+            BackColor = ColorTranslator.FromHtml("#07689F"),
+            Height = 50,
+            Dock = DockStyle.Top,
+            Padding = new Padding(0, 0, 0, 0)
+        };
+        
+        var lblTitle = new Label
+        {
+            Text = nganh == null ? "Thêm ngành" : "Cập nhật ngành",
+            ForeColor = Color.White,
+            Font = new Font("Montserrat", 13, FontStyle.Bold),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Dock = DockStyle.Fill
+        };
+        
+        headerPanel.Controls.Add(lblTitle);
 
-            // Gán dữ liệu cho DataGridView
-            dataGrid.DataSource = db.nganh.ToList();
+        // Main card panel (rounded)
+        var cardPanel = new Panel
+        {
+            BackColor = ColorTranslator.FromHtml("#F3F4F6"),
+            Size = new Size(420, 300),
+            Location = new Point(0, 50),
+            Padding = new Padding(30, 50, 30, 50)
+        };
+        // cardPanel.Region = System.Drawing.Region.FromHrgn(
+        //     NativeMethods.CreateRoundRectRgn(0, 0, cardPanel.Width, cardPanel.Height, 18, 18));
+
+        // Labels and textboxes
+        var lblMaNganh = new Label { Text = "Mã Ngành", Font = new Font("Montserrat", 10), AutoSize = true };
+        var txtMaNganh = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle };
+        var lblMaKhoa = new Label { Text = "Mã Khoa", Font = new Font("Montserrat", 10), AutoSize = true };
+        var txtMaKhoa = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle };
+        var lblTenNganh = new Label { Text = "Tên Ngành", Font = new Font("Montserrat", 10), AutoSize = true };
+        var txtTenNganh = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle };
+
+        if (nganh != null)
+        {
+            txtMaNganh.Text = nganh.MaNganh.ToString();
+            txtMaNganh.Enabled = false;
+            txtMaKhoa.Text = nganh.MaKhoa.ToString();
+            txtTenNganh.Text = nganh.TenNganh;
         }
+
+        // Layout for fields
+        var layout = new TableLayoutPanel
+        {
+            RowCount = 3,
+            ColumnCount = 2,
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
+            Padding = new Padding(0, 0, 0, 0)
+        };
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        // layout.Controls.Add(lblMaNganh, 0, 0);
+        // layout.Controls.Add(txtMaNganh, 1, 0);
+        layout.Controls.Add(lblMaKhoa, 0, 1);
+        layout.Controls.Add(txtMaKhoa, 1, 1);
+        layout.Controls.Add(lblTenNganh, 0, 2);
+        layout.Controls.Add(txtTenNganh, 1, 2);
+
+        // Buttons
+        var btnCancel = new Button
+        {
+            Text = "Hủy",
+            DialogResult = DialogResult.Cancel,
+            Width = 90,
+            Height = 32,
+            Font = new Font("Montserrat", 10, FontStyle.Regular),
+            BackColor = Color.White,
+            ForeColor = Color.Black,
+            FlatStyle = FlatStyle.Flat,
+            Margin = new Padding(0, 20, 10, 0)
+        };
+        btnCancel.FlatAppearance.BorderColor = ColorTranslator.FromHtml("#B0BEC5");
+        btnCancel.FlatAppearance.BorderSize = 1;
+
+        var btnOK = new Button
+        {
+            Text = nganh == null ? "Thêm" : "Cập nhật",
+            DialogResult = DialogResult.OK,
+            Width = 90,
+            Height = 32,
+            Font = new Font("Montserrat", 10, FontStyle.Bold),
+            BackColor = ColorTranslator.FromHtml("#07689F"),
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat,
+            Margin = new Padding(10, 20, 0, 0)
+        };
+        btnOK.FlatAppearance.BorderSize = 0;
+
+        // Button panel
+        var buttonPanel = new FlowLayoutPanel
+        {
+            FlowDirection = FlowDirection.RightToLeft,
+            Dock = DockStyle.Bottom,
+            // Padding = new Padding(0, 10, 0, 0),
+            Height = 50
+        };
+        buttonPanel.Controls.Add(btnOK);
+        buttonPanel.Controls.Add(btnCancel);
+
+        cardPanel.Controls.Add(layout);
+        cardPanel.Controls.Add(buttonPanel);
+        buttonPanel.BringToFront();
+
+        dialog.Controls.Add(headerPanel);
+        dialog.Controls.Add(cardPanel);
+
+        dialog.AcceptButton = btnOK;
+        dialog.CancelButton = btnCancel;
+
+        // Center cardPanel vertically
+        // cardPanel.Top = (dialog.ClientSize.Height - cardPanel.Height) / 2 + 10;
+
+        // Handle rounded corners for the dialog itself
+        dialog.Load += (s, e) =>
+        {
+            dialog.Region = System.Drawing.Region.FromHrgn(
+                NativeMethods.CreateRoundRectRgn(0, 0, dialog.Width, dialog.Height, 18, 18));
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+        {
+            int maNganh, maKhoa;
+            if (!int.TryParse(txtMaNganh.Text.Trim(), out maNganh))
+            {
+                MessageBox.Show("Mã Ngành phải là số nguyên.");
+                return null;
+            }
+            if (!int.TryParse(txtMaKhoa.Text.Trim(), out maKhoa))
+            {
+                MessageBox.Show("Mã Khoa phải là số nguyên.");
+                return null;
+            }
+            var tenNganh = txtTenNganh.Text.Trim();
+            if (string.IsNullOrEmpty(tenNganh))
+            {
+                MessageBox.Show("Tên Ngành không được để trống.");
+                return null;
+            }
+            return new Nganh
+            {
+                MaNganh = maNganh,
+                MaKhoa = maKhoa,
+                TenNganh = tenNganh
+            };
+        }
+        return null;
+    }
+
+    // Native method for rounded corners
+    private static class NativeMethods
+    {
+        [System.Runtime.InteropServices.DllImport("gdi32.dll", SetLastError = true)]
+        public static extern IntPtr CreateRoundRectRgn(
+            int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
     }
 
     Bitmap ResizeImage(Bitmap original, int width, int height)
