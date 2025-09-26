@@ -204,7 +204,7 @@ public class MyHome : Form
         var rightTop = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
-            // Padding = new Padding(10, 30, 10, 30),
+            BackColor = MyColor.GrayBackGround,
             ColumnCount = 2
         };
 
