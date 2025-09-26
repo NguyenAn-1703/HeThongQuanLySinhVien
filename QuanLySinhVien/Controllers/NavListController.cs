@@ -1,6 +1,8 @@
 using QuanLySinhVien.Views.Components;
+using QuanLySinhVien.Views.Components.NavList;
 
-namespace QuanLySinhVien.Models;
+namespace QuanLySinhVien.Controllers;
+
 using System.Collections.Generic;
 public class NavListController
 {
