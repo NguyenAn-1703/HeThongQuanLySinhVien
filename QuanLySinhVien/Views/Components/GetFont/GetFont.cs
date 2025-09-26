@@ -33,19 +33,25 @@ public class GetFont
         switch (type)
         {
             case FontType.Regular:
-                font = new Font(pfc.Families[0], size, FontStyle.Regular);;
+                font = new Font(pfc.Families[0], size, FontStyle.Regular);
                 break;
             case FontType.SemiBold:
-                font = new Font(pfc.Families[3], size, FontStyle.Regular);;
+                font = new Font(pfc.Families[3], size, FontStyle.Regular);
                 break;
             case FontType.Bold:
-                font = new Font(pfc.Families[0], size, FontStyle.Bold);;
+                font = new Font(pfc.Families[0], size, FontStyle.Bold);
                 break;
             case FontType.ExtraBold:
-                font = new Font(pfc.Families[2], size, FontStyle.Regular);;
+                font = new Font(pfc.Families[2], size, FontStyle.Regular);
                 break;
             case FontType.Black:
-                font = new Font(pfc.Families[1], size, FontStyle.Regular);;
+                font = new Font(pfc.Families[1], size, FontStyle.Regular);
+                break;
+            case FontType.SemiBoldItalic:
+                font = new Font(pfc.Families[3], size, FontStyle.Italic);
+                break;
+            case FontType.RegularItalic:
+                font = new Font(pfc.Families[0], size, FontStyle.Italic);
                 break;
             default: throw new Exception("Font type not supported");
         }

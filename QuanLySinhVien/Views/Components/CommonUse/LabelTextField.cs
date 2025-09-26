@@ -1,3 +1,4 @@
+using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
@@ -7,6 +8,10 @@ public class LabelTextField : TableLayoutPanel
 {
     private string _title;
     private TextFieldType _fieldType;
+    private TextBox _field;
+    
+    private PictureBox _eyePb;
+    private bool statusEp = false;
     
     public LabelTextField(string title, TextFieldType fieldType)
     {
@@ -33,19 +38,65 @@ public class LabelTextField : TableLayoutPanel
 
     TextBox GetField()
     {
-        TextBox field = new TextBox();
-        field.Dock = DockStyle.Top;
-        field.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
+        _field = new TextBox();
+        _field.Dock = DockStyle.Top;
+        _field.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
         switch (_fieldType)
         {
             case TextFieldType.NormalText:
                 break;
             case TextFieldType.Password:
-                field.PasswordChar = '*';
+                _field.PasswordChar = '*';
+                setEyeButton();
                 break;
             
         }
-        return field;
+        return _field;
+    }
+
+    void setEyeButton()
+    {
+
+        _eyePb = new PictureBox
+        {
+            Size = new Size(25, 25), 
+            SizeMode = PictureBoxSizeMode.Zoom, 
+            Image = GetSvgBitmap.GetBitmap("eye-close.svg"),
+        };
+        _eyePb.Location = new Point(this._field.Right + 207, 2);
+        _eyePb.Cursor = Cursors.Hand;
+        this._field.Controls.Add(_eyePb);    
+        
+        _eyePb.MouseEnter += (sender, args) => {_eyePb.BackColor = MyColor.GrayHoverColor;};
+        _eyePb.MouseLeave += (sender, args) => {_eyePb.BackColor = MyColor.White;};
+        _eyePb.MouseClick += (sender, args) => { onClickEyeBtn();};
+
+        foreach (Control c in _eyePb.Controls)
+        {
+            c.MouseEnter += (sender, args) => {_eyePb.BackColor = MyColor.GrayHoverColor;};
+            c.MouseLeave += (sender, args) => {_eyePb.BackColor = MyColor.White;};
+            c.MouseClick += (sender, args) => { onClickEyeBtn();};
+            c.Cursor = Cursors.Hand;
+        }
+
+    }
+
+    void onClickEyeBtn()
+    {
+        //mở -> đóng
+        if (statusEp)
+        {
+            _eyePb.Image = GetSvgBitmap.GetBitmap("eye-close.svg");
+            this._field.PasswordChar = '*';
+            statusEp = false;
+        }
+        // đóng -> mở
+        else
+        {
+            _eyePb.Image = GetSvgBitmap.GetBitmap("eye-open.svg");
+            this._field.PasswordChar = '\0';
+            statusEp = true;
+        }
     }
     
 }

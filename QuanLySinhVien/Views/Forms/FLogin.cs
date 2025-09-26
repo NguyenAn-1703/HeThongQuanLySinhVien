@@ -11,6 +11,9 @@ namespace QuanLySinhVien.Views.Forms;
 
 public class FLogin : Form
 {
+    private LabelTextField _usrnameTfl;
+    private LabelTextField _passTfl;
+    
     // public FLogin()
     // {
     //     Form Screen = new Form();
@@ -300,33 +303,21 @@ public class FLogin : Form
         loginForm.Controls.Add(titleWb);
         loginForm.Controls.Add(title2);
 
-        LabelTextField usrnameTfl = new LabelTextField("Tên đăng nhập", TextFieldType.NormalText);
-        LabelTextField passTfl = new LabelTextField("Mật khẩu", TextFieldType.Password);
+        _usrnameTfl = new LabelTextField("Tên đăng nhập", TextFieldType.NormalText);
+        _passTfl = new LabelTextField("Mật khẩu", TextFieldType.Password);
         
-        loginForm.Controls.Add(usrnameTfl);
-        loginForm.Controls.Add(passTfl);
+        loginForm.Controls.Add(_usrnameTfl);
+        loginForm.Controls.Add(_passTfl);
         
         Label lblQmk = new Label();
         lblQmk.Dock = DockStyle.Right;
         lblQmk.AutoSize = true;
         lblQmk.Text = "Quên mật khẩu ?";
-        lblQmk.Font = GetFont.GetMainFont(10, FontType.SemiBold);
+        lblQmk.Font = GetFont.GetMainFont(10, FontType.SemiBoldItalic);
         
         loginForm.Controls.Add(lblQmk);
         
-        Button btnDangXuat = new Button();
-        btnDangXuat.Text = "Tạm";
-        btnDangXuat.MouseClick += (sender, args) =>
-        {
-            this.Hide();
-            Form home = new MyHome();
-            home.FormClosed += (s, args) => this.Show();
-            home.ShowDialog();
-        };
-        
-        loginForm.Controls.Add(btnDangXuat);
-        
-        
+        loginForm.Controls.Add(GetButtonDangNhap());
         /////////////////////form điền
         
         
@@ -340,5 +331,44 @@ public class FLogin : Form
         
         
         return controlPanel;
+    }
+
+    RoundTLP GetButtonDangNhap()
+    {
+        RoundTLP btnDangNhap = new RoundTLP();
+        btnDangNhap.BorderRadius = 60;
+        btnDangNhap.BackColor = MyColor.MainColor;
+        btnDangNhap.Dock = DockStyle.Top;
+        btnDangNhap.Height = 60;
+        
+        Label lblDangNhap = new Label();
+        lblDangNhap.Anchor = AnchorStyles.None;
+        lblDangNhap.Text = "Đăng nhập";
+        lblDangNhap.Font = GetFont.GetMainFont(11, FontType.Black);
+        lblDangNhap.ForeColor = MyColor.White;
+        lblDangNhap.AutoSize = true;
+        
+        btnDangNhap.Controls.Add(lblDangNhap);
+        
+        btnDangNhap.MouseClick += (sender, args) => onClickBtnDangNhap(); 
+        btnDangNhap.MouseEnter += (sender, args) => { btnDangNhap.BackColor = MyColor.GrayHoverColor; };
+        btnDangNhap.MouseLeave +=  (sender, args) => { btnDangNhap.BackColor = MyColor.MainColor; };
+
+        foreach (Control c in btnDangNhap.Controls)
+        {
+            c.MouseClick += (sender, args) => onClickBtnDangNhap();
+            c.MouseEnter += (sender, args) => { btnDangNhap.BackColor = MyColor.GrayHoverColor; };
+            c.MouseLeave +=  (sender, args) => { btnDangNhap.BackColor = MyColor.MainColor; };
+        }
+        
+        return btnDangNhap;
+    }
+
+    void onClickBtnDangNhap()
+    {
+        this.Hide();
+        Form home = new MyHome();
+        home.FormClosed += (s, args) => this.Show();
+        home.ShowDialog();
     }
 }
