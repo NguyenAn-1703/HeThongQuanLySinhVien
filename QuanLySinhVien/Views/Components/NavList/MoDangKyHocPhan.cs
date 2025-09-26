@@ -6,6 +6,8 @@ namespace QuanLySinhVien.Views.Components;
 
 public class MoDangKyHocPhan : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
+    
     private DataGridView dataGridView;
     private DataTable table;
     private TableLayoutPanel tableLayout;
@@ -290,6 +292,6 @@ public class MoDangKyHocPhan : NavBase
 
     public override List<string> getComboboxList()
     {
-        throw new NotImplementedException();
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

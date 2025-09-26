@@ -51,7 +51,7 @@ public class NavListController
         {
             ans = new SinhVien();
         }
-        else if (s.Equals("Giangvien"))
+        else if (s.Equals("GiangVien"))
         {
             ans = new GiangVien();
         }

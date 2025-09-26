@@ -87,11 +87,13 @@ public class SearchBar: TableLayoutPanel
     public void UpdateListCombobox(List<String> list)
     {
         this.listSelection = list;
+        this.listSelection.Insert(0, "Tất cả");
         this.Filter.Items.Clear();
         
         foreach (string i in  listSelection)
         {
             this.Filter.Items.Add(i);
         }
+        this.Filter.SelectedIndex = 0;
     }
 }

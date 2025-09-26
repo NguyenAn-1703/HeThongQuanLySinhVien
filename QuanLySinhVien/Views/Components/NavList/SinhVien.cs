@@ -56,6 +56,6 @@ public class SinhVien : NavBase
 
     public override List<string> getComboboxList()
     {
-        throw new NotImplementedException();
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

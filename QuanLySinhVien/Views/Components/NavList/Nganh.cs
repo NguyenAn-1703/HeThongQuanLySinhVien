@@ -1,9 +1,12 @@
+using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class Nganh : NavBase
 {
+    
+    private string[] _listSelectionForComboBox = new []{"Mã ngành", "Tên ngành"};
     public Nganh()
     {
         Init();
@@ -49,6 +52,6 @@ public class Nganh : NavBase
 
     public override List<string> getComboboxList()
     {
-        throw new NotImplementedException();
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

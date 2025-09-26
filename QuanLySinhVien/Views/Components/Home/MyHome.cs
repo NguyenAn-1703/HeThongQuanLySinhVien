@@ -33,6 +33,7 @@ public class MyHome : Form
     private TableLayoutPanel left;
     private Panel logout;
     private LogoutButton logoutButton;
+    private SearchBar _searchBar;
     
     public MyHome()
     {
@@ -210,7 +211,7 @@ public class MyHome : Form
         rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
-        SearchBar searchBar = new SearchBar();
+        _searchBar = new SearchBar();
         TableLayoutPanel accountInfo = getAcountInfo();
             
 
@@ -227,7 +228,7 @@ public class MyHome : Form
          rightBottomChange.Dock = DockStyle.Fill;
          rightBottomHost.Controls.Add(rightBottomChange);
          
-         rightTop.Controls.Add(searchBar);
+         rightTop.Controls.Add(_searchBar);
          rightTop.Controls.Add(accountInfo);
          
          rightTop.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
@@ -281,8 +282,9 @@ public class MyHome : Form
         String change = navListController.getDataButton(function);
         rightBottomChange = navListController.update(change);
         
-        
-        
+        List<string> t = rightBottomChange.getComboboxList();
+        _searchBar.UpdateListCombobox(t);
+
     }
 
     public void LogOut()

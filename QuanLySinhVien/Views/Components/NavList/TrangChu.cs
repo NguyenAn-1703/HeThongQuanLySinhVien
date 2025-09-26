@@ -1,9 +1,11 @@
+using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class TrangChu : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
     public TrangChu()
     {
         Init();
@@ -49,6 +51,7 @@ public class TrangChu : NavBase
 
     public override List<string> getComboboxList()
     {
-        throw new NotImplementedException();
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+    
 }

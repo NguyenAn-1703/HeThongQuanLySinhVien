@@ -1,7 +1,10 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class ThongKe : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
 
     // private void Init()
     // {
@@ -77,9 +80,9 @@ public class ThongKe : NavBase
         panel.BackColor = MyColor.GrayBackGround;
         return panel;
     }
-
+    
     public override List<string> getComboboxList()
     {
-        throw new NotImplementedException();
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

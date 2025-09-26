@@ -5,6 +5,8 @@ using QuanLySinhVien.Views.Components.NavList;
 namespace QuanLySinhVien.Views.Components;
 public class NhapDiem : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
+    
     private DataGridView dataGridView1;
     private DataTable table;
     private CUse _cUse; 
@@ -187,6 +189,6 @@ public class NhapDiem : NavBase
 
     public override List<string> getComboboxList()
     {
-        throw new NotImplementedException();
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }
