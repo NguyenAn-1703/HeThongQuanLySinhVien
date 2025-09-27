@@ -1,48 +1,11 @@
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class ThongKe : NavBase
 {
     private string[] _listSelectionForComboBox = new []{""};
-
-    // private void Init()
-    // {
-    //     //BackColor = Color.Blue;
-    //     Dock = DockStyle.Bottom;
-    //     Size = new Size(1200, 900);
-    //     var borderTop = new Panel
-    //     {
-    //         Dock = DockStyle.Fill,
-    //         // Padding = new  Padding(0 , 30 , 0 , 0),
-    //     };
-    //     borderTop.Controls.Add(Top());
-    //     Controls.Add(borderTop);
-    //     Controls.Add(Bottom());
-    // }
-    //
-    // private Panel Top()
-    // {
-    //     Panel mainTop = new Panel
-    //     {
-    //         Dock = DockStyle.Bottom,
-    //         // BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-    //         BackColor = Color.Red,
-    //         Height = 90,
-    //     };
-    //     return mainTop;
-    // }
-    //
-    // private Panel Bottom()
-    // {
-    //     Panel mainBot = new Panel
-    //     {
-    //         Dock = DockStyle.Bottom,
-    //         BackColor = Color.Green,
-    //         Height = 780,
-    //     };
-    //     return mainBot;
-    // }
     public ThongKe()
     {
         Init();
@@ -57,29 +20,24 @@ public class ThongKe : NavBase
             ColumnCount = 4,
             Dock = DockStyle.Fill,
         };
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+        
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        
         mainLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         
-        mainLayout.Controls.Add(GetTopBar());
-        mainLayout.Controls.Add(GetMainPanel());
-
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số sinh viên", 123, StatisticalIndex.first));
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số giảng viên", 123, StatisticalIndex.second));
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số ngành", 123, StatisticalIndex.third));
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", 123, StatisticalIndex.fourth));
+        
         this.Controls.Add(mainLayout);
     }
-
-    TableLayoutPanel GetTopBar()
-    {
-        TableLayoutPanel panel = new TableLayoutPanel();
-        panel.BackColor = MyColor.Red;
-        return panel;
-    }
-
-    TableLayoutPanel GetMainPanel()
-    {
-        TableLayoutPanel panel = new TableLayoutPanel();
-        panel.BackColor = MyColor.GrayBackGround;
-        return panel;
-    }
+    
     
     public override List<string> getComboboxList()
     {
