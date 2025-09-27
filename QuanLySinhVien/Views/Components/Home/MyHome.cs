@@ -34,6 +34,8 @@ public class MyHome : Form
     private Panel logout;
     private LogoutButton logoutButton;
     private SearchBar _searchBar;
+    private TableLayoutPanel rightTop;
+    private TableLayoutPanel mainLayout;
     
     public MyHome()
     {
@@ -46,7 +48,7 @@ public class MyHome : Form
         // Chia layout co dãn theo kích thước window
         // Bố cục 2 phần trái, phải, kích thước theo component bên trong
         #endregion
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        mainLayout = new TableLayoutPanel
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
@@ -201,7 +203,7 @@ public class MyHome : Form
          * mục đích xử lí navList khi chọn vào button (các phần còn lại để nguyên chỉ có thành phần bottom là bị thay đổi)
          * TODO: Sử dụng cái gì để xử lí? dùng Map để lưu các thành phần?
          */ 
-        var rightTop = new TableLayoutPanel
+        rightTop = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
@@ -359,7 +361,7 @@ public class MyHome : Form
     
     public void ToggleNavbar()
     {
-        navBar.SuspendLayout();
+        SuspendForToggle();
         foreach(NavItem item in navBar.ButtonArray)
         {
             item.Controls[2].Visible = false;
@@ -369,18 +371,17 @@ public class MyHome : Form
         logoPb.Size = new Size(40, 40);
         logoText.Visible = false;
 
-        toggleButton.Location = new Point(logoPb.Location.X + 20, 40);
+        toggleButton.Location = new Point(logoPb.Location.X - 50, 40);
         toggleButton.ChangeImg("toggle2.svg");
         
         logoutButton.Controls[1].Visible = false;
         
-        navBar.ResumeLayout();
-        navBar.Refresh();
+        ResumeForToggle();
     }
     
     public void UnToggleNavbar()
     {
-        navBar.SuspendLayout();
+        SuspendForToggle();
         foreach(NavItem item in navBar.ButtonArray)
         {
             item.Controls[2].Visible = true;
@@ -395,9 +396,26 @@ public class MyHome : Form
         
         logoutButton.Controls[1].Visible = true;
         
-        navBar.ResumeLayout();
-        navBar.Refresh();
+        ResumeForToggle();
         
+    }
+
+    void SuspendForToggle()
+    {
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].SuspendLayout();
+        }
+        mainLayout.SuspendLayout();
+    }
+
+    void ResumeForToggle()
+    {
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].ResumeLayout();
+        }
+        mainLayout.ResumeLayout();
     }
 
 }
