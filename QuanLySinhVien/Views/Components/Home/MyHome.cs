@@ -30,12 +30,15 @@ public class MyHome : Form
     private ToggleButton toggleButton;
     private TableLayoutPanel navListContainer;
     private Panel parLeft;
+    private TableLayoutPanel parRight;
     private TableLayoutPanel left;
     private Panel logout;
     private LogoutButton logoutButton;
     private SearchBar _searchBar;
     private TableLayoutPanel rightTop;
     private TableLayoutPanel mainLayout;
+    //panel trống cho chức năng không cần đến rightTop
+    private TableLayoutPanel _emptyForUnTopBar;
     
     public MyHome()
     {
@@ -148,67 +151,26 @@ public class MyHome : Form
         logoutButton = new LogoutButton();
         logoutButton.OnClick += LogOut;
         
-        //taskbar
-        // var taskbar = new Panel
-        // {
-        //     Dock = DockStyle.Top,
-        //     BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-        //     Height = 100,
-        // };
+        // panel phải
         
-        
-        //Panel Phải
-
-        
-        // var txtSearch = new TextBox {
-        //     BorderStyle = BorderStyle.None,
-        //     PlaceholderText = "Tìm kiếm...",
-        //     Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
-        //     Dock = DockStyle.Fill,
-        //     BackColor = searchWrap.BackColor
-        // };
-        // searchWrap.Controls.Add(txtSearch);
-        // searchWrap.Controls.Add(iconSearch);
-        // functionTopRightLeft.Controls.Add(searchWrap);
-        
-        // var comboList = new[] {"1" , "2" , "3" , "4"} ;
-        // var filter = new ComboBox
-        // {
-        //     DropDownStyle = ComboBoxStyle.DropDown,
-        //     AutoCompleteMode = AutoCompleteMode.SuggestAppend,
-        //     Location = new Point(550, 35),
-        //     Font = new Font("JetBrains Mono", 10f),
-        //     Size = new Size(200, 0),
-        //     DrawMode = DrawMode.Normal,
-        //     ItemHeight = 35,                
-        //     //DropDownHeight = 200,             
-        //     IntegralHeight = false,
-        //     SelectedText = "Lọc",
-        // };
-        // filter.Items.AddRange(comboList);
-        
-        var parRight = new TableLayoutPanel     //////////////////////ddang lamf
+        parRight = new TableLayoutPanel   
         {
             Dock = DockStyle.Fill,
             BackColor = Color.White,
             RowCount = 2,
         };
         
-        // parRight.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         
         parRight.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         parRight.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         
-        /* right panel => chia thành 2 thành phần top và bottom
-         * mục đích xử lí navList khi chọn vào button (các phần còn lại để nguyên chỉ có thành phần bottom là bị thay đổi)
-         * TODO: Sử dụng cái gì để xử lí? dùng Map để lưu các thành phần?
-         */ 
         rightTop = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
             ColumnCount = 2
         };
+
 
         rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -219,21 +181,32 @@ public class MyHome : Form
 
         // border
          parLeft.Padding = new Padding(5);
-         parRight.Padding = new Padding(10);
-
+         
+         
         //add
          rightBottomHost = new Panel
          {
              Dock = DockStyle.Fill,
          };
+
+         if (rightBottomChange is TrangChu)
+         {
+             _emptyForUnTopBar = new TableLayoutPanel { AutoSize = true };
+             _emptyForUnTopBar.Margin = new Padding(0);
+             _emptyForUnTopBar.BackColor = MyColor.GrayBackGround;
+             rightTop.Visible = false;
+             parRight.Controls.Add(_emptyForUnTopBar);
+             rightBottomHost.Padding = new Padding(0);
+         }
          
          rightBottomChange.Dock = DockStyle.Fill;
+         rightBottomHost.Margin = new Padding(0);
+         parRight.Margin = new Padding(0);
+         
          rightBottomHost.Controls.Add(rightBottomChange);
          
          rightTop.Controls.Add(_searchBar);
          rightTop.Controls.Add(accountInfo);
-         
-         // rightTop.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
          
          parRight.Controls.Add(rightTop);
          parRight.Controls.Add(rightBottomHost);
@@ -277,6 +250,19 @@ public class MyHome : Form
         rightBottomHost.ResumeLayout(true);
         rightBottomHost.Invalidate();
         rightBottomHost.Refresh();
+
+        if (rightBottomChange is TrangChu)
+        {
+            rightTop.Visible = false;
+            _emptyForUnTopBar.Visible = true;
+            this.rightBottomHost.Padding = new Padding(0);
+        }
+        else
+        {
+            rightTop.Visible = true;
+            _emptyForUnTopBar.Visible = false;
+            this.rightBottomHost.Padding = new Padding(10);
+        }
     }
 
     void UpdateSearchCombobox(string function)
@@ -349,6 +335,7 @@ public class MyHome : Form
         
         return AccountInfo;
     }
+    
     
     public void UpdateToggleNavbar()
     {
