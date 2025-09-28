@@ -1,10 +1,13 @@
 using System.Data;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
 using Svg;
 namespace QuanLySinhVien.Views.Components;
 
-public class MoDangKyHocPhan : Panel
+public class MoDangKyHocPhan : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
+    
     private DataGridView dataGridView;
     private DataTable table;
     private TableLayoutPanel tableLayout;
@@ -285,5 +288,10 @@ public class MoDangKyHocPhan : Panel
             // Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
+    }
+
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

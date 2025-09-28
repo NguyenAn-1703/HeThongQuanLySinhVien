@@ -1,6 +1,8 @@
 using QuanLySinhVien.Views.Components;
+using QuanLySinhVien.Views.Components.NavList;
 
-namespace QuanLySinhVien.Models;
+namespace QuanLySinhVien.Controllers;
+
 using System.Collections.Generic;
 public class NavListController
 {
@@ -38,9 +40,9 @@ public class NavListController
         return buttonClickTrans[key];
     }
 
-    public Panel update(string s)
+    public NavBase update(string s)
     {
-        Panel ans;
+        NavBase ans;
         if (s.Equals("TrangChu"))
         {
             ans = new TrangChu();
@@ -49,7 +51,7 @@ public class NavListController
         {
             ans = new SinhVien();
         }
-        else if (s.Equals("Giangvien"))
+        else if (s.Equals("GiangVien"))
         {
             ans = new GiangVien();
         }

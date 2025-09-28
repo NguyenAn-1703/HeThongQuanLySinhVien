@@ -1,7 +1,12 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class QuanLiTaiKhoan : Panel
+public class QuanLiTaiKhoan : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{"Mã tài khoản", "Tên tài khoản"};
+    
     public QuanLiTaiKhoan()
     {
         Init();
@@ -43,5 +48,10 @@ public class QuanLiTaiKhoan : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

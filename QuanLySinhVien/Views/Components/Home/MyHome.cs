@@ -1,12 +1,15 @@
 // using QuanLySinhVien.Views;
 
 using System.Drawing.Text;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controllers;
 using Svg;
 using QuanLySinhVien.Views.Components.GetFont;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 using System.Windows.Forms;
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
 using Timer = System.Windows.Forms.Timer;
 
 namespace QuanLySinhVien.Views.Components.Home;
@@ -17,7 +20,7 @@ public class MyHome : Form
     private string ButtonClickNavList = "";
     private NavListController navListController = new NavListController();
     //Trang bắt đầu
-    Panel rightBottomChange = new TrangChu();
+    NavBase rightBottomChange = new TrangChu();
     private Panel rightBottomHost;
     private NavBar navBar;
     //Cho phan thu gon navbar
@@ -30,6 +33,9 @@ public class MyHome : Form
     private TableLayoutPanel left;
     private Panel logout;
     private LogoutButton logoutButton;
+    private SearchBar _searchBar;
+    private TableLayoutPanel rightTop;
+    private TableLayoutPanel mainLayout;
     
     public MyHome()
     {
@@ -42,7 +48,7 @@ public class MyHome : Form
         // Chia layout co dãn theo kích thước window
         // Bố cục 2 phần trái, phải, kích thước theo component bên trong
         #endregion
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        mainLayout = new TableLayoutPanel
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
@@ -62,30 +68,6 @@ public class MyHome : Form
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.GrayBackGround
-        };
-
-        var parRight = new Panel
-        {
-            Dock = DockStyle.Fill,
-            BackColor = Color.White
-        };
-
-        /* right panel => chia thành 2 thành phần top và bottom
-         * mục đích xử lí navList khi chọn vào button (các phần còn lại để nguyên chỉ có thành phần bottom là bị thay đổi)
-         * TODO: Sử dụng cái gì để xử lí? dùng Map để lưu các thành phần?
-        */ 
-        var right = new Panel
-        {
-            Dock = DockStyle.Fill,
-        };
-        var rightTop = new Panel
-        {
-            Dock = DockStyle.Top,
-            Height = 100,
-        };
-        rightBottomHost = new Panel
-        {
-            Dock = DockStyle.Fill,
         };
         
         // left panel
@@ -154,181 +136,108 @@ public class MyHome : Form
         toggleButton.Location = new Point(logoPb.Location.X + 130, 40);
         toggleButton.OnClick += UpdateToggleNavbar;
         
-
-        
-        // for (int i = 0; i < buttonArray.Length; i++)
-        // {
-        //     int pos = i;
-        //     buttonArray[pos].Click += (s, e) =>
-        //     {
-        //         buttonArray[IndexButton].BackColor = Color.Transparent;
-        //         IndexButton = pos;
-        //         buttonArray[IndexButton].BackColor = MyColor.Gray;
-        //         ButtonClickNavList = buttonArray[IndexButton].Text;
-        //         Console.WriteLine(ButtonClickNavList);
-        
-        //         rightBottomHost.SuspendLayout();
-        //         rightBottomHost.Controls.Clear();
-        
-        //         String change = navListController.getDataButton(ButtonClickNavList);
-        
-        //         Console.WriteLine(change);
-        
-        //         rightBottomChange = navListController.update(change);
-        //         if (rightBottomChange != null)
-        //         {
-        //             rightBottomChange.Dock = DockStyle.Fill;
-        //             rightBottomHost.Controls.Add(rightBottomChange);
-        //         }
-        
-        //         rightBottomHost.ResumeLayout(true);
-        //         rightBottomHost.Invalidate();
-        //         rightBottomHost.Refresh();
-        //     };
-        // }
-        
         /* TODO: rightBottomChange = new TrangChu() hay 1 thành phần nào đó được button click
          * vậy thì trong cái button phải lưu trử 1 cái gì đó để truy xuất đến được <Button text = Trang Chủ -> TrangChu>
          *
          */
         
-        //set Panel bên phải
-        navBar.OnSelect1Item += this.UpdateRightBottomHost;
-        
-        
+        //set Panel bên trái
+        navBar.OnSelect1Item += this.OnChangeItemNavBar;
         navListContainer.Controls.Add(navBar);
-        
-        
         
         logoutButton = new LogoutButton();
         logoutButton.OnClick += LogOut;
         
         //taskbar
-        var taskbar = new Panel
-        {
-            Dock = DockStyle.Top,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 100,
-        };
+        // var taskbar = new Panel
+        // {
+        //     Dock = DockStyle.Top,
+        //     BackColor = ColorTranslator.FromHtml("#E5E7EB"),
+        //     Height = 100,
+        // };
         
-        var functionTopRightLeft = new Panel
+        
+        //Panel Phải
+
+        
+        // var txtSearch = new TextBox {
+        //     BorderStyle = BorderStyle.None,
+        //     PlaceholderText = "Tìm kiếm...",
+        //     Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
+        //     Dock = DockStyle.Fill,
+        //     BackColor = searchWrap.BackColor
+        // };
+        // searchWrap.Controls.Add(txtSearch);
+        // searchWrap.Controls.Add(iconSearch);
+        // functionTopRightLeft.Controls.Add(searchWrap);
+        
+        // var comboList = new[] {"1" , "2" , "3" , "4"} ;
+        // var filter = new ComboBox
+        // {
+        //     DropDownStyle = ComboBoxStyle.DropDown,
+        //     AutoCompleteMode = AutoCompleteMode.SuggestAppend,
+        //     Location = new Point(550, 35),
+        //     Font = new Font("JetBrains Mono", 10f),
+        //     Size = new Size(200, 0),
+        //     DrawMode = DrawMode.Normal,
+        //     ItemHeight = 35,                
+        //     //DropDownHeight = 200,             
+        //     IntegralHeight = false,
+        //     SelectedText = "Lọc",
+        // };
+        // filter.Items.AddRange(comboList);
+        
+        var parRight = new TableLayoutPanel     //////////////////////ddang lamf
         {
-            Dock = DockStyle.Left,
-            Width = 800,
-        };
-        var searchWrap = new Panel {
-            Size = new Size(480, 40),
+            Dock = DockStyle.Fill,
             BackColor = Color.White,
-            Padding = new Padding(40, 8, 12, 8) 
-        };
-        searchWrap.Location = new Point(30, 30);
-        var iconSearchPath = Path.Combine(AppContext.BaseDirectory, "img", "search.svg");
-        var iconSearch = new PictureBox {
-            Image = SvgDocument.Open(iconSearchPath).Draw(30, 30),
-            Size = new Size(30, 30),
-            Location = new Point(8, 8),
-            SizeMode = PictureBoxSizeMode.CenterImage,
-            BackColor = Color.Transparent
-        };
-        var txtSearch = new TextBox {
-            BorderStyle = BorderStyle.None,
-            PlaceholderText = "Tìm kiếm...",
-            Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
-            Dock = DockStyle.Fill,
-            BackColor = searchWrap.BackColor
-        };
-        searchWrap.Controls.Add(txtSearch);
-        searchWrap.Controls.Add(iconSearch);
-        functionTopRightLeft.Controls.Add(searchWrap);
-        var comboList = new[] {"1" , "2" , "3" , "4"} ;
-        var filter = new ComboBox
-        {
-            DropDownStyle = ComboBoxStyle.DropDown,
-            AutoCompleteMode = AutoCompleteMode.SuggestAppend,
-            Location = new Point(550, 35),
-            Font = new Font("JetBrains Mono", 10f),
-            Size = new Size(200, 0),
-            DrawMode = DrawMode.Normal,
-            ItemHeight = 35,                
-            //DropDownHeight = 200,             
-            IntegralHeight = false,
-            SelectedText = "Lọc",
-        };
-        filter.Items.AddRange(comboList);
-        
-        functionTopRightLeft.Controls.Add(filter);
-        
-        // user account
-        var functionTopRightRight = new Panel
-        {
-            Dock = DockStyle.Right,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Width = 400,
-        };
-        
-        var pathIconAccount = Path.Combine(AppContext.BaseDirectory, "img", "user.svg");
-        var userIcon = new PictureBox
-        {
-            Image = SvgDocument.Open(pathIconAccount).Draw(50, 50),
-            AutoSize = true,
-            Dock = DockStyle.Left,
-            Margin = new Padding(0),
-            Padding = new Padding(0),
-        };
-
-        var textAccount = new TableLayoutPanel {
-            ColumnCount = 1,
             RowCount = 2,
-            Dock = DockStyle.Fill,
-            Padding = new Padding(0),
-            Margin = new Padding(8, 0, 0, 0),
         };
-        textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        var userTextName = new Label
+        
+        parRight.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        
+        parRight.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        parRight.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        
+        /* right panel => chia thành 2 thành phần top và bottom
+         * mục đích xử lí navList khi chọn vào button (các phần còn lại để nguyên chỉ có thành phần bottom là bị thay đổi)
+         * TODO: Sử dụng cái gì để xử lí? dùng Map để lưu các thành phần?
+         */ 
+        rightTop = new TableLayoutPanel
         {
-            Text = "truy vấn sql",  
-            Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
-            AutoSize = true
+            Dock = DockStyle.Fill,
+            BackColor = MyColor.GrayBackGround,
+            ColumnCount = 2
         };
 
-        var userTextGmail = new Label
-        {   
-            Text = "truyvấnsql@gmail.com",
-            Font = new Font("JetBrains Mono",10f, FontStyle.Regular),
-            AutoSize = true,
-            ForeColor = Color.Gray,
-        };
+        rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
-        textAccount.Controls.Add(userTextName, 0, 0);
-        textAccount.Controls.Add(userTextGmail, 0, 1);
-        
-        var fullUserAccount = new Panel
-        {
-            Size = new Size(400, 50),
-            Padding = new Padding(8, 4, 8, 4)
-            //BackColor = Color.Red,
-        };
-        fullUserAccount.Controls.Add(textAccount);
-        fullUserAccount.Controls.Add(userIcon);
-        fullUserAccount.Location = new Point(30, 25);
-        functionTopRightRight.Controls.Add(fullUserAccount);
+        _searchBar = new SearchBar();
+        TableLayoutPanel accountInfo = getAcountInfo();
+            
+
         // border
          parLeft.Padding = new Padding(5);
          parRight.Padding = new Padding(10);
 
-         // add
-         taskbar.Controls.Add(functionTopRightLeft);
-         taskbar.Controls.Add(functionTopRightRight);
-        
-         // right.Controls.Add(bottom);
-         // right.Controls.Add(center);
-         rightTop.Controls.Add(taskbar);
-         right.Controls.Add(rightTop);
-         right.Controls.Add(rightBottomHost);
+        //add
+         rightBottomHost = new Panel
+         {
+             Dock = DockStyle.Fill,
+         };
+         
          rightBottomChange.Dock = DockStyle.Fill;
          rightBottomHost.Controls.Add(rightBottomChange);
          
+         rightTop.Controls.Add(_searchBar);
+         rightTop.Controls.Add(accountInfo);
+         
+         rightTop.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+         
+         parRight.Controls.Add(rightTop);
+         parRight.Controls.Add(rightBottomHost);
+        
          Controls.Add(toggleButton);
          
          left.Controls.Add(logo);
@@ -336,7 +245,6 @@ public class MyHome : Form
          left.Controls.Add(logoutButton); 
         
          parLeft.Controls.Add(left);
-         parRight.Controls.Add(right);
          
          mainLayout.Controls.Add(parLeft);
          mainLayout.Controls.Add(parRight);
@@ -346,30 +254,100 @@ public class MyHome : Form
         
     }
     
-    //update xem item nào được chọn
-    public void UpdateRightBottomHost(string function)
+    //update khi 1 item khác được chọn
+    public void OnChangeItemNavBar(string function)
+    {
+        ChangePanel(function);
+        UpdateSearchCombobox(function);
+    }
+    
+    //Đổi rightbottom sang bảng chức năng khác
+    void ChangePanel(string function)
     {
         rightBottomHost.SuspendLayout();
         rightBottomHost.Controls.Clear();
         
         String change = navListController.getDataButton(function);
-        
         Console.WriteLine(change);
-        
         rightBottomChange = navListController.update(change);
-        if (rightBottomChange != null)
-        {
-            rightBottomChange.Dock = DockStyle.Fill;
-            rightBottomHost.Controls.Add(rightBottomChange);
-        }
+        Console.WriteLine(rightBottomChange);
+        
+        rightBottomChange.Dock = DockStyle.Fill;
+        rightBottomHost.Controls.Add(rightBottomChange);
         rightBottomHost.ResumeLayout(true);
         rightBottomHost.Invalidate();
         rightBottomHost.Refresh();
     }
 
+    void UpdateSearchCombobox(string function)
+    {
+        String change = navListController.getDataButton(function);
+        rightBottomChange = navListController.update(change);
+        
+        List<string> t = rightBottomChange.getComboboxList();
+        _searchBar.UpdateListCombobox(t);
+
+    }
+
     public void LogOut()
     {
         this.Dispose();
+    }
+
+    TableLayoutPanel getAcountInfo()
+    {
+        TableLayoutPanel AccountInfo = new TableLayoutPanel
+        {
+            ColumnCount = 2,
+        };
+        AccountInfo.Anchor = AnchorStyles.None;
+        AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        AccountInfo.AutoSize = true;
+        
+        AccountInfo.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;        
+        
+        
+        var userIcon = new PictureBox
+        {
+            Image = GetSvgBitmap.GetBitmap("user.svg"),
+            Margin = new Padding(0),
+            Size = new Size(45, 45),
+            SizeMode = PictureBoxSizeMode.Zoom,
+        };
+        
+        var textAccount = new TableLayoutPanel {
+            RowCount = 2,
+            Margin = new Padding(8, 0, 0, 0),
+            AutoSize = true
+        };
+        
+        textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        
+        var userTextName = new Label
+        {
+            Text = "truy vấn sql",  
+            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            AutoSize = true
+        };
+        
+        var userTextGmail = new Label
+        {   
+            Text = "truyvấnsql@gmail.com",
+            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            AutoSize = true,
+            ForeColor = Color.Gray,
+        };
+        
+        textAccount.Controls.Add(userTextName);
+        textAccount.Controls.Add(userTextGmail);
+        
+        
+        AccountInfo.Controls.Add(userIcon);
+        AccountInfo.Controls.Add(textAccount);
+        
+        return AccountInfo;
     }
     
     public void UpdateToggleNavbar()
@@ -380,10 +358,10 @@ public class MyHome : Form
             ToggleNavbar();
         _isToggle = !_isToggle;
     }
-
+    
     public void ToggleNavbar()
     {
-        navBar.SuspendLayout();
+        SuspendForToggle();
         foreach(NavItem item in navBar.ButtonArray)
         {
             item.Controls[2].Visible = false;
@@ -393,18 +371,17 @@ public class MyHome : Form
         logoPb.Size = new Size(40, 40);
         logoText.Visible = false;
 
-        toggleButton.Location = new Point(logoPb.Location.X + 20, 40);
+        toggleButton.Location = new Point(logoPb.Location.X - 50, 40);
         toggleButton.ChangeImg("toggle2.svg");
         
         logoutButton.Controls[1].Visible = false;
         
-        navBar.ResumeLayout();
-        navBar.Refresh();
+        ResumeForToggle();
     }
     
     public void UnToggleNavbar()
     {
-        navBar.SuspendLayout();
+        SuspendForToggle();
         foreach(NavItem item in navBar.ButtonArray)
         {
             item.Controls[2].Visible = true;
@@ -419,9 +396,26 @@ public class MyHome : Form
         
         logoutButton.Controls[1].Visible = true;
         
-        navBar.ResumeLayout();
-        navBar.Refresh();
+        ResumeForToggle();
         
+    }
+
+    void SuspendForToggle()
+    {
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].SuspendLayout();
+        }
+        mainLayout.SuspendLayout();
+    }
+
+    void ResumeForToggle()
+    {
+        foreach(NavItem item in navBar.ButtonArray)
+        {
+            item.Controls[2].ResumeLayout();
+        }
+        mainLayout.ResumeLayout();
     }
 
 }

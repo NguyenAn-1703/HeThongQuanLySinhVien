@@ -1,7 +1,11 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class HocPhi : Panel
+public class HocPhi : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
     public HocPhi()
     {
         Init();
@@ -43,5 +47,10 @@ public class HocPhi : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

@@ -1,7 +1,12 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class PhongHoc : Panel
+public class PhongHoc : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{"Mã phòng học", "Tên phòng học"};
+    
     public PhongHoc()
     {
         Init();
@@ -43,5 +48,10 @@ public class PhongHoc : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

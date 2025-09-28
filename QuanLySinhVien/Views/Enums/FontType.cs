@@ -7,4 +7,6 @@ public enum FontType
     Bold,
     ExtraBold,
     Black,
+    RegularItalic,
+    SemiBoldItalic,
 }

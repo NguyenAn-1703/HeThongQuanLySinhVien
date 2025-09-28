@@ -1,7 +1,12 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class Nganh : Panel
+public class Nganh : NavBase
 {
+    
+    private string[] _listSelectionForComboBox = new []{"Mã ngành", "Tên ngành"};
     public Nganh()
     {
         Init();
@@ -43,5 +48,10 @@ public class Nganh : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

@@ -1,7 +1,12 @@
+using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.NavList;
+
 namespace QuanLySinhVien.Views.Components;
 
-public class ChuongTrinhDaoTao : Panel
+public class ChuongTrinhDaoTao : NavBase
 {
+    
+    private string[] _listSelectionForComboBox = new []{""};
     public ChuongTrinhDaoTao()
     {
         Init();
@@ -43,5 +48,10 @@ public class ChuongTrinhDaoTao : Panel
             Height = 780,
         };
         return mainBot;
+    }
+
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }
