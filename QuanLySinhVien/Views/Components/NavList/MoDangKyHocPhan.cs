@@ -23,35 +23,42 @@ public class MoDangKyHocPhan : NavBase
     private void Init()
     {
         //BackColor = Color.Blue;
-        Dock = DockStyle.Bottom;
+        Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
-        var borderTop = new Panel
-        {
-            Dock = DockStyle.Fill,
-            // Padding = new  Padding(0 , 30 , 0 , 0),
-        };
-        borderTop.Controls.Add(Top());
-        Controls.Add(borderTop);
         Controls.Add(Bottom());
+        Controls.Add(Top());
     }
 
     private Panel Top()
     {
         Panel mainTop = new Panel
         {
-            Dock = DockStyle.Bottom,
+            Dock = DockStyle.Top,
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             //BackColor = Color.Red,
             Height = 120,
         };
+        var header = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 3,
+            RowCount = 2,
+            Padding = new Padding(20, 10, 20, 10),
+        };
+        header.ColumnStyles.Clear();
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        header.RowStyles.Clear();
+        header.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
+        header.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         
         // Text Nav_List
         var textNavList = new Label
         {
             Text = "Mở đăng ký học phần",
             // Font = new Font("JetBrains Mono", 16f , FontStyle.Bold),
-            Size = new Size(400, 40),
-            Location = new Point(20 , 10),
+            AutoSize = true,
         };
         // Học kỳ
         var textHk = new Label
@@ -84,10 +91,11 @@ public class MoDangKyHocPhan : NavBase
         btnHk.FlatAppearance.BorderSize = 0;
         var panelFull = new FlowLayoutPanel
         {
-            Location = new Point(500 , 10),
             FlowDirection = FlowDirection.LeftToRight,
-            Size = new Size(1000, 100),
             AutoSize = true,
+            WrapContents = false,
+            Anchor = AnchorStyles.Top | AnchorStyles.Right,
+            Margin = new Padding(0, 30, 15, 0),
         };
         panelFull.Controls.Add(textHk);
         panelFull.Controls.Add(cbHk);
@@ -101,12 +109,12 @@ public class MoDangKyHocPhan : NavBase
             Image = imgPlus,
             Text = "Thêm",
             FlatStyle = FlatStyle.Flat,
-            Margin = new Padding(0),
+            Margin = new Padding(0 , 30 , 0 , 0),
             Size = new  Size(120, 50),
-            Location = new Point(1040, 60),
             TextAlign = ContentAlignment.MiddleLeft,
             Padding = new Padding(8, 0, 0, 0),
             // Font = new Font("JetBrains Mono", 10f , FontStyle.Regular),
+            Anchor = AnchorStyles.None
         };
         btnAdd.ImageAlign = ContentAlignment.MiddleLeft;
         btnAdd.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -116,15 +124,17 @@ public class MoDangKyHocPhan : NavBase
         {
             Text = "Các lớp mở đăng ký",
             // Font = new Font("JetBrains Mono", 10f , FontStyle.Regular),
-            Location = new Point(20 , 80),
             Size = new Size(200, 40),
+            Margin = new Padding(0, 8, 0, 0),
         };
         
-        // add components
-        mainTop.Controls.Add(textClmdk);
-        mainTop.Controls.Add(btnAdd);
-        mainTop.Controls.Add(textNavList);
-        mainTop.Controls.Add(panelFull);
+        // add components using layout
+        header.Controls.Add(textNavList, 0, 0);
+        header.Controls.Add(panelFull, 1, 0);
+        header.Controls.Add(btnAdd, 2, 0);
+        header.Controls.Add(textClmdk, 0, 1);
+        header.SetColumnSpan(textClmdk, 3);
+        mainTop.Controls.Add(header);
         return mainTop;
     }
 
@@ -132,10 +142,9 @@ public class MoDangKyHocPhan : NavBase
     {
         Panel mainBot = new Panel
         {
-            Dock = DockStyle.Bottom,
+            Dock = DockStyle.Fill,
             // BackColor = Color.Green,
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 750,
             Padding = new Padding(20 , 0 , 20 , 0),
         };
         //TODO: Chia thành table layout có 2 hàng 1 cái của bảng 1 cái của lịch
@@ -233,6 +242,7 @@ public class MoDangKyHocPhan : NavBase
         dataGridView.BorderStyle = BorderStyle.None;
         dataGridView.CellBorderStyle = DataGridViewCellBorderStyle.None;
         dataGridView.RowHeadersVisible = false;
+        dataGridView.Dock = DockStyle.Fill;
         // change Width
         bool _actionsAdded = false;
         dataGridView.DataBindingComplete += (s, e) =>
@@ -240,38 +250,55 @@ public class MoDangKyHocPhan : NavBase
             if (_actionsAdded) return;
             _actionsAdded = true;
             dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            dataGridView.Columns[0].Width = 120;
-            dataGridView.Columns[1].Width = 220;
-            dataGridView.Columns[2].Width = 100;
-            dataGridView.Columns[3].Width = 80;
-            dataGridView.Columns[4].Width = 100;
-            dataGridView.Columns[5].Width = 100;
-            dataGridView.Columns[6].Width = 148;
-            dataGridView.Columns[7].Width = 100;
+            int[] weights = {150, 250, 120, 80, 120, 120, 148 , 120};
+            for (int i = 0; i < dataGridView.Columns.Count && i < weights.Length; i++)
+            {
+                var col = dataGridView.Columns[i];
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                col.FillWeight = weights[i];
+                col.MinimumWidth = 80;
+            }
             
-            var editIcon = SvgDocument.Open(Path.Combine(AppContext.BaseDirectory,"img","fix.svg")).Draw(20, 20);
-            var delIcon  = SvgDocument.Open(Path.Combine(AppContext.BaseDirectory,"img","trashbin.svg")).Draw(20, 20);
+            var editIcon = _cUse.CreateIconWithBackground(
+                Path.Combine(AppContext.BaseDirectory,"img","fix.svg"),
+                Color.Black,
+                ColorTranslator.FromHtml("#6DB7E3"),
+                28,
+                6,
+                4
+            );
+            var delIcon  = _cUse.CreateIconWithBackground(
+                Path.Combine(AppContext.BaseDirectory,"img","trashbin.svg"),
+                Color.Black,
+                ColorTranslator.FromHtml("#FF6B6B"),
+                28,
+                6,
+                4
+            );
             var colEdit = new DataGridViewImageColumn {
                 Name = "Edit",
                 Image = editIcon,
                 DataPropertyName = null,
-                Width = 75
+                Width = 60,
+                ImageLayout = DataGridViewImageCellLayout.Normal
             };
+            
             var colDel = new DataGridViewImageColumn {
-                Name = "Delete",
+                Name = "Del",
                 Image = delIcon,
                 DataPropertyName = null,
-                Width = 75
+                Width = 60,
+                ImageLayout = DataGridViewImageCellLayout.Normal
             };
             dataGridView.Columns.Add(colEdit);
             dataGridView.Columns.Add(colDel);
             dataGridView.Columns["Edit"].DisplayIndex   = 8;
-            dataGridView.Columns["Delete"].DisplayIndex = 9;
+            dataGridView.Columns["Del"].DisplayIndex = 9;
             dataGridView.CellClick += (s, e) =>
             {
                 if (e.RowIndex < 0) return;
                 if (e.ColumnIndex == dataGridView.Columns["Edit"]?.Index) { Console.WriteLine("sua"); }
-                else if (e.ColumnIndex == dataGridView.Columns["Delete"]?.Index) { Console.WriteLine("xoa"); }
+                else if (e.ColumnIndex == dataGridView.Columns["Del"]?.Index) { Console.WriteLine("xoa"); }
             };
         };
         
