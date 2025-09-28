@@ -194,7 +194,7 @@ public class MyHome : Form
             RowCount = 2,
         };
         
-        parRight.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // parRight.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         
         parRight.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         parRight.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
@@ -233,7 +233,7 @@ public class MyHome : Form
          rightTop.Controls.Add(_searchBar);
          rightTop.Controls.Add(accountInfo);
          
-         rightTop.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+         // rightTop.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
          
          parRight.Controls.Add(rightTop);
          parRight.Controls.Add(rightBottomHost);
@@ -305,7 +305,7 @@ public class MyHome : Form
         AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         AccountInfo.AutoSize = true;
         
-        AccountInfo.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;        
+        // AccountInfo.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;        
         
         
         var userIcon = new PictureBox

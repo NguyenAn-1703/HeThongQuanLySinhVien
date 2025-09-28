@@ -4,26 +4,26 @@ using LiveChartsCore.SkiaSharpView;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Chart;
 
-public class View : UserControl
+public class OverViewChart : UserControl
 {
-    public View()
+    public OverViewChart(int[] listValue)
     {
         Size = new System.Drawing.Size(400, 400);
 
         var cartesianChart = new CartesianChart
         {
-            LegendPosition = LegendPosition.Right,
+            LegendPosition = LegendPosition.Bottom,
             Series = [
                 new LineSeries<int>
                 {
-                    Values = [5, 10, 8, 4],
-                    Name = "Mary"
+                    Values = listValue,
+                    Name = "Tổng số sinh viên"
                 },
-                new ColumnSeries<int>
-                {
-                    Values = [4, 7, 3, 8],
-                    Name = "Ana"
-                }
+                // new ColumnSeries<int>
+                // {
+                //     Values = [4, 7, 3, 8],
+                //     Name = "Ana"
+                // }
             ],
 
             Location = new System.Drawing.Point(0, 0),

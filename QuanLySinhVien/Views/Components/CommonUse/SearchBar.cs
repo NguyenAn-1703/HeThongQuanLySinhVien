@@ -26,7 +26,7 @@ public class SearchBar: TableLayoutPanel
         this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
-        this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
 
         RoundTLP searchField = getSearchField();
 

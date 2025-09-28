@@ -2,7 +2,6 @@ using LiveChartsCore.SkiaSharpView.WinForms;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.Views.Enums;
-using WinFormsSample.Pies.Doughnut;
 
 
 namespace QuanLySinhVien.Views.Components.NavList;
@@ -33,20 +32,19 @@ public class ThongKe : NavBase
         mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         
-        mainLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // mainLayout.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         
         mainLayout.Controls.Add(new StatisticalBox("Tổng số sinh viên", 123, StatisticalIndex.first));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số giảng viên", 123, StatisticalIndex.second));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số ngành", 123, StatisticalIndex.third));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", 123, StatisticalIndex.fourth));
 
-        CommonUse.Chart.View chart = GetChart();
+        OverViewChart chart = GetOverViewChart();
         mainLayout.Controls.Add(chart);
         mainLayout.SetColumnSpan(chart, 3);
 
-        MyChart sideChart = GetSideStatistical();
-        mainLayout.Controls.Add(sideChart);
-        mainLayout.SetRowSpan(sideChart, 2);
+        TableLayoutPanel sideContainer = GetPieChartContainer();
+        mainLayout.Controls.Add(sideContainer);
 
         TableLayoutPanel bottomBoxContainer = this.GetBottomContainer();
         mainLayout.Controls.Add(bottomBoxContainer);
@@ -56,18 +54,43 @@ public class ThongKe : NavBase
         this.Controls.Add(mainLayout);
     }
 
-    CommonUse.Chart.View GetChart()
+    OverViewChart GetOverViewChart()
     {
-        CommonUse.Chart.View chart = new CommonUse.Chart.View();
+        int[] soSVTheoNam = new[] { 100, 150, 110, 90, 88, 120 };
+        OverViewChart chart = new OverViewChart(soSVTheoNam);
         chart.Dock = DockStyle.Fill;
         return chart;
     }
 
-    MyChart GetSideStatistical()
+    TableLayoutPanel GetPieChartContainer()
     {
-        MyChart chart =  new MyChart();
-        chart.Dock = DockStyle.Fill;
-        chart.BorderStyle = BorderStyle.FixedSingle;
+        TableLayoutPanel panel = new TableLayoutPanel
+        {
+            Anchor = AnchorStyles.None,
+            RowCount = 2,
+            AutoSize = true
+        };
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        Label title = new Label();
+        title.AutoSize = true;
+        title.Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold);
+        title.Text = "Số sinh viên theo khóa";
+        
+        panel.Controls.Add(title);
+        panel.Controls.Add(GetPieChart());
+        // panel.Controls.Add(new Panel());
+        // panel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        return panel;
+    }
+
+    CustomPieChart GetPieChart()
+    {
+        string[] dsKhoaHoc = new[] { "Khóa 22", "Khóa 23", "Khóa 24", "Khóa 25" };
+        float[] percent = new[] { 20f, 20f, 25f, 25f, 10f };
+        
+        CustomPieChart chart =  new CustomPieChart(dsKhoaHoc, percent);
         return chart;
     }
 

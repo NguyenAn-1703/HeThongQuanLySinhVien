@@ -60,7 +60,7 @@ public class StatisticalTop5Box : TableLayoutPanel
             this.Controls.Add(lbl2);
         }
 
-        this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
 
 
     }

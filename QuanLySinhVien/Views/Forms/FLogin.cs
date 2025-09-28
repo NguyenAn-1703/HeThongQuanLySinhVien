@@ -267,7 +267,7 @@ public class FLogin : Form
         
         //Tiêu đề
         Label title = new Label();
-        title.Text = "Hệ thống quản lý sinh viên Best Việt Nam";
+        title.Text = "Hệ thống quản lý sinh viên SGU";
         title.Font = GetFont.GetMainFont(12, FontType.Black);
         title.AutoSize = true;
         title.Anchor = AnchorStyles.None;
