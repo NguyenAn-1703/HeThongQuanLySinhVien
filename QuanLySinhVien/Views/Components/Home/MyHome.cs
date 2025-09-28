@@ -68,6 +68,7 @@ public class MyHome : Form
         // layout border
         parLeft = new Panel
         {
+            Margin = new Padding(0),
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.GrayBackGround
@@ -76,6 +77,7 @@ public class MyHome : Form
         // left panel
         left = new TableLayoutPanel()
         {
+            Margin = new Padding(0),
             Dock = DockStyle.Fill,
             AutoSize = true,
             RowCount = 3

@@ -8,7 +8,7 @@ namespace QuanLySinhVien.Views.Components;
 public class TrangChu : NavBase
 {
     private string[] _listSelectionForComboBox = new[] { "" };
-    private Panel _image;
+    private BackgroundPic _image;
     private int _imgWidth = 364;
     private int _imgHeight = 626;
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
@@ -19,7 +19,7 @@ public class TrangChu : NavBase
 
     private void Init()
     {
-        //BackColor = Color.Blue;
+        BackColor = MyColor.GrayBackGround;
         Dock = DockStyle.Fill;
         Margin = new Padding(0);
 
@@ -31,8 +31,9 @@ public class TrangChu : NavBase
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-        mainLayout.Controls.Add(new Panel());
+        mainLayout.Controls.Add(GetLeftPanel());
 
+        // new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn")
         
         SetImage();
         mainLayout.Controls.Add(_image);
@@ -47,16 +48,21 @@ public class TrangChu : NavBase
 
     void updateSize()
     {
+        this.SuspendLayout();
+        _image.SuspendLayout();
         _image.Height = this.Height;
         _image.Width = this.Height * _imgWidth / _imgHeight;
         _lbl2.Location = new Point(50, _image.Bottom - 250);
         _lbl3.Location = new Point(50, _image.Bottom - 130);
         _lbl4.Location = new Point(50, _image.Bottom - 100);
+        Console.WriteLine("a");
+        this.ResumeLayout();
+        _image.ResumeLayout();
     }
 
     void SetImage()
     {
-        _image = new Panel
+        _image = new BackgroundPic
         {
             Margin = new Padding(0),
             BackgroundImage = GetPng.GetImage("img/jpg/homeimg.jpg"),
@@ -115,8 +121,6 @@ public class TrangChu : NavBase
         _image.Controls.Add(_lbl2);
         _image.Controls.Add(_lbl3);
         _image.Controls.Add(_lbl4);
-        
-        
     }
 
     PictureBox GetStar()
@@ -129,9 +133,46 @@ public class TrangChu : NavBase
             SizeMode = PictureBoxSizeMode.Zoom,
             Image = GetSvgBitmap.GetBitmap("star.svg")
         };
-        
-        
         return pb;
+    }
+
+    TableLayoutPanel GetLeftPanel()
+    {
+        TableLayoutPanel panel = new TableLayoutPanel();
+        panel.Margin = new Padding(0);
+        panel.Padding = new Padding(40);
+        panel.Dock = DockStyle.Fill;
+        panel.RowCount = 5;
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+        
+        Label name = new Label();
+        name.Text = "Hệ thống quản lý sinh viên \nSGU";
+        name.AutoSize = true;
+        name.Font = GetFont.GetFont.GetPlayFairFont(25, FontType.Regular);
+        name.ForeColor = MyColor.MainColor;
+
+        BoxHome box1 = new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn.");
+        BoxHome box2 = new BoxHome("Bảo mật", "Hệ thống bảo mật an toàn.");
+        BoxHome box3 = new BoxHome("Nhanh chóng", "Lưu trữ và tải dữ liệu nhanh chóng.");
+        BoxHome box4 = new BoxHome("Thân thiện", "Thao tác dễ dàng.");
+
+        box1.Anchor = AnchorStyles.Left;
+        box3.Anchor = AnchorStyles.Left;
+        box2.Anchor = AnchorStyles.Right;
+        box4.Anchor = AnchorStyles.Right;
+        
+        panel.Controls.Add(name);
+        panel.Controls.Add(box1);
+        panel.Controls.Add(box2);
+        panel.Controls.Add(box3);
+        panel.Controls.Add(box4);
+        
+        return panel;
+
     }
 
 
