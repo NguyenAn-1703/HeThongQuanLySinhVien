@@ -27,7 +27,7 @@ public class StatisticalTop5Box : TableLayoutPanel
         this.RowCount = 6;
 
         _title.AutoSize = true;
-        _title.Font = GetFont.GetFont.GetMainFont(13, FontType.Bold);
+        _title.Font = GetFont.GetFont.GetMainFont(11, FontType.Bold);
         
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -52,8 +52,8 @@ public class StatisticalTop5Box : TableLayoutPanel
             lbl1.Text = _listTen[i];
             lbl2.Text = _listPhanTram[i] + "";
 
-            lbl1.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
-            lbl2.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
+            lbl1.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
+            lbl2.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
             
             
             this.Controls.Add(lbl1);

@@ -1,5 +1,8 @@
+using LiveChartsCore.SkiaSharpView.WinForms;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.Views.Enums;
+using WinFormsSample.Pies.Doughnut;
 
 
 namespace QuanLySinhVien.Views.Components.NavList;
@@ -40,16 +43,14 @@ public class ThongKe : NavBase
         CommonUse.Chart.View chart = GetChart();
         mainLayout.Controls.Add(chart);
         mainLayout.SetColumnSpan(chart, 3);
-        
-        mainLayout.Controls.Add(GetSideStatistical());
 
-        
-        string[] listTen = new string[] { "Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin"};
-        float[] listPhanTram = new[] { 100f, 100f, 100f, 100f, 100f };
-        StatisticalTop5Box box1 = new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp cao nhất", listTen, listPhanTram);
-        
-        mainLayout.Controls.Add(box1);
-        mainLayout.SetColumnSpan(box1, 3);
+        MyChart sideChart = GetSideStatistical();
+        mainLayout.Controls.Add(sideChart);
+        mainLayout.SetRowSpan(sideChart, 2);
+
+        TableLayoutPanel bottomBoxContainer = this.GetBottomContainer();
+        mainLayout.Controls.Add(bottomBoxContainer);
+        mainLayout.SetColumnSpan(bottomBoxContainer, 3);
         
         
         this.Controls.Add(mainLayout);
@@ -62,11 +63,35 @@ public class ThongKe : NavBase
         return chart;
     }
 
-    TableLayoutPanel GetSideStatistical()
+    MyChart GetSideStatistical()
+    {
+        MyChart chart =  new MyChart();
+        chart.Dock = DockStyle.Fill;
+        chart.BorderStyle = BorderStyle.FixedSingle;
+        return chart;
+    }
+
+    //chứa 2 box top5
+    TableLayoutPanel GetBottomContainer()
     {
         TableLayoutPanel panel = new TableLayoutPanel();
-        panel.BackColor = MyColor.Red;
-
+        panel.ColumnCount = 2;
+        panel.Dock = DockStyle.Fill;
+        panel.AutoSize = true;
+        
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        
+        string[] listTen1 = new string[] { "Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin"};
+        float[] listPhanTram1 = new[] { 100f, 100f, 100f, 100f, 100f };
+        StatisticalTop5Box box1 = new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp cao nhất", listTen1, listPhanTram1);
+        
+        string[] listTen2 = new string[] { "Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin","Công nghệ thông tin"};
+        float[] listPhanTram2 = new[] { 100f, 100f, 100f, 100f, 100f };
+        StatisticalTop5Box box2 = new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp thấp nhất", listTen2, listPhanTram2);
+        
+        panel.Controls.Add(box1);
+        panel.Controls.Add(box2);
         return panel;
     }
     
