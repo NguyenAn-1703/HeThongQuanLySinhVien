@@ -1,6 +1,7 @@
 using LiveChartsCore.SkiaSharpView.WinForms;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Chart;
+using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
 
@@ -40,11 +41,13 @@ public class ThongKe : NavBase
         mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", 123, StatisticalIndex.fourth));
 
         OverViewChart chart = GetOverViewChart();
+        chart.BackColor = MyColor.GrayBackGround;
         mainLayout.Controls.Add(chart);
         mainLayout.SetColumnSpan(chart, 3);
 
         TableLayoutPanel sideContainer = GetPieChartContainer();
         mainLayout.Controls.Add(sideContainer);
+        mainLayout.SetRowSpan(sideContainer, 2);
 
         TableLayoutPanel bottomBoxContainer = this.GetBottomContainer();
         mainLayout.Controls.Add(bottomBoxContainer);
@@ -62,14 +65,17 @@ public class ThongKe : NavBase
         return chart;
     }
 
-    TableLayoutPanel GetPieChartContainer()
+    RoundTLP GetPieChartContainer()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        RoundTLP panel = new RoundTLP
         {
-            Anchor = AnchorStyles.None,
+            Dock = DockStyle.Fill,
             RowCount = 2,
-            AutoSize = true
+            AutoSize = true,
+            Padding = new Padding(10),
+            Margin = new Padding(10)
         };
+        panel.BackColor = MyColor.GrayBackGround;
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 

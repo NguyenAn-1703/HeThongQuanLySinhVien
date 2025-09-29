@@ -1,9 +1,10 @@
 using OpenTK.Graphics.OpenGL;
+using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
-public class StatisticalTop5Box : TableLayoutPanel
+public class StatisticalTop5Box : RoundTLP
 {
     private Label _title;
     private string[] _listTen;
@@ -20,9 +21,10 @@ public class StatisticalTop5Box : TableLayoutPanel
 
     void Init()
     {
+        this.BackColor = MyColor.GrayBackGround;
         this.Dock = DockStyle.Fill;
         this.AutoSize = true;
-        
+        this.Margin = new Padding(5);
         this.ColumnCount = 2;
         this.RowCount = 6;
 

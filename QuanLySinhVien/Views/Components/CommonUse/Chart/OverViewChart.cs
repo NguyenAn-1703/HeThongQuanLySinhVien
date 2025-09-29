@@ -1,15 +1,16 @@
 using LiveChartsCore.SkiaSharpView.WinForms;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
+using QuanLySinhVien.Views.Components.ViewComponents;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Chart;
 
-public class OverViewChart : UserControl
+public class OverViewChart : RoundTLP
 {
     public OverViewChart(int[] listValue)
     {
         Size = new System.Drawing.Size(400, 400);
-
+        Margin = new Padding(10, 10, 10, 10);
         var cartesianChart = new CartesianChart
         {
             LegendPosition = LegendPosition.Bottom,
