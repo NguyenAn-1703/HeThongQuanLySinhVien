@@ -31,7 +31,6 @@ public class FLogin : Form
         mainPanel.BackColor = MyColor.White;
         mainPanel.ColumnCount = 2;
         mainPanel.Dock = DockStyle.Fill;
-        mainPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
         mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60));
         
@@ -59,13 +58,16 @@ public class FLogin : Form
     {
         TableLayoutPanel Button = new TableLayoutPanel
         {
+            Margin = new Padding(0),
             AutoSize = true,
         };
         PictureBox pb = new PictureBox
         {
+            Margin = new Padding(0),
             Image = GetSvgBitmap.GetBitmap("exitbutton.svg"),
-            Size = new Size(30, 30),
+            Size = new Size(40, 40),
             SizeMode = PictureBoxSizeMode.Zoom,
+            BorderStyle = BorderStyle.None,
         };
         Button.Dock = DockStyle.Right;
         
@@ -89,7 +91,8 @@ public class FLogin : Form
     {
         TableLayoutPanel controlPanel = new TableLayoutPanel
         {
-            RowCount = 3
+            RowCount = 3,
+            Margin = new Padding(0),
         };
         controlPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         controlPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));

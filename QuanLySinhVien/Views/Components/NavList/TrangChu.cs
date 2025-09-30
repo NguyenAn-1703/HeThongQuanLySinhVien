@@ -19,6 +19,7 @@ public class TrangChu : NavBase
 
     private void Init()
     {
+        this.SuspendLayout();
         BackColor = MyColor.GrayBackGround;
         Dock = DockStyle.Fill;
         Margin = new Padding(0);
@@ -41,9 +42,8 @@ public class TrangChu : NavBase
         
         SetContentInFrontOfImg();
         
-        
         this.Resize += (sender, args) => { updateSize(); };
-
+        this.ResumeLayout();
     }
 
     void updateSize()
@@ -55,7 +55,6 @@ public class TrangChu : NavBase
         _lbl2.Location = new Point(50, _image.Bottom - 250);
         _lbl3.Location = new Point(50, _image.Bottom - 130);
         _lbl4.Location = new Point(50, _image.Bottom - 100);
-        Console.WriteLine("a");
         this.ResumeLayout();
         _image.ResumeLayout();
     }

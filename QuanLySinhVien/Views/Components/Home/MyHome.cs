@@ -170,6 +170,7 @@ public class MyHome : Form
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
+            Margin = new Padding(10),
             ColumnCount = 2
         };
 
@@ -239,7 +240,10 @@ public class MyHome : Form
     //Đổi rightbottom sang bảng chức năng khác
     void ChangePanel(string function)
     {
-        rightBottomHost.SuspendLayout();
+        this.SuspendLayout();
+        parRight.SuspendLayout();
+        rightBottomChange.SuspendLayout();
+        
         rightBottomHost.Controls.Clear();
         
         String change = navListController.getDataButton(function);
@@ -249,9 +253,6 @@ public class MyHome : Form
         
         rightBottomChange.Dock = DockStyle.Fill;
         rightBottomHost.Controls.Add(rightBottomChange);
-        rightBottomHost.ResumeLayout(true);
-        rightBottomHost.Invalidate();
-        rightBottomHost.Refresh();
 
         if (rightBottomChange is TrangChu)
         {
@@ -265,6 +266,12 @@ public class MyHome : Form
             _emptyForUnTopBar.Visible = false;
             this.rightBottomHost.Padding = new Padding(10);
         }
+        
+        parRight.ResumeLayout();
+        rightBottomChange.ResumeLayout();
+        this.ResumeLayout(true);
+        this.Invalidate();
+        this.Refresh();
     }
 
     void UpdateSearchCombobox(string function)

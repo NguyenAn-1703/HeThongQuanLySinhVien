@@ -6,9 +6,11 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 public class SearchBar: TableLayoutPanel
 {
     // private TextBox _searchBox;
-    private ComboBox Filter;
+    private CustomCombobox Filter;
 
     private List<String> listSelection;
+
+    private RoundTLP _searchFieldPanel;
     
     public SearchBar()
     {
@@ -27,32 +29,32 @@ public class SearchBar: TableLayoutPanel
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
         // this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-
-        RoundTLP searchField = getSearchField();
+        SetSearchField();
 
         this.Filter = getFilter();
         
-        this.Controls.Add(searchField);
+        this.Controls.Add(_searchFieldPanel);
         
         this.Controls.Add(Filter);
         
     }
 
-    RoundTLP getSearchField()
+    void SetSearchField()
     {
-        RoundTLP searchFieldPanel = new RoundTLP
+        _searchFieldPanel = new RoundTLP
         {
             BackColor = MyColor.White,
             ColumnCount = 2,
             Dock = DockStyle.Top,
             AutoSize = true,
             Margin = new Padding(10, 25, 10, 0),
-            BorderRadius = 30
+            BorderRadius = 30,
+            Border = true
         };
-        searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        _searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         
-        // searchFieldPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // _searchFieldPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         
 
         PictureBox iconGlass = new PictureBox
@@ -68,18 +70,20 @@ public class SearchBar: TableLayoutPanel
         field.Dock = DockStyle.Fill;
         field.Font = GetFont.GetFont.GetMainFont(12,  FontType.Regular);
         field.BorderStyle = BorderStyle.None;
-        field.Margin = new Padding(3, 5, 3, 3);
+        field.Margin = new Padding(3, 5, 7, 3);
         
         
-        searchFieldPanel.Controls.Add(iconGlass);
-        searchFieldPanel.Controls.Add(field);
-        return searchFieldPanel;
+        _searchFieldPanel.Controls.Add(iconGlass);
+        _searchFieldPanel.Controls.Add(field);
+
+        field.Enter += (sender, args) => onEnter();
+        field.Leave += (sender, args) => onLeave();
 
     }
 
-    ComboBox getFilter()
+    CustomCombobox getFilter()
     {
-        ComboBox filter = new ComboBox();
+        CustomCombobox filter = new CustomCombobox(new String[]{});
         filter.Margin = new Padding(10, 35, 10, 0);
         return filter;
     }
@@ -88,12 +92,24 @@ public class SearchBar: TableLayoutPanel
     {
         this.listSelection = list;
         this.listSelection.Insert(0, "Tất cả");
-        this.Filter.Items.Clear();
+        this.Filter.combobox.Items.Clear();
         
         foreach (string i in  listSelection)
         {
-            this.Filter.Items.Add(i);
+            this.Filter.combobox.Items.Add(i);
         }
-        this.Filter.SelectedIndex = 0;
+        this.Filter.combobox.SelectedIndex = 0;
+    }
+
+    void onEnter()
+    {
+        this._searchFieldPanel.BorderColor = MyColor.MainColor;
+        this._searchFieldPanel.Invalidate();
+    }
+
+    void onLeave()
+    {
+        this._searchFieldPanel.BorderColor = MyColor.GraySelectColor;
+        this._searchFieldPanel.Invalidate();
     }
 }

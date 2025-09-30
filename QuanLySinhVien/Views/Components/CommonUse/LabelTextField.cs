@@ -63,7 +63,7 @@ public class LabelTextField : TableLayoutPanel
             SizeMode = PictureBoxSizeMode.Zoom, 
             Image = GetSvgBitmap.GetBitmap("eye-close.svg"),
         };
-        _eyePb.Location = new Point(this._field.contentTextBox.Right + 207, 4);
+        _eyePb.Anchor = AnchorStyles.None;
         _eyePb.Cursor = Cursors.Hand;
         
         this._field.Controls.Add(_eyePb);    
