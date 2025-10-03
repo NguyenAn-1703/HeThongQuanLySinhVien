@@ -47,10 +47,7 @@ public class MyHome : Form
 
     private void Init()
     {
-        #region mainLayout
-        // Chia layout co dãn theo kích thước window
-        // Bố cục 2 phần trái, phải, kích thước theo component bên trong
-        #endregion
+
         mainLayout = new TableLayoutPanel
         {
             ColumnCount = 2,
@@ -58,6 +55,8 @@ public class MyHome : Form
         };
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        mainLayout.SuspendLayout();
 
         
         // Client
@@ -226,8 +225,7 @@ public class MyHome : Form
          mainLayout.Controls.Add(parRight);
          Controls.Add(mainLayout);
         
-         ResumeLayout(performLayout: true);
-        
+         mainLayout.ResumeLayout(true);
     }
     
     //update khi 1 item khác được chọn
@@ -240,12 +238,12 @@ public class MyHome : Form
     //Đổi rightbottom sang bảng chức năng khác
     void ChangePanel(string function)
     {
-        this.SuspendLayout();
-        parRight.SuspendLayout();
+        mainLayout.SuspendLayout();
+        
+        rightBottomHost.SuspendLayout();
         rightBottomChange.SuspendLayout();
         
         rightBottomHost.Controls.Clear();
-        
         String change = navListController.getDataButton(function);
         Console.WriteLine(change);
         rightBottomChange = navListController.update(change);
@@ -269,9 +267,8 @@ public class MyHome : Form
         
         parRight.ResumeLayout();
         rightBottomChange.ResumeLayout();
-        this.ResumeLayout(true);
-        this.Invalidate();
-        this.Refresh();
+        rightBottomHost.ResumeLayout();
+        mainLayout.ResumeLayout(true);
     }
 
     void UpdateSearchCombobox(string function)
@@ -414,4 +411,10 @@ public class MyHome : Form
         mainLayout.ResumeLayout();
     }
 
+
+    // void SuspendLayoutStart()
+    // {
+    //     this.SuspendLayout();
+    //     this.
+    // }
 }

@@ -6,7 +6,7 @@ namespace QuanLySinhVien.Views.Components;
 public class QuanLiTaiKhoan : NavBase
 {
     private string[] _listSelectionForComboBox = new []{"Mã tài khoản", "Tên tài khoản"};
-    
+    private CustomTable _table;
     public QuanLiTaiKhoan()
     {
         Init();
@@ -14,40 +14,46 @@ public class QuanLiTaiKhoan : NavBase
         
     private void Init()
     {
-        //BackColor = Color.Blue;
-        Dock = DockStyle.Bottom;
-        Size = new Size(1200, 900);
-        var borderTop = new Panel
+        Dock = DockStyle.Fill;
+        
+        TableLayoutPanel mainLayout = new  TableLayoutPanel
         {
+            RowCount = 2,
             Dock = DockStyle.Fill,
-            // Padding = new  Padding(0 , 30 , 0 , 0),
         };
-        borderTop.Controls.Add(Top());
-        Controls.Add(borderTop);
-        Controls.Add(Bottom());
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        mainLayout.Controls.Add(Top());
+        mainLayout.Controls.Add(Bottom());
+
+        Controls.Add(mainLayout);
     }
 
     private Panel Top()
     {
-        Panel mainTop = new Panel
+        Panel panel = new Panel
         {
             Dock = DockStyle.Bottom,
-            // BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             BackColor = Color.Red,
             Height = 90,
         };
-        return mainTop;
+        return panel;
     }
 
     private Panel Bottom()
     {
-        Panel mainBot = new Panel
+        TableLayoutPanel panel = new TableLayoutPanel
         {
-            Dock = DockStyle.Bottom,
-            BackColor = Color.Green,
-            Height = 780,
+            Dock = DockStyle.Fill,
         };
-        return mainBot;
+
+        string[] headerArray = new string[] { "Mã tài khoản", "Tên tài khoản", "người dùng" };
+        List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
+        _table = new CustomTable(headerList);
+        panel.Controls.Add(_table);
+        
+        return panel;
     }
 
     public override List<string> getComboboxList()

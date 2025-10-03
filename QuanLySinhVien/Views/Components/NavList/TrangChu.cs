@@ -12,6 +12,7 @@ public class TrangChu : NavBase
     private int _imgWidth = 364;
     private int _imgHeight = 626;
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
+    private TableLayoutPanel _leftPanel;
     public TrangChu()
     {
         Init();
@@ -25,6 +26,7 @@ public class TrangChu : NavBase
         Margin = new Padding(0);
 
         TableLayoutPanel mainLayout = new TableLayoutPanel();
+        mainLayout.SuspendLayout();
         mainLayout.Margin = new Padding(0);
         mainLayout.Dock = DockStyle.Fill;
 
@@ -32,31 +34,32 @@ public class TrangChu : NavBase
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-        mainLayout.Controls.Add(GetLeftPanel());
+        _leftPanel = GetLeftPanel();
+        mainLayout.Controls.Add(_leftPanel);
 
         // new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn")
         
         SetImage();
         mainLayout.Controls.Add(_image);
+        mainLayout.ResumeLayout();
+        
         this.Controls.Add(mainLayout);
         
         SetContentInFrontOfImg();
         
         this.Resize += (sender, args) => { updateSize(); };
+        
         this.ResumeLayout();
     }
 
     void updateSize()
     {
-        this.SuspendLayout();
         _image.SuspendLayout();
         _image.Height = this.Height;
         _image.Width = this.Height * _imgWidth / _imgHeight;
         _lbl2.Location = new Point(50, _image.Bottom - 250);
         _lbl3.Location = new Point(50, _image.Bottom - 130);
         _lbl4.Location = new Point(50, _image.Bottom - 100);
-        this.ResumeLayout();
-        _image.ResumeLayout();
     }
 
     void SetImage()
@@ -82,6 +85,7 @@ public class TrangChu : NavBase
 
     void SetContentInFrontOfImg()
     {
+        _image.SuspendLayout();
         _lbl1 = new Label();
         _lbl1.Text = "SGU";
         _lbl1.AutoSize = true;
@@ -120,6 +124,8 @@ public class TrangChu : NavBase
         _image.Controls.Add(_lbl2);
         _image.Controls.Add(_lbl3);
         _image.Controls.Add(_lbl4);
+        
+        _image.ResumeLayout();
     }
 
     PictureBox GetStar()
@@ -138,6 +144,7 @@ public class TrangChu : NavBase
     TableLayoutPanel GetLeftPanel()
     {
         TableLayoutPanel panel = new TableLayoutPanel();
+        panel.SuspendLayout();
         panel.Margin = new Padding(0);
         panel.Padding = new Padding(40);
         panel.Dock = DockStyle.Fill;
@@ -169,15 +176,15 @@ public class TrangChu : NavBase
         panel.Controls.Add(box2);
         panel.Controls.Add(box3);
         panel.Controls.Add(box4);
-        
+        panel.ResumeLayout();
         return panel;
 
     }
 
 
+    
     public override List<string> getComboboxList()
         {
             return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
         }
-    
     }
