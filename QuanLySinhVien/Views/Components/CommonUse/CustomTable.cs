@@ -1,101 +1,123 @@
 using System.Data;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 
-public class CustomTable : FlowLayoutPanel
+public class CustomTable : TableLayoutPanel
 {
-    private List<string> _header;
-    private Panel _parForDock = new Panel();
-    private int[] _locationX;
-    private FlowLayoutPanel _headerPanel;
-    
-
-    private List<Control> _lblHeaders;
-    public CustomTable(List<string> header)
+    DataGridView _dataGridView;
+    DataTable _dataTable;
+    List<String> _headerContent;
+    private FlowLayoutPanel _header;
+    private List<List<object>> _cellDatas;
+    private bool _action;
+    public CustomTable(List<String> headerContent, List<List<object>> cells, bool action = false)
     {
-        _header = header;
-        _locationX = new int[_header.Count];
-        _lblHeaders = new List<Control>();
+        _headerContent = headerContent;
+        _header = new FlowLayoutPanel();
+        _dataTable = new DataTable();
+        _cellDatas = cells;
+        _action = action;
         Init();
     }
 
     void Init()
     {
-        this.Dock = DockStyle.Fill;
-        this.FlowDirection = FlowDirection.TopDown;
-        this.BorderStyle = BorderStyle.FixedSingle;
-        this.Controls.Add(_parForDock);
-        
+        Configuration();
         SetHeader();
-        
-        // FlowLayoutPanel panel = new FlowLayoutPanel{AutoSize = true};
-        //
-        // panel.FlowDirection = FlowDirection.TopDown;
-        // panel.BorderStyle = BorderStyle.FixedSingle;
-        // panel.SuspendLayout();
-        // for (int i = 0; i < 20; i++)
-        // {
-        //     Panel box = new Panel
-        //     {
-        //         BackColor = MyColor.Red,
-        //         Size = new Size(1000, 10),
-        //     };
-        //     panel.Controls.Add(box);
-        // }
-        //
-        // this.Controls.Add(panel);
-        //
-        // panel.ResumeLayout();
-
+        SetContent();
+        // this.CellBorderStyle =TableLayoutPanelCellBorderStyle.Single;
         this.Resize += (sender, args) => OnResize();
+    }
+
+    void Configuration()
+    {
+        this.Dock = DockStyle.Fill;
+        this.RowCount = 2;
+        this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        
+        _dataGridView = new DataGridView
+        {
+            AllowUserToAddRows = false,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            AllowUserToResizeColumns = false,
+            AllowUserToResizeRows = false,
+            Dock = DockStyle.Fill,
+            BackgroundColor = Color.White,
+            RowHeadersVisible = false,
+            ColumnHeadersVisible = false,
+            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+            AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+            {
+                BackColor = ColorTranslator.FromHtml("#f5f5f5")
+            }, 
+        };
+        _dataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
     }
 
     void SetHeader()
     {
-        _headerPanel  = new FlowLayoutPanel
-        {
-            AutoSize = true, 
-            Dock = DockStyle.Top,
-            Margin = new Padding(0),
-            WrapContents = false,
-        };
+        _header.Dock = DockStyle.Top;
+        _header.AutoSize = true;
+        _header.FlowDirection = FlowDirection.LeftToRight;
+        _header.WrapContents = false;
         
-        _headerPanel.BorderStyle = BorderStyle.FixedSingle;
-        
-        for (int i = 0; i < _header.Count; i++)
+        foreach (String i in _headerContent)
         {
-            _lblHeaders.Add(GetLabel(_header[i]));
-            _headerPanel.Controls.Add(_lblHeaders[i]);
+            this._header.Controls.Add(GetLabel(i));
+        }
+
+        if (_action)
+        {
+            _header.Controls.Add(GetLabel("Hành động"));
         }
         
-        this.Controls.Add(_headerPanel);
-        
+        this.Controls.Add(_header);
     }
 
-    Label GetLabel(string text)
+    void SetContent()
+    {
+        for (int i = 0; i < _headerContent.Count; i++)
+        {
+            _dataTable.Columns.Add(_headerContent[i], typeof(string));
+        }
+        
+        for (int i = 0; i < _cellDatas.Count; i++)
+        {
+            _dataTable.Rows.Add(_cellDatas[i].ToArray());
+        }
+        
+        _dataGridView.DataSource = _dataTable;
+        _dataGridView.BorderStyle = BorderStyle.FixedSingle;
+        _dataGridView.Dock = DockStyle.Fill;
+        _dataGridView.Font = GetFont.GetFont.GetMainFont(8, FontType.Regular);
+        this.Controls.Add(_dataGridView);
+    }
+
+    Label GetLabel(String text)
     {
         Label lbl = new Label
         {
+            Dock = DockStyle.Top,
+            Height = 30,
             Text = text,
-            BorderStyle = BorderStyle.FixedSingle,
-            Margin = new Padding(0),
+            TextAlign = ContentAlignment.MiddleCenter,
+            Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
         };
-        
+        lbl.BorderStyle = BorderStyle.FixedSingle;
         return lbl;
     }
 
-
-    // Cho phần DockFill mỗi hàng
     void OnResize()
     {
-        _parForDock.Size = new Size(this.Width - this.Padding.Left * 2, 0);
-        
-        int columnSize = this.Width/_header.Count;
-
-        for (int i = 0; i < _header.Count; i++)
+        int tableWidth = this.Width - 24;
+        int columnSize = _action ? tableWidth / (_headerContent.Count + 1) : tableWidth / _headerContent.Count;
+        foreach (Control c in _header.Controls)
         {
-            _lblHeaders[i].Size = new Size(columnSize, _lblHeaders[i].Height);
+            c.Size = new Size(columnSize, c.Height);
         }
     }
+    
 }

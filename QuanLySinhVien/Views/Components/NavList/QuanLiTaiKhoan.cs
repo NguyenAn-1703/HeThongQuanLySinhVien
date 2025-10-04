@@ -48,10 +48,72 @@ public class QuanLiTaiKhoan : NavBase
             Dock = DockStyle.Fill,
         };
 
-        string[] headerArray = new string[] { "Mã tài khoản", "Tên tài khoản", "người dùng" };
+        string[] headerArray = new string[] { "Mã tài khoản", "Tên tài khoản", "Người dùng" };
         List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
-        _table = new CustomTable(headerList);
-        panel.Controls.Add(_table);
+
+        object[,] datas =
+        {
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            {"1","an","Nguyen An"},
+            
+            
+        };
+        List<List<object>> listData = ConvertArray_ListString.ConvertArrayToListObject(datas);
+        
+        CustomTable table = new CustomTable(headerList, listData, true);
+        panel.Controls.Add(table);
         
         return panel;
     }
