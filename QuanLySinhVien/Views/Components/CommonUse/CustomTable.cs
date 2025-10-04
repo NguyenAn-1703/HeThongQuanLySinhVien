@@ -38,22 +38,7 @@ public class CustomTable : TableLayoutPanel
         this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        _dataGridView = new CustomDataGridView();
-        // {
-        //     AllowUserToAddRows = false,
-        //     AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-        //     AllowUserToResizeColumns = false,
-        //     AllowUserToResizeRows = false,
-        //     Dock = DockStyle.Fill,
-        //     BackgroundColor = Color.White,
-        //     RowHeadersVisible = false,
-        //     ColumnHeadersVisible = false,
-        //     SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-        //     AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
-        //     {
-        //         BackColor = ColorTranslator.FromHtml("#f5f5f5")
-        //     }, 
-        // };
+        _dataGridView = new CustomDataGridView(true);
         _dataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
     }
 
@@ -63,6 +48,9 @@ public class CustomTable : TableLayoutPanel
         _header.AutoSize = true;
         _header.FlowDirection = FlowDirection.LeftToRight;
         _header.WrapContents = false;
+        _header.BackColor = MyColor.MainColor;
+        _header.Margin =  new Padding(0, 0, 0, 0);
+        _header.Padding = new Padding(5, 0, 5,0);
         
         foreach (String i in _headerContent)
         {
@@ -84,22 +72,21 @@ public class CustomTable : TableLayoutPanel
             _dataTable.Columns.Add(_headerContent[i], typeof(string));
         }
         
+        for (int i = 0; i < _cellDatas.Count; i++)
+        {
+            _dataTable.Rows.Add(_cellDatas[i].ToArray());
+        }
+
         if (_action)
         {
             _dataTable.Columns.Add("Hành động");
         }
         
-        for (int i = 0; i < _cellDatas.Count; i++)
-        {
-            _dataTable.Rows.Add(_cellDatas[i].ToArray());
-        }
+        _dataGridView.DataSource = _dataTable;
+        _dataGridView.Dock = DockStyle.Fill;
+        _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
         
 
-        
-        _dataGridView.DataSource = _dataTable;
-        _dataGridView.BorderStyle = BorderStyle.FixedSingle;
-        _dataGridView.Dock = DockStyle.Fill;
-        _dataGridView.Font = GetFont.GetFont.GetMainFont(8, FontType.Regular);
         this.Controls.Add(_dataGridView);
     }
 
@@ -109,11 +96,10 @@ public class CustomTable : TableLayoutPanel
         {
             Dock = DockStyle.Top,
             Height = 30,
-            Text = text,
             TextAlign = ContentAlignment.MiddleCenter,
             Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
+            ForeColor = MyColor.White
         };
-        lbl.BorderStyle = BorderStyle.FixedSingle;
         return lbl;
     }
 

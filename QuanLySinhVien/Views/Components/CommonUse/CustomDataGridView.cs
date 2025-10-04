@@ -8,6 +8,7 @@ public class CustomDataGridView : DataGridView
 {
     private bool _action;
     private Bitmap editIcon = GetSvgBitmap.GetBitmap("fix.svg");
+    private Bitmap deleteIcon = GetSvgBitmap.GetBitmap("trashbin.svg");
     public CustomDataGridView(bool action = false)
     {
         _action = action;
@@ -17,11 +18,15 @@ public class CustomDataGridView : DataGridView
     void Init()
     {
         Configuration();
-        SetActionColumn();
+        if (_action)
+        {
+            SetActionColumn();
+        }
     }
 
     void Configuration()
     {
+        Margin = new Padding(0);
         DoubleBuffered = true;
         AllowUserToAddRows = false;
         AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -37,9 +42,10 @@ public class CustomDataGridView : DataGridView
             BackColor = ColorTranslator.FromHtml("#f5f5f5")
         };
         this.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        CellBorderStyle = DataGridViewCellBorderStyle.None;
         ReadOnly = true;
     }
-
+    
     void SetActionColumn()
     {
         CellPainting += (sender, args) => DrawBtn(args);
@@ -49,24 +55,33 @@ public class CustomDataGridView : DataGridView
     {
         if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Hành động"].Index)
         {
-            int PaddingX = 10; int PaddingY = 10;
-            int ButtonHeight = 30;
-            int ButtonWidth = 30;
+            int ButtonHeight = 20;
+            int ButtonWidth = 20;
+            int Margin = 5;
             
             //Cai dat cell trong nhu binh thuong
             e.PaintBackground(e.CellBounds, true);
             e.PaintContent(e.CellBounds);
             Rectangle rectEdit = new Rectangle(
-                e.CellBounds.Left + PaddingX, 
+                e.CellBounds.Left + (e.CellBounds.Width - 2*ButtonWidth - Margin) / 2, 
                 e.CellBounds.Top + (e.CellBounds.Height - ButtonHeight) / 2, 
                 ButtonWidth, 
                 ButtonHeight
                 ); 
-            Rectangle rectDelete = new Rectangle( rectEdit.Right + PaddingX, rectEdit.Top, ButtonWidth, ButtonHeight);
+            Rectangle rectDelete = new Rectangle( 
+                rectEdit.Right + Margin, 
+                rectEdit.Top, 
+                ButtonWidth, 
+                ButtonHeight
+                );
     
             e.Graphics.DrawImage(editIcon,rectEdit);
+            e.Graphics.DrawImage(deleteIcon,rectDelete);
+            
             e.Handled = true;
             
         }
     }
+    
+    
 }
