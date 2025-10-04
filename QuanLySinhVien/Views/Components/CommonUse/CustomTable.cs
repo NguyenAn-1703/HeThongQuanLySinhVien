@@ -6,7 +6,7 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CustomTable : TableLayoutPanel
 {
-    DataGridView _dataGridView;
+    CustomDataGridView _dataGridView;
     DataTable _dataTable;
     List<String> _headerContent;
     private FlowLayoutPanel _header;
@@ -37,23 +37,23 @@ public class CustomTable : TableLayoutPanel
         this.RowCount = 2;
         this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        
-        _dataGridView = new DataGridView
-        {
-            AllowUserToAddRows = false,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-            AllowUserToResizeColumns = false,
-            AllowUserToResizeRows = false,
-            Dock = DockStyle.Fill,
-            BackgroundColor = Color.White,
-            RowHeadersVisible = false,
-            ColumnHeadersVisible = false,
-            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = ColorTranslator.FromHtml("#f5f5f5")
-            }, 
-        };
+
+        _dataGridView = new CustomDataGridView();
+        // {
+        //     AllowUserToAddRows = false,
+        //     AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+        //     AllowUserToResizeColumns = false,
+        //     AllowUserToResizeRows = false,
+        //     Dock = DockStyle.Fill,
+        //     BackgroundColor = Color.White,
+        //     RowHeadersVisible = false,
+        //     ColumnHeadersVisible = false,
+        //     SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+        //     AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+        //     {
+        //         BackColor = ColorTranslator.FromHtml("#f5f5f5")
+        //     }, 
+        // };
         _dataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
     }
 
@@ -84,10 +84,17 @@ public class CustomTable : TableLayoutPanel
             _dataTable.Columns.Add(_headerContent[i], typeof(string));
         }
         
+        if (_action)
+        {
+            _dataTable.Columns.Add("Hành động");
+        }
+        
         for (int i = 0; i < _cellDatas.Count; i++)
         {
             _dataTable.Rows.Add(_cellDatas[i].ToArray());
         }
+        
+
         
         _dataGridView.DataSource = _dataTable;
         _dataGridView.BorderStyle = BorderStyle.FixedSingle;
