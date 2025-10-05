@@ -1,12 +1,16 @@
 using QuanLySinhVien.DAO;
 using QuanLySinhVien.DB;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.Views.Components.NavList;
+using QuanLySinhVien.Views.Components.CommonUse;
 using Svg;
 
 namespace QuanLySinhVien.Views.Components;
 
-public class NganhPanel : Panel
+public class NganhPanel : NavBase
 {
+    private string[] _listSelectionForComboBox = new []{""};
+    
     private DataGridView dataGrid;
     private TableLayoutPanel tableLayout;
     
@@ -483,11 +487,11 @@ public class NganhPanel : Panel
         if (dialog.ShowDialog() == DialogResult.OK)
         {
             int maNganh, maKhoa;
-            if (!int.TryParse(txtMaNganh.Text.Trim(), out maNganh))
-            {
-                MessageBox.Show("Mã Ngành phải là số nguyên.");
-                return null;
-            }
+            // if (!int.TryParse(txtMaNganh.Text.Trim(), out maNganh))
+            // {
+            //     MessageBox.Show("Mã Ngành phải là số nguyên.");
+            //     return null;
+            // }
             if (!int.TryParse(txtMaKhoa.Text.Trim(), out maKhoa))
             {
                 MessageBox.Show("Mã Khoa phải là số nguyên.");
@@ -499,9 +503,17 @@ public class NganhPanel : Panel
                 MessageBox.Show("Tên Ngành không được để trống.");
                 return null;
             }
+            if (nganh == null)
+                return new Nganh
+                {
+                    // MaNganh = maNganh,
+                    MaKhoa = maKhoa,
+                    TenNganh = tenNganh
+                };
+            
             return new Nganh
             {
-                MaNganh = maNganh,
+                MaNganh = nganh.MaNganh,
                 MaKhoa = maKhoa,
                 TenNganh = tenNganh
             };
@@ -527,5 +539,10 @@ public class NganhPanel : Panel
         }
 
         return bmp;
+    }
+    
+    public override List<string> getComboboxList()
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
 }

@@ -44,13 +44,17 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="LiveChartsCore.SkiaSharpView.WinForms" Version="2.0.0-rc5.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Include="MySqlConnector" Version="2.4.0" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
       <PackageReference Include="Svg" Version="3.4.7" />
     </ItemGroup>
+
 
     <ItemGroup>
       <None Remove="img\trangchu.svg" />
@@ -152,6 +156,11 @@
   	<Content Include="font\**\*.*">
     		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   	</Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>
