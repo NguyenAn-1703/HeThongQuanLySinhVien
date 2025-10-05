@@ -15,8 +15,8 @@ public class CustomDataGridView : DataGridView
     int _margin = 10;
     int _padding = 3;
     private int actionRadius = 10;
-    public event Action<Point> BtnHoverEdit;
-    public event Action<Point> BtnHoverDelete; 
+    public event Action<Point, int> BtnHoverEdit;
+    public event Action<Point, int> BtnHoverDelete; 
     public event Action BtnEditLeave;
     public event Action BtnDeleteLeave;
     
@@ -230,8 +230,7 @@ public class CustomDataGridView : DataGridView
             Rectangle recDelete;
             
             SetActionRegion(out recEdit, out  recDelete, cellRect);
-            
-            SetButtonAction(dgv, recEdit, recDelete);
+            SetButtonAction(dgv, recEdit, recDelete, e);
         }
     }
 
@@ -274,8 +273,9 @@ public class CustomDataGridView : DataGridView
         }
     }
 
-    void SetButtonAction(DataGridView dgv, Rectangle recEdit, Rectangle recDelete)
+    void SetButtonAction(DataGridView dgv, Rectangle recEdit, Rectangle recDelete, DataGridViewCellMouseEventArgs e)
     {
+        int index = e.RowIndex;
         //Kiểm tra vị trí chuột
         Point mousePos = dgv.PointToClient(Cursor.Position);
 
@@ -289,7 +289,7 @@ public class CustomDataGridView : DataGridView
             if (!flagEdit)
             {
                 flagEdit = true;
-                OnHoverButtonEdit(screenPosEdit);
+                OnHoverButtonEdit(screenPosEdit, index);
             }
         }
         else
@@ -306,7 +306,7 @@ public class CustomDataGridView : DataGridView
             if (!flagDelete)
             {
                 flagDelete = true;
-                OnHoverButtonDelete(screenPosDelete);
+                OnHoverButtonDelete(screenPosDelete, index);
             }
         }
         else
@@ -319,14 +319,14 @@ public class CustomDataGridView : DataGridView
         }
     }
 
-    void OnHoverButtonEdit(Point rec)
+    void OnHoverButtonEdit(Point rec, int index)
     {
-        BtnHoverEdit?.Invoke(rec);
+        BtnHoverEdit?.Invoke(rec, index);
     }
     
-    void OnHoverButtonDelete(Point rec)
+    void OnHoverButtonDelete(Point rec, int index)
     {
-        BtnHoverDelete?.Invoke(rec);
+        BtnHoverDelete?.Invoke(rec, index);
     }
 
     void OnLeaveButtonEdit()

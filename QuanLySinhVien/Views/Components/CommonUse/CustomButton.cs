@@ -8,6 +8,7 @@ public class CustomButton : RoundTLP
     public int PicHeight {get; set;}
     public string Svg {get; set;}
     public int Pad { get; set; } = 3;
+    
     public Color BackgroundColor {get; set;}
 
     public CustomButton(int width, int height, string svg, Color backColor)
@@ -34,6 +35,7 @@ public class CustomButton : RoundTLP
             Size = new Size(PicWidth, PicHeight),
             Image = GetSvgBitmap.GetBitmap(Svg),
             SizeMode = PictureBoxSizeMode.Zoom,
+            Enabled = false
         };
         this.Controls.Add(pB);
     }

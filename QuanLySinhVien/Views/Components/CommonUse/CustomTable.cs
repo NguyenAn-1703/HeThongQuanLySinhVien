@@ -112,15 +112,24 @@ public class CustomTable : TableLayoutPanel
 
     void SetEventListen()
     {
-        this._dataGridView.BtnHoverEdit += (rec) => OnHoverEditBtn(rec);
-        this._dataGridView.BtnHoverDelete += (rec) => OnHoverDeleteBtn(rec);
+        this._dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
+        
+        this._dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
+        this._dataGridView.BtnHoverDelete += (rec, index) => OnHoverDeleteBtn(rec, index);
         
         this._dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
         this._dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
     }
 
-    void OnHoverEditBtn(Point rec)
+    void OnDoubleClickRow(DataGridViewCellEventArgs e)
     {
+        int index = e.RowIndex;
+        detail(index);
+    }
+
+    void OnHoverEditBtn(Point rec, int index)
+    {
+        int rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
         _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor);
@@ -132,11 +141,13 @@ public class CustomTable : TableLayoutPanel
         _topForm.Controls.Add(_editBtn);
         
         _editBtn.BringToFront();
-        Console.WriteLine("Dang goij hover");
+
+        _editBtn.MouseDown += (sender, args) => edit(index);
     }
     
-    void OnHoverDeleteBtn(Point rec)
+    void OnHoverDeleteBtn(Point rec, int index)
     {
+        int rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
         _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover);
@@ -148,7 +159,8 @@ public class CustomTable : TableLayoutPanel
         _topForm.Controls.Add(_deleteBtn);
         
         _deleteBtn.BringToFront();
-        Console.WriteLine("Dang goij hover");
+        
+        _deleteBtn.MouseDown += (sender, args) => delete(index);
     }
 
     void OnLeaveEditBtn()
@@ -159,6 +171,37 @@ public class CustomTable : TableLayoutPanel
     void OnLeaveDeleteBtn()
     {
         _deleteBtn.Dispose();   
+    }
+
+    void delete(int index)
+    {
+        List<string> row = GetStringDataRowByIndex(index);
+        Console.WriteLine("Sửa :" + index + " " + string.Join(" ",row));
+    }
+
+    void edit(int index)
+    {
+        List<string> row = GetStringDataRowByIndex(index);
+        Console.WriteLine("Sửa :" + index + " " + string.Join(" ",row));
+    }
+
+    void detail(int index)
+    {
+        List<string> row = GetStringDataRowByIndex(index);
+        Console.WriteLine("Chi tiết :" + index + " " + string.Join(" ",row));
+    }
+    
+    List<string> GetStringDataRowByIndex(int index)
+    {
+        DataRow row = _dataTable.Rows[index];
+        List<string> arrayString = new List<string>();
+        foreach (var item in row.ItemArray)
+        {
+            string value = item.ToString();
+            arrayString.Add(value);
+        }
+
+        return arrayString;
     }
 
     void OnResize()
