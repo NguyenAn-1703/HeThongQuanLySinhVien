@@ -8,8 +8,8 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 public class CustomDataGridView : DataGridView
 {
     private bool _action;
-    private bool _edit = true;
-    private bool _delete = true;
+    private bool _edit;
+    private bool _delete;
     int ButtonHeight = 20;
     int ButtonWidth = 20;
     int _margin = 10;
@@ -28,9 +28,11 @@ public class CustomDataGridView : DataGridView
     private bool flagDelete = false;
     
     
-    public CustomDataGridView(bool action = false)
+    public CustomDataGridView(bool action = false, bool edit = false, bool delete = false)
     {
         _action = action;
+        _edit = edit;
+        _delete = delete;
         Init();
     }
 

@@ -112,7 +112,7 @@ public class QuanLiTaiKhoan : NavBase
         };
         List<List<object>> listData = ConvertArray_ListString.ConvertArrayToListObject(datas);
         
-        CustomTable table = new CustomTable(headerList, listData, true);
+        CustomTable table = new CustomTable(headerList, listData, true, true, true);
         panel.Controls.Add(table);
         
         return panel;
@@ -122,4 +122,10 @@ public class QuanLiTaiKhoan : NavBase
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+
+    public override void onSearch(string txtSearch)
+    {
+        // this._table.Search(txtSearch);
+    }
+
 }

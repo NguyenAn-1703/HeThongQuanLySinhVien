@@ -11,6 +11,9 @@ public class SearchBar: TableLayoutPanel
     private List<String> listSelection;
 
     private RoundTLP _searchFieldPanel;
+    private TextBox _field;
+    
+    public event Action<string> KeyDown;
     
     public SearchBar()
     {
@@ -65,19 +68,20 @@ public class SearchBar: TableLayoutPanel
             Margin = new Padding(20, 5, 20, 5),
         };
 
-        TextBox field = new TextBox();
-        field.PlaceholderText = "Tìm kiếm ...";
-        field.Dock = DockStyle.Fill;
-        field.Font = GetFont.GetFont.GetMainFont(12,  FontType.Regular);
-        field.BorderStyle = BorderStyle.None;
-        field.Margin = new Padding(3, 5, 7, 3);
+        _field = new TextBox();
+        _field.PlaceholderText = "Tìm kiếm ...";
+        _field.Dock = DockStyle.Fill;
+        _field.Font = GetFont.GetFont.GetMainFont(12,  FontType.Regular);
+        _field.BorderStyle = BorderStyle.None;
+        _field.Margin = new Padding(3, 5, 7, 3);
         
         
         _searchFieldPanel.Controls.Add(iconGlass);
-        _searchFieldPanel.Controls.Add(field);
+        _searchFieldPanel.Controls.Add(_field);
 
-        field.Enter += (sender, args) => onEnter();
-        field.Leave += (sender, args) => onLeave();
+        _field.Enter += (sender, args) => onEnter();
+        _field.Leave += (sender, args) => onLeave();
+        _field.KeyDown += (sender, args) => OnKeyDown(sender, args);
 
     }
 
@@ -111,5 +115,13 @@ public class SearchBar: TableLayoutPanel
     {
         this._searchFieldPanel.BorderColor = MyColor.GraySelectColor;
         this._searchFieldPanel.Invalidate();
+    }
+
+    void OnKeyDown(object e, KeyEventArgs k)
+    {
+        if (k.KeyCode == Keys.Enter)
+        {
+            KeyDown.Invoke(_field.Text);
+        }
     }
 }

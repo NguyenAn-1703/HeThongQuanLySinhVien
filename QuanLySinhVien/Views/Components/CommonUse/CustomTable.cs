@@ -3,7 +3,10 @@ using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
-
+#region Cách dùng
+//Set bool action trước để set nút xóa, sửa
+//Nếu set action và không set nút, tự động sẽ có nút xóa
+#endregion
 public class CustomTable : TableLayoutPanel
 {
     CustomDataGridView _dataGridView;
@@ -12,18 +15,21 @@ public class CustomTable : TableLayoutPanel
     private FlowLayoutPanel _header;
     private List<List<object>> _cellDatas;
     private bool _action;
+    private bool _edit;
+    private bool _delete;
     private Form _topForm;
 
     private CustomButton _editBtn;
     private CustomButton _deleteBtn;
-    public CustomTable(List<String> headerContent, List<List<object>> cells, bool action = false)
+    public CustomTable(List<String> headerContent, List<List<object>> cells, bool action = false, bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
         _header = new FlowLayoutPanel();
         _dataTable = new DataTable();
         _cellDatas = cells;
         _action = action;
-
+        _edit = edit;
+        _delete = delete;
         Init();
     }
 
@@ -44,7 +50,7 @@ public class CustomTable : TableLayoutPanel
         this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        _dataGridView = new CustomDataGridView(_action);
+        _dataGridView = new CustomDataGridView(_action, _edit, _delete);
     }
 
     void SetHeader()

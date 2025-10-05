@@ -54,4 +54,7 @@ public class ToChucThi : NavBase
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+    
+    public override void onSearch(string txtSearch){}
+
 }
