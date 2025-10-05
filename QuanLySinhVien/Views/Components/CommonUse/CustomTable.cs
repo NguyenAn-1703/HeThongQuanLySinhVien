@@ -15,6 +15,7 @@ public class CustomTable : TableLayoutPanel
     private Form _topForm;
 
     private CustomButton _editBtn;
+    private CustomButton _deleteBtn;
     public CustomTable(List<String> headerContent, List<List<object>> cells, bool action = false)
     {
         _headerContent = headerContent;
@@ -43,7 +44,7 @@ public class CustomTable : TableLayoutPanel
         this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        _dataGridView = new CustomDataGridView(true);
+        _dataGridView = new CustomDataGridView(_action);
     }
 
     void SetHeader()
@@ -111,15 +112,18 @@ public class CustomTable : TableLayoutPanel
 
     void SetEventListen()
     {
-        this._dataGridView.BtnHover += (rec) => OnHoverEditBtn(rec);
-        this._dataGridView.BtnLeave += () => OnLeaveEditBtn();
+        this._dataGridView.BtnHoverEdit += (rec) => OnHoverEditBtn(rec);
+        this._dataGridView.BtnHoverDelete += (rec) => OnHoverDeleteBtn(rec);
+        
+        this._dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
+        this._dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
     }
 
     void OnHoverEditBtn(Point rec)
     {
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
-        _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MediumBlue);
+        _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor);
          
         Point myPoint = _topForm.PointToClient(rec);
         
@@ -130,11 +134,31 @@ public class CustomTable : TableLayoutPanel
         _editBtn.BringToFront();
         Console.WriteLine("Dang goij hover");
     }
+    
+    void OnHoverDeleteBtn(Point rec)
+    {
+        //Vẽ vào form, không phụ thuộc layout
+        _topForm = this.FindForm();
+        _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover);
+         
+        Point myPoint = _topForm.PointToClient(rec);
+        
+        _deleteBtn.Location = myPoint;
+        
+        _topForm.Controls.Add(_deleteBtn);
+        
+        _deleteBtn.BringToFront();
+        Console.WriteLine("Dang goij hover");
+    }
 
     void OnLeaveEditBtn()
     {
         _editBtn.Dispose();
-        Console.WriteLine("Dang goij dípose");
+    }
+
+    void OnLeaveDeleteBtn()
+    {
+        _deleteBtn.Dispose();   
     }
 
     void OnResize()
