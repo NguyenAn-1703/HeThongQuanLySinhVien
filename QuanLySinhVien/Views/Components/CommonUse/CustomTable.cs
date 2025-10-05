@@ -12,6 +12,9 @@ public class CustomTable : TableLayoutPanel
     private FlowLayoutPanel _header;
     private List<List<object>> _cellDatas;
     private bool _action;
+    private Form _topForm;
+
+    private CustomButton _editBtn;
     public CustomTable(List<String> headerContent, List<List<object>> cells, bool action = false)
     {
         _headerContent = headerContent;
@@ -19,6 +22,7 @@ public class CustomTable : TableLayoutPanel
         _dataTable = new DataTable();
         _cellDatas = cells;
         _action = action;
+
         Init();
     }
 
@@ -29,6 +33,7 @@ public class CustomTable : TableLayoutPanel
         SetContent();
         // this.CellBorderStyle =TableLayoutPanelCellBorderStyle.Single;
         this.Resize += (sender, args) => OnResize();
+        SetEventListen();
     }
 
     void Configuration()
@@ -39,7 +44,6 @@ public class CustomTable : TableLayoutPanel
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
         _dataGridView = new CustomDataGridView(true);
-        _dataGridView.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
     }
 
     void SetHeader()
@@ -61,6 +65,7 @@ public class CustomTable : TableLayoutPanel
         {
             _header.Controls.Add(GetLabel("Hành động"));
         }
+
         
         this.Controls.Add(_header);
     }
@@ -97,10 +102,39 @@ public class CustomTable : TableLayoutPanel
             Dock = DockStyle.Top,
             Height = 30,
             TextAlign = ContentAlignment.MiddleCenter,
+            Text = text,
             Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
-            ForeColor = MyColor.White
+            ForeColor = MyColor.White,
         };
         return lbl;
+    }
+
+    void SetEventListen()
+    {
+        this._dataGridView.BtnHover += (rec) => OnHoverEditBtn(rec);
+        this._dataGridView.BtnLeave += () => OnLeaveEditBtn();
+    }
+
+    void OnHoverEditBtn(Point rec)
+    {
+        //Vẽ vào form, không phụ thuộc layout
+        _topForm = this.FindForm();
+        _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MediumBlue);
+         
+        Point myPoint = _topForm.PointToClient(rec);
+        
+        _editBtn.Location = myPoint;
+        
+        _topForm.Controls.Add(_editBtn);
+        
+        _editBtn.BringToFront();
+        Console.WriteLine("Dang goij hover");
+    }
+
+    void OnLeaveEditBtn()
+    {
+        _editBtn.Dispose();
+        Console.WriteLine("Dang goij dípose");
     }
 
     void OnResize()
@@ -112,5 +146,6 @@ public class CustomTable : TableLayoutPanel
             c.Size = new Size(columnSize, c.Height);
         }
     }
+    
     
 }

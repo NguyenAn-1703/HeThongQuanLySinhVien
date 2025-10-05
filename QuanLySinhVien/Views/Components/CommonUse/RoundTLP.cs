@@ -25,6 +25,7 @@ public class RoundTLP : TableLayoutPanel
         base.OnPaint(e);
         Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
         
+        e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         using (GraphicsPath path = new GraphicsPath())
         {
             if(TopLeft) path.AddArc(rect.X, rect.Y, BorderRadius, BorderRadius, 180, 90);
@@ -48,12 +49,12 @@ public class RoundTLP : TableLayoutPanel
                 using (Pen pen = new Pen(BorderColor, BorderSize))
                 {
                     pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Inset; 
-                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                     e.Graphics.DrawPath(pen, path);
                 }
             }
 
         }
+        e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
         
 
     }
