@@ -55,7 +55,8 @@ public class GiangVien : NavBase
             BackColor = Color.Transparent,
             ForeColor = Color.Black,
             Height = 30,
-            Width = 250,
+            Width = 300,
+            // AutoSize = true,
             TextAlign = ContentAlignment.MiddleRight,
         };
         
@@ -63,8 +64,8 @@ public class GiangVien : NavBase
         {
             Dock = DockStyle.Top,
             Height = 50,
-            Width = 250,
-            
+            Width = 300,
+            // AutoSize = true,
             Controls = { lb }
         };
         return pn;
@@ -105,13 +106,14 @@ public class GiangVien : NavBase
             Panel pnNgaySinh = PanelTop("Ngày sinh: ");
             Panel pnGioiTinh = PanelTop("Giới tính: ");
             Panel pnKhoa = PanelTop("Khoa: ");
+
             
             Form form = new Form()
             {
                 Text = "Thêm giảng viên",
                 Size = new Size(WForm, HForm),
                 StartPosition = FormStartPosition.CenterParent,
-                Controls = { pnKhoa, pnGioiTinh, pnNgaySinh, pnTen, pnMa, HeaderAddForm }
+                Controls = { HeaderAddForm}
             };
             form.ShowDialog();
         };
