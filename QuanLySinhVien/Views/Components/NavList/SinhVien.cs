@@ -24,7 +24,7 @@ public class SinhVien : NavBase
     }
         
     private void Init()
-    {
+    {   
         //BackColor = Color.Blue;
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);

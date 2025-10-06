@@ -1,0 +1,218 @@
+using System.Data;
+using QuanLySinhVien.Views.Enums;
+
+namespace QuanLySinhVien.Views.Components.CommonUse;
+
+
+public class CustomTable : TableLayoutPanel
+{
+    CustomDataGridView _dataGridView;
+    DataTable _dataTable;
+    List<String> _headerContent;
+    private FlowLayoutPanel _header;
+    private List<List<object>> _cellDatas;
+    private bool _action;
+    private Form _topForm;
+
+    private CustomButton _editBtn;
+    private CustomButton _deleteBtn;
+    public CustomTable(List<String> headerContent, List<List<object>> cells, bool action = false)
+    {
+        _headerContent = headerContent;
+        _header = new FlowLayoutPanel();
+        _dataTable = new DataTable();
+        _cellDatas = cells;
+        _action = action;
+
+        Init();
+    }
+
+    void Init()
+    {
+        Configuration();
+        SetHeader();
+        SetContent();
+        // this.CellBorderStyle =TableLayoutPanelCellBorderStyle.Single;
+        this.Resize += (sender, args) => OnResize();
+        SetEventListen();
+    }
+
+    void Configuration()
+    {
+        this.Dock = DockStyle.Fill;
+        this.RowCount = 2;
+        this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+        _dataGridView = new CustomDataGridView(_action);
+    }
+
+    void SetHeader()
+    {
+        _header.Dock = DockStyle.Top;
+        _header.AutoSize = true;
+        _header.FlowDirection = FlowDirection.LeftToRight;
+        _header.WrapContents = false;
+        _header.BackColor = MyColor.MainColor;
+        _header.Margin =  new Padding(0, 0, 0, 0);
+        _header.Padding = new Padding(5, 0, 5,0);
+        
+        foreach (String i in _headerContent)
+        {
+            this._header.Controls.Add(GetLabel(i));
+        }
+
+        if (_action)
+        {
+            _header.Controls.Add(GetLabel("Hành động"));
+        }
+
+        
+        this.Controls.Add(_header);
+    }
+
+    void SetContent()
+    {
+        for (int i = 0; i < _headerContent.Count; i++)
+        {
+            _dataTable.Columns.Add(_headerContent[i], typeof(string));
+        }
+        
+        for (int i = 0; i < _cellDatas.Count; i++)
+        {
+            _dataTable.Rows.Add(_cellDatas[i].ToArray());
+        }
+
+        if (_action)
+        {
+            _dataTable.Columns.Add("Hành động");
+        }
+        
+        _dataGridView.DataSource = _dataTable;
+        _dataGridView.Dock = DockStyle.Fill;
+        _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
+        
+
+        this.Controls.Add(_dataGridView);
+    }
+
+    Label GetLabel(String text)
+    {
+        Label lbl = new Label
+        {
+            Dock = DockStyle.Top,
+            Height = 30,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Text = text,
+            Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
+            ForeColor = MyColor.White,
+        };
+        return lbl;
+    }
+
+    void SetEventListen()
+    {
+        this._dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
+        
+        this._dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
+        this._dataGridView.BtnHoverDelete += (rec, index) => OnHoverDeleteBtn(rec, index);
+        
+        this._dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
+        this._dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
+    }
+
+    void OnDoubleClickRow(DataGridViewCellEventArgs e)
+    {
+        int index = e.RowIndex;
+        detail(index);
+    }
+
+    void OnHoverEditBtn(Point rec, int index)
+    {
+        int rowIndex = index;
+        //Vẽ vào form, không phụ thuộc layout
+        _topForm = this.FindForm();
+        _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor);
+         
+        Point myPoint = _topForm.PointToClient(rec);
+        
+        _editBtn.Location = myPoint;
+        
+        _topForm.Controls.Add(_editBtn);
+        
+        _editBtn.BringToFront();
+
+        _editBtn.MouseDown += (sender, args) => edit(index);
+    }
+    
+    void OnHoverDeleteBtn(Point rec, int index)
+    {
+        int rowIndex = index;
+        //Vẽ vào form, không phụ thuộc layout
+        _topForm = this.FindForm();
+        _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover);
+         
+        Point myPoint = _topForm.PointToClient(rec);
+        
+        _deleteBtn.Location = myPoint;
+        
+        _topForm.Controls.Add(_deleteBtn);
+        
+        _deleteBtn.BringToFront();
+        
+        _deleteBtn.MouseDown += (sender, args) => delete(index);
+    }
+
+    void OnLeaveEditBtn()
+    {
+        _editBtn.Dispose();
+    }
+
+    void OnLeaveDeleteBtn()
+    {
+        _deleteBtn.Dispose();   
+    }
+
+    void delete(int index)
+    {
+        List<string> row = GetStringDataRowByIndex(index);
+        Console.WriteLine("Sửa :" + index + " " + string.Join(" ",row));
+    }
+
+    void edit(int index)
+    {
+        List<string> row = GetStringDataRowByIndex(index);
+        Console.WriteLine("Sửa :" + index + " " + string.Join(" ",row));
+    }
+
+    void detail(int index)
+    {
+        List<string> row = GetStringDataRowByIndex(index);
+        Console.WriteLine("Chi tiết :" + index + " " + string.Join(" ",row));
+    }
+    
+    List<string> GetStringDataRowByIndex(int index)
+    {
+        DataRow row = _dataTable.Rows[index];
+        List<string> arrayString = new List<string>();
+        foreach (var item in row.ItemArray)
+        {
+            string value = item.ToString();
+            arrayString.Add(value);
+        }
+
+        return arrayString;
+    }
+
+    void OnResize()
+    {
+        int tableWidth = this.Width - 24;
+        int columnSize = _action ? tableWidth / (_headerContent.Count + 1) : tableWidth / _headerContent.Count;
+        foreach (Control c in _header.Controls)
+        {
+            c.Size = new Size(columnSize, c.Height);
+        }
+    }
+    
+    
+}

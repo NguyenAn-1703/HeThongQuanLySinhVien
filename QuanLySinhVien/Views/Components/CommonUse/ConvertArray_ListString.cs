@@ -3,12 +3,12 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 // Đổi kiểu mảng string sang list
 public class ConvertArray_ListString
 {
-    public static List<string> ConvertArrayToListString(string[] array)
+    public static List<String> ConvertArrayToListString(String[] array)
     {
-        List<string> list;
+        List<String> list;
         try
         {
-            list = new List<string>(array);
+            list = new List<String>(array);
         }
         catch (Exception e)
         {
@@ -32,5 +32,20 @@ public class ConvertArray_ListString
             throw;
         }
         return array;
+    }
+
+    public static List<List<object>> ConvertArrayToListObject(object[,] array)
+    {
+        List<List<object>> list = new List<List<object>>();
+        for (int row = 0; row < array.GetLength(0); row++)
+        {
+            List<object> rowItems = new List<object>();
+            for (int col = 0; col < array.GetLength(1); col++)
+            {
+                rowItems.Add(array[row, col]);
+            }
+            list.Add(rowItems);
+        }
+        return list;
     }
 }

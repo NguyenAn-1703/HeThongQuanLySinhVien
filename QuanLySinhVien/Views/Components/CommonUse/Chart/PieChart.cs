@@ -21,6 +21,7 @@ public class CustomPieChart : TableLayoutPanel
 
     void Init()
     {
+        this.Anchor = AnchorStyles.None;
         this.AutoSize = true;
         pieChart = new PieChart
         {

@@ -8,7 +8,7 @@ public class LabelTextField : TableLayoutPanel
 {
     private string _title;
     private TextFieldType _fieldType;
-    private TextBox _field;
+    private CustomTextBox _field;
     
     private PictureBox _eyePb;
     private bool statusEp = false;
@@ -36,9 +36,9 @@ public class LabelTextField : TableLayoutPanel
         this.Controls.Add(GetField());
     }
 
-    TextBox GetField()
+    CustomTextBox GetField()
     {
-        _field = new TextBox();
+        _field = new CustomTextBox();
         _field.Dock = DockStyle.Top;
         _field.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
         switch (_fieldType)
@@ -46,7 +46,7 @@ public class LabelTextField : TableLayoutPanel
             case TextFieldType.NormalText:
                 break;
             case TextFieldType.Password:
-                _field.PasswordChar = '*';
+                _field.contentTextBox.PasswordChar = '*';
                 setEyeButton();
                 break;
             
@@ -63,8 +63,9 @@ public class LabelTextField : TableLayoutPanel
             SizeMode = PictureBoxSizeMode.Zoom, 
             Image = GetSvgBitmap.GetBitmap("eye-close.svg"),
         };
-        _eyePb.Location = new Point(this._field.Right + 207, 2);
+        _eyePb.Anchor = AnchorStyles.None;
         _eyePb.Cursor = Cursors.Hand;
+        
         this._field.Controls.Add(_eyePb);    
         
         _eyePb.MouseEnter += (sender, args) => {_eyePb.BackColor = MyColor.GrayHoverColor;};
@@ -87,14 +88,14 @@ public class LabelTextField : TableLayoutPanel
         if (statusEp)
         {
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-close.svg");
-            this._field.PasswordChar = '*';
+            this._field.contentTextBox.PasswordChar = '*';
             statusEp = false;
         }
         // đóng -> mở
         else
         {
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-open.svg");
-            this._field.PasswordChar = '\0';
+            this._field.contentTextBox.PasswordChar = '\0';
             statusEp = true;
         }
     }
