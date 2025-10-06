@@ -154,21 +154,17 @@ public class NganhPanel : NavBase
             MessageBox.Show($"Lỗi khi tải danh sách ngành: {ex.Message}");
         }
 
-        var nganhsAsObjectList = _currentNganhs.Select(nganh => new List<object>
-        {
-            nganh.MaNganh,
-            nganh.MaKhoa,
-            nganh.TenNganh
-        }).ToList();
+        var nganhsAsObjectList = _currentNganhs.Cast<object>().ToList();
 
         if (_table == null)
         {
             string[] headerArray = new string[] { "Mã ngành", "Mã khoa", "Tên ngành" };
             List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
+            var columnNames = new List<string> { "MaNganh", "MaKhoa", "TenNganh" };
 
-            _table = new CustomTable(headerList, nganhsAsObjectList, true);
+            _table = new CustomTable(headerList, columnNames, nganhsAsObjectList, true, true, true);
 
-            _table.OnEdit += (index, row) =>
+            _table.OnEdit += (index) =>
             {
                 if (index >= 0 && index < _currentNganhs.Count)
                 {
@@ -191,7 +187,7 @@ public class NganhPanel : NavBase
                 }
             };
 
-            _table.OnDelete += (index, row) =>
+            _table.OnDelete += (index) =>
             {
                 if (index >= 0 && index < _currentNganhs.Count)
                 {
@@ -213,7 +209,7 @@ public class NganhPanel : NavBase
                 }
             };
 
-            _table.OnDetail += (index, row) =>
+            _table.OnDetail += (index) =>
             {
                 if (index >= 0 && index < _currentNganhs.Count)
                 {
@@ -454,4 +450,7 @@ public class NganhPanel : NavBase
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+    
+    public override void onSearch(string txtSearch, string filter)
+    { }
 }
