@@ -23,6 +23,11 @@ public class CustomTable : TableLayoutPanel
 
     private CustomButton _editBtn;
     private CustomButton _deleteBtn;
+    
+    public event Action<int, List<string>> OnEdit;
+    public event Action<int, List<string>> OnDelete;
+    public event Action<int, List<string>> OnDetail;
+    
     public CustomTable(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false, bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
@@ -52,8 +57,7 @@ public class CustomTable : TableLayoutPanel
         this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        _dataGridView = new CustomDataGridView(_action, _edit, _delete);
-        
+        _dataGridView = new CustomDataGridView(_action);
     }
 
     void SetHeader()
@@ -234,36 +238,15 @@ public class CustomTable : TableLayoutPanel
 
     public void Search(string search, string filter)
     {
-        // string keyword = search.Trim().Replace("'", "''");
-        //
-        // _dataGridView.DataSource = null;
-        //
-        // if (filter.Trim() == "Tất cả")
-        // {
-        //     searchAll(keyword);
-        // }
-        // else
-        // {
-        //     _dataView.RowFilter = $"[{filter.Trim()}] LIKE '%{keyword}%'";
-        //     
-        //     Console.WriteLine(filter.Trim().Equals("Tất cả"));
-        //     Console.WriteLine(keyword);
-        //     Console.WriteLine(_dataView.Count);
-        // }
-    }
+        DataRow row = _dataTable.Rows[index];
+        List<string> arrayString = new List<string>();
+        foreach (var item in row.ItemArray)
+        {
+            string value = item.ToString();
+            arrayString.Add(value);
+        }
 
-    void searchAll(string keyword)
-    {
-        // List<string> filters = new List<string>();
-        // foreach (string i in this._headerContent)
-        // {
-        //     filters.Add($"[{i.Trim()}] LIKE '%{keyword}%'");
-        // }
-        //
-        // Console.WriteLine(keyword);
-        // Console.WriteLine(_dataView.Count);
-        //
-        // _dataView.RowFilter = string.Join(" OR ", filters);
+        return arrayString;
     }
 
     void OnResize()
