@@ -1,7 +1,7 @@
 using System.Data;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
-
+using QuanLySinhVien.Views.Enums;
 namespace QuanLySinhVien.Views.Components;
 public class NhapDiem : NavBase
 {
@@ -9,7 +9,7 @@ public class NhapDiem : NavBase
     
     private DataGridView dataGridView1;
     private DataTable table;
-    private CUse _cUse; 
+    private CUse _cUse;
     public NhapDiem()
     {
         _cUse = new CUse();
@@ -20,91 +20,77 @@ public class NhapDiem : NavBase
     private void Init()
     {
         //BackColor = Color.Blue;
-        Dock = DockStyle.Bottom;
+        Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
-        var borderTop = new Panel
-        {
-            Dock = DockStyle.Fill,
-            // Padding = new  Padding(0 , 30 , 0 , 0),
-        };
-        borderTop.Controls.Add(Top());
-        Controls.Add(borderTop);
         Controls.Add(Bottom());
+        Controls.Add(Top());
     }
 
     private Panel Top()
     {
         Panel mainTop = new Panel
         {
-            Dock = DockStyle.Bottom,
+            Dock = DockStyle.Top,
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             //BackColor = Color.Red,
             Height = 120,
         };
-        
-        // Text Nav_List
+        var header = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 3,
+            RowCount = 1,
+            Padding = new Padding(20, 10, 20, 10),
+        };
+        header.ColumnStyles.Clear();
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        header.RowStyles.Clear();
+        header.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        // Title
         var textNavList = new Label
         {
             Text = "Nhập Điểm",
-            // Font = new Font("JetBrains Mono", 16f , FontStyle.Bold),
-            Size = new Size(200, 40),
-            Location = new Point(20 , 10),
-            UseCompatibleTextRendering = false,
+            AutoSize = true,
         };
         
-        // Text Box học phần
-        var textHp = new Label
+        var filters = new FlowLayoutPanel
         {
-            Text = "Học phần",
-            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
-            Width = 120,
-            Dock = DockStyle.Left,
+            FlowDirection = FlowDirection.LeftToRight,
+            AutoSize = true,
+            WrapContents = false,
+            Anchor = AnchorStyles.Top | AnchorStyles.Right,
+            Margin = new Padding(0, 8, 12, 0),
         };
-        var textBoxHp = new TextBox
+        Panel MakeLabeledInput(string labelText, int labelWidth, int inputWidth)
         {
-            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
-            Dock = DockStyle.Right,
-            Width = 250,
+            var panel = new Panel { Width = labelWidth + inputWidth, Height = 36, Margin = new Padding(8, 30, 8, 0) };
+            var lbl = new Label { Text = labelText, Width = labelWidth, Dock = DockStyle.Left, TextAlign = ContentAlignment.MiddleLeft };
+            var tb  = new TextBox { Width = inputWidth, Dock = DockStyle.Right };
+            panel.Controls.Add(tb);
+            panel.Controls.Add(lbl);
+            return panel;
+        }
+        filters.Controls.Add(MakeLabeledInput("Học phần", 90, 220));
+        filters.Controls.Add(MakeLabeledInput("Lớp", 60, 200));
+
+        // Action button
+        var btnAction = new Button
+        {
+            Text = "Tìm",
+            AutoSize = true,
+            Padding = new Padding(16, 10, 16, 10),
+            Margin = new Padding(0),
+            Anchor = AnchorStyles.None,
         };
 
-        var textFullHp = new Panel
-        {
-            Size = new Size(400, 100),
-            Location = new Point(90, 60),
-            Padding = new  Padding(0,0,0,0),
-        };
-        
-        textFullHp.Controls.Add(textBoxHp);
-        textFullHp.Controls.Add(textHp);
-        // TextBox lớp
-        var textLop = new Label
-        {
-            Text = "Lớp",
-            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
-            Width = 80,
-            Dock = DockStyle.Left,
-        };
-
-        var textBoxLop = new TextBox
-        {   
-            // Font = new Font("JetBrains Mono", 13f, FontStyle.Regular),
-            Dock = DockStyle.Right,
-            Width = 240,
-        };
-        
-        var textFullLop = new Panel
-        {
-            Size = new Size(320, 100),
-            Location = new Point(670, 60),
-            Padding = new  Padding(0,0,0,0),
-        };
-        
-        textFullLop.Controls.Add(textBoxLop);
-        textFullLop.Controls.Add(textLop);
-        
-        mainTop.Controls.Add(textNavList);
-        mainTop.Controls.Add(textFullHp);
-        mainTop.Controls.Add(textFullLop);
+        // Add to header
+        header.Controls.Add(textNavList, 0, 0);
+        header.Controls.Add(filters, 1, 0);
+        header.Controls.Add(btnAction, 2, 0);
+        mainTop.Controls.Add(header);
         return mainTop;
     }
 
@@ -112,10 +98,9 @@ public class NhapDiem : NavBase
     {
         Panel mainBot = new Panel
         {
-            Dock = DockStyle.Bottom,
+            Dock = DockStyle.Fill,
             // BackColor = Color.Green,
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 750,
             Padding = new Padding(20 , 0 , 20 , 0),
         };
         
@@ -130,6 +115,7 @@ public class NhapDiem : NavBase
         dataGridView1 = _cUse.getDataView(710 , 1140 , 20 , 20);
         dataGridView1.ReadOnly = false;
         dataGridView1.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        
         return dataGridView1;
     }
     
@@ -160,23 +146,28 @@ public class NhapDiem : NavBase
         dataGridView1.BorderStyle = BorderStyle.None;
         dataGridView1.CellBorderStyle = DataGridViewCellBorderStyle.None;
         dataGridView1.RowHeadersVisible = false;
+        
         // change Width
         dataGridView1.DataBindingComplete += (s, e) =>
         {
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            dataGridView1.Columns[0]!.Width = 150;
-            dataGridView1.Columns[1]!.Width = 250;
-            dataGridView1.Columns[2]!.Width = 170;
-            dataGridView1.Columns[3]!.Width = 150;
-            dataGridView1.Columns[4]!.Width = 140;
-            dataGridView1.Columns[5]!.Width = 130;
-            dataGridView1.Columns[6]!.Width = 128;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            int[] weights = {150, 250, 170, 150, 140, 130, 128};
+            for (int i = 0; i < dataGridView1.Columns.Count && i < weights.Length; i++)
+            {
+                var col = dataGridView1.Columns[i];
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                col.FillWeight = weights[i];
+                col.MinimumWidth = 60;
+            }
         };
         // change header
         dataGridView1.EnableHeadersVisualStyles = false;
+        dataGridView1.Dock = DockStyle.Fill;
         dataGridView1.ColumnHeadersHeight = 45;
         dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
         dataGridView1.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+        dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         dataGridView1.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
         {
             BackColor = ColorTranslator.FromHtml("#07689F"),

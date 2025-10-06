@@ -14,14 +14,14 @@ public class GetFont
             pfc.AddFontFile("font/Montserrat-SemiBold.ttf");
             pfc.AddFontFile("font/Montserrat-ExtraBold.ttf");
             pfc.AddFontFile("font/Montserrat-Black.ttf");
+            pfc.AddFontFile("font/PlayfairDisplay-ExtraBold.ttf");
         }
         catch (Exception ex)
         {
             throw new Exception(ex.Message);
         }
-
-
-        for (int i = 0; i < 4; i++)
+        
+        for (int i = 0; i < 5; i++)
         {
             Console.WriteLine(pfc.Families[i].Name);
         }
@@ -55,6 +55,22 @@ public class GetFont
                 break;
             default: throw new Exception("Font type not supported");
         }
+        return font;
+    }
+
+    static public Font GetPlayFairFont(float size, FontType type)
+    {
+        Font font;
+        switch (type)
+        {
+            case FontType.Regular:
+                font = new Font(pfc.Families[4], size, FontStyle.Regular);
+                break;
+            default:
+                font = new Font(pfc.Families[4], size, FontStyle.Regular);
+                break;
+        }
+
         return font;
     }
 

@@ -18,6 +18,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Remove="Fonts\Montserrat-Black.ttf" />
       <None Remove="Fonts\Montserrat-BlackItalic.ttf" />
       <None Remove="Fonts\Montserrat-BoldItalic.ttf" />
@@ -39,7 +43,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MySql.Data" Version="9.4.0" />
       <PackageReference Include="MySqlConnector" Version="2.4.0" />
       <PackageReference Include="Svg" Version="3.4.7" />
     </ItemGroup>

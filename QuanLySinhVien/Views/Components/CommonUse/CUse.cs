@@ -1,4 +1,6 @@
+using System.Drawing.Drawing2D;
 using QuanLySinhVien.Views.Enums;
+using Svg;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
@@ -68,5 +70,38 @@ public class CUse
         };
         dgv.AllowUserToResizeColumns = false;
         dgv.AllowUserToResizeRows = false;
+    }
+    public Bitmap CreateIconWithBackground(string svgPath, Color iconColor, Color bgColor, int canvas, int cornerRadius, int padding)
+    {
+        var svg = SvgDocument.Open(svgPath);
+        foreach (var v in svg.Descendants().OfType<SvgVisualElement>())
+        {
+            v.Fill = new SvgColourServer(iconColor);
+            v.Stroke = new SvgColourServer(iconColor);
+        }
+        int inner = canvas - padding * 2;
+        var iconBmp = svg.Draw(inner, inner);
+
+        var bmp = new Bitmap(canvas, canvas);
+        using (var g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            using (var brush = new SolidBrush(bgColor))
+            using (var path = new GraphicsPath())
+            {
+                float r = cornerRadius * 2f;
+                path.AddArc(0, 0, r, r, 180, 90);
+                path.AddArc(canvas - r, 0, r, r, 270, 90);
+                path.AddArc(canvas - r, canvas - r, r, r, 0, 90);
+                path.AddArc(0, canvas - r, r, r, 90, 90);
+                path.CloseFigure();
+                g.FillPath(brush, path);
+            }
+
+            g.DrawImage(iconBmp, padding, padding, inner, inner);
+        }
+
+        return bmp;
     }
 }

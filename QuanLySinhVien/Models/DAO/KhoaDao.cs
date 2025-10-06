@@ -105,7 +105,7 @@ namespace QuanLySinhVien.Models.DAO
                          FROM Khoa 
                          WHERE MaKhoa = @MaKhoa AND Status = 1"; // chỉ lấy khoa đang active
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
+                {A
                     cmd.Parameters.AddWithValue("@MaKhoa", maKhoa);
                     using (MySqlDataAdapter adapter = new MySqlDataAdapter(cmd))
                     {
