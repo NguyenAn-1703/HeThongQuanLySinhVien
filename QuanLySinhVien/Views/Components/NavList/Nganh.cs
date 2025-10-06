@@ -4,8 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using QuanLySinhVien.DAO;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.ViewComponents;
@@ -21,7 +21,7 @@ public class NganhPanel : NavBase
     private Panel _tableContainer;
     private List<Nganh> _currentNganhs;
 
-    private NganhDAO nganhDAO = new NganhDAO();
+    private NganhDao nganhDAO = new NganhDao();
 
     int iconSize = 24;
     int spacing = 25;
@@ -107,7 +107,7 @@ public class NganhPanel : NavBase
                 {
                     try
                     {
-                        nganhDAO.addNganh(dialog.ResultNganh);
+                        nganhDAO.Insert(dialog.ResultNganh);
                         LoadData();
                     }
                     catch (Exception ex)
@@ -146,7 +146,7 @@ public class NganhPanel : NavBase
     {
         try
         {
-            _currentNganhs = nganhDAO.getAllNganh() ?? new List<Nganh>();
+            _currentNganhs = nganhDAO.GetAll() ?? new List<Nganh>();
         }
         catch (Exception ex)
         {
@@ -175,7 +175,7 @@ public class NganhPanel : NavBase
                         {
                             try
                             {
-                                nganhDAO.updateNganh(dialog.ResultNganh);
+                                nganhDAO.Update(dialog.ResultNganh);
                                 LoadData();
                             }
                             catch (Exception ex)
@@ -198,7 +198,7 @@ public class NganhPanel : NavBase
                     {
                         try
                         {
-                            nganhDAO.deleteNganh(nganh.MaNganh);
+                            nganhDAO.Delete(nganh.MaNganh);
                             LoadData();
                         }
                         catch (Exception ex)

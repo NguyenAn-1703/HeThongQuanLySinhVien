@@ -1,23 +1,18 @@
 using System.Data;
-using MySqlConnector; 
+using MySqlConnector;
+using QuanLySinhVien.Database;
 
 namespace QuanLySinhVien.Models.DAO
 {
     public class KhoaDao
     {
         // thông tin database local
-        private string _connectionString = "Server=localhost;" +
-                                           "Database=quanlysinhvien;" +
-                                           "Uid=root;" +
-                                           "Pwd=;";
         
         // lấy danh sách khoa ( hàm dùng mỗi ln loadData )
         public DataTable GetAllKhoa()
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlConnection conn = MyConnection.GetConnection())
             {
-                conn.Open();
-                
                 // check status = 1
                 string query = @"SELECT 
                                 MaKhoa AS 'Mã khoa',
@@ -37,10 +32,8 @@ namespace QuanLySinhVien.Models.DAO
         // add Khoa
         public void InsertKhoa(string tenKhoa, string email, string diaChi)
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlConnection conn = MyConnection.GetConnection())
             {
-                conn.Open();
-                
                 // status = 1, id auto +1
                 string query = @"INSERT INTO Khoa (TenKhoa, Email, DiaChi)
                                  VALUES (@TenKhoa, @Email, @DiaChi)";
@@ -57,9 +50,8 @@ namespace QuanLySinhVien.Models.DAO
         // edit khoa -> get id = getById call form controller
         public void UpdateKhoa(int maKhoa, string tenKhoa, string email, string diaChi)
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlConnection conn = MyConnection.GetConnection())
             {
-                conn.Open();
                 string query = @"UPDATE Khoa 
                                  SET TenKhoa = @TenKhoa,
                                      Email = @Email,
@@ -79,10 +71,8 @@ namespace QuanLySinhVien.Models.DAO
         // delete khoa
         public void DeleteKhoa(int maKhoa)
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlConnection conn = MyConnection.GetConnection())
             {
-                conn.Open();
-                
                 // update status = 0 
                 string query = @"UPDATE Khoa
                                SET Status = 0
@@ -98,9 +88,8 @@ namespace QuanLySinhVien.Models.DAO
         // id -> data (1row)
         public DataRow GetKhoaById(int maKhoa)
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlConnection conn = MyConnection.GetConnection())
             {
-                conn.Open();
                 string query = @"SELECT MaKhoa, TenKhoa, Email, DiaChi, Status 
                          FROM Khoa 
                          WHERE MaKhoa = @MaKhoa AND Status = 1"; // chỉ lấy khoa đang active
