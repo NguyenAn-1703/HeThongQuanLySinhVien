@@ -203,21 +203,23 @@ public class CustomTable : TableLayoutPanel
     {
         object o = _cellDatas[index];
         Console.WriteLine("Xóa" + o.ToString());
-        OnDelete.Invoke(index);
+        OnDelete?.Invoke(index);
+        _deleteBtn.Dispose();
     }
 
     void edit(int index)
     {
         object o = _cellDatas[index];
         Console.WriteLine("Sửa" + o.ToString());
-        OnEdit.Invoke(index);
+        OnEdit?.Invoke(index);
+        _editBtn.Dispose();
     }
 
     void detail(int index)
     {
         object o = _cellDatas[index];
         Console.WriteLine("Chi tiết" + o.ToString());
-        OnDetail.Invoke(index);
+        OnDetail?.Invoke(index);
     }
     //
     // List<string> GetStringDataRowByIndex(int index)

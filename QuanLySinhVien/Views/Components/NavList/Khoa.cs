@@ -1,5 +1,6 @@
 using System.Data;
 using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 
@@ -11,37 +12,34 @@ public class Khoa : NavBase
     private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
 
     private KhoaController _kcontroller;
-    private DataGridView dgv;
+    
+    private CustomTable _table;
+    private List<KhoaDto> listKhoa;
+    private Panel _mainBot;
 
     //button
     private Button btnThem;
     private Button btnSua;
     private Button btnXoa;
 
-    // default
-    private int selectedMaKhoa = -1; // mặc định chưa chọn
 
 
     public Khoa()
     {
         _kcontroller = new KhoaController();
         Init();
+        loadData();
+        setActionListener();
     }
 
     private void Init()
     {
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
+        _mainBot = Bottom();
+        Controls.Add(_mainBot);
+        Controls.Add(Top());
 
-        var borderTop = new Panel
-        {
-            Dock = DockStyle.Fill
-        };
-
-        borderTop.Controls.Add(Bottom());
-        borderTop.Controls.Add(Top());
-
-        Controls.Add(borderTop);
     }
 
     private new Panel Top()
@@ -63,25 +61,16 @@ public class Khoa : NavBase
         btnThem.Click += BtnThem_Click;
         mainTop.Controls.Add(btnThem);
 
-        btnSua = new Button
-        {
-            Text = "Sửa khoa",
-            Size = new Size(120, 40),
-            Location = new Point(170, 25)
-        };
-        btnSua.Click += BtnSua_Click;
-        mainTop.Controls.Add(btnSua);
-
-        btnXoa = new Button
-        {
-            Text = "Xóa khoa",
-            Size = new Size(120, 40),
-            Location = new Point(310, 25)
-        };
-        btnXoa.Click += BtnXoa_Click;
+        
         mainTop.Controls.Add(btnXoa);
 
         return mainTop;
+    }
+
+    void setActionListener()
+    {
+        this._table.OnEdit += i => BtnSua_Click(i);
+        this._table.OnDelete += i => BtnXoa_Click(i);
     }
 
     private new Panel Bottom()
@@ -91,68 +80,12 @@ public class Khoa : NavBase
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
             Padding = new Padding(20, 0, 20, 0)
+            
         };
 
-        // edit dgv
-        dgv = new DataGridView
-        {
-            Dock = DockStyle.Fill,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-            BorderStyle = BorderStyle.None,
-            BackgroundColor = MyColor.GrayBackGround,
-            AllowUserToAddRows = false,
-            ReadOnly = true,
-            RowHeadersVisible = false,
-            CellBorderStyle = DataGridViewCellBorderStyle.None,
-            AllowUserToResizeRows = false,
-            AllowUserToResizeColumns = false,
-            SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            MultiSelect = false
-        };
-
-        // Header
-        dgv.EnableHeadersVisualStyles = false;
-        dgv.ColumnHeadersDefaultCellStyle.BackColor = MyColor.MediumBlue;
-        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-        dgv.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 11, FontStyle.Bold);
-        dgv.ColumnHeadersHeight = 40;
-        dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-        dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-        dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-        // sọc
-        dgv.RowsDefaultCellStyle.BackColor = Color.White;
-        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGray;
-        dgv.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-        // add columns -> dataTable
-        DataTable dt = new DataTable();
-        dt.Columns.Add("Mã khoa", typeof(int));
-        dt.Columns.Add("Tên khoa", typeof(string));
-        dt.Columns.Add("Email", typeof(string));
-        dt.Columns.Add("Địa chỉ", typeof(string));
-
-        // get all data
-        dt = _kcontroller.GetDanhSachKhoa();
-
-        // debug
-        foreach (DataColumn col in dt.Columns)
-        {
-            Console.WriteLine(col.ColumnName);
-        }
-
-        // test table
-        // for (int i = 0; i < 50; i++)
-        // {
-        //     dt.Rows.Add(i, "Khoa" + i, "email" + i + "@gmail.com", "Địa chỉ " + i);
-        // }
-
-        dgv.DataSource = dt;
-
-        // event click in row
-        dgv.CellClick += Dgv_CellClick;
-
-        mainBot.Controls.Add(dgv);
+        
+        
+        
         return mainBot;
     }
 
@@ -160,7 +93,15 @@ public class Khoa : NavBase
     // load data function
     public void loadData()
     {
-        dgv.DataSource = _kcontroller.GetDanhSachKhoa();
+        listKhoa = _kcontroller.GetDanhSachKhoa();
+        
+        string[] headerArray = new string[] { "Mã khoa", "Tên khoa", "email", "Địa chỉ" };
+        List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
+        var columnNames = new List<string> { "MaKhoa", "TenKhoa", "Email","DiaChi"};
+            
+        var cells = listKhoa.Cast<object>().ToList();
+        _table = new CustomTable(headerList, columnNames,cells, true, true, true);
+        _mainBot.Controls.Add(_table);
     }
 
     // envent
@@ -233,31 +174,32 @@ public class Khoa : NavBase
     }
 
     // edit button
-    private void BtnSua_Click(object? sender, EventArgs e)
+    private void BtnSua_Click(int index)
     {
+        index++;
         try
         {
             // check null
-            if (selectedMaKhoa <= 0)
+            if (index <= 0)
             {
                 MessageBox.Show("Vui lòng chọn dòng cần sửa!", "Thông báo");
                 return;
             }
-
+    
             // check null
-            if (selectedMaKhoa <= 0)
+            if (index <= 0)
                 throw new ArgumentException("ID khoa không hợp lệ!");
-
+    
             // get data by id -> show in dialog
-            DataRow khoa = _kcontroller.GetKhoaById(selectedMaKhoa);
+            KhoaDto khoa = _kcontroller.GetKhoaById(index);
             if (khoa == null)
                 throw new Exception("Khoa không tồn tại!");
-
+    
             // variable -> function
-            string tenKhoaMoi = khoa["TenKhoa"].ToString();
-            string emailMoi = khoa["Email"].ToString();
-            string diaChiMoi = khoa["DiaChi"].ToString();
-
+            string tenKhoaMoi = khoa.TenKhoa;
+            string emailMoi = khoa.Email;
+            string diaChiMoi = khoa.DiaChi;
+    
             // create dialog
             using (Form inputForm = new Form())
             {
@@ -265,7 +207,7 @@ public class Khoa : NavBase
                 inputForm.Text = "Sửa thông tin Khoa";
                 inputForm.Size = new Size(400, 300);
                 inputForm.StartPosition = FormStartPosition.CenterScreen;
-
+    
                 // item
                 TextBox txtTen = new TextBox() { Text = tenKhoaMoi, Location = new Point(20, 20), Width = 340 };
                 TextBox txtEmail = new TextBox() { Text = emailMoi, Location = new Point(20, 70), Width = 340 };
@@ -274,25 +216,25 @@ public class Khoa : NavBase
                     { Text = "OK", Location = new Point(100, 200), DialogResult = DialogResult.OK };
                 Button btnCancel = new Button()
                     { Text = "Hủy", Location = new Point(200, 200), DialogResult = DialogResult.Cancel };
-
+    
                 // add item
                 inputForm.Controls.Add(txtTen);
                 inputForm.Controls.Add(txtEmail);
                 inputForm.Controls.Add(txtDiaChi);
                 inputForm.Controls.Add(btnOK);
                 inputForm.Controls.Add(btnCancel);
-
+    
                 inputForm.AcceptButton = btnOK;
                 inputForm.CancelButton = btnCancel;
-
+    
                 // button OK on click
                 if (inputForm.ShowDialog() == DialogResult.OK)
                 {
                     // call controller function
-                    _kcontroller.SuaKhoa(selectedMaKhoa, txtTen.Text, txtEmail.Text, txtDiaChi.Text);
+                    _kcontroller.SuaKhoa(index, txtTen.Text, txtEmail.Text, txtDiaChi.Text);
                 }
             }
-
+    
             // reload table
             loadData();
         }
@@ -303,50 +245,39 @@ public class Khoa : NavBase
     }
 
     // del button
-    private void BtnXoa_Click(object? sender, EventArgs e)
+    private void BtnXoa_Click(int index)
     {
+        index++;
         try
         {
             // call functon(controller) 
             // check null
-            if (selectedMaKhoa <= 0)
+            if (index <= 0)
                 throw new ArgumentException("ID khoa không hợp lệ!");
-
+    
             // Button y/n
             DialogResult rs =
                 MessageBox.Show(
-                    "Bạn chắc chắn muốn xóa khoa " + _kcontroller.GetKhoaById(selectedMaKhoa)["TenKhoa"].ToString(),
+                    "Bạn chắc chắn muốn xóa khoa " + _kcontroller.GetKhoaById(index).TenKhoa,
                     "Cảnh báo",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning);
             if (rs == DialogResult.Yes)
             {
                 // call controller function
-                _kcontroller.XoaKhoa(selectedMaKhoa);
+                _kcontroller.XoaKhoa(index);
             }
             else if (rs == DialogResult.No)
             {
                 MessageBox.Show("Đã hủy xóa khoa", "Thông báo");
             }
-
+    
             // reload table
             loadData();
         }
         catch (Exception ex)
         {
             MessageBox.Show("Lỗi khi xóa khoa: " + ex.Message);
-        }
-    }
-
-    // get id after click
-    private void Dgv_CellClick(object sender, DataGridViewCellEventArgs e)
-    {
-        // check header or null
-        if (e.RowIndex >= 0)
-        {
-            // get id by function
-            DataGridViewRow row = dgv.Rows[e.RowIndex];
-            selectedMaKhoa = Convert.ToInt32(row.Cells["Mã khoa"].Value);
         }
     }
 

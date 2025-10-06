@@ -1,4 +1,5 @@
 using System.Data;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 
 namespace QuanLySinhVien.Controllers
@@ -13,9 +14,9 @@ namespace QuanLySinhVien.Controllers
         }
 
         // get databse (all)
-        public DataTable GetDanhSachKhoa()
+        public List<KhoaDto> GetDanhSachKhoa()
         {
-            return _khoaDao.GetAllKhoa();
+            return _khoaDao.GetAll();
         }
 
         // pop up dialog
@@ -25,14 +26,14 @@ namespace QuanLySinhVien.Controllers
             if (string.IsNullOrWhiteSpace(tenKhoa))
                 throw new ArgumentException("Tên khoa không được để trống!");
 
-            _khoaDao.InsertKhoa(tenKhoa, email, diaChi);
+            _khoaDao.Insert(new  KhoaDto{TenKhoa = tenKhoa, Email = email, DiaChi = diaChi});
         }
 
         // edit khoa
         public void SuaKhoa(int idKhoa, string txtTen, string txtEmail, string txtDiaChi)
         {
             // call DAO function
-            _khoaDao.UpdateKhoa(idKhoa, txtTen, txtEmail, txtDiaChi);
+            _khoaDao.Update(new  KhoaDto{MaKhoa = idKhoa,TenKhoa = txtTen, Email = txtEmail, DiaChi = txtDiaChi});
         }
 
 
@@ -40,13 +41,13 @@ namespace QuanLySinhVien.Controllers
         public void XoaKhoa(int idKhoa)
         {
             // call DAO function
-            _khoaDao.DeleteKhoa(idKhoa);
+            _khoaDao.Delete(idKhoa);
         }
 
         // get name by ID ( khoa.cs <-> dao )
-        public DataRow GetKhoaById(int id)
+        public KhoaDto GetKhoaById(int id)
         {
-            DataRow tmp = _khoaDao.GetKhoaById(id);
+            KhoaDto tmp = _khoaDao.GetKhoaById(id);
             return tmp;
         }
     }

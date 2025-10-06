@@ -9,105 +9,171 @@ namespace QuanLySinhVien.Models.DAO
         // thông tin database local
         
         // lấy danh sách khoa ( hàm dùng mỗi ln loadData )
-        public DataTable GetAllKhoa()
+        public List<KhoaDto> GetAll()
         {
-            using (MySqlConnection conn = MyConnection.GetConnection())
-            {
-                // check status = 1
-                string query = @"SELECT 
-                                MaKhoa AS 'Mã khoa',
-                                TenKhoa AS 'Tên khoa',
-                                Email,
-                                DiaChi AS 'Địa chỉ'
-                                FROM Khoa
-                                WHERE Status = 1";
+            List<KhoaDto> result = new();
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(
+                "SELECT MaKhoa, TenKhoa, Email, DiaChi FROM Khoa WHERE Status = 1", 
+                conn
+            );
+            using var reader = cmd.ExecuteReader();
 
-                MySqlDataAdapter da = new MySqlDataAdapter(query,conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
+            while (reader.Read())
+            {
+                result.Add(new KhoaDto
+                {
+                    MaKhoa = reader.GetInt32("MaKhoa"),
+                    TenKhoa = reader.GetString("TenKhoa"),
+                    Email = reader.GetString("Email"),
+                    DiaChi = reader.GetString("DiaChi")
+                });
             }
+
+            return result;
         }
+
 
         // add Khoa
-        public void InsertKhoa(string tenKhoa, string email, string diaChi)
+        public bool Insert(KhoaDto khoaDto)
         {
-            using (MySqlConnection conn = MyConnection.GetConnection())
-            {
-                // status = 1, id auto +1
-                string query = @"INSERT INTO Khoa (TenKhoa, Email, DiaChi)
-                                 VALUES (@TenKhoa, @Email, @DiaChi)";
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@TenKhoa", tenKhoa);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@DiaChi", diaChi);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            int rowAffected = 0;
+            using var conn = MyConnection.GetConnection();
+
+            // status = 1, id tự tăng
+            string query = @"INSERT INTO Khoa (TenKhoa, Email, DiaChi)
+                     VALUES (@TenKhoa, @Email, @DiaChi);";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TenKhoa", khoaDto.TenKhoa);
+            cmd.Parameters.AddWithValue("@Email", khoaDto.Email);
+            cmd.Parameters.AddWithValue("@DiaChi", khoaDto.DiaChi);
+
+            rowAffected = cmd.ExecuteNonQuery();
+
+            return rowAffected > 0; 
         }
+
 
         // edit khoa -> get id = getById call form controller
-        public void UpdateKhoa(int maKhoa, string tenKhoa, string email, string diaChi)
+        public bool Update(KhoaDto khoaDto)
         {
-            using (MySqlConnection conn = MyConnection.GetConnection())
-            {
-                string query = @"UPDATE Khoa 
-                                 SET TenKhoa = @TenKhoa,
-                                     Email = @Email,
-                                     DiaChi = @DiaChi
-                                 WHERE MaKhoa = @MaKhoa";
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@MaKhoa", maKhoa);
-                    cmd.Parameters.AddWithValue("@TenKhoa", tenKhoa);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@DiaChi", diaChi);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            int rowAffected = 0;
+            using var conn = MyConnection.GetConnection();
+
+            string query = @"UPDATE Khoa 
+                     SET TenKhoa = @TenKhoa,
+                         Email = @Email,
+                         DiaChi = @DiaChi
+                     WHERE MaKhoa = @MaKhoa;";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TenKhoa", khoaDto.TenKhoa);
+            cmd.Parameters.AddWithValue("@Email", khoaDto.Email);
+            cmd.Parameters.AddWithValue("@DiaChi", khoaDto.DiaChi);
+            cmd.Parameters.AddWithValue("@MaKhoa", khoaDto.MaKhoa);
+
+            rowAffected = cmd.ExecuteNonQuery();
+
+            return rowAffected > 0; 
         }
+
 
         // delete khoa
-        public void DeleteKhoa(int maKhoa)
+        public bool Delete(int maKhoa)
         {
+            int rowAffected = 0;
             using (MySqlConnection conn = MyConnection.GetConnection())
             {
-                // update status = 0 
                 string query = @"UPDATE Khoa
-                               SET Status = 0
-                               WHERE MaKhoa = @MaKhoa;";
+                         SET Status = 0
+                         WHERE MaKhoa = @MaKhoa;";
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@MaKhoa", maKhoa);
-                    cmd.ExecuteNonQuery();
+                    rowAffected = cmd.ExecuteNonQuery();
                 }
             }
-        }
-        
-        // id -> data (1row)
-        public DataRow GetKhoaById(int maKhoa)
-        {
-            using (MySqlConnection conn = MyConnection.GetConnection())
-            {
-                string query = @"SELECT MaKhoa, TenKhoa, Email, DiaChi, Status 
-                         FROM Khoa 
-                         WHERE MaKhoa = @MaKhoa AND Status = 1"; // chỉ lấy khoa đang active
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@MaKhoa", maKhoa);
-                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(cmd))
-                    {
-                        DataTable dt = new DataTable();
-                        adapter.Fill(dt);
-                        if (dt.Rows.Count > 0)
-                            return dt.Rows[0]; // trả về dòng đầu tiên
-                        else
-                            return null;
-                    }
-                }
-            }
+
+            return rowAffected > 0;
         }
 
+        
+        // id -> data (1row)
+        public KhoaDto GetKhoaById(int maKhoa)
+        {
+            KhoaDto result = new();
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(
+                "SELECT MaKhoa, TenKhoa, Email, DiaChi, Status FROM Khoa WHERE Status = 1 AND MaKhoa = @MaKhoa",
+                conn);
+            cmd.Parameters.AddWithValue("@MaKhoa", maKhoa);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                result = new KhoaDto
+                {
+                    MaKhoa = reader.GetInt32("MaKhoa"),
+                    TenKhoa = reader.GetString("TenKhoa"),
+                    Email = reader.GetString("Email"),
+                    DiaChi = reader.GetString("DiaChi"),
+                };
+            }
+
+            return result;
+        }
+
+        public static void TestKhoaDAO()
+        {
+            var dao = new KhoaDao();
+
+            Console.WriteLine("=== TEST KHOA DAO ===");
+
+            // 🧩 1. Insert mới
+            Console.WriteLine("\n--- INSERT ---");
+            KhoaDto newKhoaDto = new KhoaDto
+            {
+                TenKhoa = "Khoa CNTT",
+                Email = "cntt@truong.edu.vn",
+                DiaChi = "Tòa nhà A1"
+            };
+
+            bool insertResult = dao.Insert(newKhoaDto);
+            Console.WriteLine(insertResult ? "✅ Thêm mới thành công!" : "❌ Thêm mới thất bại!");
+
+            // 🧩 2. Lấy danh sách tất cả Khoa
+            Console.WriteLine("\n--- GET ALL ---");
+            var allKhoa = dao.GetAll();
+            foreach (var k in allKhoa)
+            {
+                Console.WriteLine($"ID: {k.MaKhoa}, Tên: {k.TenKhoa}, Email: {k.Email}, Địa chỉ: {k.DiaChi}");
+            }
+
+            // 🧩 3. Lấy 1 khoa theo ID (giả sử ID = 1)
+            Console.WriteLine("\n--- GET BY ID (MaKhoa = 1) ---");
+            var khoa = dao.GetKhoaById(1);
+            if (khoa != null && khoa.MaKhoa != 0)
+                Console.WriteLine($"Tên khoa: {khoa.TenKhoa}, Email: {khoa.Email}, Địa chỉ: {khoa.DiaChi}");
+            else
+                Console.WriteLine("❌ Không tìm thấy khoa có ID = 1");
+
+            // 🧩 4. Update khoa (ví dụ ID = 1)
+            Console.WriteLine("\n--- UPDATE (MaKhoa = 1) ---");
+            khoa.TenKhoa = "Khoa Công nghệ Thông tin (Update)";
+            khoa.Email = "update_cntt@truong.edu.vn";
+            khoa.DiaChi = "Tòa nhà B2";
+            bool updateResult = dao.Update(khoa);
+            Console.WriteLine(updateResult ? "✅ Cập nhật thành công!" : "❌ Cập nhật thất bại!");
+
+            // 🧩 5. Xóa khoa (cập nhật Status = 0)
+            Console.WriteLine("\n--- DELETE (MaKhoa = 1) ---");
+            bool deleteResult = dao.Delete(1);
+            Console.WriteLine(deleteResult ? "✅ Xóa thành công!" : "❌ Xóa thất bại!");
+
+            Console.WriteLine("\n=== KẾT THÚC TEST ===");
+        }
+
+        
     }
 }

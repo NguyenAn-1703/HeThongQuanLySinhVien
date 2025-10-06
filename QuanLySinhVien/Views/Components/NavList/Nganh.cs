@@ -19,7 +19,7 @@ public class NganhPanel : NavBase
 
     private CustomTable _table;
     private Panel _tableContainer;
-    private List<Nganh> _currentNganhs;
+    private List<NganhDto> _currentNganhs;
 
     private NganhDao nganhDAO = new NganhDao();
 
@@ -103,11 +103,11 @@ public class NganhPanel : NavBase
         {
             using (var dialog = new NganhDialog(NganhDialog.DialogMode.Create, null))
             {
-                if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultNganh != null)
+                if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultNganhDto != null)
                 {
                     try
                     {
-                        nganhDAO.Insert(dialog.ResultNganh);
+                        nganhDAO.Insert(dialog.ResultNganhDto);
                         LoadData();
                     }
                     catch (Exception ex)
@@ -146,11 +146,11 @@ public class NganhPanel : NavBase
     {
         try
         {
-            _currentNganhs = nganhDAO.GetAll() ?? new List<Nganh>();
+            _currentNganhs = nganhDAO.GetAll() ?? new List<NganhDto>();
         }
         catch (Exception ex)
         {
-            _currentNganhs = new List<Nganh>();
+            _currentNganhs = new List<NganhDto>();
             MessageBox.Show($"Lỗi khi tải danh sách ngành: {ex.Message}");
         }
 
@@ -171,11 +171,11 @@ public class NganhPanel : NavBase
                     var nganh = _currentNganhs[index];
                     using (var dialog = new NganhDialog(NganhDialog.DialogMode.Edit, nganh))
                     {
-                        if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultNganh != null)
+                        if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultNganhDto != null)
                         {
                             try
                             {
-                                nganhDAO.Update(dialog.ResultNganh);
+                                nganhDAO.Update(dialog.ResultNganhDto);
                                 LoadData();
                             }
                             catch (Exception ex)
@@ -247,9 +247,9 @@ public class NganhPanel : NavBase
     {
         public enum DialogMode { View, Create, Edit }
 
-        public Nganh ResultNganh { get; private set; }
+        public NganhDto ResultNganhDto { get; private set; }
 
-        public NganhDialog(DialogMode mode, Nganh nganh)
+        public NganhDialog(DialogMode mode, NganhDto nganhDto)
         {
             Text = string.Empty;
             Size = new Size(420, 350);
@@ -313,11 +313,11 @@ public class NganhPanel : NavBase
             var lblTenNganh = new Label { Text = "Tên Ngành", Font = new Font("Montserrat", 10), AutoSize = true };
             var txtTenNganh = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle };
 
-            if (nganh != null)
+            if (nganhDto != null)
             {
-                txtMaNganh.Text = nganh.MaNganh.ToString();
-                txtMaKhoa.Text = nganh.MaKhoa.ToString();
-                txtTenNganh.Text = nganh.TenNganh;
+                txtMaNganh.Text = nganhDto.MaNganh.ToString();
+                txtMaKhoa.Text = nganhDto.MaKhoa.ToString();
+                txtTenNganh.Text = nganhDto.TenNganh;
             }
 
             bool isView = mode == DialogMode.View;
@@ -398,11 +398,11 @@ public class NganhPanel : NavBase
 
                 if (mode == DialogMode.Create)
                 {
-                    ResultNganh = new Nganh { MaKhoa = maKhoa, TenNganh = tenNganh };
+                    ResultNganhDto = new NganhDto { MaKhoa = maKhoa, TenNganh = tenNganh };
                 }
-                else if (mode == DialogMode.Edit && nganh != null)
+                else if (mode == DialogMode.Edit && nganhDto != null)
                 {
-                    ResultNganh = new Nganh { MaNganh = nganh.MaNganh, MaKhoa = maKhoa, TenNganh = tenNganh };
+                    ResultNganhDto = new NganhDto { MaNganh = nganhDto.MaNganh, MaKhoa = maKhoa, TenNganh = tenNganh };
                 }
             };
 

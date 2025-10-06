@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuanLySinhVien.Models;
 
-public class Nganh
+public class NganhDto
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

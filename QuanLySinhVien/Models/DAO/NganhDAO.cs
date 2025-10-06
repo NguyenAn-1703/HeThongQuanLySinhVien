@@ -54,16 +54,16 @@ public class NganhDao
     // thông tin database local
 
     // lấy danh sách khoa ( hàm dùng mỗi ln loadData )
-    public List<Nganh> GetAll()
+    public List<NganhDto> GetAll()
     {
-        List<Nganh> result = new();
+        List<NganhDto> result = new();
         using var conn = MyConnection.GetConnection();
         using var cmd = new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE Status = 1", conn);
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read())
         {
-            result.Add(new Nganh
+            result.Add(new NganhDto
             {
                 MaKhoa = reader.GetInt32("MaKhoa"),
                 MaNganh = reader.GetInt32("MaNganh"),
@@ -74,7 +74,7 @@ public class NganhDao
         return result;
     }
 
-    public bool Insert(Nganh nganh)
+    public bool Insert(NganhDto nganhDto)
     {
         int rowAffected = 0;
         using (MySqlConnection conn = MyConnection.GetConnection())
@@ -84,8 +84,8 @@ public class NganhDao
                                  VALUES (@MaKhoa, @TenNganh)";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
-                cmd.Parameters.AddWithValue("@MaKhoa", nganh.MaKhoa);
-                cmd.Parameters.AddWithValue("@TenNganh", nganh.TenNganh);
+                cmd.Parameters.AddWithValue("@MaKhoa", nganhDto.MaKhoa);
+                cmd.Parameters.AddWithValue("@TenNganh", nganhDto.TenNganh);
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
@@ -93,7 +93,7 @@ public class NganhDao
     }
 
     // edit khoa -> get id = getById call form controller
-    public bool Update(Nganh nganh)
+    public bool Update(NganhDto nganhDto)
     {
         int rowAffected = 0;
         using (MySqlConnection conn = MyConnection.GetConnection())
@@ -104,9 +104,9 @@ public class NganhDao
                                  WHERE MaNganh = @MaNganh";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
-                cmd.Parameters.AddWithValue("@MaKhoa", nganh.MaKhoa);
-                cmd.Parameters.AddWithValue("@TenNganh", nganh.TenNganh);
-                cmd.Parameters.AddWithValue("@MaNganh", nganh.MaNganh);
+                cmd.Parameters.AddWithValue("@MaKhoa", nganhDto.MaKhoa);
+                cmd.Parameters.AddWithValue("@TenNganh", nganhDto.TenNganh);
+                cmd.Parameters.AddWithValue("@MaNganh", nganhDto.MaNganh);
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
@@ -135,9 +135,9 @@ public class NganhDao
     }
 
     // id -> data (1row)
-    public Nganh GetNganhById(int maNganh)
+    public NganhDto GetNganhById(int maNganh)
     {
-        Nganh result = new();
+        NganhDto result = new();
         using var conn = MyConnection.GetConnection();
         using var cmd =
             new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE Status = 1 AND MaNganh = @MaNganh",
@@ -147,7 +147,7 @@ public class NganhDao
 
         if (reader.Read())
         {
-            result = new Nganh
+            result = new NganhDto
             {
                 MaKhoa = reader.GetInt32("MaKhoa"),
                 MaNganh = reader.GetInt32("MaNganh"),
@@ -167,7 +167,7 @@ public class NganhDao
             Console.WriteLine("===== BẮT ĐẦU TEST NGANHDAO =====");
 
             // 1️⃣ Test Insert
-            var newNganh = new Nganh
+            var newNganh = new NganhDto
             {
                 MaKhoa = 1, // giả sử khoa có ID = 1
                 TenNganh = "Ngành Thử Nghiệm"

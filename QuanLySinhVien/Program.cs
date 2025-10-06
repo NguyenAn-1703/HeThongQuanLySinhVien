@@ -20,5 +20,6 @@ static class Program
         Application.Run(new FLogin());
 
         // NganhDao.TestNganhDAO();
+        // KhoaDao.TestKhoaDAO();
     }
 }
