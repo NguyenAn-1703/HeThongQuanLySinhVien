@@ -86,8 +86,21 @@ namespace QuanLySinhVien.Controllers
             if (idKhoa <= 0)
                 throw new ArgumentException("ID khoa không hợp lệ!");
             
-            // call DAO function
-            _khoaDao.DeleteKhoa(idKhoa);
+            // Button y/n
+            DialogResult rs =
+                MessageBox.Show("Bạn chắc chắn muốn xóa khoa " + _khoaDao.GetKhoaById(idKhoa)["TenKhoa"].ToString(),
+                    "Cảnh báo",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+            if (rs == DialogResult.Yes)
+            {
+                // call DAO function
+                _khoaDao.DeleteKhoa(idKhoa);
+            }
+            else if (rs == DialogResult.No)
+            {
+                MessageBox.Show("Đã hủy xóa khoa", "Thông báo");
+            }
         }
         
         // create dialog add khoa
@@ -129,7 +142,8 @@ namespace QuanLySinhVien.Controllers
             form.CancelButton = btnCancel;
 
             // check OK, -> call function
-            if (form.ShowDialog() == DialogResult.OK)
+            DialogResult rs = form.ShowDialog();
+            if (rs == DialogResult.OK)
             {
                 if (string.IsNullOrWhiteSpace(txtTen.Text))
                 {
@@ -138,6 +152,10 @@ namespace QuanLySinhVien.Controllers
                 }
 
                 ThemKhoa(txtTen.Text.Trim(), txtEmail.Text.Trim(), txtDiaChi.Text.Trim());
+            }
+            else if (rs == DialogResult.Cancel)
+            {
+                MessageBox.Show("Hủy thêm khoa mới", "Thông báo");
             }
         }
 

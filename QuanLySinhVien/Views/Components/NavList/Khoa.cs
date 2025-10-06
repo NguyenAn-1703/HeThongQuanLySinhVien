@@ -178,7 +178,6 @@ namespace QuanLySinhVien.Views.Components
             {
                 // call function (controller)
                 _kcontroller.NhapKhoaMoi(); 
-                MessageBox.Show("Đã gọi hàm ThemKhoa()", "Thông báo");
                 
                 // reload table
                 loadData();
@@ -203,7 +202,6 @@ namespace QuanLySinhVien.Views.Components
 
                 // call function(controller)
                 _kcontroller.SuaKhoa(selectedMaKhoa);
-                MessageBox.Show("Đã sửa thông tin khoa!", "Thông báo");
                 
                 // reload table
                 loadData();
@@ -221,7 +219,6 @@ namespace QuanLySinhVien.Views.Components
             {
                 // call functon(controller) 
                 _kcontroller.XoaKhoa(selectedMaKhoa);
-                MessageBox.Show("Đã gọi hàm XoaKhoa()", "Thông báo");
                 
                 // reload table
                 loadData();
