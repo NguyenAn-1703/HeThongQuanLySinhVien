@@ -227,9 +227,9 @@ public class MyHome : Form
         
          mainLayout.ResumeLayout(true);
 
-         this._searchBar.KeyDown += (txtSearch) =>
+         this._searchBar.KeyDown += (txtSearch, selectedItem) =>
          {
-             this.rightBottomChange.onSearch(txtSearch);
+             this.rightBottomChange.onSearch(txtSearch, selectedItem);
          };
     }
     

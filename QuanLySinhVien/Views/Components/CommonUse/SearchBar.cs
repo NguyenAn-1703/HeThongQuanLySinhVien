@@ -8,12 +8,12 @@ public class SearchBar: TableLayoutPanel
     // private TextBox _searchBox;
     private CustomCombobox Filter;
 
-    private List<String> listSelection;
+    private List<string> listSelection;
 
     private RoundTLP _searchFieldPanel;
     private TextBox _field;
     
-    public event Action<string> KeyDown;
+    public event Action<string, string> KeyDown;
     
     public SearchBar()
     {
@@ -35,7 +35,8 @@ public class SearchBar: TableLayoutPanel
         SetSearchField();
 
         this.Filter = getFilter();
-        
+        Filter.combobox.SelectedIndexChanged += (sender, args) => OnChangeItem();
+
         this.Controls.Add(_searchFieldPanel);
         
         this.Controls.Add(Filter);
@@ -81,18 +82,17 @@ public class SearchBar: TableLayoutPanel
 
         _field.Enter += (sender, args) => onEnter();
         _field.Leave += (sender, args) => onLeave();
-        _field.KeyDown += (sender, args) => OnKeyDown(sender, args);
-
+        _field.KeyDown += (sender, args) => OnKeyDown(args);
     }
 
     CustomCombobox getFilter()
     {
-        CustomCombobox filter = new CustomCombobox(new String[]{});
+        CustomCombobox filter = new CustomCombobox(new string[]{});
         filter.Margin = new Padding(10, 35, 10, 0);
         return filter;
     }
 
-    public void UpdateListCombobox(List<String> list)
+    public void UpdateListCombobox(List<string> list)
     {
         this.listSelection = list;
         this.listSelection.Insert(0, "Tất cả");
@@ -117,11 +117,16 @@ public class SearchBar: TableLayoutPanel
         this._searchFieldPanel.Invalidate();
     }
 
-    void OnKeyDown(object e, KeyEventArgs k)
+    void OnKeyDown(KeyEventArgs k)
     {
         if (k.KeyCode == Keys.Enter)
         {
-            KeyDown.Invoke(_field.Text);
+            KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
         }
+    }
+
+    void OnChangeItem()
+    {
+        KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
     }
 }

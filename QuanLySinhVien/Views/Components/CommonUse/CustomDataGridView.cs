@@ -69,17 +69,21 @@ public class CustomDataGridView : DataGridView
         DefaultCellStyle.SelectionForeColor = Color.Black; 
         BorderStyle = BorderStyle.None;
         ReadOnly = true;
+        AutoGenerateColumns = false;
+
     }
     
     void SetActionColumn()
     {
+
         CellPainting += (sender, args) => DrawBtn(sender, args);
         CellMouseMove +=  (sender, args) => OnHoverCell(sender, args);
     }
     
     void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
     {
-        if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Hành động"].Index)
+        
+        if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Action"].Index)
         {
             //Cai dat cell trong nhu binh thuong
             e.PaintBackground(e.CellBounds, true);
@@ -218,7 +222,7 @@ public class CustomDataGridView : DataGridView
 
     void OnHoverCell(object o,  DataGridViewCellMouseEventArgs e)
     {
-        if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Hành động"].Index)
+        if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Action"].Index)
         {
             int rowIndex = e.RowIndex;
             int columnIndex = e.ColumnIndex;
