@@ -3,105 +3,245 @@ using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 
-namespace QuanLySinhVien.Views.Components;
-
-public class Khoa : NavBase
+namespace QuanLySinhVien.Views.Components
 {
-    private string[] _listSelectionForComboBox = new []{"Mã khoa", "Tên khoa"};
-
-    private DataTable table = new DataTable();
-    private CUse cuse;
-    private KhoaController _kcontroller;
-    private DataGridView dgv;
-    public Khoa()
+    public class Khoa : NavBase
     {
-        _kcontroller = new KhoaController();
-        cuse = new CUse();
-        Init();
+        // variable
+        private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
+
+        private DataTable table = new DataTable();
+        private CUse cuse;
+        private KhoaController _kcontroller;
+        private DataGridView dgv;
+
+        //button
+        private Button btnThem;
+        private Button btnSua;
+        private Button btnXoa;
         
-    }
-    private void Init()
-    {
-        Dock = DockStyle.Fill; // để nó full vùng center
-        Size = new Size(1200, 900);
+        // default
+        private int selectedMaKhoa = -1; // mặc định chưa chọn
 
-        var borderTop = new Panel
+
+        public Khoa()
         {
-            Dock = DockStyle.Fill
-        };
+            _kcontroller = new KhoaController();
+            cuse = new CUse();
+            Init();
+        }
 
-        borderTop.Controls.Add(Bottom()); // Add Bottom trước
-        borderTop.Controls.Add(Top());    // Add Top sau để nằm trên cùng
-
-        Controls.Add(borderTop);
-    }
-
-    private Panel Top()
-    {
-        Panel mainTop = new Panel
+        private void Init()
         {
-            Dock = DockStyle.Top,   // đổi sang Top
-            BackColor = MyColor.GrayBackGround,
-            Height = 90
-        };
-        return mainTop;
-    }
+            Dock = DockStyle.Fill;
+            Size = new Size(1200, 900);
 
-    private Panel Bottom()
-    {
-        Panel mainBot = new Panel
+            var borderTop = new Panel
+            {
+                Dock = DockStyle.Fill
+            };
+
+            borderTop.Controls.Add(Bottom());
+            borderTop.Controls.Add(Top());
+
+            Controls.Add(borderTop);
+        }
+
+        private Panel Top()
         {
-            Dock = DockStyle.Fill,  // chiếm toàn bộ phần còn lại
-            BackColor = MyColor.GrayBackGround,
-            Padding = new Padding(20, 0, 20, 0)
-        };
+            Panel mainTop = new Panel
+            {
+                Dock = DockStyle.Top,
+                BackColor = MyColor.GrayBackGround,
+                Height = 90
+            };
 
-        table.Columns.Add("Tên khoa", typeof(string));
-        table.Columns.Add("Email", typeof(string));
-        table.Columns.Add("Địa chỉ", typeof(string));
+            // edit button
+            btnThem = new Button
+            {
+                Text = "Thêm khoa",
+                Size = new Size(120, 40),
+                Location = new Point(30, 25)
+            };
+            btnThem.Click += BtnThem_Click;
+            mainTop.Controls.Add(btnThem);
 
-        // for (int i = 0; i < 50; i++)
-        // {
-        //     table.Rows.Add("abc", "deff","ghi");
-        // }
+            btnSua = new Button
+            {
+                Text = "Sửa khoa",
+                Size = new Size(120, 40),
+                Location = new Point(170, 25)
+            };
+            btnSua.Click += BtnSua_Click;
+            mainTop.Controls.Add(btnSua);
 
-        dgv = new DataGridView
+            btnXoa = new Button
+            {
+                Text = "Xóa khoa",
+                Size = new Size(120, 40),
+                Location = new Point(310, 25)
+            };
+            btnXoa.Click += BtnXoa_Click;
+            mainTop.Controls.Add(btnXoa);
+
+            return mainTop;
+        }
+
+        private Panel Bottom()
         {
-            Dock = DockStyle.Fill,
-            DataSource = table,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-            BorderStyle = BorderStyle.None,
-            BackgroundColor = MyColor.GrayBackGround,
-            AllowUserToAddRows = false,
-            ReadOnly = true
-        };
+            Panel mainBot = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = MyColor.GrayBackGround,
+                Padding = new Padding(20, 0, 20, 0)
+            };
 
-        dgv.EnableHeadersVisualStyles = false; // quan trọng, để tự set màu
-        dgv.ColumnHeadersDefaultCellStyle.BackColor = MyColor.MediumBlue; // xanh dương
-        dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White; // chữ trắng
-        dgv.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 11, FontStyle.Bold);
-        dgv.ColumnHeadersHeight = 40; // chiều cao header
-        dgv.AutoSize = false;
-        dgv.BorderStyle = BorderStyle.None;
-        dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-        dgv.RowHeadersVisible = false;
-        dgv.CellBorderStyle = DataGridViewCellBorderStyle.None;
-        dgv.AllowUserToResizeRows = false;   // khóa resize row
-        dgv.AllowUserToResizeColumns = false; // khóa resize column
+            // edit dgv
+            dgv = new DataGridView
+            {
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BorderStyle = BorderStyle.None,
+                BackgroundColor = MyColor.GrayBackGround,
+                AllowUserToAddRows = false,
+                ReadOnly = true,
+                RowHeadersVisible = false,
+                CellBorderStyle = DataGridViewCellBorderStyle.None,
+                AllowUserToResizeRows = false,
+                AllowUserToResizeColumns = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                MultiSelect = false
+            };
+            
+            // Header
+            dgv.EnableHeadersVisualStyles = false;
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = MyColor.MediumBlue;
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            dgv.ColumnHeadersHeight = 40;
+            dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            // sọc
+            dgv.RowsDefaultCellStyle.BackColor = Color.White;
+            dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGray;
+            dgv.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            // add columns -> dataTable
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Mã khoa", typeof(int));
+            dt.Columns.Add("Tên khoa", typeof(string));
+            dt.Columns.Add("Email", typeof(string));
+            dt.Columns.Add("Địa chỉ", typeof(string));
+
+            // get all data
+            dt = _kcontroller.GetDanhSachKhoa();
+            
+            // debug
+            foreach (DataColumn col in dt.Columns)
+            {
+                Console.WriteLine(col.ColumnName);
+            }
+
+            // test table
+            // for (int i = 0; i < 50; i++)
+            // {
+            //     dt.Rows.Add(i, "Khoa" + i, "email" + i + "@gmail.com", "Địa chỉ " + i);
+            // }
+
+            dgv.DataSource = dt;
+
+            // event click in row
+            dgv.CellClick += Dgv_CellClick!;
+
+            mainBot.Controls.Add(dgv);
+            return mainBot;
+        }
         
-        // 3. Add vào panel
-        mainBot.Controls.Add(dgv);
-        loadData();        
-        return mainBot;
-    }
 
-    public void loadData()
-    {
-        dgv.DataSource = _kcontroller.GetDanhSachKhoa();
-    }
-    
-    public override List<string> getComboboxList()
-    {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        // load data function
+        public void loadData()
+        {
+            dgv.DataSource = _kcontroller.GetDanhSachKhoa();
+        }
+
+        public override List<string> getComboboxList()
+        {
+            return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        }
+
+        // envent
+        private void BtnThem_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                // call function (controller)
+                _kcontroller.NhapKhoaMoi(); 
+                MessageBox.Show("Đã gọi hàm ThemKhoa()", "Thông báo");
+                
+                // reload table
+                loadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi thêm khoa: " + ex.Message);
+            }
+        }
+
+        // edit button
+        private void BtnSua_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                // check null
+                if (selectedMaKhoa <= 0)
+                {
+                    MessageBox.Show("Vui lòng chọn dòng cần sửa!", "Thông báo");
+                    return;
+                }
+
+                // call function(controller)
+                _kcontroller.SuaKhoa(selectedMaKhoa);
+                MessageBox.Show("Đã sửa thông tin khoa!", "Thông báo");
+                
+                // reload table
+                loadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi sửa khoa: " + ex.Message);
+            }
+        }
+        
+        // del button
+        private void BtnXoa_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                // call functon(controller) 
+                _kcontroller.XoaKhoa(selectedMaKhoa);
+                MessageBox.Show("Đã gọi hàm XoaKhoa()", "Thông báo");
+                
+                // reload table
+                loadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa khoa: " + ex.Message);
+            }
+        }
+        
+        // get id after click
+        private void Dgv_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // check header or null
+            if (e.RowIndex >= 0)
+            {
+                // get id by function
+                DataGridViewRow row = dgv.Rows[e.RowIndex];
+                selectedMaKhoa = Convert.ToInt32(row.Cells["Mã khoa"].Value);
+            }
+        }
     }
 }
