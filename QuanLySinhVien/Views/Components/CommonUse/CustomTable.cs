@@ -5,9 +5,12 @@ using QuanLySinhVien.Views.Enums;
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 #region Cách dùng
+
 //Set bool action trước để set nút xóa, sửa
 //Nếu set action và không set nút, tự động sẽ có nút xóa
+
 #endregion
+
 public class CustomTable : TableLayoutPanel
 {
     CustomDataGridView _dataGridView;
@@ -23,7 +26,13 @@ public class CustomTable : TableLayoutPanel
 
     private CustomButton _editBtn;
     private CustomButton _deleteBtn;
-    public CustomTable(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false, bool edit = false, bool delete = false)
+
+    public event Action<int> OnEdit;
+    public event Action<int> OnDelete;
+    public event Action<int> OnDetail;
+
+    public CustomTable(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false,
+        bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
         _header = new FlowLayoutPanel();
@@ -31,7 +40,7 @@ public class CustomTable : TableLayoutPanel
         _action = action;
         _edit = edit;
         _delete = delete;
-        _columnNames =  columnNames;
+        _columnNames = columnNames;
         Init();
     }
 
@@ -53,7 +62,6 @@ public class CustomTable : TableLayoutPanel
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
         _dataGridView = new CustomDataGridView(_action, _edit, _delete);
-        
     }
 
     void SetHeader()
@@ -63,9 +71,9 @@ public class CustomTable : TableLayoutPanel
         _header.FlowDirection = FlowDirection.LeftToRight;
         _header.WrapContents = false;
         _header.BackColor = MyColor.MainColor;
-        _header.Margin =  new Padding(0, 0, 0, 0);
-        _header.Padding = new Padding(5, 0, 5,0);
-        
+        _header.Margin = new Padding(0, 0, 0, 0);
+        _header.Padding = new Padding(5, 0, 5, 0);
+
         foreach (String i in _headerContent)
         {
             this._header.Controls.Add(GetLabel(i));
@@ -76,14 +84,13 @@ public class CustomTable : TableLayoutPanel
             _header.Controls.Add(GetLabel("Hành động"));
         }
 
-        
+
         this.Controls.Add(_header);
     }
 
     void SetContent()
     {
-
-        for ( int i = 0; i < _headerContent.Count; i++)
+        for (int i = 0; i < _headerContent.Count; i++)
         {
             var column = new DataGridViewTextBoxColumn
             {
@@ -93,7 +100,7 @@ public class CustomTable : TableLayoutPanel
             };
             _dataGridView.Columns.Add(column);
         }
-        
+
         if (_action)
         {
             var column = new DataGridViewTextBoxColumn
@@ -105,12 +112,12 @@ public class CustomTable : TableLayoutPanel
             };
             _dataGridView.Columns.Add(column);
         }
-        
+
         _dataGridView.DataSource = new BindingList<object>(_cellDatas);
-        
+
         _dataGridView.Dock = DockStyle.Fill;
         _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
-        
+
 
         this.Controls.Add(_dataGridView);
     }
@@ -132,10 +139,10 @@ public class CustomTable : TableLayoutPanel
     void SetEventListen()
     {
         this._dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
-        
+
         this._dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
         this._dataGridView.BtnHoverDelete += (rec, index) => OnHoverDeleteBtn(rec, index);
-        
+
         this._dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
         this._dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
     }
@@ -152,33 +159,33 @@ public class CustomTable : TableLayoutPanel
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
         _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor);
-         
+
         Point myPoint = _topForm.PointToClient(rec);
-        
+
         _editBtn.Location = myPoint;
-        
+
         _topForm.Controls.Add(_editBtn);
-        
+
         _editBtn.BringToFront();
 
         _editBtn.MouseDown += (sender, args) => edit(index);
     }
-    
+
     void OnHoverDeleteBtn(Point rec, int index)
     {
         int rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
         _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover);
-         
+
         Point myPoint = _topForm.PointToClient(rec);
-        
+
         _deleteBtn.Location = myPoint;
-        
+
         _topForm.Controls.Add(_deleteBtn);
-        
+
         _deleteBtn.BringToFront();
-        
+
         _deleteBtn.MouseDown += (sender, args) => delete(index);
     }
 
@@ -189,26 +196,28 @@ public class CustomTable : TableLayoutPanel
 
     void OnLeaveDeleteBtn()
     {
-        _deleteBtn.Dispose();   
+        _deleteBtn.Dispose();
     }
 
     void delete(int index)
     {
-        object o =  _cellDatas[index];
+        object o = _cellDatas[index];
         Console.WriteLine("Xóa" + o.ToString());
-        
+        OnDelete.Invoke(index);
     }
-    
+
     void edit(int index)
     {
-        object o =  _cellDatas[index];
+        object o = _cellDatas[index];
         Console.WriteLine("Sửa" + o.ToString());
+        OnEdit.Invoke(index);
     }
-    
+
     void detail(int index)
     {
-        object o =  _cellDatas[index];
+        object o = _cellDatas[index];
         Console.WriteLine("Chi tiết" + o.ToString());
+        OnDetail.Invoke(index);
     }
     //
     // List<string> GetStringDataRowByIndex(int index)
@@ -275,6 +284,50 @@ public class CustomTable : TableLayoutPanel
             c.Size = new Size(columnSize, c.Height);
         }
     }
-    
-    
+
+    public void UpdateData(List<List<object>> newRows)
+    {
+        // reset binding and repopulate rows manually to support list-based rows
+        _dataGridView.DataSource = null;
+        _dataGridView.Rows.Clear();
+
+        if (newRows == null) return;
+
+        foreach (var row in newRows)
+        {
+            var values = new List<object>();
+            if (row != null)
+            {
+                // take only as many values as header columns define
+                for (int i = 0; i < _headerContent.Count && i < row.Count; i++)
+                {
+                    values.Add(row[i]);
+                }
+                // pad if row has fewer cells than headers
+                while (values.Count < _headerContent.Count)
+                {
+                    values.Add(string.Empty);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < _headerContent.Count; i++) values.Add(string.Empty);
+            }
+
+            // add placeholder for action column if enabled
+            if (_action)
+            {
+                values.Add(string.Empty);
+            }
+
+            _dataGridView.Rows.Add(values.ToArray());
+        }
+    }
+
+    public void UpdateData(List<object> newItems)
+    {
+        _cellDatas = newItems ?? new List<object>();
+        _dataGridView.Rows.Clear();
+        _dataGridView.DataSource = new BindingList<object>(_cellDatas);
+    }
 }
