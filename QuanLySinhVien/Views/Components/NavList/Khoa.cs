@@ -10,8 +10,6 @@ namespace QuanLySinhVien.Views.Components
         // variable
         private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
 
-        private DataTable table = new DataTable();
-        private CUse cuse;
         private KhoaController _kcontroller;
         private DataGridView dgv;
 
@@ -27,7 +25,6 @@ namespace QuanLySinhVien.Views.Components
         public Khoa()
         {
             _kcontroller = new KhoaController();
-            cuse = new CUse();
             Init();
         }
 
@@ -47,7 +44,7 @@ namespace QuanLySinhVien.Views.Components
             Controls.Add(borderTop);
         }
 
-        private Panel Top()
+        private new Panel Top()
         {
             Panel mainTop = new Panel
             {
@@ -87,7 +84,7 @@ namespace QuanLySinhVien.Views.Components
             return mainTop;
         }
 
-        private Panel Bottom()
+        private new Panel Bottom()
         {
             Panel mainBot = new Panel
             {
@@ -153,7 +150,7 @@ namespace QuanLySinhVien.Views.Components
             dgv.DataSource = dt;
 
             // event click in row
-            dgv.CellClick += Dgv_CellClick!;
+            dgv.CellClick += Dgv_CellClick;
 
             mainBot.Controls.Add(dgv);
             return mainBot;
@@ -177,7 +174,57 @@ namespace QuanLySinhVien.Views.Components
             try
             {
                 // call function (controller)
-                _kcontroller.NhapKhoaMoi(); 
+                // form
+            Form form = new Form()
+            {
+                Text = "Thêm Khoa mới",
+                Size = new System.Drawing.Size(400, 300),  // form lớn hơn
+                StartPosition = FormStartPosition.CenterScreen  // hiện giữa màn hình
+            };
+
+            // Label, TextBox
+            Label lblTen = new Label() { Text = "Tên Khoa:", Top = 30, Left = 30, Width = 100 };
+            TextBox txtTen = new TextBox() { Top = 30, Left = 140, Width = 200 };
+
+            Label lblEmail = new Label() { Text = "Email:", Top = 80, Left = 30, Width = 100 };
+            TextBox txtEmail = new TextBox() { Top = 80, Left = 140, Width = 200 };
+
+            Label lblDiaChi = new Label() { Text = "Địa chỉ:", Top = 130, Left = 30, Width = 100 };
+            TextBox txtDiaChi = new TextBox() { Top = 130, Left = 140, Width = 200 };
+
+            // button
+            Button btnOk = new Button() { Text = "OK", Top = 200, Left = 80, Width = 80, DialogResult = DialogResult.OK };
+            Button btnCancel = new Button() { Text = "Cancel", Top = 200, Left = 200, Width = 80, DialogResult = DialogResult.Cancel };
+
+            // add
+            form.Controls.Add(lblTen);
+            form.Controls.Add(txtTen);
+            form.Controls.Add(lblEmail);
+            form.Controls.Add(txtEmail);
+            form.Controls.Add(lblDiaChi);
+            form.Controls.Add(txtDiaChi);
+            form.Controls.Add(btnOk);
+            form.Controls.Add(btnCancel);
+
+            form.AcceptButton = btnOk;
+            form.CancelButton = btnCancel;
+
+            // check OK, -> call function
+            DialogResult rs = form.ShowDialog();
+            if (rs == DialogResult.OK)
+            {
+                if (string.IsNullOrWhiteSpace(txtTen.Text))
+                {
+                    MessageBox.Show("Tên Khoa không được để trống!", "Lỗi");
+                    return;
+                }
+
+                _kcontroller.ThemKhoa(txtTen.Text.Trim(), txtEmail.Text.Trim(), txtDiaChi.Text.Trim());
+            }
+            else if (rs == DialogResult.Cancel)
+            {
+                MessageBox.Show("Hủy thêm khoa mới", "Thông báo");
+            }
                 
                 // reload table
                 loadData();
@@ -199,10 +246,52 @@ namespace QuanLySinhVien.Views.Components
                     MessageBox.Show("Vui lòng chọn dòng cần sửa!", "Thông báo");
                     return;
                 }
+                // check null
+            if (selectedMaKhoa <= 0)
+                throw new ArgumentException("ID khoa không hợp lệ!");
 
-                // call function(controller)
-                _kcontroller.SuaKhoa(selectedMaKhoa);
-                
+            // get data by id -> show in dialog
+            DataRow khoa = _kcontroller.GetKhoaById(selectedMaKhoa);
+            if (khoa == null)
+                throw new Exception("Khoa không tồn tại!");
+
+            // variable -> function
+            string tenKhoaMoi = khoa["TenKhoa"].ToString();
+            string emailMoi = khoa["Email"].ToString();
+            string diaChiMoi = khoa["DiaChi"].ToString();
+
+            // create dialog
+            using (Form inputForm = new Form())
+            {
+                // form
+                inputForm.Text = "Sửa thông tin Khoa";
+                inputForm.Size = new Size(400, 300);
+                inputForm.StartPosition = FormStartPosition.CenterScreen;
+
+                // item
+                TextBox txtTen = new TextBox() { Text = tenKhoaMoi, Location = new Point(20, 20), Width = 340 };
+                TextBox txtEmail = new TextBox() { Text = emailMoi, Location = new Point(20, 70), Width = 340 };
+                TextBox txtDiaChi = new TextBox() { Text = diaChiMoi, Location = new Point(20, 120), Width = 340 };
+                Button btnOK = new Button() { Text = "OK", Location = new Point(100, 200), DialogResult = DialogResult.OK };
+                Button btnCancel = new Button() { Text = "Hủy", Location = new Point(200, 200), DialogResult = DialogResult.Cancel };
+
+                // add item
+                inputForm.Controls.Add(txtTen);
+                inputForm.Controls.Add(txtEmail);
+                inputForm.Controls.Add(txtDiaChi);
+                inputForm.Controls.Add(btnOK);
+                inputForm.Controls.Add(btnCancel);
+
+                inputForm.AcceptButton = btnOK;
+                inputForm.CancelButton = btnCancel;
+
+                // button OK on click
+                if (inputForm.ShowDialog() == DialogResult.OK)
+                {
+                    // call controller function
+                    _kcontroller.SuaKhoa(selectedMaKhoa, txtTen.Text, txtEmail.Text, txtDiaChi.Text);
+                }
+            }                
                 // reload table
                 loadData();
             }
@@ -218,8 +307,25 @@ namespace QuanLySinhVien.Views.Components
             try
             {
                 // call functon(controller) 
-                _kcontroller.XoaKhoa(selectedMaKhoa);
-                
+                // check null
+                if (selectedMaKhoa <= 0)
+                    throw new ArgumentException("ID khoa không hợp lệ!");
+            
+                // Button y/n
+                DialogResult rs =
+                    MessageBox.Show("Bạn chắc chắn muốn xóa khoa " + _kcontroller.GetKhoaById(selectedMaKhoa)["TenKhoa"].ToString(),
+                        "Cảnh báo",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+                if (rs == DialogResult.Yes)
+                {
+                    // call controller function
+                    _kcontroller.XoaKhoa(selectedMaKhoa);
+                }
+                else if (rs == DialogResult.No)
+                {
+                    MessageBox.Show("Đã hủy xóa khoa", "Thông báo");
+                }
                 // reload table
                 loadData();
             }
