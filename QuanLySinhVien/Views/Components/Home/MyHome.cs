@@ -278,9 +278,6 @@ public class MyHome : Form
 
     void UpdateSearchCombobox(string function)
     {
-        String change = navListController.getDataButton(function);
-        rightBottomChange = navListController.update(change);
-        
         List<string> t = rightBottomChange.getComboboxList();
         _searchBar.UpdateListCombobox(t);
 

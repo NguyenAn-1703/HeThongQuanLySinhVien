@@ -21,5 +21,6 @@ static class Program
 
         // NganhDao.TestNganhDAO();
         // KhoaDao.TestKhoaDAO();
+        // TaiKhoanDao.Test();
     }
 }

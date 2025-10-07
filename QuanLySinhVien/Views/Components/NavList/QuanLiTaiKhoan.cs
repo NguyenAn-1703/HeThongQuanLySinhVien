@@ -1,3 +1,4 @@
+using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
@@ -6,10 +7,20 @@ namespace QuanLySinhVien.Views.Components;
 
 public class QuanLiTaiKhoan : NavBase
 {
-    private string[] _listSelectionForComboBox;
+    private List<string> _listSelectionForComboBox;
     private CustomTable _table;
+    private TaiKhoanController _taiKhoanController;
+    string[] _headerArray = new string[] { "Mã tài khoản", "Mã nhóm quyền", "Tên đăng nhập" };
+    List<string> _headerList;
+    
+    List<TaiKhoanDto> _rawData;
+    List<object> _displayData;
+        
     public QuanLiTaiKhoan()
     {
+        _rawData = new  List<TaiKhoanDto>();
+        _displayData = new List<object>();
+        _taiKhoanController = TaiKhoanController.getInstance();
         Init();
     }
         
@@ -49,52 +60,51 @@ public class QuanLiTaiKhoan : NavBase
             Dock = DockStyle.Fill,
         };
 
-        string[] headerArray = new string[] { "Mã tài khoản", "Tên tài khoản", "Người dùng" };
-        List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
-        _listSelectionForComboBox = headerList.ToArray();
+        
+        // object[] people = new[]
+        // {
+        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
+        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
+        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
+        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
+        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
+        // };
 
-        
-        object[] people = new[]
-        {
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-            
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-            new { MaTK = "2", TenTK = "An", NgDung = "Nguyen Nguyen" },
-        };
 
-        string[] columnNames = new[] { "MaTK", "TenTK", "NgDung" };
-        List<string> columnNamesList = columnNames.ToList();
+        SetCombobox();
         
-        List<object> listData = people.ToList();
+        SetDataTable();
         
-        _table = new CustomTable(headerList, columnNamesList, listData, true, true, true);
         panel.Controls.Add(_table);
         
         return panel;
     }
 
+    void SetCombobox()
+    {
+        _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
+        _listSelectionForComboBox = _headerList;
+    }
+
+    //hàm gọi 1 lần duy nhất khi khởi tạo
+    void SetDataTable()
+    {
+        _rawData = _taiKhoanController.GetAll();
+        SetDisplayData();
+        string[] columnNames = new[] { "MaTK", "MaNQ", "TenDangNhap" };
+        List<string> columnNamesList = columnNames.ToList();
+        
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+    }
+
+    void SetDisplayData()
+    {
+        _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new {x.MaTK, x.MaNQ, x.TenDangNhap});
+    }
+
     public override List<string> getComboboxList()
     {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        return this._listSelectionForComboBox;
     }
 
     public override void onSearch(string txtSearch, string filter)

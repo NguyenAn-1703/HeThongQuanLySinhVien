@@ -35,7 +35,6 @@ public class SearchBar: TableLayoutPanel
         SetSearchField();
 
         this.Filter = getFilter();
-        Filter.combobox.SelectedIndexChanged += (sender, args) => OnChangeItem();
 
         this.Controls.Add(_searchFieldPanel);
         
@@ -103,6 +102,7 @@ public class SearchBar: TableLayoutPanel
             this.Filter.combobox.Items.Add(i);
         }
         this.Filter.combobox.SelectedIndex = 0;
+        Filter.combobox.SelectedIndexChanged += (sender, args) => OnChangeItem();
     }
 
     void onEnter()

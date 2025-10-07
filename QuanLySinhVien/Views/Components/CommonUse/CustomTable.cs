@@ -17,8 +17,8 @@ public class CustomTable : TableLayoutPanel
     List<string> _headerContent;
     private FlowLayoutPanel _header;
     private List<object> _cellDatas;
-    private List<string> _columnNames;
-    private List<List<string>> _displayCellData;
+    private List<string> _columnNames; //để truy suất
+    private BindingList<object> _displayCellData;
     private bool _action;
     private bool _edit;
     private bool _delete;
@@ -50,7 +50,6 @@ public class CustomTable : TableLayoutPanel
         SetHeader();
         SetContent();
         // this.CellBorderStyle =TableLayoutPanelCellBorderStyle.Single;
-        this.Resize += (sender, args) => OnResize();
         SetEventListen();
     }
 
@@ -84,7 +83,6 @@ public class CustomTable : TableLayoutPanel
             _header.Controls.Add(GetLabel("Hành động"));
         }
 
-
         this.Controls.Add(_header);
     }
 
@@ -113,13 +111,36 @@ public class CustomTable : TableLayoutPanel
             _dataGridView.Columns.Add(column);
         }
 
-        _dataGridView.DataSource = new BindingList<object>(_cellDatas);
+        _displayCellData = new BindingList<object>(_cellDatas);
+        _dataGridView.DataSource = _displayCellData;
 
         _dataGridView.Dock = DockStyle.Fill;
         _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
-
-
+        Console.WriteLine(_cellDatas.Count);
+            
         this.Controls.Add(_dataGridView);
+        
+    }
+    
+    public void Search(string search, string filter)
+    {
+        string keyword = search.Trim().Replace("'", "''");
+        
+        if (filter.Trim() == "Tất cả")
+        {
+            searchAll(keyword);
+        }
+        else
+        {
+        }
+    }
+
+    public void searchAll(string keyword)
+    {
+        _displayCellData = new BindingList<object>();
+        
+        
+        Console.WriteLine(_cellDatas.Count);
     }
 
     Label GetLabel(String text)
@@ -138,6 +159,7 @@ public class CustomTable : TableLayoutPanel
 
     void SetEventListen()
     {
+        this.Resize += (sender, args) => OnResize();
         this._dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
 
         this._dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
@@ -220,6 +242,7 @@ public class CustomTable : TableLayoutPanel
         object o = _cellDatas[index];
         Console.WriteLine("Chi tiết" + o.ToString());
         OnDetail?.Invoke(index);
+        
     }
     //
     // List<string> GetStringDataRowByIndex(int index)
@@ -242,40 +265,6 @@ public class CustomTable : TableLayoutPanel
     //         .ToList();
     //     return listString;
     // }
-
-    public void Search(string search, string filter)
-    {
-        // string keyword = search.Trim().Replace("'", "''");
-        //
-        // _dataGridView.DataSource = null;
-        //
-        // if (filter.Trim() == "Tất cả")
-        // {
-        //     searchAll(keyword);
-        // }
-        // else
-        // {
-        //     _dataView.RowFilter = $"[{filter.Trim()}] LIKE '%{keyword}%'";
-        //     
-        //     Console.WriteLine(filter.Trim().Equals("Tất cả"));
-        //     Console.WriteLine(keyword);
-        //     Console.WriteLine(_dataView.Count);
-        // }
-    }
-
-    void searchAll(string keyword)
-    {
-        // List<string> filters = new List<string>();
-        // foreach (string i in this._headerContent)
-        // {
-        //     filters.Add($"[{i.Trim()}] LIKE '%{keyword}%'");
-        // }
-        //
-        // Console.WriteLine(keyword);
-        // Console.WriteLine(_dataView.Count);
-        //
-        // _dataView.RowFilter = string.Join(" OR ", filters);
-    }
 
     void OnResize()
     {

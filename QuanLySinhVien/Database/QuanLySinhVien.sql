@@ -16,7 +16,8 @@ CREATE TABLE `SinhVien` (
   `GioiTinhSV` VARCHAR(255),
   `EmailSV` VARCHAR(255),
   `CCCDSV` VARCHAR(255),
-  `AnhDaiDienSV` VARCHAR(255)
+  `AnhDaiDienSV` VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 2
@@ -25,7 +26,8 @@ MaLop   INT AUTO_INCREMENT PRIMARY KEY ,
 MaGV INT,
 MaNganh  INT,
 TenLop   VARCHAR(255),
-SoLuongSV INT 
+SoLuongSV INT,
+Status TINYINT DEFAULT 1 
 );
 
 -- 3
@@ -35,7 +37,8 @@ MaTK INT,
 MaKhoa INT,
 TenGV  VARCHAR(255),
 SoDienThoai INT,
-Email  VARCHAR(255)
+Email  VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 4
@@ -43,21 +46,24 @@ CREATE TABLE Khoa    (
 MaKhoa  INT AUTO_INCREMENT PRIMARY KEY , 
 TenKHoa  VARCHAR(255),
 Email  VARCHAR(255),
-DiaChi  VARCHAR(255)
+DiaChi  VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 5
 CREATE TABLE Nganh      (
 MaNganh    INT AUTO_INCREMENT PRIMARY KEY , 
 MaKhoa  INT,
-TenNganh   VARCHAR(255)
+TenNganh   VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 6
 CREATE TABLE ChuyenNganh      (
 MaCN     INT AUTO_INCREMENT PRIMARY KEY , 
 MaNganh   INT,
-TenCN    VARCHAR(255)
+TenCN    VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 7
@@ -67,7 +73,8 @@ create table HocPhiTinChi(
     
     SoTienMotTinChi double,
     HocKy INT,
-    Nam VARCHAR(255)
+    Nam VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 
@@ -80,7 +87,8 @@ create table HocPhiSV(
     Nam VARCHAR(255),
     TongHocPhi double,
     DaThu double,
-	TrangThai VARCHAR(255)
+	TrangThai VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 9
@@ -89,7 +97,8 @@ create table KhoaHoc(
    MaCKDT INT, -- FK
     
 	TenKhoaHoc VARCHAR(255),
-   NienKhoaHoc VARCHAR(255)
+   NienKhoaHoc VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 10
@@ -97,14 +106,16 @@ create table ChuKyDaoTao(
 	MaCKDT INT AUTO_INCREMENT PRIMARY KEY,
     
     NamBatDau VARCHAR(255),
-    NamKetThuc VARCHAR(255)
+    NamKetThuc VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 11
 CREATE TABLE `DangKy` (
   `MaNHP` INT,
   `MaSV` INT,
-  PRIMARY KEY (`MaNHP`, `MaSV`)
+  PRIMARY KEY (`MaNHP`, `MaSV`),
+Status TINYINT DEFAULT 1
 );
 
 -- 12
@@ -114,7 +125,8 @@ CREATE TABLE `NhomHocPhan` (
   `MaHocPhan` INT,
   `HocKy` INT,
   `Nam` VARCHAR(255),
-  `SiSo` INT
+  `SiSo` INT,
+Status TINYINT DEFAULT 1
 );
 
 -- 13
@@ -127,7 +139,8 @@ CREATE TABLE `LichHoc` (
   `TuNgay` date,
   `DenNgay` date,
   `TietKetThuc` INT,
-  `SoTiet` INT
+  `SoTiet` INT,
+Status TINYINT DEFAULT 1
 );
 
  -- 14
@@ -137,7 +150,8 @@ CREATE TABLE `PhongHoc` (
   `LoaiPH` VARCHAR(255),
   `CoSo` VARCHAR(255),
   `SucChua` INT,
-  `TinhTrang` VARCHAR(255)
+  `TinhTrang` VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 15
@@ -148,7 +162,8 @@ CREATE TABLE `HocPhan` (
   `SoTinChi` INT,
   `HeSoHocPhan` float,
   `SoTietLyThuyet` INT,
-  `SoTietThucHanh` INT
+  `SoTietThucHanh` INT,
+Status TINYINT DEFAULT 1
 );
 
 -- 16
@@ -157,7 +172,8 @@ CREATE TABLE `ChiTietDiem` (
   `MaSV` INT,
   `MaHP` INT,
   `HocKy` INT,
-  `Nam` VARCHAR(255)
+  `Nam` VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 17
@@ -165,21 +181,24 @@ CREATE TABLE `KetQua` (
   `MaKQ` INT AUTO_INCREMENT PRIMARY KEY,
   `MaCTD` INT,
   `DiemHe4` float,
-  `DiemHe10` float
+  `DiemHe10` float,
+Status TINYINT DEFAULT 1
 );
 
 -- 18
 CREATE TABLE `DiemThi` (
   `MaDT` INT AUTO_INCREMENT PRIMARY KEY,
   `MaCTD` INT,
-  `DiemSo` float
+  `DiemSo` float,
+Status TINYINT DEFAULT 1
 );
 
 -- 19
 CREATE TABLE `DiemQuaTrinh` (
   `MaDQT` INT AUTO_INCREMENT PRIMARY KEY,
   `MaCTD` INT,
-  `DiemSo` float
+  `DiemSo` float,
+Status TINYINT DEFAULT 1
 );
 
 -- 20
@@ -189,7 +208,8 @@ CREATE TABLE `CotDiem` (
   `MaHP` INT,
   `TenCotDiem` VARCHAR(255),
   `DiemSo` float,
-  `HeSo` float
+  `HeSo` float,
+Status TINYINT DEFAULT 1
 );
 
 -- 21
@@ -197,7 +217,8 @@ CREATE TABLE `HocPhiHocPhan` (
   `MaSV` INT,
   `MaHP` INT,
   `TongTien` double,
-  PRIMARY KEY (`MaSV`, `MaHP`)
+  PRIMARY KEY (`MaSV`, `MaHP`),
+Status TINYINT DEFAULT 1
 );
 
 -- 22
@@ -207,21 +228,24 @@ CREATE TABLE `CaThi` (
   `MaPH` INT,
   `Thu` INT,
   `ThoiGianBatDau` VARCHAR(255),
-  `ThoiLuong` INT
+  `ThoiLuong` INT,
+Status TINYINT DEFAULT 1
 );
 
 -- 23
 CREATE TABLE `CaThi_SinhVien` (
   `MaCT` INT,
   `MaSV` INT,
-  PRIMARY KEY (`MaCT`, `MaSV`)
+  PRIMARY KEY (`MaCT`, `MaSV`),
+Status TINYINT DEFAULT 1
 );
 
 -- 24
 CREATE TABLE ChuongTrinhDaoTao_HocPhan(
 MaCTDT INT,
 MaHP INT,
-PRIMARY KEY (MaCTDT, MaHP)
+PRIMARY KEY (MaCTDT, MaHP),
+Status TINYINT DEFAULT 1
 );
 
 -- 25
@@ -231,7 +255,8 @@ create table ChuongTrinhDaoTao(
     
     TenCTDT VARCHAR(255),
     LoaiHinhDT VARCHAR(255),
-    TrinhDo VARCHAR(255)
+    TrinhDo VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 26
@@ -239,13 +264,15 @@ CREATE TABLE TaiKhoan (
 MaTK INT AUTO_INCREMENT PRIMARY KEY , 
 MaNQ INT ,
 TenDangNhap VARCHAR(255),
-MatKhau VARCHAR(255)
+MatKhau VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 27
 CREATE TABLE NhomQuyen  (
 MaNQ INT AUTO_INCREMENT  PRIMARY KEY ,
-TenNhomQuyen VARCHAR(255)
+TenNhomQuyen VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- 28
@@ -253,13 +280,15 @@ CREATE TABLE ChiTietQuyen (
 MaCN INT, 
 MaNQ INT ,
 HanhDong VARCHAR(255),
-PRIMARY KEY(MaCN, MaNQ, HanhDong)
+PRIMARY KEY(MaCN, MaNQ, HanhDong),
+Status TINYINT DEFAULT 1
 );
 
 -- 29
 CREATE TABLE ChucNang  (
 MaCN INT AUTO_INCREMENT PRIMARY KEY , 
-TenChucNang VARCHAR(255)
+TenChucNang VARCHAR(255),
+Status TINYINT DEFAULT 1
 );
 
 -- ------------------------INSERT-----------------------------------
