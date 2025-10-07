@@ -2,18 +2,19 @@ using QuanLySinhVien.Models;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Search;
 
-public class TaiKhoanSearch
+public class NganhSearch
 {
-    private List<TaiKhoanDto> _rawData;
-    public event Action<List<TaiKhoanDto>> FinishSearch;
+    private List<NganhDto> _rawData;
+    public event Action<List<NganhDto>> FinishSearch;
 
-    public TaiKhoanSearch(List<TaiKhoanDto> rawData)
+    public NganhSearch(List<NganhDto> rawData)
     {
         this._rawData = rawData;
     }
+    
     public void Search(string text, string selection)
     {
-        List<TaiKhoanDto> result = new List<TaiKhoanDto>();
+        List<NganhDto> result = new List<NganhDto>();
         string keyword = text.ToLower().Trim();
         selection =  selection.Trim();
         
@@ -32,36 +33,36 @@ public class TaiKhoanSearch
         FinishSearch.Invoke(result);
     }
 
-    List<TaiKhoanDto> SearchAll(string keyword, string selection)
+    List<NganhDto> SearchAll(string keyword, string selection)
     {
-        List<TaiKhoanDto> result = _rawData
-            .Where(x => x.MaTK.ToString().ToLower().Contains(keyword) || 
-                        x.MaNQ.ToString().ToLower().Contains(keyword) ||
-                        x.TenDangNhap.ToString().ToLower().Contains(keyword)
+        List<NganhDto> result = _rawData
+            .Where(x => x.MaNganh.ToString().ToLower().Contains(keyword) || 
+                        x.MaKhoa.ToString().ToLower().Contains(keyword) ||
+                        x.TenNganh.ToString().ToLower().Contains(keyword)
                         )
             .ToList();
         return result;
     }
 
-    List<TaiKhoanDto> SearchFilter(string keyword, string selection)
+    List<NganhDto> SearchFilter(string keyword, string selection)
     {
-        List<TaiKhoanDto> result;
-        if (selection.Equals("Mã tài khoản"))
+        List<NganhDto> result;
+        if (selection.Equals("Mã ngành"))
         {
             result = _rawData
-                .Where(x => x.MaTK.ToString().ToLower().Contains(keyword))
+                .Where(x => x.MaNganh.ToString().ToLower().Contains(keyword))
                 .ToList();
         }
-        else if(selection.Equals("Mã nhóm quyền"))
+        else if(selection.Equals("Mã khoa"))
         {
             result = _rawData
-                .Where(x => x.MaNQ.ToString().ToLower().Contains(keyword))
+                .Where(x => x.MaKhoa.ToString().ToLower().Contains(keyword))
                 .ToList();
         }
         else
         {
             result = _rawData
-                .Where(x => x.TenDangNhap.ToLower().Contains(keyword))
+                .Where(x => x.TenNganh.ToLower().Contains(keyword))
                 .ToList();
         }
         return result;

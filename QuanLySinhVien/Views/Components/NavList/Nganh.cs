@@ -8,6 +8,7 @@ using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using Svg;
 
@@ -20,6 +21,8 @@ public class NganhPanel : NavBase
     private CustomTable _table;
     private Panel _tableContainer;
     private List<NganhDto> _currentNganhs;
+    
+    private NganhSearch _nganhSearch;
 
     private NganhDao nganhDAO = new NganhDao();
 

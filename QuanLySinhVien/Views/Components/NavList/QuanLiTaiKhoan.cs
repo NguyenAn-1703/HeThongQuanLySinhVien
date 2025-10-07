@@ -1,6 +1,7 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.NavList;
 
 namespace QuanLySinhVien.Views.Components;
@@ -15,6 +16,8 @@ public class QuanLiTaiKhoan : NavBase
     
     List<TaiKhoanDto> _rawData;
     List<object> _displayData;
+
+    private TaiKhoanSearch _taiKhoanSearch;
         
     public QuanLiTaiKhoan()
     {
@@ -60,20 +63,13 @@ public class QuanLiTaiKhoan : NavBase
             Dock = DockStyle.Fill,
         };
 
-        
-        // object[] people = new[]
-        // {
-        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-        //     new { MaTK = "1", TenTK = "An", NgDung = "Nguyen An" },
-        // };
-
-
         SetCombobox();
         
         SetDataTable();
+
+        SetSearch();
+
+        SetAction();
         
         panel.Controls.Add(_table);
         
@@ -102,6 +98,20 @@ public class QuanLiTaiKhoan : NavBase
         _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new {x.MaTK, x.MaNQ, x.TenDangNhap});
     }
 
+    void SetSearch()
+    {
+        _taiKhoanSearch = new TaiKhoanSearch(_rawData);
+    }
+
+    void SetAction()
+    {
+        _taiKhoanSearch.FinishSearch += dtos =>
+        {
+            this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new { x.MaTK, x.MaNQ, x.TenDangNhap });
+            this._table.UpdateData(_displayData);
+        };
+    }
+
     public override List<string> getComboboxList()
     {
         return this._listSelectionForComboBox;
@@ -109,7 +119,10 @@ public class QuanLiTaiKhoan : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._table.Search(txtSearch, filter);
+        this._taiKhoanSearch.Search(txtSearch, filter);
+            
+        // this._table.Search(txtSearch, filter);
+        
     }
 
 }

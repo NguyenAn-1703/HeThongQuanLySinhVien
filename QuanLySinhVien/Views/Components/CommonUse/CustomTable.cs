@@ -318,7 +318,7 @@ public class CustomTable : TableLayoutPanel
     public void UpdateData(List<object> newItems)
     {
         _cellDatas = newItems ?? new List<object>();
-        _dataGridView.Rows.Clear();
-        _dataGridView.DataSource = new BindingList<object>(_cellDatas);
+        _displayCellData = new BindingList<object>(_cellDatas);
+        _dataGridView.DataSource = _displayCellData;
     }
 }
