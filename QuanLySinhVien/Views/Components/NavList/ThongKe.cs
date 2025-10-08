@@ -1,6 +1,7 @@
 using LiveChartsCore.SkiaSharpView.WinForms;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Chart;
+// using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
@@ -78,27 +79,27 @@ public class ThongKe : NavBase
         panel.BackColor = MyColor.GrayBackGround;
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
+        
         Label title = new Label();
         title.AutoSize = true;
         title.Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold);
         title.Text = "Số sinh viên theo khóa";
         
         panel.Controls.Add(title);
-        // panel.Controls.Add(GetPieChart());
-        // panel.Controls.Add(new Panel());
+        panel.Controls.Add(GetPieChart());
+        panel.Controls.Add(new Panel());
         // panel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         return panel;
     }
 
-    // CustomPieChart GetPieChart()
-    // {
-    //     string[] dsKhoaHoc = new[] { "Khóa 22", "Khóa 23", "Khóa 24", "Khóa 25" };
-    //     float[] percent = new[] { 20f, 20f, 25f, 25f, 10f };
-    //     
-    //     CustomPieChart chart =  new CustomPieChart(dsKhoaHoc, percent);
-    //     return chart;
-    // }
+    CustomPieChart GetPieChart()
+    {
+        string[] dsKhoaHoc = new[] { "Khóa 22", "Khóa 23", "Khóa 24", "Khóa 25" };
+        float[] percent = new[] { 20f, 20f, 25f, 25f, 10f };
+        
+        CustomPieChart chart =  new CustomPieChart(dsKhoaHoc, percent);
+        return chart;
+    }
 
     //chứa 2 box top5
     TableLayoutPanel GetBottomContainer()
