@@ -11,8 +11,17 @@ public class MyConnection
 
     public static MySqlConnection GetConnection()
     {
-        var connection = new MySqlConnection(_connectionString);
-        connection.Open();
-        return connection;
+        try
+        {
+            var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            return connection;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Loi ket noi databee x" + e.Message);
+            throw;
+        }
+
     }
 }
