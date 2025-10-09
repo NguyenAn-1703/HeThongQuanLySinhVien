@@ -16,33 +16,35 @@ public class QuanLiTaiKhoan : NavBase
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
     private TaiKhoanController _taiKhoanController;
-    string[] _headerArray = new string[] { "Mã tài khoản", "Mã nhóm quyền", "Tên đăng nhập" };
+    private NhomQuyenController _nhomQuyenController;
+    string[] _headerArray = new string[] { "Mã tài khoản", "Tên đăng nhập", "Tên nhóm quyền" };
     List<string> _headerList;
 
     private TitleButton _insertButton;
-    
+
     List<TaiKhoanDto> _rawData;
     List<object> _displayData;
 
     private TaiKhoanSearch _taiKhoanSearch;
-    
+
     private TaiKhoanDialog _taiKhoanDialog;
-    
+
     private List<InputFormItem> _listIFI;
-        
+
     public QuanLiTaiKhoan()
     {
-        _rawData = new  List<TaiKhoanDto>();
+        _rawData = new List<TaiKhoanDto>();
         _displayData = new List<object>();
         _taiKhoanController = TaiKhoanController.getInstance();
+        _nhomQuyenController = NhomQuyenController.GetInstance();
         Init();
     }
-        
+
     private void Init()
     {
         Dock = DockStyle.Fill;
-        
-        TableLayoutPanel mainLayout = new  TableLayoutPanel
+
+        TableLayoutPanel mainLayout = new TableLayoutPanel
         {
             RowCount = 2,
             Dock = DockStyle.Fill,
@@ -52,7 +54,7 @@ public class QuanLiTaiKhoan : NavBase
 
         mainLayout.Controls.Add(Top());
         mainLayout.Controls.Add(Bottom());
-        
+
         Controls.Add(mainLayout);
     }
 
@@ -67,18 +69,18 @@ public class QuanLiTaiKhoan : NavBase
             ColumnCount = 2,
             BackColor = MyColor.GrayBackGround
         };
-        
+
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        
+
         panel.Controls.Add(getTitle());
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
-        _insertButton._label.Font = GetFont.GetFont.GetMainFont(12,  FontType.ExtraBold);
+        _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
         panel.Controls.Add(_insertButton);
-        
+
         return panel;
     }
 
@@ -90,17 +92,18 @@ public class QuanLiTaiKhoan : NavBase
         };
 
         SetCombobox();
-        
-        SetDataTable();
+
+        SetDataTableFromDb();
 
         SetSearch();
 
         SetAction();
-        
+
         panel.Controls.Add(_table);
-        
+
         return panel;
     }
+
     //////////////////////////////SETTOP///////////////////////////////
     Label getTitle()
     {
@@ -114,34 +117,39 @@ public class QuanLiTaiKhoan : NavBase
     }
 
 
-    
-    
     //////////////////////////////SETTOP///////////////////////////////
-    
-    
-    
-/// ///////////////////////////SETBOTTOM////////////////////////////////////
+
+
+    /// ///////////////////////////SETBOTTOM////////////////////////////////////
     void SetCombobox()
     {
         _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _listSelectionForComboBox = _headerList;
     }
 
-    //hàm gọi 1 lần duy nhất khi khởi tạo
-    void SetDataTable()
+
+    void SetDataTableFromDb()
     {
         _rawData = _taiKhoanController.GetAll();
         SetDisplayData();
-        string[] columnNames = new[] { "MaTK", "MaNQ", "TenDangNhap" };
+
+        string[] columnNames = new[] { "MaTK", "TenDangNhap", "TenNhomQuyen" };
         List<string> columnNamesList = columnNames.ToList();
-        
+
         _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
     }
 
     void SetDisplayData()
     {
-        _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new {x.MaTK, x.MaNQ, x.TenDangNhap});
+        _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new
+            {
+                MaTK = x.MaTK,
+                TenDangNhap = x.TenDangNhap,
+                TenNhomQuyen = _nhomQuyenController.GetTenQuyenByID(x.MaNQ),
+            }
+        );
     }
+
 
     void SetSearch()
     {
@@ -152,36 +160,102 @@ public class QuanLiTaiKhoan : NavBase
     {
         _taiKhoanSearch.FinishSearch += dtos =>
         {
-            this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new { x.MaTK, x.MaNQ, x.TenDangNhap });
+            UpdateDataDisplay(dtos);
             this._table.UpdateData(_displayData);
         };
 
         _insertButton._mouseDown += () => { Insert(); };
         _table.OnEdit += index => { Update(index); };
         _table.OnDetail += index => { Detail(index); };
+        _table.OnDelete += index => { Delete(index); };
+    }
+
+    void UpdateDataDisplay(List<TaiKhoanDto> dtos)
+    {
+        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaTK = x.MaTK,
+            TenDangNhap = x.TenDangNhap,
+            TenNhomQuyen = _nhomQuyenController.GetTenQuyenByID(x.MaNQ),
+        });
     }
 
     void Insert()
     {
-        _taiKhoanDialog = new TaiKhoanDialog("Thêm tài khoản",DialogType.Them);
+        InputFormItem[] arr = new InputFormItem[]
+        {
+            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Mật khẩu", TextFieldType.NormalText),
+            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+        };
+        List<InputFormItem> list = new List<InputFormItem>();
+        list.AddRange(arr);
+
+        _taiKhoanDialog = new TaiKhoanDialog("Thêm tài khoản", DialogType.Them, list, _taiKhoanController,
+            _nhomQuyenController);
+        
+        _taiKhoanDialog.Finish += () =>
+        {
+            UpdateDataDisplay(_taiKhoanController.GetAll());
+            this._table.UpdateData(_displayData);
+        };
         this._taiKhoanDialog.ShowDialog();
     }
 
-    void Update(int index)
+    void Update(int id)
     {
-        _taiKhoanDialog = new TaiKhoanDialog("Sửa tài khoản",DialogType.Sua);
+        InputFormItem[] arr = new InputFormItem[]
+        {
+            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+        };
+        List<InputFormItem> list = new List<InputFormItem>();
+        list.AddRange(arr);
+        _taiKhoanDialog = new TaiKhoanDialog("Sửa tài khoản", DialogType.Sua, list, _taiKhoanController,
+            _nhomQuyenController, id);
+        _taiKhoanDialog.Finish += () =>
+        {
+            UpdateDataDisplay(_taiKhoanController.GetAll());
+            this._table.UpdateData(_displayData);
+        };
         this._taiKhoanDialog.ShowDialog();
     }
 
-    void Detail(int index)
+    void Detail(int id)
     {
-        _taiKhoanDialog = new TaiKhoanDialog("Chi tiết tài khoản",DialogType.ChiTiet);
+        InputFormItem[] arr = new InputFormItem[]
+        {
+            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+        };
+        List<InputFormItem> list = new List<InputFormItem>();
+        list.AddRange(arr);
+        _taiKhoanDialog = new TaiKhoanDialog("Chi tiết tài khoản", DialogType.ChiTiet, list, _taiKhoanController,
+            _nhomQuyenController, id);
         this._taiKhoanDialog.ShowDialog();
     }
+
+    void Delete(int index)
+    {
+        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+        if (select == DialogResult.No)
+        {
+            return;
+        }
+        if (_taiKhoanController.Delete(index))
+        {
+            MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            UpdateDataDisplay(_taiKhoanController.GetAll());
+            this._table.UpdateData(_displayData);
+        }
+        else
+        {
+            MessageBox.Show("Xóa tài khoản thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+    
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
-    
-    
     public override List<string> getComboboxList()
     {
         return this._listSelectionForComboBox;
@@ -190,10 +264,7 @@ public class QuanLiTaiKhoan : NavBase
     public override void onSearch(string txtSearch, string filter)
     {
         this._taiKhoanSearch.Search(txtSearch, filter);
-            
-        // this._table.Search(txtSearch, filter);
-        
-    } 
-    
 
+        // this._table.Search(txtSearch, filter);
+    }
 }

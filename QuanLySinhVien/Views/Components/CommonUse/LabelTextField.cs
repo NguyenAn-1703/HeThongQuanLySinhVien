@@ -8,9 +8,9 @@ public class LabelTextField : TableLayoutPanel
 {
     private string _title;
     private TextFieldType _fieldType;
-    private CustomTextBox _field; // normal Field
-    private CustomTextBox _password;
-    private CustomCombobox _combobox;
+    public CustomTextBox _field; // normal Field
+    public CustomTextBox _password;
+    public CustomCombobox _combobox;
     
     private PictureBox _eyePb;
     private bool statusEp = false;
@@ -135,6 +135,36 @@ public class LabelTextField : TableLayoutPanel
         {
             this._combobox.combobox.Items.Add(s);
         }
+    }
+
+    public TextBox GetTextField()
+    {
+        return _field.contentTextBox;
+    }
+
+    public TextBox GetPasswordField()
+    {
+        return _password.contentTextBox;
+    }
+
+    public ComboBox GetComboboxField()
+    {
+        return _combobox.combobox;
+    }
+
+    public string GetTextTextField()
+    {
+        return _field.contentTextBox.Text;
+    }
+
+    public string GetTextPasswordField()
+    {
+        return _password.contentTextBox.Text;
+    }
+
+    public string GetSelectionCombobox()
+    {
+        return _combobox.combobox.SelectedItem.ToString();
     }
     
 }

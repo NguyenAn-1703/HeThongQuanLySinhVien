@@ -8,10 +8,12 @@ public class TaiKhoanController
 {
     private static TaiKhoanController _instance;
     private readonly TaiKhoanDao _taiKhoanDao;
+    private List<TaiKhoanDto> _listTaiKhoan;
 
     private TaiKhoanController()
     {
         _taiKhoanDao = TaiKhoanDao.GetInstance();
+        _listTaiKhoan = _taiKhoanDao.GetAll();
     }
 
     public static TaiKhoanController getInstance()

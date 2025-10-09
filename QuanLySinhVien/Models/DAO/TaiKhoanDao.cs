@@ -56,7 +56,8 @@ public class TaiKhoanDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
-        return rowAffected > 1;
+        Console.WriteLine("ne" + rowAffected);
+        return rowAffected > 0;
     }
 
     public bool Update(TaiKhoanDto taiKhoanDto)
@@ -79,7 +80,6 @@ public class TaiKhoanDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
-
         return rowAffected > 0;
     }
 

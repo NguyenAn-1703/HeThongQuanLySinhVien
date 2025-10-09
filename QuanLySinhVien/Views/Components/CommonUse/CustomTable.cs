@@ -201,16 +201,18 @@ public class CustomTable : TableLayoutPanel
 
     void delete(int index)
     {
-        object o = _cellDatas[index];
-        Console.WriteLine("Xóa" + o.ToString());
-        OnDelete?.Invoke(index);
+        // object o = _cellDatas[index];
+        // Console.WriteLine("Xóa" + o.ToString());
+        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+        
+        OnDelete?.Invoke(Id);
         _deleteBtn.Dispose();
     }
 
     void edit(int index)
     {
-        object o = _cellDatas[index];
-        Console.WriteLine("Sửa" + o.ToString());
+        // object o = _cellDatas[index];
+        // Console.WriteLine("Sửa" + o.ToString());
         
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
         
@@ -221,8 +223,8 @@ public class CustomTable : TableLayoutPanel
 
     void detail(int index)
     {
-        object o = _cellDatas[index];
-        Console.WriteLine("Chi tiết" + o.ToString());
+        // object o = _cellDatas[index];
+        // Console.WriteLine("Chi tiết" + o.ToString());
         
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
         
