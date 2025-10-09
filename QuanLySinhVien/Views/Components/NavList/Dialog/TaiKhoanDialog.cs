@@ -1,6 +1,7 @@
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
@@ -8,69 +9,60 @@ public class TaiKhoanDialog : CustomDialog
 {
 
     private CustomButton _exitButton;
-    private TableLayoutPanel _mainLayout;
+    private List<InputFormItem> _listIFI;
+    private List<LabelTextField> _listTextBox;
 
-    public TaiKhoanDialog(DialogType dialogType, string title)
+    public TaiKhoanDialog(string title, DialogType dialogType) : base(title, dialogType)
     {
-        _dialogType = dialogType;
-        _title = title;
+        _listTextBox = new List<LabelTextField>();
+        _listIFI = new  List<InputFormItem>();
         Init();
     }
 
     void Init()
     {
-        // StartPosition = FormStartPosition.CenterScreen;
-        // this.FormBorderStyle = FormBorderStyle.None;
-        // this.SuspendLayout();
-        //
-        // _mainLayout = new TableLayoutPanel
-        // {
-        //     AutoSize = true,
-        //     RowCount = 4,
-        //     Dock = DockStyle.Fill,
-        //     BorderStyle = BorderStyle.Fixed3D,
-        // };
-        //
-        // _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        //
-        // SetTopBar();
+        InputFormItem[] arr = new InputFormItem[]
+        {
+            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Mật khẩu", TextFieldType.NormalText),
+            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+        };
+        _listIFI.AddRange(arr);
+        
+        for (int i = 0; i < _listIFI.Count; i++)
+        {
+            _listTextBox.Add(new LabelTextField(_listIFI[i].content, _listIFI[i].type));
+            _textBoxsContainer.Controls.Add(_listTextBox[i]);
+        }
         
         if (_dialogType == DialogType.Them)
         {
-            CreateFormInsert();
+            SetupInsert();
         }
         else if (_dialogType == DialogType.Sua)
         {
-            CreateFormUpdate();
+            SetupUpdate();
         }
         else
         {
-            CreateFormDetail();
+            SetupDetail();
         }
-        // this.Controls.Add(_mainLayout);
-        // this.ResumeLayout(false);
     }
 
-    // void SetTopBar()
-    // {
-    //     _exitButton = new CustomButton(25, 25, "exitbutton.svg", MyColor.White, false, false, false, false);
-    //     _exitButton.HoverColor = MyColor.GrayHoverColor;
-    //     _exitButton.SelectColor = MyColor.GraySelectColor;
-    //     _exitButton.Anchor = AnchorStyles.Right;
-    //     
-    //     _exitButton.MouseDown +=  (sender, args) => this.Close(); 
-    //     
-    //     this._mainLayout.Controls.Add(_exitButton);
-    // }
-
-    void CreateFormInsert()
+    //Set những dòng không được chọn
+    void SetupInsert()
     {
-        base._title = "Thêm tài khoản";
+
     }
-    void CreateFormUpdate(){}
-    void CreateFormDetail(){}
+
+    void SetupUpdate()
+    {
+
+    }
+
+    void SetupDetail()
+    {
+
+    }
     
 }

@@ -18,7 +18,9 @@ public class CustomCombobox : RoundTLP
         this.Border = true;
 
         this.AutoSize = true;
+        combobox.DropDownStyle = ComboBoxStyle.DropDownList;
         combobox.AutoSize = true;
+        combobox.Dock = DockStyle.Fill;
         combobox.Items.AddRange(_items);
         combobox.Margin = new Padding(2);
         

@@ -29,7 +29,7 @@ public class TitleButton : RoundTLP
         BackColor = MyColor.White;
         AutoSize = true;
         Padding = new Padding(7, 5, 7, 5);
-        Margin = new Padding(3, 3, 20, 3);
+        
 
         ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));

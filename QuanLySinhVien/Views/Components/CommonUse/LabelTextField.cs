@@ -8,7 +8,9 @@ public class LabelTextField : TableLayoutPanel
 {
     private string _title;
     private TextFieldType _fieldType;
-    private CustomTextBox _field;
+    private CustomTextBox _field; // normal Field
+    private CustomTextBox _password;
+    private CustomCombobox _combobox;
     
     private PictureBox _eyePb;
     private bool statusEp = false;
@@ -33,25 +35,51 @@ public class LabelTextField : TableLayoutPanel
 
         this.Controls.Add(label);
 
-        this.Controls.Add(GetField());
+        SetField();
     }
 
-    CustomTextBox GetField()
+    void SetField()
+    {
+
+        switch (_fieldType)
+        {
+            case TextFieldType.NormalText:
+                SetNormalTextField();
+                break;
+            case TextFieldType.Password:
+                SetPasswordTextField();
+                break;
+            case TextFieldType.Combobox:
+                SetComboboxField();
+                break;
+            
+        }
+    }
+
+    void SetNormalTextField()
     {
         _field = new CustomTextBox();
         _field.Dock = DockStyle.Top;
         _field.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
-        switch (_fieldType)
-        {
-            case TextFieldType.NormalText:
-                break;
-            case TextFieldType.Password:
-                _field.contentTextBox.PasswordChar = '*';
-                setEyeButton();
-                break;
-            
-        }
-        return _field;
+        this.Controls.Add(_field);
+    }
+
+    void SetPasswordTextField()
+    {
+        _password = new CustomTextBox();
+        _password.Dock = DockStyle.Top;
+        _password.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
+        _password.contentTextBox.PasswordChar = '*';
+        setEyeButton();
+        this.Controls.Add(_password);
+    }
+    
+    void SetComboboxField()
+    {
+        _combobox = new CustomCombobox(new string[0]);
+        _combobox.Dock = DockStyle.Top;
+        _combobox.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
+        this.Controls.Add(_combobox);
     }
 
     void setEyeButton()
@@ -66,7 +94,7 @@ public class LabelTextField : TableLayoutPanel
         _eyePb.Anchor = AnchorStyles.None;
         _eyePb.Cursor = Cursors.Hand;
         
-        this._field.Controls.Add(_eyePb);    
+        this._password.Controls.Add(_eyePb);    
         
         _eyePb.MouseEnter += (sender, args) => {_eyePb.BackColor = MyColor.GrayHoverColor;};
         _eyePb.MouseLeave += (sender, args) => {_eyePb.BackColor = MyColor.White;};
@@ -97,6 +125,15 @@ public class LabelTextField : TableLayoutPanel
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-open.svg");
             this._field.contentTextBox.PasswordChar = '\0';
             statusEp = true;
+        }
+    }
+
+    public void SetComboboxList(List<string> list)
+    {
+        this._combobox.combobox.Items.Clear();
+        foreach (string s in list)
+        {
+            this._combobox.combobox.Items.Add(s);
         }
     }
     

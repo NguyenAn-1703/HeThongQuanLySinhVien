@@ -6,6 +6,7 @@ using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components;
 
@@ -24,14 +25,16 @@ public class QuanLiTaiKhoan : NavBase
     List<object> _displayData;
 
     private TaiKhoanSearch _taiKhoanSearch;
+    
     private TaiKhoanDialog _taiKhoanDialog;
+    
+    private List<InputFormItem> _listIFI;
         
     public QuanLiTaiKhoan()
     {
         _rawData = new  List<TaiKhoanDto>();
         _displayData = new List<object>();
         _taiKhoanController = TaiKhoanController.getInstance();
-        _taiKhoanDialog = new TaiKhoanDialog(DialogType.Them, "Thêm tài khoản");
         Init();
     }
         
@@ -49,7 +52,7 @@ public class QuanLiTaiKhoan : NavBase
 
         mainLayout.Controls.Add(Top());
         mainLayout.Controls.Add(Bottom());
-
+        
         Controls.Add(mainLayout);
     }
 
@@ -71,6 +74,7 @@ public class QuanLiTaiKhoan : NavBase
         
         panel.Controls.Add(getTitle());
         _insertButton = new TitleButton("Thêm", "plus.svg");
+        _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12,  FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
         panel.Controls.Add(_insertButton);
@@ -153,13 +157,31 @@ public class QuanLiTaiKhoan : NavBase
         };
 
         _insertButton._mouseDown += () => { Insert(); };
+        _table.OnEdit += index => { Update(index); };
+        _table.OnDetail += index => { Detail(index); };
     }
 
     void Insert()
     {
+        _taiKhoanDialog = new TaiKhoanDialog("Thêm tài khoản",DialogType.Them);
         this._taiKhoanDialog.ShowDialog();
     }
 
+    void Update(int index)
+    {
+        _taiKhoanDialog = new TaiKhoanDialog("Sửa tài khoản",DialogType.Sua);
+        this._taiKhoanDialog.ShowDialog();
+    }
+
+    void Detail(int index)
+    {
+        _taiKhoanDialog = new TaiKhoanDialog("Chi tiết tài khoản",DialogType.ChiTiet);
+        this._taiKhoanDialog.ShowDialog();
+    }
+
+    /// ///////////////////////////SETBOTTOM////////////////////////////////////
+    
+    
     public override List<string> getComboboxList()
     {
         return this._listSelectionForComboBox;
@@ -172,6 +194,6 @@ public class QuanLiTaiKhoan : NavBase
         // this._table.Search(txtSearch, filter);
         
     } 
-    /// ///////////////////////////SETBOTTOM////////////////////////////////////
+    
 
 }

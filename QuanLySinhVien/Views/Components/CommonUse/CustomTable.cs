@@ -49,7 +49,6 @@ public class CustomTable : TableLayoutPanel
         Configuration();
         SetHeader();
         SetContent();
-        // this.CellBorderStyle =TableLayoutPanelCellBorderStyle.Single;
         SetEventListen();
     }
 
@@ -120,27 +119,6 @@ public class CustomTable : TableLayoutPanel
             
         this.Controls.Add(_dataGridView);
         
-    }
-    
-    public void Search(string search, string filter)
-    {
-        string keyword = search.Trim().Replace("'", "''");
-        
-        if (filter.Trim() == "Tất cả")
-        {
-            searchAll(keyword);
-        }
-        else
-        {
-        }
-    }
-
-    public void searchAll(string keyword)
-    {
-        _displayCellData = new BindingList<object>();
-        
-        
-        Console.WriteLine(_cellDatas.Count);
     }
 
     Label GetLabel(String text)
@@ -233,7 +211,11 @@ public class CustomTable : TableLayoutPanel
     {
         object o = _cellDatas[index];
         Console.WriteLine("Sửa" + o.ToString());
-        OnEdit?.Invoke(index);
+        
+        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+        
+        OnEdit?.Invoke(Id);
+        
         _editBtn.Dispose();
     }
 
@@ -241,8 +223,10 @@ public class CustomTable : TableLayoutPanel
     {
         object o = _cellDatas[index];
         Console.WriteLine("Chi tiết" + o.ToString());
-        OnDetail?.Invoke(index);
         
+        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+        
+        OnDetail?.Invoke(Id);
     }
     //
     // List<string> GetStringDataRowByIndex(int index)
