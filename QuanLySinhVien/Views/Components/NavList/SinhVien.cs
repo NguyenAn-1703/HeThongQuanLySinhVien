@@ -1,6 +1,7 @@
 using System.Data;
 using System.DirectoryServices.ActiveDirectory;
 using System.Drawing.Drawing2D;
+using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Enums;
@@ -10,7 +11,7 @@ namespace QuanLySinhVien.Views.Components;
 public class SinhVien : NavBase
 {
     private String[] columns;
-    
+    private SinhVienController _controller = new SinhVienController();
     private string[] _listSelectionForComboBox = new []{"Mã sinh viên", "Tên sinh viên"};
     
     private DataGridView dataGridView;
@@ -21,8 +22,9 @@ public class SinhVien : NavBase
         _cUse = new CUse();
         Init();
         SetupDataGridView();
+        LoadSinhVienData();
     }
-        
+    
     private void Init()
     {   
         //BackColor = Color.Blue;
@@ -408,19 +410,12 @@ public class SinhVien : NavBase
         table = new DataTable();
         
         // add row table
-        table.Columns.Add("Mã SV", typeof(string));
+        table.Columns.Add("Mã SV", typeof(int));
         table.Columns.Add("Tên Sinh Viên", typeof(string));
         table.Columns.Add("Ngày sinh", typeof(string));
         table.Columns.Add("Giới tính", typeof(string));
         table.Columns.Add("Ngành", typeof(string));
         table.Columns.Add("Trạng thái", typeof(string));
-
-        // add database
-        for (int i = 0; i < 30; i++)
-        {
-            table.Rows.Add("3123410025", "Nguyễn âu gia bảo", 1 , 1 , 1 , 1);
-        }
-        
         // set Width
         dataGridView.AutoGenerateColumns = true;
         dataGridView.DataSource = table;
@@ -505,6 +500,32 @@ public class SinhVien : NavBase
             Alignment = DataGridViewContentAlignment.MiddleCenter,
         };
     }
+    
+    private void LoadSinhVienData()
+    {
+        try
+        {
+            var list = _controller.LayDanhSachSinhVienTable();
+            table.Rows.Clear();
+    
+            foreach (var sv in list)
+            {
+                table.Rows.Add(
+                    sv.MaSinhVien,
+                    sv.TenSinhVien,
+                    sv.NgaySinh,
+                    sv.GioiTinh,
+                    sv.Nganh,
+                    sv.TrangThai
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error: " + ex.Message);
+        }
+    }
+
 
     public override List<string> getComboboxList()
     {
