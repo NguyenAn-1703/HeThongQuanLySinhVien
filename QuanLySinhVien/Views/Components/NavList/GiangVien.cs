@@ -1,7 +1,10 @@
 using System.Data;
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Views.Forms;
 using Svg;
 
 namespace QuanLySinhVien.Views.Components;
@@ -10,12 +13,47 @@ public class GiangVien : NavBase
 {
     private string[] _listSelectionForComboBox = new []{"Mã giảng viên", "Tên giảng viên"};
     private int PanelTopHeight = 90;
+    private CUse _cUse;
+    private Form formAddPopUp;
+    private DataTable dt;
+
     public GiangVien()
     {
+        _cUse = new CUse();
         Init();
+        LoadDatabase();
     }
+    
+    // Co so du lieu ---------------------------------------------------------------------
+    private void LoadDatabase()
+    {
+        dt.Rows.Clear();
+        foreach (var gv in GiangVienController.GetAll())
+        {
+            dt.Rows.Add(gv.ToDataRow());
+        }
+        GridGV().DataSource = dt;
+    }
+
+
+
+
+    // Giao dien --------------------------------------------------------------------------
     private void Init()
     {
+        dt = new DataTable()
+        {
+            Columns =
+            {
+                new DataColumn("Mã giảng viên", typeof(int)),
+                new DataColumn("Họ tên",  typeof(string)),
+                new DataColumn("Khoa", typeof(string)),
+                new DataColumn("Số điện thoại", typeof(string)),
+                new DataColumn("Email", typeof(string)),
+                new DataColumn("Trạng thái", typeof(string)),
+            }
+        };
+        
         //BackColor = Color.Blue;
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
@@ -42,33 +80,9 @@ public class GiangVien : NavBase
         lb.Width += 50;
         return lb;
     }
-
-
-    // Form Add ----------------------------------------------
-    private Panel PanelTop(string txt)
-    {
-        Label lb = new Label()
-        {
-            Text = txt,
-            Font = GetFont.GetFont.GetMainFont(10, FontType.Bold),
-            Dock = DockStyle.Left,
-            BackColor = Color.Transparent,
-            ForeColor = Color.Black,
-            Height = 30,
-            Width = 250,
-            TextAlign = ContentAlignment.MiddleRight,
-        };
-        
-        Panel pn = new Panel()
-        {
-            Dock = DockStyle.Top,
-            Height = 50,
-            Width = 250,
-            
-            Controls = { lb }
-        };
-        return pn;
-    }
+    
+    
+    // Add Form --------------------------------------------------------------------
     private Button AddButton()
     {
         Button btn = new Button()
@@ -86,34 +100,9 @@ public class GiangVien : NavBase
 
         btn.Click += (s, e) =>
         {
-            int WForm = 600;
-            int HForm = 600;
-
-            Label HeaderAddForm = new Label()
-            {
-                Text = "Thêm giảng viên",
-                Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold),
-                ForeColor = MyColor.White,
-                Dock = DockStyle.Top,
-                BackColor = MyColor.MainColor,
-                Height = 70,
-                TextAlign = ContentAlignment.MiddleCenter,
-            };
-            
-            Panel pnMa = PanelTop("Mã giảng viên: ");
-            Panel pnTen = PanelTop("Họ tên: ");
-            Panel pnNgaySinh = PanelTop("Ngày sinh: ");
-            Panel pnGioiTinh = PanelTop("Giới tính: ");
-            Panel pnKhoa = PanelTop("Khoa: ");
-            
-            Form form = new Form()
-            {
-                Text = "Thêm giảng viên",
-                Size = new Size(WForm, HForm),
-                StartPosition = FormStartPosition.CenterParent,
-                Controls = { pnKhoa, pnGioiTinh, pnNgaySinh, pnTen, pnMa, HeaderAddForm }
-            };
-            form.ShowDialog();
+            formAddPopUp = new FormAddGV();
+            Console.WriteLine("fewfewewfewfwe");
+            formAddPopUp.ShowDialog();
         };
         return btn;
     }
@@ -131,18 +120,6 @@ public class GiangVien : NavBase
 
     private DataGridView GridGV()
     {
-        DataTable dt = new DataTable()
-        {
-            Columns =
-            {
-                new DataColumn("Mã giảng viên", typeof(string)),
-                new DataColumn("Họ tên",  typeof(string)),
-                new DataColumn("Ngày sinh", typeof(DateTime)),
-                new DataColumn("Giới tính", typeof(string)),
-                new DataColumn("Khoa", typeof(string)),
-            }
-        };
-        for(int i=1; i<=30; i++) dt.Rows.Add("123", "Nguyễn Thanh Sang", new DateTime(2025, 01, 01), "Nam", "Công nghệ thông tin");
         
         DataGridView dtgv = new DataGridView()
         {
@@ -163,6 +140,7 @@ public class GiangVien : NavBase
             {
                 BackColor = ColorTranslator.FromHtml("#07689F"),
                 ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
+                Font = GetFont.GetFont.GetMainFont(11, FontType.Bold),
                 Alignment = DataGridViewContentAlignment.MiddleCenter,
             },
             AllowUserToAddRows = false,
@@ -174,41 +152,55 @@ public class GiangVien : NavBase
         {
             if (_actionsAdded) return;
             _actionsAdded = true;
-            dtgv.Columns.Add(
-                new DataGridViewImageColumn()
-                {
-                    Name = "Sửa",
-                    Image = SvgDocument.Open(Path.Combine(AppContext.BaseDirectory, "img", "fix.svg")).Draw(20, 20),
-                    DataPropertyName = null,
-                    Width = 75,
-                    DisplayIndex = 5
-                }
+            
+            
+            var editIcon = _cUse.CreateIconWithBackground(
+                Path.Combine(AppContext.BaseDirectory,"img","fix.svg"),
+                Color.Black,
+                ColorTranslator.FromHtml("#6DB7E3"),
+                28,
+                6,
+                4
             );
-            dtgv.Columns.Add(
-                new DataGridViewImageColumn()
-                {
-                    Name = "Xóa",
-                    Image =
-                        SvgDocument.Open(Path.Combine(AppContext.BaseDirectory, "img", "trashbin.svg")).Draw(20, 20),
-                    DataPropertyName = null,
-                    Width = 75,
-                    DisplayIndex = 6
-                }
+            var delIcon  = _cUse.CreateIconWithBackground(
+                Path.Combine(AppContext.BaseDirectory,"img","trashbin.svg"),
+                Color.Black,
+                ColorTranslator.FromHtml("#FF6B6B"),
+                28,
+                6,
+                4
             );
+            var colEdit = new DataGridViewImageColumn {
+                Name = "Sửa",
+                Image = editIcon,
+                DataPropertyName = null,
+                Width = 60,
+                ImageLayout = DataGridViewImageCellLayout.Normal
+            };
+            
+            var colDel = new DataGridViewImageColumn {
+                Name = "Xóa",
+                Image = delIcon,
+                DataPropertyName = null,
+                Width = 60,
+                ImageLayout = DataGridViewImageCellLayout.Normal
+            };
+            dtgv.Columns.Add(colEdit);
+            dtgv.Columns.Add(colDel);
             dtgv.ReadOnly = true;
             dtgv.Columns["Sửa"].ReadOnly = false;
             dtgv.Columns["Xóa"].ReadOnly = false;
             dtgv.CellClick += (s, e) =>
             {
                 if (e.RowIndex < 0) return;
-                if (e.ColumnIndex == dtgv.Columns["Sửa"]?.Index) { Console.WriteLine("sua"); }
+                if (e.ColumnIndex == dtgv.Columns["Sửa"]?.Index)
+                {
+                    Console.WriteLine("Sửa");
+                }
                 else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index) { Console.WriteLine("xoa"); }
             };
             
         };
-        
-        
-        
         dtgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         return dtgv;
     }
@@ -237,7 +229,9 @@ public class GiangVien : NavBase
         };
         return mainBot;
     }
-
+    
+    
+    
     public override List<string> getComboboxList()
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
