@@ -339,7 +339,6 @@ INSERT INTO GiangVien (MaTK, MaKhoa, TenGV, SoDienThoai, Email) VALUES
 (1, 1, 'Lê Quang Huy', '0934567890', 'huy.le@univ.edu.vn'),
 (1, 1, 'Phạm Minh Châu', '0945678901', 'chau.pham@univ.edu.vn'),
 (1, 1, 'Đỗ Thị Thu Hà', '0956789012', 'ha.do@univ.edu.vn'),
-
 (1, 2, 'Ngô Văn Dũng', '0967890123', 'dung.ngo@univ.edu.vn'),
 (1, 2, 'Vũ Thị Mai', '0978901234', 'mai.vu@univ.edu.vn'),
 (1, 2, 'Bùi Anh Tuấn', '0989012345', 'tuan.bui@univ.edu.vn'),
@@ -795,8 +794,4 @@ ADD CONSTRAINT `ChiTietQuyen_ChucNang` FOREIGN KEY (MaCN) REFERENCES `ChucNang`(
 
 ALTER TABLE `NhomHocPhan`
 ADD CONSTRAINT `NhomHocPhan_GiangVien` FOREIGN KEY (MaGV) REFERENCES `GiangVien`(MaGV);
-
-
-
-
 
