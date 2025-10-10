@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 
@@ -26,7 +27,7 @@ public class NhomQuyenController
 
     public List<NhomQuyenDto> GetAll()
     {
-        return listNhomQuyen;
+        return _nhomQuyenDao.GetAll();
     }
 
     public bool Insert(NhomQuyenDto nhomQuyenDto)
@@ -74,5 +75,14 @@ public class NhomQuyenController
         }
 
         return -1;
+    }
+
+    //Đọc ds quyền từ json
+    public List<QuyenChucNangJS> GetListAllChucNang_HanhDong()
+    {
+        string json = File.ReadAllText("config/Permission.json");
+        ListQuyenChucNangJS list = JsonConvert.DeserializeObject<ListQuyenChucNangJS>(json);
+
+        return list.Modules;
     }
 }
