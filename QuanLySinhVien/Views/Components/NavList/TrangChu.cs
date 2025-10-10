@@ -13,6 +13,7 @@ public class TrangChu : NavBase
     private int _imgHeight = 626;
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
     private TableLayoutPanel _leftPanel;
+
     public TrangChu()
     {
         Init();
@@ -38,17 +39,17 @@ public class TrangChu : NavBase
         mainLayout.Controls.Add(_leftPanel);
 
         // new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn")
-        
+
         SetImage();
         mainLayout.Controls.Add(_image);
         mainLayout.ResumeLayout();
-        
+
         this.Controls.Add(mainLayout);
-        
+
         SetContentInFrontOfImg();
-        
+
         this.Resize += (sender, args) => { updateSize(); };
-        
+
         this.ResumeLayout();
     }
 
@@ -73,10 +74,10 @@ public class TrangChu : NavBase
         };
         _image.Paint += (sender, args) => Overlay(args);
     }
-    
+
     private void Overlay(PaintEventArgs e)
     {
-        Color overlayColor = Color.FromArgb(100, 0, 0, 0); 
+        Color overlayColor = Color.FromArgb(100, 0, 0, 0);
         using (SolidBrush brush = new SolidBrush(overlayColor))
         {
             e.Graphics.FillRectangle(brush, _image.ClientRectangle);
@@ -93,7 +94,7 @@ public class TrangChu : NavBase
         _lbl1.ForeColor = MyColor.White;
         _lbl1.BackColor = Color.Transparent;
         _lbl1.Location = new Point(_image.Location.X + 50, _image.Location.Y + 15);
-        
+
         _lbl2 = new Label();
         _lbl2.Text = "“An investment in knowledge \npays the best interest.”";
         _lbl2.AutoSize = true;
@@ -101,7 +102,7 @@ public class TrangChu : NavBase
         _lbl2.ForeColor = MyColor.White;
         _lbl2.BackColor = Color.Transparent;
         _lbl2.Location = new Point(50, _image.Bottom - 250);
-        
+
         _lbl3 = new Label();
         _lbl3.Text = "Benjamin Franklin";
         _lbl3.AutoSize = true;
@@ -109,7 +110,7 @@ public class TrangChu : NavBase
         _lbl3.ForeColor = MyColor.White;
         _lbl3.BackColor = Color.Transparent;
         _lbl3.Location = new Point(50, _image.Bottom - 150);
-        
+
         _lbl4 = new Label();
         _lbl4.Text = "one of the Founding Fathers of the United States.";
         _lbl4.AutoSize = true;
@@ -117,14 +118,14 @@ public class TrangChu : NavBase
         _lbl4.ForeColor = MyColor.White;
         _lbl4.BackColor = Color.Transparent;
         _lbl4.Location = new Point(50, _image.Bottom - 100);
-        
-        
+
+
         _image.Controls.Add(GetStar());
         _image.Controls.Add(_lbl1);
         _image.Controls.Add(_lbl2);
         _image.Controls.Add(_lbl3);
         _image.Controls.Add(_lbl4);
-        
+
         _image.ResumeLayout();
     }
 
@@ -154,7 +155,7 @@ public class TrangChu : NavBase
         panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
         panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
         panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
-        
+
         Label name = new Label();
         name.Text = "Hệ thống quản lý sinh viên \nSGU";
         name.AutoSize = true;
@@ -170,7 +171,7 @@ public class TrangChu : NavBase
         box3.Anchor = AnchorStyles.Left;
         box2.Anchor = AnchorStyles.Right;
         box4.Anchor = AnchorStyles.Right;
-        
+
         panel.Controls.Add(name);
         panel.Controls.Add(box1);
         panel.Controls.Add(box2);
@@ -178,13 +179,13 @@ public class TrangChu : NavBase
         panel.Controls.Add(box4);
         panel.ResumeLayout();
         return panel;
-
     }
 
 
-    
     public override List<string> getComboboxList()
-        {
-            return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
-        }
+    {
+        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+    public override void onSearch(string txtSearch, string filter)
+    { }
+}

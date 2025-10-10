@@ -13,6 +13,7 @@ static class Program
     {
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
+        
         ApplicationConfiguration.Initialize();
         
         // using (InstalledFontCollection fontsCollection = new InstalledFontCollection())
@@ -23,6 +24,6 @@ static class Program
         //     }
         // }
         
-        Application.Run(new MyHome());
+        Application.Run(new FLogin());
     }
 }

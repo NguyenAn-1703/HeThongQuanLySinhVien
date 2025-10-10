@@ -182,4 +182,7 @@ public class NhapDiem : NavBase
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+    
+    public override void onSearch(string txtSearch, string filter)
+    { }
 }

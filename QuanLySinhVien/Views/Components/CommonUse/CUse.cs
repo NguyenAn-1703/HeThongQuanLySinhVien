@@ -71,7 +71,9 @@ public class CUse
         dgv.AllowUserToResizeColumns = false;
         dgv.AllowUserToResizeRows = false;
     }
-    public Bitmap CreateIconWithBackground(string svgPath, Color iconColor, Color bgColor, int canvas, int cornerRadius, int padding)
+
+    public Bitmap CreateIconWithBackground(string svgPath, Color iconColor, Color bgColor, int canvas, int cornerRadius,
+        int padding)
     {
         var svg = SvgDocument.Open(svgPath);
         foreach (var v in svg.Descendants().OfType<SvgVisualElement>())
@@ -79,6 +81,7 @@ public class CUse
             v.Fill = new SvgColourServer(iconColor);
             v.Stroke = new SvgColourServer(iconColor);
         }
+
         int inner = canvas - padding * 2;
         var iconBmp = svg.Draw(inner, inner);
 

@@ -226,6 +226,11 @@ public class MyHome : Form
          Controls.Add(mainLayout);
         
          mainLayout.ResumeLayout(true);
+
+         this._searchBar.KeyDown += (txtSearch, selectedItem) =>
+         {
+             this.rightBottomChange.onSearch(txtSearch, selectedItem);
+         };
     }
     
     //update khi 1 item khác được chọn
@@ -247,7 +252,7 @@ public class MyHome : Form
         String change = navListController.getDataButton(function);
         Console.WriteLine(change);
         rightBottomChange = navListController.update(change);
-        Console.WriteLine(rightBottomChange);
+        // Console.WriteLine(rightBottomChange);
         
         rightBottomChange.Dock = DockStyle.Fill;
         rightBottomHost.Controls.Add(rightBottomChange);
@@ -273,9 +278,6 @@ public class MyHome : Form
 
     void UpdateSearchCombobox(string function)
     {
-        String change = navListController.getDataButton(function);
-        rightBottomChange = navListController.update(change);
-        
         List<string> t = rightBottomChange.getComboboxList();
         _searchBar.UpdateListCombobox(t);
 

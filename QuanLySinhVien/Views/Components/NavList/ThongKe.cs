@@ -1,6 +1,7 @@
 using LiveChartsCore.SkiaSharpView.WinForms;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Chart;
+// using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
@@ -78,7 +79,7 @@ public class ThongKe : NavBase
         panel.BackColor = MyColor.GrayBackGround;
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
+        
         Label title = new Label();
         title.AutoSize = true;
         title.Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold);
@@ -86,7 +87,7 @@ public class ThongKe : NavBase
         
         panel.Controls.Add(title);
         panel.Controls.Add(GetPieChart());
-        // panel.Controls.Add(new Panel());
+        panel.Controls.Add(new Panel());
         // panel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
         return panel;
     }
@@ -129,5 +130,7 @@ public class ThongKe : NavBase
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
     
+    public override void onSearch(string txtSearch, string filter)
+    { }
     
 }

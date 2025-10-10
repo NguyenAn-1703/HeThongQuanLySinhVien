@@ -19,15 +19,14 @@ public class SinhVienDAO
 
         while (reader.Read())
         {
-            result.Add(new SinhVienDTO()
-            {
-                MaSinhVien = reader.GetInt32("MaSV"),
-                TenSinhVien = reader.GetString("TenSV"),
-                NgaySinh = reader.GetString("NgaySinhSV"),
-                GioiTinh = reader.GetString("GioiTinhSV"),
-                Nganh = reader.GetString("Nganh"),
-                TrangThai = reader.GetString("TrangThai")
-            });
+            result.Add(new SinhVienDTO(
+                reader.GetInt32(reader.GetOrdinal("MaSV")),
+                reader.GetString(reader.GetOrdinal("TenSV")),
+                reader.GetString(reader.GetOrdinal("NgaySinhSV")),
+                reader.GetString(reader.GetOrdinal("GioiTinhSV")),
+                reader.GetString(reader.GetOrdinal("Nganh")),
+                reader.GetString(reader.GetOrdinal("TrangThai"))
+            ));
         }
         return result;
     }

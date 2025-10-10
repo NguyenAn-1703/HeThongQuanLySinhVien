@@ -1,8 +1,10 @@
 using ExCSS;
+using LiveCharts.Wpf;
 using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.WinForms;
+using PieChart = LiveChartsCore.SkiaSharpView.WinForms.PieChart;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Chart;
 
@@ -27,8 +29,9 @@ public class CustomPieChart : TableLayoutPanel
         {
             Size = new Size(300, 300),
         };
+
         pieChart.Series = GetListISeries();
-        pieChart.LegendPosition = LiveChartsCore.Measure.LegendPosition.Bottom; 
+        pieChart.LegendPosition = LegendPosition.Bottom;
         
         pieChart.Anchor = AnchorStyles.None;
         Controls.Add(pieChart);

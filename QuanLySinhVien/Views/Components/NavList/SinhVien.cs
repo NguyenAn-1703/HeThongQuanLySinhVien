@@ -2,10 +2,13 @@ using System.Data;
 using System.DirectoryServices.ActiveDirectory;
 using System.Drawing.Drawing2D;
 using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
+using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Enums;
 using Svg;
+
 namespace QuanLySinhVien.Views.Components;
 
 public class SinhVien : NavBase
@@ -24,7 +27,7 @@ public class SinhVien : NavBase
         SetupDataGridView();
         LoadSinhVienData();
     }
-    
+        
     private void Init()
     {   
         //BackColor = Color.Blue;
@@ -106,10 +109,12 @@ public class SinhVien : NavBase
             Width = 300,
             Height = 60,
             Dock = DockStyle.Fill,
+            ForeColor = Color.White,
         };
         var topDialog = new Panel()
         {
-            BackColor = Color.Aqua,
+            // BackColor = Color.Aqua,
+            BackColor = ColorTranslator.FromHtml("#07689F"),
             Dock = DockStyle.Fill,
             // Height = 90
         };
@@ -252,9 +257,9 @@ public class SinhVien : NavBase
         bottomDialog.Controls.Add(resetButton);   
         bottomDialog.Controls.Add(addButton);   
         //borderMiddleLeft.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-        List<string> list = new List<string>{"Mã Sinh Viên: " ,"Tên Sinh Viên: " , "Ngày sinh: " , "Khoa: " , "Giới tính: "};
+        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Khoa: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái" , "Mã Khóa Học"};
         float tile = 60f / list.Count;
-        string[] cbb = new []{ "Cộng nghệ thông tin" };
+        string[] cbb = new []{ "" };
         List<Control> rightComponents = new List<Control>();
         var radioNam = new RadioButton
         {
@@ -306,15 +311,6 @@ public class SinhVien : NavBase
             Height = 100,
             Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
             Anchor = AnchorStyles.None,
-            // Margin = new Padding(5),
-        });
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
             //Margin = new Padding(5),
         });
         rightComponents.Add(new DateTimePicker()
@@ -328,6 +324,55 @@ public class SinhVien : NavBase
         });
         rightComponents.Add(combo);
         rightComponents.Add(panelRadioButton);
+        
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
         
         
         // Console.WriteLine(tile);
@@ -364,6 +409,17 @@ public class SinhVien : NavBase
                 FormBorderStyle = FormBorderStyle.None,
                 Controls = { fullDialog }
             };
+            
+            cancelButton.Click += (sender, args) =>
+            {
+                form.Close();
+            };
+            
+            addButton.Click += (sender, args) =>
+            {
+                form.Close();
+            };
+            
             form.ShowDialog();
         };
         // Text Nav_List
@@ -480,7 +536,28 @@ public class SinhVien : NavBase
             dataGridView.CellClick += (s, e) =>
             {
                 if (e.RowIndex < 0) return;
-                if (e.ColumnIndex == dataGridView.Columns["Edit"]?.Index) { Console.WriteLine("sua"); }
+                if (e.ColumnIndex == dataGridView.Columns["Edit"]?.Index) { 
+                    var sinhVienDto = new SinhVienDTO
+                    {
+                        //todo Chỗ nayf lấy mssv xong truy vấn tới mssv ấy lấy thông tin
+                    };
+                    
+                    using (var dialog = new SinhVienDialog(SinhVienDialog.DialogMode.Edit, sinhVienDto))
+                    {
+                        if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultSinhVienDto != null)
+                        {
+                            try
+                            {
+                                // TODO: Thêm logic cập nhật dữ liệu vào database
+                                
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Lỗi khi cập nhật sinh viên: {ex.Message}");
+                            }
+                        }
+                    }
+                 }
                 else if (e.ColumnIndex == dataGridView.Columns["Del"]?.Index) { Console.WriteLine("xoa"); }
             };
         };
@@ -531,4 +608,8 @@ public class SinhVien : NavBase
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
+    
+    public override void onSearch(string txtSearch, string filter)
+    { }
+    
 }

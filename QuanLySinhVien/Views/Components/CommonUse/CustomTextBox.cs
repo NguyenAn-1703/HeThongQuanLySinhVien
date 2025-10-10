@@ -51,4 +51,14 @@ public class CustomTextBox : RoundTLP
         this.BorderColor = MyColor.GraySelectColor;
         this.Invalidate();
     }
+    
+    public bool Enable
+    {
+        get =>  contentTextBox.Enabled;
+        set
+        {
+            contentTextBox.Enabled = value;
+            contentTextBox.BackColor = MyColor.White;
+        }
+    }
 }
