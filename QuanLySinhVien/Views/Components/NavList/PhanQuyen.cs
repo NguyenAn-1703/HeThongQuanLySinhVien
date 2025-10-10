@@ -177,12 +177,22 @@ public class PhanQuyen : NavBase
     void Insert()
     {
         _phanQuyenDialog = new PhanQuyenDialog("Thêm nhóm quyền",DialogType.Them);
+        _phanQuyenDialog.Finish += () =>
+        {
+            UpdateDataDisplay(_nhomQuyenController.GetAll());
+            this._table.UpdateData(_displayData);
+        };
         _phanQuyenDialog.ShowDialog();
     }
 
     void Update(int id)
     {
         _phanQuyenDialog = new PhanQuyenDialog("Sửa nhóm quyền", DialogType.Sua, id);
+        _phanQuyenDialog.Finish += () =>
+        {
+            UpdateDataDisplay(_nhomQuyenController.GetAll());
+            this._table.UpdateData(_displayData);
+        };
         _phanQuyenDialog.ShowDialog();
     }
 

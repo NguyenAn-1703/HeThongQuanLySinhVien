@@ -4,7 +4,7 @@ public class CustomCheckBoxNQ : CheckBox
 {
     public string ID { get; set; }
     public string HD { get; set; }
-    public CustomCheckBoxNQ(string ID, string HD)
+    public CustomCheckBoxNQ(string ID = "", string HD = "")
     {
         this.ID = ID;
         this.HD = HD;

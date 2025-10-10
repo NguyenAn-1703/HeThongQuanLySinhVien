@@ -85,4 +85,9 @@ public class NhomQuyenController
 
         return list.Modules;
     }
+
+    public int GetLastAutoIncrement()
+    {
+        return _nhomQuyenDao.GetLastAutoIncrement();
+    }
 }

@@ -57,4 +57,26 @@ public class ChucNangDao
 
         return result;
     }
+    
+    public ChucNangDto GetByTen(string tenCN)
+    {
+        ChucNangDto result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd =
+            new MySqlCommand("SELECT MaCN, TenChucNang FROM chucnang WHERE Status = 1 AND TenChucNang = @TenChucNang",
+                conn);
+        cmd.Parameters.AddWithValue("@TenChucNang", tenCN);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new ChucNangDto
+            {
+                MaCN = reader.GetInt32("MaCN"),
+                TenCN = reader.GetString("TenChucNang")
+            };
+        }
+
+        return result;
+    }
 }

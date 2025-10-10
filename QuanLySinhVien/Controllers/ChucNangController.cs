@@ -34,5 +34,10 @@ public class ChucNangController
         return _ChucNangDao.GetById(id);
     }
 
+    public ChucNangDto GetByTen(string tenCN)
+    {
+        return _ChucNangDao.GetByTen(tenCN);
+    }
+
 
 }

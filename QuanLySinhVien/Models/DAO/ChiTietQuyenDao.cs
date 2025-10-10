@@ -81,6 +81,28 @@ public class ChiTietQuyenDao
 
         return rowAffected > 0;
     }
+    
+    public bool HardDelete(int maNQ, int maCN, string hanhDong)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"DELETE FROM chitietquyen
+                             WHERE MaNQ = @MaNQ
+                             AND MaCN = @MaCN
+                             AND HanhDong = @HanhDong
+                            ;";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaNQ", maNQ);
+                cmd.Parameters.AddWithValue("@MaCN", maCN);
+                cmd.Parameters.AddWithValue("@HanhDong", hanhDong);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+
+        return rowAffected > 0;
+    }
 
     public ChiTietQuyenDto GetById(int maNQ, int maCN, string hanhDong)
     {

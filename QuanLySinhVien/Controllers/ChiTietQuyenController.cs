@@ -51,4 +51,9 @@ public class ChiTietQuyenController
     {
         return _ChiTietQuyenDao.GetByMaNQMaCN(MaNQ, MaCN);
     }
+
+    public bool HardDelete(int MaNQ, int MaCN, string hanhDong)
+    {
+        return _ChiTietQuyenDao.HardDelete(MaNQ, MaCN, hanhDong);
+    }
 }

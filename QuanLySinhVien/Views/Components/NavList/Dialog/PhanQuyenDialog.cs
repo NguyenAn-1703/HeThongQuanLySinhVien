@@ -1,7 +1,10 @@
+using Mysqlx.Crud;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
@@ -10,7 +13,7 @@ public class PhanQuyenDialog : Form
     private TableLayoutPanel _mainLayout;
     private CustomButton _exitButton;
     private TitleButton _btnLuu;
-    private event Action Finish;
+    public event Action Finish;
     
     private string _title;
     private DialogType _dialogType;
@@ -25,7 +28,10 @@ public class PhanQuyenDialog : Form
 
     private List<QuyenChucNangJS> ListDefaultQuyen_ChucNang; //jsom
     private List<string> _listIDChucNang;
-    private List<List<CustomCheckBoxNQ>> _listCheckBox; 
+    private List<List<CustomCheckBoxNQ>> _listCheckBox;
+
+    private List<List<StatusCB>> _oldListUpdate;
+    private List<List<StatusCB>> _newListUpdate;
     public PhanQuyenDialog(string title, DialogType dialogType, int idNhomQuyen = -1)
     {
         _dialogType = dialogType;
@@ -213,6 +219,7 @@ public class PhanQuyenDialog : Form
                 CustomCheckBoxNQ checkBoxNq = new CustomCheckBoxNQ(quyenCN.ID, "Xem");
                 temp.Add(checkBoxNq);
                 panel.Controls.Add(checkBoxNq, c, r);
+                c++;
             }
             else c++;
             
@@ -221,6 +228,7 @@ public class PhanQuyenDialog : Form
                 CustomCheckBoxNQ checkBoxNq = new CustomCheckBoxNQ(quyenCN.ID, "Them");
                 temp.Add(checkBoxNq);
                 panel.Controls.Add(checkBoxNq, c, r);
+                c++;
             }
             else c++;
             
@@ -229,6 +237,7 @@ public class PhanQuyenDialog : Form
                 CustomCheckBoxNQ checkBoxNq = new CustomCheckBoxNQ(quyenCN.ID, "Sua");
                 temp.Add(checkBoxNq);
                 panel.Controls.Add(checkBoxNq, c, r);
+                c++;
             }
             else c++;
             
@@ -237,6 +246,7 @@ public class PhanQuyenDialog : Form
                 CustomCheckBoxNQ checkBoxNq = new CustomCheckBoxNQ(quyenCN.ID, "Xoa");
                 temp.Add(checkBoxNq);
                 panel.Controls.Add(checkBoxNq, c, r);
+                c++;
             }
             else c++;
             
@@ -254,7 +264,16 @@ public class PhanQuyenDialog : Form
         {
             SetupDetail();
         }
+        else
+        {
+            SetUpInsert();
+        }
         
+    }
+
+    void SetUpInsert()
+    {
+        SetActionForStatusCB();
     }
 
     void SetupUpdate()
@@ -263,8 +282,24 @@ public class PhanQuyenDialog : Form
         {
             throw new Exception("Lỗi chưa cài đặt index");
         }
+        
+        _txtTenNQ.GetTextField().Text = _nhomQuyenController.GetTenQuyenByID(_idNhomQuyen);
 
         LoadCheckBoxBySelectedIndex();
+        
+        //Copy dữ liệu cũ
+        
+        _oldListUpdate = _listCheckBox
+            .Select(row => row
+                .Select(chk => new StatusCB
+                {
+                    CustomCheckBox = chk,
+                    Check = chk.Checked,
+                })
+                .ToList())
+            .ToList();
+        
+        SetActionForStatusCB();
     }
     
     void SetupDetail()
@@ -273,6 +308,8 @@ public class PhanQuyenDialog : Form
         {
             throw new Exception("Lỗi chưa cài đặt index");
         }
+
+        _txtTenNQ.GetTextField().Text = _nhomQuyenController.GetTenQuyenByID(_idNhomQuyen);
 
         LoadCheckBoxBySelectedIndex();
 
@@ -306,8 +343,42 @@ public class PhanQuyenDialog : Form
             }
         }
     }
-    
 
+    //xem được tick thì mới tick dc thêm sửa xóa
+    void SetActionForStatusCB()
+    {
+        foreach (List<CustomCheckBoxNQ> list in _listCheckBox)
+        {
+            if (!list[0].Checked)
+            {
+                for (int i = 1; i < list.Count; i++)
+                {
+                    list[i].Enabled = false;
+                }
+            }
+            
+            list[0].CheckedChanged += (sender, args) =>
+            {
+                if (list[0].Checked)
+                {
+                    for (int i = 1; i < list.Count; i++)
+                    {
+                        list[i].Enabled = true;
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i < list.Count; i++)
+                    {
+                        list[i].Checked = false;
+                        list[i].Enabled = false;
+                    }
+                }
+            };
+        }
+
+    }
+    
     Label GetLbl(string i)
     {
         return new Label
@@ -332,8 +403,6 @@ public class PhanQuyenDialog : Form
     }
     
     
-    
-
     void SetBottomButton()
     {
         TableLayoutPanel panel = new TableLayoutPanel
@@ -348,14 +417,17 @@ public class PhanQuyenDialog : Form
         {
             _btnLuu = new TitleButton("Lưu");
             panel.Controls.Add(_btnLuu);
-            _btnLuu._mouseDown += () => Finish?.Invoke();
+            if (_dialogType == DialogType.Them)
+            _btnLuu._mouseDown += () => Insert();
+            else
+            _btnLuu._mouseDown += () => Update();
+
         
             TitleButton btnHuy = new TitleButton("Hủy");
             btnHuy._mouseDown += () => this.Close();
             
             panel.Controls.Add(btnHuy);
         }
-        
         else
         {
             panel.Controls.Add(new Panel{Height = 0});
@@ -367,4 +439,133 @@ public class PhanQuyenDialog : Form
 
         _mainLayout.Controls.Add(panel);
     }
+
+    void Insert()
+    {
+        if (CommonUse.Validate.IsEmpty(_txtTenNQ.GetTextField().Text))
+        {
+            MessageBox.Show("Tên nhóm quyền không được để trống", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        
+        NhomQuyenDto nhomquyen = new  NhomQuyenDto
+        {
+            TenNhomQuyen = _txtTenNQ.GetTextField().Text,
+        };
+        
+        if (!_nhomQuyenController.Insert(nhomquyen))
+        {
+            MessageBox.Show("Lỗi thêm quyền", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+            this.Close();
+            return;
+        }
+
+        int MaNQ = _nhomQuyenController.GetLastAutoIncrement();
+        
+        //Lấy ds MaNQ, MaCN, HanhDong
+        foreach (List<CustomCheckBoxNQ> list in _listCheckBox)
+        {
+            foreach (CustomCheckBoxNQ item in list)
+            {
+                int MaCN = _chucNangController.GetByTen(item.ID).MaCN;
+                if (item.Checked)
+                {
+                    string HanhDong = item.HD;
+                    ChiTietQuyenDto dto = new ChiTietQuyenDto
+                    {
+                        MaNQ = MaNQ,
+                        MaCN = MaCN,
+                        HanhDong = HanhDong,
+                    };
+                    if (!_chiTietQuyenController.Insert(dto))
+                    {
+                        MessageBox.Show("Lỗi thêm chi tiết quyền", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Close();
+                        return;
+                    }
+                }
+            }
+        }
+        MessageBox.Show("Thêm nhóm quyền thành công", "Thêm thành công",  MessageBoxButtons.OK, MessageBoxIcon.Information);
+        this.Close();
+        Finish?.Invoke();
+    }
+    
+    void Update()
+    {
+        if (CommonUse.Validate.IsEmpty(_txtTenNQ.GetTextField().Text))
+        {
+            MessageBox.Show("Tên nhóm quyền không được để trống", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        
+        _newListUpdate = _listCheckBox
+            .Select(row => row
+                .Select(chk => new StatusCB
+                {
+                    CustomCheckBox = chk,
+                    Check = chk.Checked,
+                })
+                .ToList())
+            .ToList();
+        
+        NhomQuyenDto nhomquyen = new NhomQuyenDto
+        {
+            MaNQ = _idNhomQuyen,
+            TenNhomQuyen = _txtTenNQ.GetTextField().Text,
+        };
+        
+        if (!_nhomQuyenController.Update(nhomquyen))
+        {
+            MessageBox.Show("Lỗi Sửa quyền", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+            this.Close();
+            return;
+        }
+        
+        for (int i = 0; i < _listCheckBox.Count; i++)
+        {
+            for (int j = 0; j < _listCheckBox[i].Count; j++)
+            {
+                //List cũ có, mới không có -> xóa
+                if (_oldListUpdate[i][j].Check && !_newListUpdate[i][j].Check)
+                {
+                    int maCN = _chucNangController.GetByTen(_oldListUpdate[i][j].CustomCheckBox.ID).MaCN;
+                    string hanhDong = _oldListUpdate[i][j].CustomCheckBox.HD;
+                    if (!_chiTietQuyenController.HardDelete(_idNhomQuyen, maCN, hanhDong))
+                    {
+                        MessageBox.Show("Lỗi sửa chi tiết quyền", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Close();
+                        return;
+                    }
+                }
+                //List cũ không có, mới có -> thêm
+                if (!_oldListUpdate[i][j].Check && _newListUpdate[i][j].Check)
+                {
+                    Console.WriteLine(!_oldListUpdate[i][j].Check + " " + _oldListUpdate[i][j].Check);
+                    
+                    int maCN = _chucNangController.GetByTen(_newListUpdate[i][j].CustomCheckBox.ID).MaCN;
+                    string hanhDong = _newListUpdate[i][j].CustomCheckBox.HD;
+
+                    ChiTietQuyenDto chiTietQuyenDto = new ChiTietQuyenDto
+                    {
+                        MaNQ = _idNhomQuyen,
+                        MaCN = maCN,
+                        HanhDong = hanhDong,
+                    };
+                    
+                    if (!_chiTietQuyenController.Insert(chiTietQuyenDto))
+                    {
+                        MessageBox.Show("Lỗi sửa chi tiết quyền", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Close();
+                        return;
+                    }
+                }
+            }
+        }
+        
+        MessageBox.Show("Sửa nhóm quyền thành công", "Sửa thành công",  MessageBoxButtons.OK, MessageBoxIcon.Information);
+        this.Close();
+        Finish?.Invoke();
+    }
+    
 }
