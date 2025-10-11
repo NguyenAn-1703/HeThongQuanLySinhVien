@@ -8,14 +8,14 @@ namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class SinhVienDialog : Form
 {
-    public enum DialogMode { View, Create, Edit }
+    public enum DialogMode { View, Create, Edit, Delete }
 
     public SinhVienDTO ResultSinhVienDto { get; private set; }
 
     private TextBox txtMaSinhVien;
     private TextBox txtTenSinhVien;
     private DateTimePicker dtpNgaySinh;
-    private ComboBox cbbKhoa;
+    private TextBox txtNganh;
     private RadioButton rbNam;
     private RadioButton rbNu;
     private TextBox txtSoDienThoai;
@@ -55,7 +55,8 @@ public class SinhVienDialog : Form
         var lblTitle = new Label
         {
             Text = mode == DialogMode.Create ? "Thêm sinh viên" : 
-                   mode == DialogMode.Edit ? "Cập nhật sinh viên" : "Chi tiết sinh viên",
+                   mode == DialogMode.Edit ? "Cập nhật sinh viên" : 
+                   mode == DialogMode.Delete ? "Xóa sinh viên" : "Chi tiết sinh viên",
             ForeColor = Color.White,
             Font = new Font("Montserrat", 13, FontStyle.Bold),
             AutoSize = false,
@@ -103,8 +104,9 @@ public class SinhVienDialog : Form
             LoadData(sinhVienDto);
         }
 
-        bool isView = mode == DialogMode.View;
-        SetControlsEnabled(!isView);
+        bool ok = true;
+        if(mode == DialogMode.Edit) SetControlsEnabled(ok);
+        else if(mode == DialogMode.Delete) SetControlsEnabled2(!ok);
 
         var layout = new TableLayoutPanel
         {
@@ -176,16 +178,16 @@ public class SinhVienDialog : Form
         };
 
         
-        cbbKhoa = new ComboBox
+        txtNganh = new TextBox
         {
             Width = 300,
             Height = 32,
             Font = new Font("Montserrat", 10),
-            DropDownStyle = ComboBoxStyle.DropDownList,
+            BorderStyle = BorderStyle.FixedSingle,
             Padding = new Padding(6, 6, 6, 6),
             Margin = new Padding(0)
         };
-        cbbKhoa.Items.AddRange(new[] {"Công nghệ thông tin"});
+        // cbbKhoa.Items.AddRange(new[] {"Công nghệ thông tin"});
 
         
         rbNam = new RadioButton
@@ -268,7 +270,7 @@ public class SinhVienDialog : Form
 
     private Label[] CreateLabels()
     {
-        var labelTexts = new[] { "Mã SV:", "Tên SV:", "Ngày sinh:", "Khoa:", "Giới tính:", "SĐT:", "Quê quán:", "Email:", "CCCD:", "Trạng thái:" };
+        var labelTexts = new[] { "Mã SV:", "Tên SV:", "Ngày sinh:", "Ngành:", "Giới tính:", "SĐT:", "Quê quán:", "Email:", "CCCD:", "Trạng thái:" };
         var labels = new Label[labelTexts.Length];
 
         for (int i = 0; i < labelTexts.Length; i++)
@@ -303,7 +305,7 @@ public class SinhVienDialog : Form
             CreateControlPanel(txtMaSinhVien),
             CreateControlPanel(txtTenSinhVien),
             CreateControlPanel(dtpNgaySinh),
-            CreateControlPanel(cbbKhoa),
+            CreateControlPanel(txtNganh),
             genderPanel,
             CreateControlPanel(txtSoDienThoai),
             CreateControlPanel(txtQueQuan),
@@ -335,7 +337,8 @@ public class SinhVienDialog : Form
             dtpNgaySinh.Value = ngaySinh;
         }
 
-        
+        txtNganh.Text = sinhVienDto.Nganh ?? "";
+                
         if (sinhVienDto.GioiTinh == "Nam")
         {
             rbNam.Checked = true;
@@ -363,16 +366,30 @@ public class SinhVienDialog : Form
 
     private void SetControlsEnabled(bool enabled)
     {
-        txtTenSinhVien.Enabled = enabled;
-        dtpNgaySinh.Enabled = enabled;
-        cbbKhoa.Enabled = enabled;
-        rbNam.Enabled = enabled;
-        rbNu.Enabled = enabled;
+        txtTenSinhVien.Enabled = !enabled;
+        dtpNgaySinh.Enabled = !enabled;
+        txtNganh.Enabled = !enabled;
+        rbNam.Enabled = !enabled;
+        rbNu.Enabled = !enabled;
         txtSoDienThoai.Enabled = enabled;
-        txtQueQuan.Enabled = enabled;
+        txtQueQuan.Enabled = !enabled;
         txtEmail.Enabled = enabled;
-        txtCCCD.Enabled = enabled;
+        txtCCCD.Enabled = !enabled;
         cbbTrangThai.Enabled = enabled;
+    }
+
+    private void SetControlsEnabled2(bool disable)
+    {
+        txtTenSinhVien.Enabled = disable;
+        dtpNgaySinh.Enabled = disable;
+        txtNganh.Enabled = disable;
+        rbNam.Enabled = disable;
+        rbNu.Enabled = disable;
+        txtSoDienThoai.Enabled = disable;
+        txtQueQuan.Enabled = disable;
+        txtEmail.Enabled = disable;
+        txtCCCD.Enabled = disable;
+        cbbTrangThai.Enabled = disable;
     }
 
     private Panel CreateButtonPanel(DialogMode mode)
@@ -403,12 +420,13 @@ public class SinhVienDialog : Form
 
         var btnOk = new Button
         {
-            Text = mode == DialogMode.Create ? "Thêm" : "Cập nhật",
+            Text = mode == DialogMode.Create ? "Thêm" : 
+                   mode == DialogMode.Delete ? "Xóa" : "Cập nhật",
             DialogResult = DialogResult.OK,
             Width = 100,
             Height = 32,
             Font = new Font("Montserrat", 10, FontStyle.Bold),
-            BackColor = ColorTranslator.FromHtml("#07689F"),
+            BackColor = mode == DialogMode.Delete ? ColorTranslator.FromHtml("#FF6B6B") : ColorTranslator.FromHtml("#07689F"),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
             Dock = DockStyle.Right,
@@ -420,7 +438,7 @@ public class SinhVienDialog : Form
 
         btnOk.Click += (s, e) =>
         {
-            if (ValidateInput())
+            if (mode == DialogMode.Delete || ValidateInput())
             {
                 ResultSinhVienDto = CreateSinhVienDto();
             }
@@ -438,34 +456,49 @@ public class SinhVienDialog : Form
 
     private bool ValidateInput()
     {
-        if (string.IsNullOrWhiteSpace(txtTenSinhVien.Text))
+        if (!rbNam.Checked && !rbNu.Checked)
         {
-            MessageBox.Show("Tên sinh viên không được để trống.");
-            txtTenSinhVien.Focus();
+            MessageBox.Show("Vui lòng chọn giới tính.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
-
+        
         if (string.IsNullOrWhiteSpace(txtSoDienThoai.Text))
         {
-            MessageBox.Show("Số điện thoại không được để trống.");
+            MessageBox.Show("Số điện thoại không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             txtSoDienThoai.Focus();
             return false;
         }
-
+        
+        var sdt = txtSoDienThoai.Text.Trim();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(sdt, @"^(0[3|5|7|8|9])+([0-9]{8})$"))
+        {
+            MessageBox.Show("Số điện thoại không hợp lệ. Phải là 10 số và bắt đầu bằng 03, 05, 07, 08, 09.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            txtSoDienThoai.Focus();
+            return false;
+        }
+        
         if (string.IsNullOrWhiteSpace(txtEmail.Text))
         {
-            MessageBox.Show("Email không được để trống.");
+            MessageBox.Show("Email không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             txtEmail.Focus();
             return false;
         }
-
-        if (string.IsNullOrWhiteSpace(txtCCCD.Text))
+        
+        var email = txtEmail.Text.Trim();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
         {
-            MessageBox.Show("CCCD không được để trống.");
-            txtCCCD.Focus();
+            MessageBox.Show("Email không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            txtEmail.Focus();
             return false;
         }
-
+        
+        if (cbbTrangThai.SelectedIndex < 0)
+        {
+            MessageBox.Show("Vui lòng chọn trạng thái.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            cbbTrangThai.Focus();
+            return false;
+        }
+        
         return true;
     }
 
@@ -483,21 +516,5 @@ public class SinhVienDialog : Form
             CCCD = txtCCCD.Text.Trim(),
             TrangThai = cbbTrangThai.SelectedItem?.ToString() ?? "Đang học"
         };
-    }
-    
-    public void setEdit(SinhVienDTO sinhVienDto)
-    {
-        using (var dialog = new SinhVienDialog(DialogMode.Edit, sinhVienDto))
-        {
-            if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultSinhVienDto != null)
-            {
-                
-            }
-        }
-    }
-
-    public void setDelete()
-    {
-        
     }
 }

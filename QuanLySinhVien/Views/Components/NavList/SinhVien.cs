@@ -3,6 +3,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Drawing.Drawing2D;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
@@ -14,15 +15,32 @@ namespace QuanLySinhVien.Views.Components;
 public class SinhVien : NavBase
 {
     private String[] columns;
-    private SinhVienController _controller = new SinhVienController();
+    private SinhVienController _controller;
     private string[] _listSelectionForComboBox = new []{"Mã sinh viên", "Tên sinh viên"};
-    
+    private SinhVienDAO sinhVienDao;
     private DataGridView dataGridView;
     private DataTable table;
     private CUse _cUse;
+
+    private TextBox txtTenSinhVien;
+    private TextBox txtNgaySinh;
+    private ComboBox cbbNganh;
+    private RadioButton rbNam;
+    private RadioButton rbNu;
+    private TextBox txtSoDienThoai;
+    private TextBox txtQueQuan;
+    private TextBox txtEmail;
+    private TextBox txtCCCD;
+    private ComboBox cbbTrangThai;
+    private TextBox txtKhoaHoc;
+    private TextBox txtMaLop;
+    private DateTimePicker dtpNgaySinh;
+    
     public SinhVien()
     {
         _cUse = new CUse();
+        sinhVienDao = new SinhVienDAO();
+        _controller = new SinhVienController();
         Init();
         SetupDataGridView();
         LoadSinhVienData();
@@ -202,15 +220,19 @@ public class SinhVien : NavBase
         middleDialogFull.Controls.Add(middleDialog , 0 , 1);
         
         
-        var bottomDialog = new TableLayoutPanel()
+        var bottomDialog = new Panel()
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
-            RowCount = 1,
         };
-        bottomDialog.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
-        bottomDialog.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
-        bottomDialog.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
+        
+        var buttonContainer = new FlowLayoutPanel()
+        {
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false,
+            AutoSize = true,
+            // Anchor = AnchorStyles.None,
+        };
+        
         var cancelButton = new Button
         {
             Text = "Hủy",
@@ -218,11 +240,10 @@ public class SinhVien : NavBase
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.Red,
             Cursor = Cursors.Hand,
-            // Dock = DockStyle.Left,
             Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
-            Anchor = AnchorStyles.None,
             Width = 140,
             Height = 50,
+            Margin = new Padding(120, 20, 30, 0),
         };
         var addButton = new Button
         {
@@ -231,35 +252,19 @@ public class SinhVien : NavBase
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.Green,
             Cursor = Cursors.Hand,
-            // Dock = DockStyle.Right,
             Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
-            Anchor = AnchorStyles.None,
             Width = 140,
             Height = 50,
+            Margin = new Padding(30, 20, 0, 0),
         };
-        var resetButton = new Button
-        {
-            Text = "Làm mới",
-            TextAlign = ContentAlignment.MiddleCenter,
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.Cyan,
-            Cursor = Cursors.Hand,
-            // Dock = DockStyle.Fill,
-            Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
-            Anchor = AnchorStyles.None,
-            Width = 140,
-            Height = 50,
-        };
-        cancelButton.Margin = new Padding(20, 0, 20, 0);
-        resetButton.Margin = new Padding(20, 0, 20, 0);
-        addButton.Margin   = new Padding(20, 0, 20, 0);
-        bottomDialog.Controls.Add(cancelButton);   
-        bottomDialog.Controls.Add(resetButton);   
-        bottomDialog.Controls.Add(addButton);   
+        
+        buttonContainer.Controls.Add(cancelButton);   
+        buttonContainer.Controls.Add(addButton);
+        bottomDialog.Controls.Add(buttonContainer);   
         //borderMiddleLeft.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Khoa: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái" , "Mã Khóa Học"};
+        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Ngành: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái" , "Khóa Học"};
         float tile = 60f / list.Count;
-        string[] cbb = new []{ "" };
+        string[] cbb = new []{"--Chọn--", "Công nghệ thông tin", "Mạng máy tính", "Hệ thống thông tin" };
         List<Control> rightComponents = new List<Control>();
         var radioNam = new RadioButton
         {
@@ -304,75 +309,100 @@ public class SinhVien : NavBase
             // Margin = new Padding(0 , 0 , 0 , 0),
         };
         combo.Items.AddRange(cbb);
-        rightComponents.Add(new TextBox()
+        combo.SelectedIndex = 0;
+        
+        combo.SelectedIndexChanged += (s, e) =>
+        {
+            if (combo.SelectedIndex == 0)
+            {
+                MessageBox.Show("Vui lòng chọn một ngành.");
+            }
+        };
+        
+        txtTenSinhVien = new TextBox()
         {
             BorderStyle = BorderStyle.FixedSingle,
             Width = 300,
             Height = 100,
             Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
             Anchor = AnchorStyles.None,
-            //Margin = new Padding(5),
-        });
-        rightComponents.Add(new DateTimePicker()
+        };
+        
+        dtpNgaySinh = new DateTimePicker()
         {
-            Value = DateTime.Now,
+            Value = DateTime.Now.AddYears(-18),
             Width = 300,
             Height = 100,
             Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
             Anchor = AnchorStyles.None,
-            //Margin = new Padding(5),
-        });
+        };
+        
+        txtSoDienThoai = new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        
+        txtQueQuan = new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        
+        txtEmail = new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        
+        txtCCCD = new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        
+        cbbTrangThai = new ComboBox()
+        {
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Width = 300,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        cbbTrangThai.Items.AddRange(new[] {"--Chọn--" , "Đang học", "Tạm nghỉ", "Tốt nghiệp", "Bị đuổi học" });
+        cbbTrangThai.SelectedIndex = 0;
+        
+        
+        txtKhoaHoc = new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        
+        rightComponents.Add(txtTenSinhVien);
+        rightComponents.Add(dtpNgaySinh);
         rightComponents.Add(combo);
         rightComponents.Add(panelRadioButton);
-        
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        });
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        });
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        });
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        });
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        });
-        rightComponents.Add(new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        });
+        rightComponents.Add(txtSoDienThoai);
+        rightComponents.Add(txtQueQuan);
+        rightComponents.Add(txtEmail);
+        rightComponents.Add(txtCCCD);
+        rightComponents.Add(cbbTrangThai);
+        rightComponents.Add(txtKhoaHoc);
         
         
         // Console.WriteLine(tile);
@@ -417,7 +447,159 @@ public class SinhVien : NavBase
             
             addButton.Click += (sender, args) =>
             {
-                form.Close();
+                try
+                {
+                    // Validate tên sinh viên
+                    if (string.IsNullOrWhiteSpace(txtTenSinhVien.Text))
+                    {
+                        MessageBox.Show("Tên sinh viên không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtTenSinhVien.Focus();
+                        return;
+                    }
+                    
+                    if (txtTenSinhVien.Text.Trim().Length < 3)
+                    {
+                        MessageBox.Show("Tên sinh viên phải có ít nhất 3 ký tự.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtTenSinhVien.Focus();
+                        return;
+                    }
+                    
+                    // Validate ngày sinh (>= 18 tuổi)
+                    var age = DateTime.Now.Year - dtpNgaySinh.Value.Year;
+                    if (dtpNgaySinh.Value > DateTime.Now.AddYears(-age)) age--;
+                    
+                    if (age < 16)
+                    {
+                        MessageBox.Show("Sinh viên phải từ 16 tuổi trở lên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    
+                    if (age > 100)
+                    {
+                        MessageBox.Show("Ngày sinh không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    
+                    // Validate ngành
+                    if (combo.SelectedIndex == 0)
+                    {
+                        MessageBox.Show("Vui lòng chọn ngành.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        combo.Focus();
+                        return;
+                    }
+                    
+                    // Validate giới tính
+                    if (!radioNam.Checked && !radioNu.Checked)
+                    {
+                        MessageBox.Show("Vui lòng chọn giới tính.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    
+                    // Validate số điện thoại
+                    if (string.IsNullOrWhiteSpace(txtSoDienThoai.Text))
+                    {
+                        MessageBox.Show("Số điện thoại không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtSoDienThoai.Focus();
+                        return;
+                    }
+                    
+                    var sdt = txtSoDienThoai.Text.Trim();
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(sdt, @"^(0[3|5|7|8|9])+([0-9]{8})$"))
+                    {
+                        MessageBox.Show("Số điện thoại không hợp lệ. Phải là 10 số và bắt đầu bằng 03, 05, 07, 08, 09.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtSoDienThoai.Focus();
+                        return;
+                    }
+                    
+                    // Validate quê quán
+                    if (string.IsNullOrWhiteSpace(txtQueQuan.Text))
+                    {
+                        MessageBox.Show("Quê quán không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtQueQuan.Focus();
+                        return;
+                    }
+                    
+                    // Validate email
+                    if (string.IsNullOrWhiteSpace(txtEmail.Text))
+                    {
+                        MessageBox.Show("Email không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtEmail.Focus();
+                        return;
+                    }
+                    
+                    var email = txtEmail.Text.Trim();
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    {
+                        MessageBox.Show("Email không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtEmail.Focus();
+                        return;
+                    }
+                    
+                    // Validate CCCD
+                    if (string.IsNullOrWhiteSpace(txtCCCD.Text))
+                    {
+                        MessageBox.Show("CCCD không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtCCCD.Focus();
+                        return;
+                    }
+                    
+                    var cccd = txtCCCD.Text.Trim();
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(cccd, @"^\d{12}$"))
+                    {
+                        MessageBox.Show("CCCD phải là 12 chữ số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtCCCD.Focus();
+                        return;
+                    }
+                    
+                    // Validate trạng thái
+                    if (cbbTrangThai.SelectedIndex == 0)
+                    {
+                        MessageBox.Show("Vui lòng chọn trạng thái.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        cbbTrangThai.Focus();
+                        return;
+                    }
+                    
+                    // Validate khóa học
+                    if (string.IsNullOrWhiteSpace(txtKhoaHoc.Text))
+                    {
+                        MessageBox.Show("Khóa học không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtKhoaHoc.Focus();
+                        return;
+                    }
+                    
+                    var sinhVien = new SinhVienDTO
+                    {
+                        TenSinhVien = txtTenSinhVien.Text.Trim(),
+                        NgaySinh = dtpNgaySinh.Value.ToString("yyyy-MM-dd"),
+                        GioiTinh = radioNam.Checked ? "Nam" : "Nữ",
+                        SdtSinhVien = txtSoDienThoai.Text.Trim(),
+                        QueQuanSinhVien = txtQueQuan.Text.Trim(),
+                        Email = txtEmail.Text.Trim(),
+                        CCCD = txtCCCD.Text.Trim(),
+                        TrangThai = cbbTrangThai.SelectedItem?.ToString() ?? "Đang học",
+                        // MaLop = combo.SelectedValue?.ToString(),
+                        // MaKhoaHoc = txtKhoaHoc.Text,
+                    };
+                    
+                    _controller.AddSinhVien(sinhVien);
+                    
+                    MessageBox.Show("Thêm sinh viên thành công!");
+                    txtTenSinhVien.Clear();
+                    txtSoDienThoai.Clear();
+                    txtQueQuan.Clear();
+                    txtEmail.Clear();
+                    txtCCCD.Clear();
+                    txtKhoaHoc.Clear();
+                    dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
+                    cbbTrangThai.SelectedIndex = 0;
+
+                    form.Close();
+                    LoadSinhVienData();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi khi thêm sinh viên: {ex.Message}");
+                }
             };
             
             form.ShowDialog();
@@ -537,10 +719,12 @@ public class SinhVien : NavBase
             {
                 if (e.RowIndex < 0) return;
                 if (e.ColumnIndex == dataGridView.Columns["Edit"]?.Index) { 
+                    var row = dataGridView.Rows[e.RowIndex];
                     var sinhVienDto = new SinhVienDTO
                     {
-                        //todo Chỗ nayf lấy mssv xong truy vấn tới mssv ấy lấy thông tin
+                        MaSinhVien = Convert.ToInt32(row.Cells["Mã SV"].Value),
                     };
+                    sinhVienDto = _controller.GetSinhVienById(sinhVienDto.MaSinhVien);
                     
                     using (var dialog = new SinhVienDialog(SinhVienDialog.DialogMode.Edit, sinhVienDto))
                     {
@@ -548,8 +732,8 @@ public class SinhVien : NavBase
                         {
                             try
                             {
-                                // TODO: Thêm logic cập nhật dữ liệu vào database
-                                
+                                _controller.EditSinhVien(dialog.ResultSinhVienDto);
+                                LoadSinhVienData();
                             }
                             catch (Exception ex)
                             {
@@ -558,7 +742,30 @@ public class SinhVien : NavBase
                         }
                     }
                  }
-                else if (e.ColumnIndex == dataGridView.Columns["Del"]?.Index) { Console.WriteLine("xoa"); }
+                else if (e.ColumnIndex == dataGridView.Columns["Del"]?.Index) { 
+                    var row = dataGridView.Rows[e.RowIndex];
+                    var sinhVienDto = new SinhVienDTO
+                    {
+                        MaSinhVien = Convert.ToInt32(row.Cells["Mã SV"].Value),
+                    };
+                    sinhVienDto = _controller.GetSinhVienById(sinhVienDto.MaSinhVien);
+                    
+                    using (var dialog = new SinhVienDialog(SinhVienDialog.DialogMode.Delete, sinhVienDto))
+                    {
+                        if (dialog.ShowDialog() == DialogResult.OK)
+                        {
+                            try
+                            {
+                                _controller.DeleteSinhVien(sinhVienDto.MaSinhVien);
+                                LoadSinhVienData();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Lỗi khi xóa sinh viên: {ex.Message}");
+                            }
+                        }
+                    }
+                }
             };
         };
         
@@ -608,8 +815,42 @@ public class SinhVien : NavBase
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
     }
-    
+
     public override void onSearch(string txtSearch, string filter)
-    { }
-    
+    {
+        try
+        {
+            List<SinhVienDTO> list;
+        
+            filter = filter.Trim();
+            
+            if (string.IsNullOrWhiteSpace(txtSearch))
+            {
+                list = _controller.LayDanhSachSinhVienTable();
+            }
+            else
+            {
+                // Tìm kiếm theo text và filter
+                list = _controller.Search(txtSearch, filter);
+            }
+
+            table.Rows.Clear();
+            
+            foreach (var sv in list)
+            {
+                table.Rows.Add(
+                    sv.MaSinhVien,
+                    sv.TenSinhVien,
+                    sv.NgaySinh,
+                    sv.GioiTinh,
+                    sv.Nganh,
+                    sv.TrangThai
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message);
+        }
+    }
 }
