@@ -34,7 +34,7 @@ public class SinhVienDAO
     public SinhVienDTO GetSinhVienById(int maSinhVien){ 
         SinhVienDTO result = new();
         using var conn = MyConnection.GetConnection();
-        const string sql = @"SELECT s.* , IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh 
+        const string sql = @"SELECT s.* , IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh, s.MaLop, s.MaKhoaHoc
                             FROM SinhVien s 
                             LEFT JOIN Lop l ON s.MaLop = l.MaLop 
                             LEFT JOIN Nganh n ON n.MaNganh = l.MaNganh
@@ -53,6 +53,8 @@ public class SinhVienDAO
             result.CCCD = reader.GetString(reader.GetOrdinal("CCCDSV"));
             result.TrangThai = reader.GetString(reader.GetOrdinal("TrangThaiSV"));
             result.Nganh = reader.GetString(reader.GetOrdinal("Nganh"));
+            result.MaLop = reader.GetInt32(reader.GetOrdinal("MaLop"));
+            result.MaKhoaHoc = reader.GetInt32(reader.GetOrdinal("MaKhoaHoc"));
         }
         return result;
     }

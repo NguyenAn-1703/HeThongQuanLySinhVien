@@ -6,7 +6,10 @@ namespace QuanLySinhVien.Models.DAO;
 public class NhomQuyenDao
 {
     private static NhomQuyenDao _instance;
-    private NhomQuyenDao() { }
+
+    private NhomQuyenDao()
+    {
+    }
 
     public static NhomQuyenDao GetInstance()
     {
@@ -14,6 +17,7 @@ public class NhomQuyenDao
         {
             _instance = new NhomQuyenDao();
         }
+
         return _instance;
     }
 
@@ -100,5 +104,20 @@ public class NhomQuyenDao
         }
 
         return result;
+    }
+
+    public int GetLastAutoIncrement()
+    {
+        int Id = 0;
+
+        string query = "SELECT MAX(MaNQ) FROM nhomquyen";
+
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(query, conn);
+        var result = cmd.ExecuteScalar();
+        if (result != DBNull.Value)
+            Id = Convert.ToInt32(result);
+
+        return Id;
     }
 }

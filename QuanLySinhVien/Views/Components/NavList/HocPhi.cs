@@ -10,6 +10,43 @@ public class HocPhi : NavBase
     {
         Init();
     }
+    
+    
+    // -------------- Graphics --------------- //
+    private float GetFontWidth(Label label)
+    {
+        Graphics g = label.CreateGraphics();
+        SizeF size = g.MeasureString(label.Text, label.Font);
+
+        return size.Width;
+    }
+    
+    
+    
+    
+    
+    
+    // -------------- Label --------------- //
+    private Label LbHeding()
+    {
+        Label lb = new Label
+        {
+            Dock = DockStyle.Left,
+            Text = "Học phí",
+            Font = new Font("JetBrains Mono", 17f, FontStyle.Bold),
+            Height = 90,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Padding = new Padding(30, 0, 0, 0),
+        };
+        
+        lb.Width = Convert.ToInt32(GetFontWidth(lb)) + 50;
+        return lb;
+    }
+    
+    
+    
+    
+    
         
     private void Init()
     {
@@ -34,6 +71,7 @@ public class HocPhi : NavBase
             // BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             BackColor = Color.Red,
             Height = 90,
+            Controls = { LbHeding() }
         };
         return mainTop;
     }

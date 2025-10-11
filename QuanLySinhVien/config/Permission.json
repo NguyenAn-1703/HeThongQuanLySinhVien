@@ -1,0 +1,74 @@
+{
+  "Modules": [
+    {
+      "Name": "Quản lý sinh viên",
+      "ID": "SINHVIEN",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý giảng viên",
+      "ID": "GIANGVIEN",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý khoa",
+      "ID": "KHOA",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý ngành",
+      "ID": "NGANH",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Chương trình đào tạo",
+      "ID": "CHUONGTRINHDAOTAO",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý học phần",
+      "ID": "HOCPHAN",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý phòng học",
+      "ID": "PHONGHOC",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Tổ chức thi",
+      "ID": "TOCHUCTHI",
+      "Actions": ["Xem", "Them"]
+    },
+    {
+      "Name": "Nhập điểm",
+      "ID": "NHAPDIEM",
+      "Actions": ["Xem", "Them"]
+    },
+    {
+      "Name": "Học phí",
+      "ID": "HOCPHI",
+      "Actions": ["Xem", "Them"]
+    },
+    {
+      "Name": "Mở đăng ký học phần",
+      "ID": "MODANGKYHOCPHAN",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý tài khoản",
+      "ID": "TAIKHOAN",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Quản lý phân quyền",
+      "ID": "PHANQUYEN",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
+      "Name": "Thống kê",
+      "ID": "THONGKE",
+      "Actions": ["Xem"]
+    }
+  ]
+}

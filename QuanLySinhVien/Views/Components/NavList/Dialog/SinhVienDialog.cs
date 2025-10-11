@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Models.DAO;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
@@ -15,7 +17,9 @@ public class SinhVienDialog : Form
     private TextBox txtMaSinhVien;
     private TextBox txtTenSinhVien;
     private DateTimePicker dtpNgaySinh;
-    private TextBox txtNganh;
+    private ComboBox cbbNganh;
+    private ComboBox cbbKhoaHoc;
+    private ComboBox cbbLop;
     private RadioButton rbNam;
     private RadioButton rbNu;
     private TextBox txtSoDienThoai;
@@ -23,7 +27,11 @@ public class SinhVienDialog : Form
     private TextBox txtEmail;
     private TextBox txtCCCD;
     private ComboBox cbbTrangThai;
-    private TextBox txtMaKhoaHoc;
+    
+    // DAO instances
+    private NganhDao nganhDao;
+    private KhoaHocDAO khoaHocDao;
+    private LopDAO lopDao;
 
     public SinhVienDialog(DialogMode mode, SinhVienDTO sinhVienDto = null)
     {
@@ -33,6 +41,11 @@ public class SinhVienDialog : Form
         StartPosition = FormStartPosition.CenterParent;
         ShowInTaskbar = false;
         BackColor = ColorTranslator.FromHtml("#F3F4F6");
+
+        // Initialize DAOs
+        nganhDao = new NganhDao();
+        khoaHocDao = new KhoaHocDAO();
+        lopDao = new LopDAO();
 
         var headerPanel = CreateHeaderPanel(mode);
         var buttonPanel = CreateButtonPanel(mode);
@@ -113,7 +126,7 @@ public class SinhVienDialog : Form
             Dock = DockStyle.Top,
             AutoSize = true,
             ColumnCount = 2,
-            RowCount = 10,
+            RowCount = 12,
             Padding = new Padding(0),
             CellBorderStyle = TableLayoutPanelCellBorderStyle.None
         };
@@ -121,7 +134,7 @@ public class SinhVienDialog : Form
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 270));
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 12; i++)
         {
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 60));
         }
@@ -178,16 +191,45 @@ public class SinhVienDialog : Form
         };
 
         
-        txtNganh = new TextBox
+        cbbNganh = new ComboBox
         {
             Width = 300,
             Height = 32,
             Font = new Font("Montserrat", 10),
-            BorderStyle = BorderStyle.FixedSingle,
+            DropDownStyle = ComboBoxStyle.DropDownList,
             Padding = new Padding(6, 6, 6, 6),
             Margin = new Padding(0)
         };
-        // cbbKhoa.Items.AddRange(new[] {"Công nghệ thông tin"});
+
+        cbbKhoaHoc = new ComboBox
+        {
+            Width = 300,
+            Height = 32,
+            Font = new Font("Montserrat", 10),
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Padding = new Padding(6, 6, 6, 6),
+            Margin = new Padding(0),
+            Enabled = false
+        };
+
+        cbbLop = new ComboBox
+        {
+            Width = 300,
+            Height = 32,
+            Font = new Font("Montserrat", 10),
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Padding = new Padding(6, 6, 6, 6),
+            Margin = new Padding(0),
+            Enabled = false
+        };
+
+        // Load initial data
+        LoadNganhData();
+        LoadKhoaHocData();
+
+        // Add event handlers for cascading
+        cbbNganh.SelectedIndexChanged += CbbNganh_SelectedIndexChanged;
+        cbbKhoaHoc.SelectedIndexChanged += CbbKhoaHoc_SelectedIndexChanged;
 
         
         rbNam = new RadioButton
@@ -268,9 +310,93 @@ public class SinhVienDialog : Form
         cbbTrangThai.SelectedIndex = 0;
     }
 
+    private void LoadNganhData()
+    {
+        try
+        {
+            var nganhList = nganhDao.GetAll();
+            cbbNganh.Items.Clear();
+            cbbNganh.DisplayMember = "TenNganh";
+            cbbNganh.ValueMember = "MaNganh";
+            cbbNganh.DataSource = nganhList;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi tải dữ liệu ngành: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void LoadKhoaHocData()
+    {
+        try
+        {
+            var khoaHocList = khoaHocDao.GetAllWithDisplayText();
+            cbbKhoaHoc.Items.Clear();
+            cbbKhoaHoc.DisplayMember = "DisplayText";
+            cbbKhoaHoc.ValueMember = "MaKhoaHoc";
+            cbbKhoaHoc.DataSource = khoaHocList;
+            cbbKhoaHoc.Enabled = true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi tải dữ liệu khóa học: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void LoadLopData(int maNganh, string tenKhoaHoc)
+    {
+        try
+        {
+            var lopList = lopDao.GetByNganhAndKhoaHoc(maNganh, tenKhoaHoc);
+            cbbLop.Items.Clear();
+            cbbLop.DisplayMember = "DisplayText";
+            cbbLop.ValueMember = "MaLop";
+            cbbLop.DataSource = lopList;
+            cbbLop.Enabled = true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi tải dữ liệu lớp: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void CbbNganh_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (cbbNganh.SelectedValue != null && cbbKhoaHoc.SelectedValue != null)
+        {
+            int maNganh = (int)cbbNganh.SelectedValue;
+            string tenKhoaHoc = cbbKhoaHoc.SelectedItem?.GetType().GetProperty("DisplayText")?.GetValue(cbbKhoaHoc.SelectedItem)?.ToString() ?? "";
+            
+            // Extract khoa hoc name (e.g., "K21" from "K21 (2021-2025)")
+            if (tenKhoaHoc.Contains("("))
+            {
+                tenKhoaHoc = tenKhoaHoc.Substring(0, tenKhoaHoc.IndexOf("(")).Trim();
+            }
+            
+            LoadLopData(maNganh, tenKhoaHoc);
+        }
+    }
+
+    private void CbbKhoaHoc_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (cbbNganh.SelectedValue != null && cbbKhoaHoc.SelectedValue != null)
+        {
+            int maNganh = (int)cbbNganh.SelectedValue;
+            string tenKhoaHoc = cbbKhoaHoc.SelectedItem?.GetType().GetProperty("DisplayText")?.GetValue(cbbKhoaHoc.SelectedItem)?.ToString() ?? "";
+            
+            // Extract khoa hoc name (e.g., "K21" from "K21 (2021-2025)")
+            if (tenKhoaHoc.Contains("("))
+            {
+                tenKhoaHoc = tenKhoaHoc.Substring(0, tenKhoaHoc.IndexOf("(")).Trim();
+            }
+            
+            LoadLopData(maNganh, tenKhoaHoc);
+        }
+    }
+
     private Label[] CreateLabels()
     {
-        var labelTexts = new[] { "Mã SV:", "Tên SV:", "Ngày sinh:", "Ngành:", "Giới tính:", "SĐT:", "Quê quán:", "Email:", "CCCD:", "Trạng thái:" };
+        var labelTexts = new[] { "Mã SV:", "Tên SV:", "Ngày sinh:", "Ngành:", "Khóa học:", "Lớp:", "Giới tính:", "SĐT:", "Quê quán:", "Email:", "CCCD:", "Trạng thái:" };
         var labels = new Label[labelTexts.Length];
 
         for (int i = 0; i < labelTexts.Length; i++)
@@ -305,7 +431,9 @@ public class SinhVienDialog : Form
             CreateControlPanel(txtMaSinhVien),
             CreateControlPanel(txtTenSinhVien),
             CreateControlPanel(dtpNgaySinh),
-            CreateControlPanel(txtNganh),
+            CreateControlPanel(cbbNganh),
+            CreateControlPanel(cbbKhoaHoc),
+            CreateControlPanel(cbbLop),
             genderPanel,
             CreateControlPanel(txtSoDienThoai),
             CreateControlPanel(txtQueQuan),
@@ -337,7 +465,31 @@ public class SinhVienDialog : Form
             dtpNgaySinh.Value = ngaySinh;
         }
 
-        txtNganh.Text = sinhVienDto.Nganh ?? "";
+        if (!string.IsNullOrEmpty(sinhVienDto.Nganh))
+        {
+            var nganhList = nganhDao.GetAll();
+            var selectedNganh = nganhList.FirstOrDefault(n => n.TenNganh == sinhVienDto.Nganh);
+            if (selectedNganh != null)
+            {
+                cbbNganh.SelectedValue = selectedNganh.MaNganh;
+                
+                if (sinhVienDto.MaKhoaHoc > 0)
+                {
+                    cbbKhoaHoc.SelectedValue = sinhVienDto.MaKhoaHoc;
+                    
+                    if (sinhVienDto.MaLop > 0)
+                    {
+                        var khoaHoc = khoaHocDao.GetById(sinhVienDto.MaKhoaHoc);
+                        if (khoaHoc != null)
+                        {
+                            string tenKhoaHoc = khoaHoc.TenKhoaHoc;
+                            LoadLopData(selectedNganh.MaNganh, tenKhoaHoc);
+                            cbbLop.SelectedValue = sinhVienDto.MaLop;
+                        }
+                    }
+                }
+            }
+        }
                 
         if (sinhVienDto.GioiTinh == "Nam")
         {
@@ -368,7 +520,9 @@ public class SinhVienDialog : Form
     {
         txtTenSinhVien.Enabled = !enabled;
         dtpNgaySinh.Enabled = !enabled;
-        txtNganh.Enabled = !enabled;
+        cbbNganh.Enabled = !enabled;
+        cbbKhoaHoc.Enabled = !enabled;
+        cbbLop.Enabled = !enabled;
         rbNam.Enabled = !enabled;
         rbNu.Enabled = !enabled;
         txtSoDienThoai.Enabled = enabled;
@@ -382,7 +536,9 @@ public class SinhVienDialog : Form
     {
         txtTenSinhVien.Enabled = disable;
         dtpNgaySinh.Enabled = disable;
-        txtNganh.Enabled = disable;
+        cbbNganh.Enabled = disable;
+        cbbKhoaHoc.Enabled = disable;
+        cbbLop.Enabled = disable;
         rbNam.Enabled = disable;
         rbNu.Enabled = disable;
         txtSoDienThoai.Enabled = disable;
@@ -499,17 +655,50 @@ public class SinhVienDialog : Form
             return false;
         }
         
+        // Validate cascading dropdown
+        if (cbbNganh.SelectedIndex < 0 || cbbNganh.SelectedValue == null)
+        {
+            MessageBox.Show("Vui lòng chọn ngành.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            cbbNganh.Focus();
+            return false;
+        }
+        
+        if (cbbKhoaHoc.SelectedIndex < 0 || cbbKhoaHoc.SelectedValue == null)
+        {
+            MessageBox.Show("Vui lòng chọn khóa học.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            cbbKhoaHoc.Focus();
+            return false;
+        }
+        
+        if (cbbLop.SelectedIndex < 0 || cbbLop.SelectedValue == null)
+        {
+            MessageBox.Show("Vui lòng chọn lớp.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            cbbLop.Focus();
+            return false;
+        }
+        
         return true;
     }
 
     private SinhVienDTO CreateSinhVienDto()
     {
+        // Get nganh name from selected value
+        string nganhName = "";
+        if (cbbNganh.SelectedValue != null)
+        {
+            var selectedNganh = nganhDao.GetNganhById((int)cbbNganh.SelectedValue);
+            nganhName = selectedNganh.TenNganh;
+        }
+
         return new SinhVienDTO
         {
             MaSinhVien = string.IsNullOrEmpty(txtMaSinhVien.Text) ? 0 : int.Parse(txtMaSinhVien.Text),
             TenSinhVien = txtTenSinhVien.Text.Trim(),
             NgaySinh = dtpNgaySinh.Value.ToString("yyyy-MM-dd"),
             GioiTinh = rbNam.Checked ? "Nam" : "Nữ",
+            Nganh = nganhName,
+            MaKhoaHoc = cbbKhoaHoc.SelectedValue != null ? (int)cbbKhoaHoc.SelectedValue : 0,
+            MaLop = cbbLop.SelectedValue != null ? (int)cbbLop.SelectedValue : 0,
             SdtSinhVien = txtSoDienThoai.Text.Trim(),
             QueQuanSinhVien = txtQueQuan.Text.Trim(),
             Email = txtEmail.Text.Trim(),
