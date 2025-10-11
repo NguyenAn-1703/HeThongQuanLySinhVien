@@ -252,6 +252,13 @@ public class NganhPanel : NavBase
 
         public NganhDto ResultNganhDto { get; private set; }
 
+        private Label _maNganhLabel;
+        private TextBox _maNganhTextBox;
+        private Label _maKhoaLabel;
+        private ComboBox _maKhoaComboBox;
+        private Label _tenNganhLabel;
+        private TextBox _tenNganhTextBox;
+
         public NganhDialog(DialogMode mode, NganhDto nganhDto)
         {
             Text = string.Empty;
@@ -308,46 +315,104 @@ public class NganhPanel : NavBase
                 Padding = new Padding(30, 50, 30, 50)
             };
 
-            var lblMaNganh = new Label { Text = "Mã Ngành", Font = new Font("Montserrat", 10), AutoSize = true };
-            var txtMaNganh = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle, Enabled = false };
+            // Create standard controls
+            _maNganhLabel = new Label
+            {
+                Text = "Mã Ngành:",
+                Font = new Font("Montserrat", 10, FontStyle.Regular),
+                AutoSize = true,
+                Location = new Point(0, 0)
+            };
+            _maNganhTextBox = new TextBox
+            {
+                Font = new Font("Montserrat", 10, FontStyle.Regular),
+                Size = new Size(250, 25),
+                Location = new Point(100, 0),
+                ReadOnly = true,
+                BackColor = Color.LightGray
+            };
 
-            var lblMaKhoa = new Label { Text = "Mã Khoa", Font = new Font("Montserrat", 10), AutoSize = true };
-            var txtMaKhoa = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle };
-            var lblTenNganh = new Label { Text = "Tên Ngành", Font = new Font("Montserrat", 10), AutoSize = true };
-            var txtTenNganh = new TextBox { Width = 250, Font = new Font("Montserrat", 10), BorderStyle = BorderStyle.FixedSingle };
+            _maKhoaLabel = new Label
+            {
+                Text = "Mã Khoa:",
+                Font = new Font("Montserrat", 10, FontStyle.Regular),
+                AutoSize = true,
+                Location = new Point(0, 30)
+            };
+            _maKhoaComboBox = new ComboBox
+            {
+                Font = new Font("Montserrat", 10, FontStyle.Regular),
+                Size = new Size(250, 25),
+                Location = new Point(100, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
 
+            _tenNganhLabel = new Label
+            {
+                Text = "Tên Ngành:",
+                Font = new Font("Montserrat", 10, FontStyle.Regular),
+                AutoSize = true,
+                Location = new Point(0, 60)
+            };
+            _tenNganhTextBox = new TextBox
+            {
+                Font = new Font("Montserrat", 10, FontStyle.Regular),
+                Size = new Size(250, 25),
+                Location = new Point(100, 60)
+            };
+
+            // Set TabIndex for editable fields
+            if (mode != DialogMode.View)
+            {
+                _maKhoaComboBox.TabIndex = 1;
+                _tenNganhTextBox.TabIndex = 2;
+            }
+
+            // Populate ComboBox for MaKhoa
+            var khoaList = new KhoaDao().GetAll();
+            var khoaComboList = khoaList.Select(k => $"{k.MaKhoa} - {k.TenKhoa}").ToList();
+            _maKhoaComboBox.Items.AddRange(khoaComboList.ToArray());
+
+            // Set values if editing/viewing
             if (nganhDto != null)
             {
-                txtMaNganh.Text = nganhDto.MaNganh.ToString();
-                txtMaKhoa.Text = nganhDto.MaKhoa.ToString();
-                txtTenNganh.Text = nganhDto.TenNganh;
+                _maNganhTextBox.Text = nganhDto.MaNganh.ToString();
+                _tenNganhTextBox.Text = nganhDto.TenNganh;
+
+                // Set MaKhoa selection
+                string targetValue = $"{nganhDto.MaKhoa} - ";
+                foreach (string item in _maKhoaComboBox.Items)
+                {
+                    if (item.StartsWith(targetValue))
+                    {
+                        _maKhoaComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
             }
 
             bool isView = mode == DialogMode.View;
-            txtMaKhoa.Enabled = !isView;
-            txtTenNganh.Enabled = !isView;
+            bool isAdd = mode == DialogMode.Create;
 
-            var layout = new RoundTLP()
+            // Set field visibility and enable state
+            _maNganhLabel.Visible = isView; // Hide in Add/Edit, show in View
+            _maNganhTextBox.Visible = isView;
+            _maNganhTextBox.Enabled = false; // Always disabled
+
+            _maKhoaComboBox.Enabled = !isView;
+            _tenNganhTextBox.Enabled = !isView;
+
+            // Add controls to cardPanel
+            if (isView)
             {
-                RowCount = 3,
-                ColumnCount = 2,
-                Dock = DockStyle.Top,
-                AutoSize = true,
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.None,
-                Padding = new Padding(0, 0, 0, 0)
-            };
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100));
-            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+                cardPanel.Controls.Add(_maNganhLabel);
+                cardPanel.Controls.Add(_maNganhTextBox);
+            }
 
-            layout.Controls.Add(lblMaNganh, 0, 0);
-            layout.Controls.Add(txtMaNganh, 1, 0);
-            layout.Controls.Add(lblMaKhoa, 0, 1);
-            layout.Controls.Add(txtMaKhoa, 1, 1);
-            layout.Controls.Add(lblTenNganh, 0, 2);
-            layout.Controls.Add(txtTenNganh, 1, 2);
+            cardPanel.Controls.Add(_maKhoaLabel);
+            cardPanel.Controls.Add(_maKhoaComboBox);
+            cardPanel.Controls.Add(_tenNganhLabel);
+            cardPanel.Controls.Add(_tenNganhTextBox);
 
             var btnCancel = new Button
             {
@@ -383,29 +448,25 @@ public class NganhPanel : NavBase
 
             btnOk.Click += (s, e) =>
             {
-                int maKhoa;
-                if (!int.TryParse(txtMaKhoa.Text.Trim(), out maKhoa))
-                {
-                    MessageBox.Show("Mã Khoa phải là số nguyên.");
-                    DialogResult = DialogResult.None;
-                    return;
-                }
-
-                var tenNganh = txtTenNganh.Text.Trim();
-                if (string.IsNullOrEmpty(tenNganh))
+                // Validation
+                if (string.IsNullOrWhiteSpace(_tenNganhTextBox.Text))
                 {
                     MessageBox.Show("Tên Ngành không được để trống.");
                     DialogResult = DialogResult.None;
                     return;
                 }
 
+                // Parse MaKhoa from ComboBox selection
+                string selectedKhoa = _maKhoaComboBox.SelectedItem?.ToString();
+                int maKhoa = int.Parse(selectedKhoa.Split('-')[0].Trim());
+
                 if (mode == DialogMode.Create)
                 {
-                    ResultNganhDto = new NganhDto { MaKhoa = maKhoa, TenNganh = tenNganh };
+                    ResultNganhDto = new NganhDto { MaKhoa = maKhoa, TenNganh = _tenNganhTextBox.Text };
                 }
                 else if (mode == DialogMode.Edit && nganhDto != null)
                 {
-                    ResultNganhDto = new NganhDto { MaNganh = nganhDto.MaNganh, MaKhoa = maKhoa, TenNganh = tenNganh };
+                    ResultNganhDto = new NganhDto { MaNganh = nganhDto.MaNganh, MaKhoa = maKhoa, TenNganh = _tenNganhTextBox.Text };
                 }
             };
 
@@ -418,7 +479,6 @@ public class NganhPanel : NavBase
             buttonPanel.Controls.Add(btnCancel);
             if (!isView) buttonPanel.Controls.Add(btnOk);
 
-            cardPanel.Controls.Add(layout);
             cardPanel.Controls.Add(buttonPanel);
             buttonPanel.BringToFront();
 
