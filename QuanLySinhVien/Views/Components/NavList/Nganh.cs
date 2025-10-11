@@ -10,6 +10,8 @@ using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.ViewComponents;
+using QuanLySinhVien.Views.Components.NavList.Dialog;
+using QuanLySinhVien.Views.Enums;
 using Svg;
 
 namespace QuanLySinhVien.Views.Components;
@@ -26,10 +28,7 @@ public class NganhPanel : NavBase
 
     private NganhDao nganhDAO = new NganhDao();
 
-    int iconSize = 24;
-    int spacing = 25;
-
-    private Bitmap _addIcon;
+    private TitleButton _insertButton;
 
     public NganhPanel()
     {
@@ -40,91 +39,63 @@ public class NganhPanel : NavBase
     private void Init()
     {
         Dock = DockStyle.Fill;
-        Size = new Size(1200, 900);
-        var borderTop = new Panel
+        
+        TableLayoutPanel mainLayout = new TableLayoutPanel
         {
+            RowCount = 2,
             Dock = DockStyle.Fill,
         };
-        Controls.Add(Bottom());
-        Controls.Add(Top());
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        mainLayout.Controls.Add(Top());
+        mainLayout.Controls.Add(Bottom());
+
+        Controls.Add(mainLayout);
     }
 
     private Panel Top()
     {
-        var addIconPath = Path.Combine(AppContext.BaseDirectory, "img", "plus.svg");
-        if (_addIcon == null && File.Exists(addIconPath))
+        TableLayoutPanel panel = new TableLayoutPanel
         {
-            var svgDoc = SvgDocument.Open(addIconPath);
-            var rawBitmap = svgDoc.Draw();
-            _addIcon = ResizeImage(rawBitmap, iconSize, iconSize);
-            rawBitmap.Dispose();
-        }
-
-        Panel mainTop = new Panel
-        {
-            Dock = DockStyle.Top,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Height = 90,
-            Padding = new Padding(20)
-        };
-
-        Label title = new Label
-        {
-            Text = "Ngành",
-            Dock = DockStyle.Left,
+            Dock = DockStyle.Fill,
             AutoSize = true,
-            Height = 50,
-            TextAlign = ContentAlignment.MiddleLeft,
-            Font = new Font("Montserrat", 20, FontStyle.Bold)
+            Padding = new Padding(10),
+            ColumnCount = 2,
+            BackColor = MyColor.GrayBackGround
         };
 
-        Button addButton = new Button
-        {
-            Text = "Thêm",
-            Font = new Font("Montserrat", 10, FontStyle.Bold),
-            FlatAppearance = { BorderSize = 0 },
-            Width = 150,
-            TextAlign = ContentAlignment.MiddleCenter,
-            Dock = DockStyle.Right,
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.White,
-            Image = _addIcon,
-            ImageAlign = ContentAlignment.MiddleLeft,
-            Padding = new Padding(10, 0, 10, 0),
-            TextImageRelation = TextImageRelation.ImageBeforeText
-        };
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-        addButton.MouseEnter += (sender, e) =>
-        {
-            addButton.Cursor = Cursors.Hand;
-            addButton.BackColor = ColorTranslator.FromHtml("#B0BEC5");
-        };
+        panel.Controls.Add(getTitle());
+        _insertButton = new TitleButton("Thêm", "plus.svg");
+        _insertButton.Margin = new Padding(3, 3, 20, 3);
+        _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
+        _insertButton.Anchor = AnchorStyles.Right;
+        panel.Controls.Add(_insertButton);
 
-        addButton.MouseLeave += (sender, e) => { addButton.BackColor = Color.White; };
-
-        addButton.MouseClick += (sender, e) =>
+        _insertButton._mouseDown += () =>
         {
-            using (var dialog = new NganhDialog(NganhDialog.DialogMode.Create, null))
+            using (var dialog = new NganhDialog(DialogType.Them, null, nganhDAO))
             {
-                if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultNganhDto != null)
-                {
-                    try
-                    {
-                        nganhDAO.Insert(dialog.ResultNganhDto);
-                        LoadData();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Lỗi khi thêm ngành: {ex.Message}");
-                    }
-                }
+                dialog.Finish += () => LoadData();
+                dialog.ShowDialog();
             }
         };
 
-        mainTop.Controls.Add(title);
-        mainTop.Controls.Add(addButton);
+        return panel;
+    }
 
-        return mainTop;
+    Label getTitle()
+    {
+        Label titlePnl = new Label
+        {
+            Text = "Ngành",
+            Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
+            AutoSize = true,
+        };
+        return titlePnl;
     }
 
     private Panel Bottom()
@@ -167,34 +138,24 @@ public class NganhPanel : NavBase
 
             _table = new CustomTable(headerList, columnNames, nganhsAsObjectList, true, true, true);
 
-            _table.OnEdit += (index) =>
+            _table.OnEdit += (id) =>
             {
-                if (index >= 0 && index < _currentNganhs.Count)
+                var nganh = _currentNganhs.FirstOrDefault(n => n.MaNganh == id);
+                if (nganh != null)
                 {
-                    var nganh = _currentNganhs[index];
-                    using (var dialog = new NganhDialog(NganhDialog.DialogMode.Edit, nganh))
+                    using (var dialog = new NganhDialog(DialogType.Sua, nganh, nganhDAO))
                     {
-                        if (dialog.ShowDialog() == DialogResult.OK && dialog.ResultNganhDto != null)
-                        {
-                            try
-                            {
-                                nganhDAO.Update(dialog.ResultNganhDto);
-                                LoadData();
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"Lỗi khi cập nhật ngành: {ex.Message}");
-                            }
-                        }
+                        dialog.Finish += () => LoadData();
+                        dialog.ShowDialog();
                     }
                 }
             };
 
-            _table.OnDelete += (index) =>
+            _table.OnDelete += (id) =>
             {
-                if (index >= 0 && index < _currentNganhs.Count)
+                var nganh = _currentNganhs.FirstOrDefault(n => n.MaNganh == id);
+                if (nganh != null)
                 {
-                    var nganh = _currentNganhs[index];
                     var confirm = MessageBox.Show($"Bạn có chắc muốn xóa ngành '{nganh.TenNganh}'?", "Xác nhận xóa",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if (confirm == DialogResult.Yes)
@@ -212,12 +173,12 @@ public class NganhPanel : NavBase
                 }
             };
 
-            _table.OnDetail += (index) =>
+            _table.OnDetail += (id) =>
             {
-                if (index >= 0 && index < _currentNganhs.Count)
+                var nganh = _currentNganhs.FirstOrDefault(n => n.MaNganh == id);
+                if (nganh != null)
                 {
-                    var nganh = _currentNganhs[index];
-                    using (var dialog = new NganhDialog(NganhDialog.DialogMode.View, nganh))
+                    using (var dialog = new NganhDialog(DialogType.ChiTiet, nganh, nganhDAO))
                     {
                         dialog.ShowDialog();
                     }
@@ -233,281 +194,6 @@ public class NganhPanel : NavBase
         }
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            if (_addIcon != null)
-            {
-                _addIcon.Dispose();
-                _addIcon = null;
-            }
-        }
-        base.Dispose(disposing);
-    }
-
-    private class NganhDialog : Form
-    {
-        public enum DialogMode { View, Create, Edit }
-
-        public NganhDto ResultNganhDto { get; private set; }
-
-        private Label _maNganhLabel;
-        private TextBox _maNganhTextBox;
-        private Label _maKhoaLabel;
-        private ComboBox _maKhoaComboBox;
-        private Label _tenNganhLabel;
-        private TextBox _tenNganhTextBox;
-
-        public NganhDialog(DialogMode mode, NganhDto nganhDto)
-        {
-            Text = string.Empty;
-            Size = new Size(420, 350);
-            FormBorderStyle = FormBorderStyle.None;
-            StartPosition = FormStartPosition.CenterParent;
-            ShowInTaskbar = false;
-            BackColor = ColorTranslator.FromHtml("#F3F4F6");
-
-            var headerPanel = new Panel
-            {
-                BackColor = ColorTranslator.FromHtml("#07689F"),
-                Height = 50,
-                Dock = DockStyle.Top,
-                Padding = new Padding(0, 0, 0, 0)
-            };
-            
-            var lblTitle = new Label
-            {
-                Text = mode == DialogMode.Create ? "Thêm ngành" : mode == DialogMode.Edit ? "Cập nhật ngành" : "Chi tiết ngành",
-                ForeColor = Color.White,
-                Font = new Font("Montserrat", 13, FontStyle.Bold),
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Dock = DockStyle.Fill,
-                Padding = new Padding(20, 0, 0, 0)
-            };
-
-            var btnClose = new Button
-            {
-                Text = "✕",
-                Width = 50,
-                Height = 50,
-                Dock = DockStyle.Right,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = ColorTranslator.FromHtml("#07689F"),
-                ForeColor = Color.White,
-                Font = new Font("Arial", 16, FontStyle.Regular),
-                Cursor = Cursors.Hand
-            };
-            btnClose.FlatAppearance.BorderSize = 0;
-            btnClose.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
-            btnClose.MouseEnter += (s, e) => btnClose.BackColor = ColorTranslator.FromHtml("#055a7a");
-            btnClose.MouseLeave += (s, e) => btnClose.BackColor = ColorTranslator.FromHtml("#07689F");
-
-            headerPanel.Controls.Add(lblTitle);
-            headerPanel.Controls.Add(btnClose);
-
-            var cardPanel = new Panel
-            {
-                BackColor = ColorTranslator.FromHtml("#F3F4F6"),
-                Size = new Size(420, 300),
-                Location = new Point(0, 50),
-                Padding = new Padding(30, 50, 30, 50)
-            };
-
-            // Create standard controls
-            _maNganhLabel = new Label
-            {
-                Text = "Mã Ngành:",
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                AutoSize = true,
-                Location = new Point(0, 0)
-            };
-            _maNganhTextBox = new TextBox
-            {
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                Size = new Size(250, 25),
-                Location = new Point(100, 0),
-                ReadOnly = true,
-                BackColor = Color.LightGray
-            };
-
-            _maKhoaLabel = new Label
-            {
-                Text = "Mã Khoa:",
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                AutoSize = true,
-                Location = new Point(0, 30)
-            };
-            _maKhoaComboBox = new ComboBox
-            {
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                Size = new Size(250, 25),
-                Location = new Point(100, 30),
-                DropDownStyle = ComboBoxStyle.DropDownList
-            };
-
-            _tenNganhLabel = new Label
-            {
-                Text = "Tên Ngành:",
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                AutoSize = true,
-                Location = new Point(0, 60)
-            };
-            _tenNganhTextBox = new TextBox
-            {
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                Size = new Size(250, 25),
-                Location = new Point(100, 60)
-            };
-
-            // Set TabIndex for editable fields
-            if (mode != DialogMode.View)
-            {
-                _maKhoaComboBox.TabIndex = 1;
-                _tenNganhTextBox.TabIndex = 2;
-            }
-
-            // Populate ComboBox for MaKhoa
-            var khoaList = new KhoaDao().GetAll();
-            var khoaComboList = khoaList.Select(k => $"{k.MaKhoa} - {k.TenKhoa}").ToList();
-            _maKhoaComboBox.Items.AddRange(khoaComboList.ToArray());
-
-            // Set values if editing/viewing
-            if (nganhDto != null)
-            {
-                _maNganhTextBox.Text = nganhDto.MaNganh.ToString();
-                _tenNganhTextBox.Text = nganhDto.TenNganh;
-
-                // Set MaKhoa selection
-                string targetValue = $"{nganhDto.MaKhoa} - ";
-                foreach (string item in _maKhoaComboBox.Items)
-                {
-                    if (item.StartsWith(targetValue))
-                    {
-                        _maKhoaComboBox.SelectedItem = item;
-                        break;
-                    }
-                }
-            }
-
-            bool isView = mode == DialogMode.View;
-            bool isAdd = mode == DialogMode.Create;
-
-            // Set field visibility and enable state
-            _maNganhLabel.Visible = isView; // Hide in Add/Edit, show in View
-            _maNganhTextBox.Visible = isView;
-            _maNganhTextBox.Enabled = false; // Always disabled
-
-            _maKhoaComboBox.Enabled = !isView;
-            _tenNganhTextBox.Enabled = !isView;
-
-            // Add controls to cardPanel
-            if (isView)
-            {
-                cardPanel.Controls.Add(_maNganhLabel);
-                cardPanel.Controls.Add(_maNganhTextBox);
-            }
-
-            cardPanel.Controls.Add(_maKhoaLabel);
-            cardPanel.Controls.Add(_maKhoaComboBox);
-            cardPanel.Controls.Add(_tenNganhLabel);
-            cardPanel.Controls.Add(_tenNganhTextBox);
-
-            var btnCancel = new Button
-            {
-                Text = isView ? "Đóng" : "Hủy",
-                DialogResult = DialogResult.Cancel,
-                Width = 90,
-                Height = 32,
-                Font = new Font("Montserrat", 10, FontStyle.Regular),
-                BackColor = Color.White,
-                ForeColor = Color.Black,
-                FlatStyle = FlatStyle.Flat,
-                Margin = new Padding(0, 20, 10, 0),
-                Cursor = Cursors.Hand
-            };
-            btnCancel.FlatAppearance.BorderColor = ColorTranslator.FromHtml("#B0BEC5");
-            btnCancel.FlatAppearance.BorderSize = 1;
-
-            var btnOk = new Button
-            {
-                Text = mode == DialogMode.Create ? "Thêm" : "Cập nhật",
-                DialogResult = DialogResult.OK,
-                Width = 100,
-                Height = 32,
-                Font = new Font("Montserrat", 10, FontStyle.Bold),
-                BackColor = ColorTranslator.FromHtml("#07689F"),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Margin = new Padding(10, 20, 0, 0),
-                Cursor = Cursors.Hand,
-                Visible = !isView
-            };
-            btnOk.FlatAppearance.BorderSize = 0;
-
-            btnOk.Click += (s, e) =>
-            {
-                // Validation
-                if (string.IsNullOrWhiteSpace(_tenNganhTextBox.Text))
-                {
-                    MessageBox.Show("Tên Ngành không được để trống.");
-                    DialogResult = DialogResult.None;
-                    return;
-                }
-
-                // Parse MaKhoa from ComboBox selection
-                string selectedKhoa = _maKhoaComboBox.SelectedItem?.ToString();
-                int maKhoa = int.Parse(selectedKhoa.Split('-')[0].Trim());
-
-                if (mode == DialogMode.Create)
-                {
-                    ResultNganhDto = new NganhDto { MaKhoa = maKhoa, TenNganh = _tenNganhTextBox.Text };
-                }
-                else if (mode == DialogMode.Edit && nganhDto != null)
-                {
-                    ResultNganhDto = new NganhDto { MaNganh = nganhDto.MaNganh, MaKhoa = maKhoa, TenNganh = _tenNganhTextBox.Text };
-                }
-            };
-
-            var buttonPanel = new FlowLayoutPanel
-            {
-                FlowDirection = FlowDirection.RightToLeft,
-                Dock = DockStyle.Bottom,
-                Height = 50
-            };
-            buttonPanel.Controls.Add(btnCancel);
-            if (!isView) buttonPanel.Controls.Add(btnOk);
-
-            cardPanel.Controls.Add(buttonPanel);
-            buttonPanel.BringToFront();
-
-            Controls.Add(headerPanel);
-            Controls.Add(cardPanel);
-
-            if (!isView)
-            {
-                AcceptButton = btnOk;
-                CancelButton = btnCancel;
-            }
-            else
-            {
-                CancelButton = btnCancel;
-            }
-        }
-    }
-
-    Bitmap ResizeImage(Bitmap original, int width, int height)
-    {
-        var bmp = new Bitmap(width, height);
-        using (var g = Graphics.FromImage(bmp))
-        {
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.DrawImage(original, 0, 0, width, height);
-        }
-
-        return bmp;
-    }
 
     public override List<string> getComboboxList()
     {

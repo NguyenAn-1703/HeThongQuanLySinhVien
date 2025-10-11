@@ -89,7 +89,7 @@ public class NganhDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
-        return rowAffected > 1;
+        return rowAffected > 0;
     }
 
     // edit khoa -> get id = getById call form controller
