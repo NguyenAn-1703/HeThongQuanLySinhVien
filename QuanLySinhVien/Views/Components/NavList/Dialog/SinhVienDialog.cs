@@ -473,10 +473,12 @@ public class SinhVienDialog : Form
             {
                 cbbNganh.SelectedValue = selectedNganh.MaNganh;
                 
+                // Load khóa học và lớp nếu có thông tin
                 if (sinhVienDto.MaKhoaHoc > 0)
                 {
                     cbbKhoaHoc.SelectedValue = sinhVienDto.MaKhoaHoc;
                     
+                    // Load lớp theo ngành và khóa học
                     if (sinhVienDto.MaLop > 0)
                     {
                         var khoaHoc = khoaHocDao.GetById(sinhVienDto.MaKhoaHoc);
