@@ -103,8 +103,7 @@ Status TINYINT DEFAULT 1
 
 -- 10
 create table ChuKyDaoTao(
-	MaCKDT INT AUTO_INCREMENT PRIMARY KEY,
-    
+    MaCKDT INT AUTO_INCREMENT PRIMARY KEY,
     NamBatDau VARCHAR(255),
     NamKetThuc VARCHAR(255),
 Status TINYINT DEFAULT 1
@@ -122,7 +121,7 @@ Status TINYINT DEFAULT 1
 CREATE TABLE `NhomHocPhan` (
   `MaNHP` INT AUTO_INCREMENT PRIMARY KEY,
   `MaGV` INT,
-  `MaHocPhan` INT,
+  `MaHP` INT,
   `HocKy` INT,
   `Nam` VARCHAR(255),
   `SiSo` INT,
@@ -177,26 +176,23 @@ Status TINYINT DEFAULT 1
 );
 
 -- 17
+-- điểm thi chưa nhập
 CREATE TABLE `KetQua` (
   `MaKQ` INT AUTO_INCREMENT PRIMARY KEY,
-  `MaCTD` INT,
-  `DiemHe4` float,
-  `DiemHe10` float,
-Status TINYINT DEFAULT 1
-);
-
--- 18
-CREATE TABLE `DiemThi` (
-  `MaDT` INT AUTO_INCREMENT PRIMARY KEY,
-  `MaCTD` INT,
-  `DiemSo` float,
+  `MaHP` INT,
+  `MaSV` INT,
+  `MaDQT` INT,
+  `DiemThi` float DEFAULT -1,
+  `DiemHe4` float DEFAULT 0,
+  `DiemHe10` float DEFAULT 0,
+  `HocKy` INT,
+  `Nam` VARCHAR(255),
 Status TINYINT DEFAULT 1
 );
 
 -- 19
 CREATE TABLE `DiemQuaTrinh` (
   `MaDQT` INT AUTO_INCREMENT PRIMARY KEY,
-  `MaCTD` INT,
   `DiemSo` float,
 Status TINYINT DEFAULT 1
 );
@@ -205,7 +201,6 @@ Status TINYINT DEFAULT 1
 CREATE TABLE `CotDiem` (
   `MaCD` INT AUTO_INCREMENT PRIMARY KEY,
   `MaDQT` INT,
-  `MaHP` INT,
   `TenCotDiem` VARCHAR(255),
   `DiemSo` float,
   `HeSo` float,
@@ -241,7 +236,7 @@ Status TINYINT DEFAULT 1
 );
 
 -- 24
-CREATE TABLE ChuongTrinhDaoTao_HocPhan(
+CREATE TABLE chuongtrinhdaotao_hocphan(
 MaCTDT INT,
 MaHP INT,
 PRIMARY KEY (MaCTDT, MaHP),
@@ -249,8 +244,9 @@ Status TINYINT DEFAULT 1
 );
 
 -- 25
-create table ChuongTrinhDaoTao(
+create table chuongtrinhdaotao(
 	MaCTDT INT AUTO_INCREMENT PRIMARY KEY,
+	MaCKDT INT, -- FK
    MaNganh INT, -- FK
     
     TenCTDT VARCHAR(255),
@@ -339,6 +335,7 @@ INSERT INTO GiangVien (MaTK, MaKhoa, TenGV, SoDienThoai, Email) VALUES
 (1, 1, 'Lê Quang Huy', '0934567890', 'huy.le@univ.edu.vn'),
 (1, 1, 'Phạm Minh Châu', '0945678901', 'chau.pham@univ.edu.vn'),
 (1, 1, 'Đỗ Thị Thu Hà', '0956789012', 'ha.do@univ.edu.vn'),
+
 (1, 2, 'Ngô Văn Dũng', '0967890123', 'dung.ngo@univ.edu.vn'),
 (1, 2, 'Vũ Thị Mai', '0978901234', 'mai.vu@univ.edu.vn'),
 (1, 2, 'Bùi Anh Tuấn', '0989012345', 'tuan.bui@univ.edu.vn'),
@@ -459,7 +456,7 @@ INSERT INTO DangKy (MaNHP, MaSV) VALUES
 
 
 -- 12
-INSERT INTO NhomHocPhan (MaGV, MaHocPhan, HocKy, Nam, SiSo) VALUES
+INSERT INTO NhomHocPhan (MaGV, MaHP, HocKy, Nam, SiSo) VALUES
 (1, 1, 1, 2025, 50),
 (1, 2, 1, 2025, 45),
 (2, 3, 2, 2025, 55),
@@ -470,12 +467,12 @@ INSERT INTO NhomHocPhan (MaGV, MaHocPhan, HocKy, Nam, SiSo) VALUES
 (4, 8, 2, 2025, 52),
 (5, 9, 1, 2025, 47),
 (5, 10, 2, 2025, 53),
-(6, 11, 1, 2025, 60),
-(6, 12, 2, 2025, 58),
-(7, 13, 1, 2025, 42),
-(7, 14, 2, 2025, 50),
-(8, 15, 1, 2025, 45),
-(8, 16, 2, 2025, 45);
+(6, 1, 1, 2025, 60),
+(6, 2, 2, 2025, 58),
+(7, 3, 1, 2025, 42),
+(7, 4, 2, 2025, 50),
+(8, 5, 1, 2025, 45),
+(8, 6, 2, 2025, 45);
 
 
 -- 13
@@ -551,45 +548,50 @@ INSERT INTO ChiTietDiem (MaSV, MaHP, HocKy, Nam) VALUES
 
 
 -- 17
-INSERT INTO KetQua (MaCTD, DiemHe4, DiemHe10) VALUES
-(1, 3.0, 7.5),
-(2, 3.2, 8.0),
-(3, 2.7, 6.8),
-(4, 3.6, 9.0),
-(5, 2.9, 7.2),
-(6, 3.4, 8.5),
-(7, 2.4, 6.0),
-(8, 3.1, 7.8),
-(9, 3.3, 8.2),
-(10, 3.7, 9.1);
+INSERT INTO `KetQua` (`MaHP`, `MaSV`, `MaDQT`, `DiemThi`, `DiemHe4`, `DiemHe10`, `HocKy`, `Nam`)
+VALUES
+(1, 1, 1, 7.5, 3.0, 7.5, 1, '2025'),
+(2, 2, 2, 8.0, 3.5, 8.0, 1, '2025'),
+(3, 3, 3, 6.0, 2.0, 6.0, 2, '2025'),
+(4, 4, 4, 9.0, 4.0, 9.0, 2, '2025'),
+(5, 5, 5, 5.5, 1.5, 5.5, 1, '2025'),
+(6, 6, 6, 7.0, 2.8, 7.0, 2, '2025'),
+(7, 7, 7, 8.5, 3.6, 8.5, 1, '2025'),
+(8, 8, 8, 4.0, 1.0, 4.0, 2, '2025'),
+(9, 9, 9, 6.5, 2.5, 6.5, 1, '2025'),
+(10, 10, 10, 9.5, 4.0, 9.5, 2, '2025');
 
--- 18
-INSERT INTO DiemThi (MaCTD, DiemSo) VALUES
-(1, 7.5), (2, 8.0), (3, 6.8),
-(4, 9.0), (5, 7.2), (6, 8.5),
-(7, 6.0), (8, 7.8), (9, 8.2),
-(10, 9.1);
 
 
 -- 19
-INSERT INTO DiemQuaTrinh (MaCTD, DiemSo) VALUES
-(1, 6.8), (2, 7.5), (3, 6.0),
-(4, 8.2), (5, 6.7), (6, 7.8),
-(7, 5.9), (8, 7.0), (9, 7.3),
-(10, 8.5);
+INSERT INTO DiemQuaTrinh (DiemSo)
+VALUES
+(8.5),
+(7.2),
+(9.0),
+(6.8),
+(5.5),
+(4.2),
+(9.3),
+(7.9),
+(6.0),
+(8.8);
+
 
 -- 20
-INSERT INTO CotDiem (MaDQT, MaHP, TenCotDiem, DiemSo, HeSo) VALUES
-(1, 1, 'Kiểm tra', 7.2, 1),
-(2, 2, 'Kiểm tra', 6.5, 1),
-(3, 3, 'Kiểm tra', 8.0, 1),
-(4, 4, 'Kiểm tra', 7.8, 1),
-(5, 5, 'Kiểm tra', 6.9, 1),
-(6, 6, 'Kiểm tra', 7.4, 1),
-(7, 7, 'Kiểm tra', 8.1, 1),
-(8, 8, 'Kiểm tra', 7.0, 1),
-(9, 9, 'Kiểm tra', 6.7, 1),
-(10, 10, 'Kiểm tra', 8.3, 1);
+INSERT INTO CotDiem (MaDQT, TenCotDiem, DiemSo, HeSo)
+VALUES
+(1, 'Cột điểm 1', 8.5, 0.5),
+(2, 'Cột điểm 2', 7.0, 0.5),
+(3, 'Cột điểm 1', 9.0, 0.5),
+(4, 'Cột điểm 2', 6.8, 0.5),
+(5, 'Cột điểm 1', 5.5, 0.5),
+(6, 'Cột điểm 2', 4.2, 0.5),
+(7, 'Cột điểm 1', 9.3, 0.5),
+(8, 'Cột điểm 2', 7.9, 0.5),
+(9, 'Cột điểm 1', 6.0, 0.5),
+(10, 'Cột điểm 2', 8.8, 0.5);
+
 
 
 -- 21
@@ -665,49 +667,61 @@ INSERT INTO ChuongTrinhDaoTao_HocPhan (MaCTDT, MaHP) VALUES
 (2, 15);
 
 -- 25
-INSERT INTO ChuongTrinhDaoTao (MaNganh, TenCTDT, LoaiHinhDT, TrinhDo) VALUES
-(1, 'Công nghệ thông tin - Kỹ sư', 'Chính quy', 'Kỹ sư'),
-(2, 'Kinh tế - Cử nhân', 'Chính quy', 'Cử nhân');
+INSERT INTO ChuongTrinhDaoTao (MaCKDT, MaNganh, LoaiHinhDT, TrinhDo) VALUES
+(1, 1, 'Chính quy', 'Cử nhân'),
+(1, 2, 'Chính quy', 'Cử nhân'),
+(2, 1, 'Chính quy', 'Cử nhân'),
+(2, 2, 'Chính quy', 'Cử nhân');
 
 
 -- 26
-INSERT INTO TaiKhoan (MaTK, MaNQ, TenDangNhap, MatKhau) VALUES
-(1, 1, 'admin', '123456');
+INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau) VALUES
+(1, 'admin', '123456'),
+(2, 'an', '123456');
 
 
 -- 27
 INSERT INTO NhomQuyen (TenNhomQuyen) VALUES
-('Admin');
+('Admin'),
+('AnQuyen');
 
 -- 28
 INSERT INTO ChiTietQuyen (MaCN, MaNQ, HanhDong) VALUES
-(1, 1, 'view'), (1, 1, 'insert'), (1, 1, 'update'), (1, 1, 'delete'),
-(2, 1, 'view'), (2, 1, 'insert'), (2, 1, 'update'), (2, 1, 'delete'),
-(3, 1, 'view'), (3, 1, 'insert'), (3, 1, 'update'), (3, 1, 'delete'),
-(4, 1, 'view'), (4, 1, 'insert'), (4, 1, 'update'), (4, 1, 'delete'),
-(5, 1, 'view'), (5, 1, 'insert'), (5, 1, 'update'), (5, 1, 'delete'),
-(6, 1, 'view'), (6, 1, 'insert'), (6, 1, 'update'), (6, 1, 'delete'),
-(7, 1, 'view'), (7, 1, 'insert'), (7, 1, 'update'), (7, 1, 'delete'),
-(8, 1, 'view'), (8, 1, 'insert'), (8, 1, 'update'), (8, 1, 'delete'),
-(9, 1, 'view'), (9, 1, 'insert'), (9, 1, 'update'), (9, 1, 'delete'),
-(10, 1, 'view'), (10, 1, 'insert'), (10, 1, 'update'), (10, 1, 'delete'),
-(11, 1, 'view'), (11, 1, 'insert'), (11, 1, 'update'), (11, 1, 'delete');
+(1, 1, 'Xem'), (1, 1, 'Them'), (1, 1, 'Sua'), (1, 1, 'Xoa'),
+(2, 1, 'Xem'), (2, 1, 'Them'), (2, 1, 'Sua'), (2, 1, 'Xoa'),
+(3, 1, 'Xem'), (3, 1, 'Them'), (3, 1, 'Sua'), (3, 1, 'Xoa'),
+(4, 1, 'Xem'), (4, 1, 'Them'), (4, 1, 'Sua'), (4, 1, 'Xoa'),
+(5, 1, 'Xem'), (5, 1, 'Them'), (5, 1, 'Sua'), (5, 1, 'Xoa'),
+(6, 1, 'Xem'), (6, 1, 'Them'), (6, 1, 'Sua'), (6, 1, 'Xoa'),
+(7, 1, 'Xem'), (7, 1, 'Them'), (7, 1, 'Sua'), (7, 1, 'Xoa'),
+(8, 1, 'Xem'), (8, 1, 'Them'),
+(9, 1, 'Xem'), (9, 1, 'Them'),
+(10, 1, 'Xem'), (10, 1, 'Them'),
+(11, 1, 'Xem'), (11, 1, 'Them'), (11, 1, 'Sua'), (11, 1, 'Xoa'),
+(12, 1, 'Xem'), (12, 1, 'Them'), (12, 1, 'Sua'), (12, 1, 'Xoa'),
+(13, 1, 'Xem'), (13, 1, 'Them'), (13, 1, 'Sua'), (13, 1, 'Xoa'),
+(14, 1, 'Xem'),
+
+
+(1, 2, 'Xem'), (1, 2, 'Them'), (1, 2, 'Sua'), (1, 2, 'Xoa'),
+(2, 2, 'Xem'), (2, 2, 'Them'), (2, 2, 'Sua'), (2, 2, 'Xoa');
 
 -- 29
 INSERT INTO ChucNang (TenChucNang) VALUES
-('trangchu'),
-('sinhvien'),
-('giangvien'),
-('khoa'),
-('nganh'),
-('chuongtrinhdaotao'),
-('hocphan'),
-('phonghoc'),
-('tochucthi'),
-('nhapdiem'),
-('sinhvien'),
-('phanquyen'),
-('thongke');
+('SINHVIEN'),
+('GIANGVIEN'),
+('KHOA'),
+('NGANH'),
+('CHUONGTRINHDAOTAO'),
+('HOCPHAN'),
+('PHONGHOC'),
+('TOCHUCTHI'),
+('NHAPDIEM'),
+('HOCPHI'),
+('MODANGKYHOCPHAN'),
+('TAIKHOAN'),
+('PHANQUYEN'),
+('THONGKE');
 
 -- ---------------------Khóa Ngoại ---------------------------
 
@@ -745,11 +759,14 @@ ALTER TABLE `DangKy`
 ADD CONSTRAINT `DangKy_SinhVien` FOREIGN KEY (MaSV) REFERENCES `SinhVien`(MaSV),
 ADD CONSTRAINT `DangKy_NhomHocPhan` FOREIGN KEY (MaNHP) REFERENCES `NhomHocPhan`(MaNHP);
 
-ALTER TABLE `LichHoc`
-ADD CONSTRAINT `LichHoc_PhongHoc` FOREIGN KEY (MaPH) REFERENCES `PhongHoc`(MaPH);
 
 ALTER TABLE `LichHoc`
-ADD CONSTRAINT `LichHoc_NhomHocPhan` FOREIGN KEY (MaNHP) REFERENCES `NhomHocPhan`(MaNHP);
+ADD CONSTRAINT `LichHoc_NhomHocPhan` FOREIGN KEY (MaNHP) REFERENCES `NhomHocPhan`(MaNHP),
+ADD CONSTRAINT `LichHoc_PhongHoc` FOREIGN KEY (MaPH) REFERENCES `PhongHoc`(MaPH);
+
+
+ALTER TABLE `NhomHocPhan`
+ADD CONSTRAINT `NhomHocPhan_HocPhan` FOREIGN KEY (MaHP) REFERENCES `HocPhan`(MaHP);
 
 ALTER TABLE `CaThi`
 ADD CONSTRAINT `CaThi_PhongHoc` FOREIGN KEY (MaPH) REFERENCES `PhongHoc`(MaPH),
@@ -759,25 +776,29 @@ ALTER TABLE `CaThi_SinhVien`
 ADD CONSTRAINT `CaThi_SinhVien_CaThi` FOREIGN KEY (MaCT) REFERENCES `CaThi`(MaCT),
 ADD CONSTRAINT `CaThi_SinhVien_SinhVien` FOREIGN KEY (MaSV) REFERENCES `SinhVien`(MaSV);
 
+
+
+
 ALTER TABLE `HocPhiHocPhan`
 ADD CONSTRAINT `HocPhiHocPhan_HocPhan` FOREIGN KEY (MaHP) REFERENCES `HocPhan`(MaHP),
 ADD CONSTRAINT `HocPhiHocPhan_SinhVien` FOREIGN KEY (MaSV) REFERENCES `SinhVien`(MaSV);
 
-ALTER TABLE `ChiTietDiem`
-ADD CONSTRAINT `ChiTietDiem_HocPhan` FOREIGN KEY (MaHP) REFERENCES `HocPhan`(MaHP),
-ADD CONSTRAINT `ChiTietDiem_SinhVien` FOREIGN KEY (MaSV) REFERENCES `SinhVien`(MaSV);
 
-ALTER TABLE `DiemThi`
-ADD CONSTRAINT `DiemThi_ChiTietDiem` FOREIGN KEY (MaCTD) REFERENCES `ChiTietDiem`(MaCTD);
+
 
 ALTER TABLE `KetQua`
-ADD CONSTRAINT `KetQua_ChiTietDiem` FOREIGN KEY (MaCTD) REFERENCES `ChiTietDiem`(MaCTD);
+ADD CONSTRAINT `KetQua_DiemQuaTrinh` FOREIGN KEY (MaDQT) REFERENCES `DiemQuaTrinh`(MaDQT);
 
-ALTER TABLE `DiemQuaTrinh`
-ADD CONSTRAINT `DiemQuaTrinh_ChiTietDiem` FOREIGN KEY (MaCTD) REFERENCES `ChiTietDiem`(MaCTD);
+ALTER TABLE `KetQua`
+ADD CONSTRAINT `KetQua_HocPhan` FOREIGN KEY (MaHP) REFERENCES `HocPhan`(MaHP);
+
+ALTER TABLE `KetQua`
+ADD CONSTRAINT `KetQua_SinhVien` FOREIGN KEY (MaSV) REFERENCES `SinhVien`(MaSV);
 
 ALTER TABLE `CotDiem`
 ADD CONSTRAINT `CotDiem_DiemQuaTrinh` FOREIGN KEY (MaDQT) REFERENCES `DiemQuaTrinh`(MaDQT);
+
+
 
 ALTER TABLE `SinhVien`
 ADD CONSTRAINT `SinhVien_TaiKhoan` FOREIGN KEY (MaTK) REFERENCES `TaiKhoan`(MaTK);
@@ -794,4 +815,39 @@ ADD CONSTRAINT `ChiTietQuyen_ChucNang` FOREIGN KEY (MaCN) REFERENCES `ChucNang`(
 
 ALTER TABLE `NhomHocPhan`
 ADD CONSTRAINT `NhomHocPhan_GiangVien` FOREIGN KEY (MaGV) REFERENCES `GiangVien`(MaGV);
+
+ALTER TABLE `ChuongTrinhDaoTao_HocPhan`
+ADD CONSTRAINT `ChuongTrinhDaoTao_HocPhan_HocPhan` FOREIGN KEY (MaHP) REFERENCES `HocPhan`(MaHP),
+ADD CONSTRAINT `ChuongTrinhDaoTao_HocPhan_ChuongTrinhDaoTao` FOREIGN KEY (MaCTDT) REFERENCES `ChuongTrinhDaoTao`(MaCTDT);
+
+ALTER TABLE `ChuongTrinhDaoTao`
+ADD CONSTRAINT `ChuongTrinhDaoTao_ChuKyDaoTao` FOREIGN KEY (MaCKDT) REFERENCES `ChuKyDaoTao`(MaCKDT),
+ADD CONSTRAINT `ChuongTrinhDaoTao_Nganh` FOREIGN KEY (MaNganh) REFERENCES `Nganh`(MaNganh);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
