@@ -53,9 +53,10 @@ public class FormAddGV : Form
         
         
         // MiddleDialog
-        List<string> list = new List<string>{"Mã giảng viên: " ,"Tên giảng viên: " , "Ngày sinh: " , "Khoa: " , "Giới tính: "};
+        List<string> list = new List<string>{"Mã giảng viên: " ,"Tên giảng viên: " , "Ngày sinh: " , "Khoa: " , "Giới tính: ", "Số điện thoại", "Email", "Trạng thái"};
         float tile = 60f / list.Count;
-        string[] cbb = new []{ "Cộng nghệ thông tin" };
+        string[] cbb = new []{"Công nghệ thông tin" };
+        string[] cbbStatus = new[] {"Đang dạy", "Đang nghỉ phép"};
         List<Control> rightComponents = new List<Control>();
         var radioNam = new RadioButton
         {
@@ -124,19 +125,44 @@ public class FormAddGV : Form
         });
         rightComponents.Add(combo);
         rightComponents.Add(panelRadioButton);
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = Components.GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
+        var comboStatus = new ComboBox()
+        {
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Width = 300,
+            Font = Components.GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        };
+        comboStatus.Items.AddRange(cbbStatus);
+        rightComponents.Add(comboStatus);
+        rightComponents.Add(new TextBox()
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            Width = 300,
+            Height = 100,
+            Font = Components.GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+        });
 
         
         var borderMiddleLeft = new TableLayoutPanel()
         {
             ColumnCount = 1,
-            RowCount = 5,
+            RowCount = list.Count,
             Dock = DockStyle.Fill,
         };
 
         var borderMiddleRight = new TableLayoutPanel()
         {
             ColumnCount = 1,
-            RowCount = 5,
+            RowCount = list.Count,
             Dock = DockStyle.Fill,
         };
         
@@ -221,7 +247,7 @@ public class FormAddGV : Form
         };
         cancelButton.Click += (s, e) =>
         {
-            myForm.Dispose();
+            myForm.Close();
         };
         var addButton = new Button
         {

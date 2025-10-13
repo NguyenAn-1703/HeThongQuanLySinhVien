@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace QuanLySinhVien.Models;
 
@@ -8,6 +9,8 @@ public class GiangVien
     public int MaTK { get; set; }
     public int MaKhoa { get; set; }
     public string TenGV { get; set; }
+    public DateOnly NgaySinhGV { get; set; }
+    public string GioiTinhGV { get; set; }
     public string SoDienThoai { get; set; }
     public string Email { get; set; }
     public string Status { get; set; }
@@ -18,6 +21,6 @@ public class GiangVien
     //
     public object[] ToDataRow()
     {
-        return new object[] {MaGV, TenGV, TenKhoa, SoDienThoai, Email, Status};
+        return new object[] {MaGV, TenGV, TenKhoa, NgaySinhGV, GioiTinhGV, SoDienThoai, Email, Status};
     }
 }

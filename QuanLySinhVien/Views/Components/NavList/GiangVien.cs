@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.InteropServices.JavaScript;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
@@ -48,6 +49,8 @@ public class GiangVien : NavBase
                 new DataColumn("Mã giảng viên", typeof(int)),
                 new DataColumn("Họ tên",  typeof(string)),
                 new DataColumn("Khoa", typeof(string)),
+                new DataColumn("Ngày sinh", typeof(DateOnly)),
+                new DataColumn("Giới tính", typeof(string)),
                 new DataColumn("Số điện thoại", typeof(string)),
                 new DataColumn("Email", typeof(string)),
                 new DataColumn("Trạng thái", typeof(string)),
@@ -140,7 +143,7 @@ public class GiangVien : NavBase
             {
                 BackColor = ColorTranslator.FromHtml("#07689F"),
                 ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
-                Font = GetFont.GetFont.GetMainFont(11, FontType.Bold),
+                Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
                 Alignment = DataGridViewContentAlignment.MiddleCenter,
             },
             AllowUserToAddRows = false,

@@ -15,7 +15,7 @@ public class GiangVienModel
         try
         {
             using var con = MyConnection.GetConnection();
-            string sql = "select gv.MaGV, gv.MaTK, gv.MaKhoa, gv.TenGV, gv.SoDienThoai, gv.Email, gv.Status, k.TenKHoa\nfrom GiangVien gv\njoin Khoa k on gv.MaKhoa = k.MaKhoa";
+            string sql = "select gv.MaGV, gv.MaTK, gv.MaKhoa, gv.TenGV, gv.NgaySinhGV, gv.GioiTinhGV, gv.SoDienThoai, gv.Email, gv.Status, k.TenKHoa\nfrom GiangVien gv\njoin Khoa k on gv.MaKhoa = k.MaKhoa";
             MySqlCommand cmd = new MySqlCommand(sql, con);
             MySqlDataReader rd = cmd.ExecuteReader();
             while (rd.Read())
@@ -26,10 +26,12 @@ public class GiangVienModel
                     MaTK = rd.GetInt32("MaTK"),
                     MaKhoa = rd.GetInt32("MaKhoa"),
                     TenGV = rd.GetString("TenGV"),
-                    SoDienThoai = rd.GetInt32("SoDienThoai") + "",
+                    NgaySinhGV = rd.GetDateOnly("NgaySinhGV"),
+                    GioiTinhGV = rd.GetString("GioiTinhGV"),
+                    SoDienThoai = rd.GetString("SoDienThoai") + "",
                     Email = rd.GetString("Email"),
                     TenKhoa = rd.GetString("TenKhoa"),
-                    Status = rd.GetInt32("Status") + "",
+                    Status = rd.GetString("Status"),
                 });
             }
             con.Close();

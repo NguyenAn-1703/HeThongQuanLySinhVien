@@ -9,5 +9,4 @@ public class GiangVienController
     {
         return GiangVienModel.GetAll();
     }
-
 }
