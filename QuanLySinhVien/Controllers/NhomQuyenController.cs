@@ -81,6 +81,7 @@ public class NhomQuyenController
     public List<QuyenChucNangJS> GetListAllChucNang_HanhDong()
     {
         string json = File.ReadAllText("config/Permission.json");
+        
         ListQuyenChucNangJS list = JsonConvert.DeserializeObject<ListQuyenChucNangJS>(json);
 
         return list.Modules;

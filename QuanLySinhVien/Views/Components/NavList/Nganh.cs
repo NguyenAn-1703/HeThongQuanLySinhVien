@@ -26,7 +26,7 @@ public class NganhPanel : NavBase
     
     private NganhSearch _nganhSearch;
 
-    private NganhDao nganhDAO = new NganhDao();
+    private NganhDao nganhDAO = NganhDao.GetInstance();
 
     private TitleButton _insertButton;
 
