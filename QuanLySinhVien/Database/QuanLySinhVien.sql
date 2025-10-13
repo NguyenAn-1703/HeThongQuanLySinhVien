@@ -40,8 +40,9 @@ CREATE TABLE GiangVien   (
     GioiTinhGV VARCHAR(255),
     SoDienThoai VARCHAR(255),
     Email  VARCHAR(255),
-    Status VARCHAR(255),
-    AnhDaiDienGV VARCHAR(255)
+    TrangThai VARCHAR(255),
+    AnhDaiDienGV VARCHAR(255),
+    Status TINYINT DEFAULT 1
 );
 
 -- 4
@@ -337,7 +338,7 @@ INSERT INTO Lop (MaGV, MaNganh, TenLop, SoLuongSV) VALUES
 
 -- 3
 INSERT INTO GiangVien
-(MaTK, MaKhoa, TenGV, NgaySinhGV, GioiTinhGV, SoDienThoai, Email, Status, AnhDaiDienGV) VALUES
+(MaTK, MaKhoa, TenGV, NgaySinhGV, GioiTinhGV, SoDienThoai, Email, TrangThai, AnhDaiDienGV) VALUES
 (1, 1, 'Nguyễn Văn An', '1980-03-15', 'Nam', '0912345678', 'an.nguyen@univ.edu.vn', 'Đang công tác', 'an.jpg'),
 (1, 1, 'Trần Thị Bình', '1982-07-22', 'Nữ', '0923456789', 'binh.tran@univ.edu.vn', 'Đang công tác', 'binh.jpg'),
 (1, 1, 'Lê Quang Huy', '1985-05-10', 'Nam', '0934567890', 'huy.le@univ.edu.vn', 'Đang công tác', 'huy.jpg'),

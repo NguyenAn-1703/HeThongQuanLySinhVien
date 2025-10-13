@@ -28,12 +28,19 @@ public class GiangVien : NavBase
     // Co so du lieu ---------------------------------------------------------------------
     private void LoadDatabase()
     {
-        dt.Rows.Clear();
-        foreach (var gv in GiangVienController.GetAll())
+        try
         {
-            dt.Rows.Add(gv.ToDataRow());
+            dt.Rows.Clear();
+            foreach (var gv in GiangVienController.GetAll()) if(gv.Status > 0)
+            {
+                dt.Rows.Add(gv.ToDataRow());
+            }
+            GridGV().DataSource = dt;
         }
-        GridGV().DataSource = dt;
+        catch (Exception e)
+        {
+            MessageBox.Show(e.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 
 
@@ -200,7 +207,30 @@ public class GiangVien : NavBase
                 {
                     Console.WriteLine("Sửa");
                 }
-                else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index) { Console.WriteLine("xoa"); }
+                else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index)
+                {
+                    var ResBox = MessageBox.Show("Bạn có chắc chắn muốn xóa?", "Xác nhận", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                    
+                    if (ResBox == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            var row = dtgv.Rows[e.RowIndex];
+                            var gv = new GiangVienDTO
+                            {
+                                MaGV = Convert.ToInt32(row.Cells["Mã giảng viên"].Value),
+                            };
+                            GiangVienController.SoftDeleteById(gv.MaGV);
+                            MessageBox.Show("Xóa giảng viên thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadDatabase();
+                            
+                        }
+                        catch (Exception exception)
+                        {
+                            MessageBox.Show(exception.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
             };
             
         };
