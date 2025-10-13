@@ -73,8 +73,8 @@ public class NhapDiem : NavBase
             panel.Controls.Add(lbl);
             return panel;
         }
-        filters.Controls.Add(MakeLabeledInput("Học phần", 90, 220));
-        filters.Controls.Add(MakeLabeledInput("Lớp", 60, 200));
+        filters.Controls.Add(MakeLabeledInput("Học phần:", 90, 220));
+        filters.Controls.Add(MakeLabeledInput("Lớp:", 60, 200));
 
         // Action button
         var btnAction = new Button
