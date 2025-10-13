@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/5e7e1fd2-cbe7-4d73-beb2-687a06a1d878/console_1.sql" value="5e7e1fd2-cbe7-4d73-beb2-687a06a1d878" />
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/5e7e1fd2-cbe7-4d73-beb2-687a06a1d878/console_2.sql" value="5e7e1fd2-cbe7-4d73-beb2-687a06a1d878" />
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/5e7e1fd2-cbe7-4d73-beb2-687a06a1d878/console_4.sql" value="5e7e1fd2-cbe7-4d73-beb2-687a06a1d878" />
     <file url="file://$PROJECT_DIR$/QuanLySinhVien/Database/QuanLySinhVien.sql" value="5e7e1fd2-cbe7-4d73-beb2-687a06a1d878" />
   </component>
 </project>
