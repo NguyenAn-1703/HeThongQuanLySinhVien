@@ -36,6 +36,11 @@
       "Actions": ["Xem", "Them", "Sua", "Xoa"]
     },
     {
+      "Name": "Chu kỳ đào tạo",
+      "ID": "CHUKYDAOTAO",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
       "Name": "Tổ chức thi",
       "ID": "TOCHUCTHI",
       "Actions": ["Xem", "Them"]

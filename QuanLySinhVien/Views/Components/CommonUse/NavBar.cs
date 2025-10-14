@@ -20,12 +20,12 @@ public class NavBar : Panel
     {
         _labels = new[]
         {
-            "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học",
+            "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học", "Chu kỳ đào tạo",
             "Tổ chức thi", "Nhập điểm", "Học phí", "Mở đăng ký học phần", "Quản lí tài khoản", "Phân quyền", "Thống kê"
         };
         _imgText = new[]
         {
-            "trangchu", "sinhvien", "giangvien", "khoa", "nganh", "chuongtrinhdaotao", "hocphan", "phonghoc",
+            "trangchu", "sinhvien", "giangvien", "khoa", "nganh", "chuongtrinhdaotao", "hocphan", "phonghoc","chukydaotao",
             "tochucthi", "nhapdiem", "hocphi", "modangkyhocphan", "sinhvien", "phanquyen", "thongke"
         };
         ButtonArray = new List<NavItem>();
@@ -83,12 +83,6 @@ public class NavBar : Panel
     public void UpdateSize()
     {
         int w = _mainLayout.Width + 6;
-        Console.WriteLine(w);
-        foreach (Control navItem in _mainLayout.Controls)
-        {
-            Console.WriteLine(navItem.Width);
-        }
-        Console.WriteLine(_mainLayout.Width);
         this.Width = w;
     }
 }
