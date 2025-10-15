@@ -13,7 +13,12 @@ using QuanLySinhVien.Views.Structs;
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class ThongKeTongQuan : TableLayoutPanel
+
 {
+    SinhVienDAO sinhVienDao = new SinhVienDAO();
+    GiangVienDao giangVienDao = new GiangVienDao();
+    NganhDao nganhDao = NganhDao.GetInstance();
+
     public ThongKeTongQuan()
     {
         Init();
@@ -21,10 +26,6 @@ public class ThongKeTongQuan : TableLayoutPanel
 
     void Init()
     {
-        SinhVienDAO sinhVienDao = new SinhVienDAO();
-        GiangVienDao giangVienDao = new GiangVienDao();
-        NganhDao nganhDao = NganhDao.GetInstance();
-
         this.Dock = DockStyle.Fill;
         this.Margin = new Padding(0);
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -108,9 +109,14 @@ public class ThongKeTongQuan : TableLayoutPanel
 
     CustomPieChart GetPieChart()
     {
-        string[] dsKhoaHoc = new[] { "Khóa 22", "Khóa 23", "Khóa 24", "Khóa 25" };
-        float[] percent = new[] { 20f, 20f, 25f, 25f, 10f };
+        Dictionary<string, int> data = sinhVienDao.GetSinhVienCountByKhoaHoc();
 
+        string[] dsKhoaHoc = data.Keys.ToArray();
+        int total = data.Values.Sum();
+        float[] percent = data.Values
+            .Select(count => (float)Math.Round((float)count / total * 100, 2))
+            .ToArray();
+        
         CustomPieChart chart = new CustomPieChart(dsKhoaHoc, percent);
         return chart;
     }
