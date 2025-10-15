@@ -3,9 +3,9 @@ using System.Runtime.InteropServices.JavaScript;
 
 namespace QuanLySinhVien.Models;
 
-public class GiangVienDTO
+public class GiangVienDto
 {   
-    public GiangVienDTO(){}
+    public GiangVienDto(){}
     public int MaGV { get; set; }
     public int MaTK { get; set; }
     public int MaKhoa { get; set; }
@@ -16,6 +16,8 @@ public class GiangVienDTO
     public string Email { get; set; }
     public string TrangThai { get; set; }
     public int Status { get; set; }
+    
+    public string AnhDaiDien { get; set; }
     
     // 
     public string TenKhoa { get; set; }

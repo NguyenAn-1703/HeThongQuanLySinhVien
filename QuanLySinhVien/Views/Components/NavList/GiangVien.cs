@@ -17,16 +17,18 @@ public class GiangVien : NavBase
     private CUse _cUse;
     private Form formAddPopUp;
     private DataTable dt;
+    protected GiangVien ThisForm;
 
     public GiangVien()
     {
+        ThisForm = this;
         _cUse = new CUse();
         Init();
         LoadDatabase();
     }
     
     // Co so du lieu ---------------------------------------------------------------------
-    private void LoadDatabase()
+    public void LoadDatabase()
     {
         try
         {
@@ -110,7 +112,7 @@ public class GiangVien : NavBase
 
         btn.Click += (s, e) =>
         {
-            formAddPopUp = new FormAddGV();
+            formAddPopUp = new FormAddGV(ThisForm);
             Console.WriteLine("fewfewewfewfwe");
             formAddPopUp.ShowDialog();
         };
@@ -205,22 +207,29 @@ public class GiangVien : NavBase
                 if (e.RowIndex < 0) return;
                 if (e.ColumnIndex == dtgv.Columns["Sửa"]?.Index)
                 {
-                    Console.WriteLine("Sửa");
+                    try
+                    {
+                        var row = dtgv.Rows[e.RowIndex];
+                        int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
+                        GiangVienDto gv = GiangVienController.GetGVById(id);
+                        FormUpdateGV form = new FormUpdateGV(gv, ThisForm);
+                        form.ShowDialog();
+                    }
+                    catch (Exception exception)
+                    {
+                        MessageBox.Show(exception.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index)
                 {
                     var ResBox = MessageBox.Show("Bạn có chắc chắn muốn xóa?", "Xác nhận", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                    
                     if (ResBox == DialogResult.Yes)
                     {
                         try
                         {
                             var row = dtgv.Rows[e.RowIndex];
-                            var gv = new GiangVienDTO
-                            {
-                                MaGV = Convert.ToInt32(row.Cells["Mã giảng viên"].Value),
-                            };
-                            GiangVienController.SoftDeleteById(gv.MaGV);
+                            int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
+                            GiangVienController.SoftDeleteById(id);
                             MessageBox.Show("Xóa giảng viên thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             LoadDatabase();
                             
