@@ -264,7 +264,5 @@ public class QuanLiTaiKhoan : NavBase
     public override void onSearch(string txtSearch, string filter)
     {
         this._taiKhoanSearch.Search(txtSearch, filter);
-
-        // this._table.Search(txtSearch, filter);
     }
 }

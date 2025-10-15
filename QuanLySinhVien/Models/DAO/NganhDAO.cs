@@ -1,49 +1,3 @@
-// using QuanLySinhVien.DB;
-//
-// namespace QuanLySinhVien.DAO;
-//
-// public class NganhDAO
-// {
-//     private AppDbContext db = new AppDbContext();
-//
-//     public List<Models.Nganh> getAllNganh()
-//     {
-//         return db.nganh.ToList();
-//     }
-//
-//     public void addNganh(Models.Nganh nganh)
-//     {
-//         db.nganh.Add(nganh);
-//         db.SaveChanges();
-//     }
-//
-//     public void deleteNganh(int maNganh)
-//     {
-//         var nganh = db.nganh.Find(maNganh);
-//         if (nganh != null)
-//         {
-//             db.nganh.Remove(nganh);
-//             db.SaveChanges();
-//         }
-//     }
-//
-//     public void updateNganh(Models.Nganh nganh)
-//     {
-//         Console.WriteLine(nganh.MaNganh);
-//         var existingNganh = db.nganh.Find(nganh.MaNganh);
-//         if (existingNganh != null)
-//         {
-//             existingNganh.TenNganh = nganh.TenNganh;
-//             existingNganh.MaKhoa = nganh.MaKhoa;
-//             db.SaveChanges();
-//         }
-//         else
-//         {
-//             Console.Write("Nganh not found");
-//         }
-//     }
-// }
-
 using MySqlConnector;
 using QuanLySinhVien.Database;
 
@@ -54,6 +8,21 @@ public class NganhDao
     // thông tin database local
 
     // lấy danh sách khoa ( hàm dùng mỗi ln loadData )
+
+    private static NganhDao _instance;
+    private NganhDao(){}
+    public static NganhDao GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new NganhDao();
+        }
+
+        return _instance;
+    }
+    
+    
+    
     public List<NganhDto> GetAll()
     {
         List<NganhDto> result = new();
@@ -89,7 +58,7 @@ public class NganhDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
-        return rowAffected > 1;
+        return rowAffected > 0;
     }
 
     // edit khoa -> get id = getById call form controller

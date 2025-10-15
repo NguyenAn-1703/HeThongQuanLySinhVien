@@ -83,9 +83,34 @@ public class GiangVien : NavBase
         lb.Width += 50;
         return lb;
     }
-    
-    
-    // Add Form --------------------------------------------------------------------
+
+
+    // Form Add ----------------------------------------------
+    private Panel PanelTop(string txt)
+    {
+        Label lb = new Label()
+        {
+            Text = txt,
+            Font = GetFont.GetFont.GetMainFont(10, FontType.Bold),
+            Dock = DockStyle.Left,
+            BackColor = Color.Transparent,
+            ForeColor = Color.Black,
+            Height = 30,
+            Width = 300,
+            // AutoSize = true,
+            TextAlign = ContentAlignment.MiddleRight,
+        };
+        
+        Panel pn = new Panel()
+        {
+            Dock = DockStyle.Top,
+            Height = 50,
+            Width = 300,
+            // AutoSize = true,
+            Controls = { lb }
+        };
+        return pn;
+    }
     private Button AddButton()
     {
         Button btn = new Button()
@@ -103,9 +128,35 @@ public class GiangVien : NavBase
 
         btn.Click += (s, e) =>
         {
-            formAddPopUp = new FormAddGV();
-            Console.WriteLine("fewfewewfewfwe");
-            formAddPopUp.ShowDialog();
+            int WForm = 600;
+            int HForm = 600;
+
+            Label HeaderAddForm = new Label()
+            {
+                Text = "Thêm giảng viên",
+                Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold),
+                ForeColor = MyColor.White,
+                Dock = DockStyle.Top,
+                BackColor = MyColor.MainColor,
+                Height = 70,
+                TextAlign = ContentAlignment.MiddleCenter,
+            };
+            
+            Panel pnMa = PanelTop("Mã giảng viên: ");
+            Panel pnTen = PanelTop("Họ tên: ");
+            Panel pnNgaySinh = PanelTop("Ngày sinh: ");
+            Panel pnGioiTinh = PanelTop("Giới tính: ");
+            Panel pnKhoa = PanelTop("Khoa: ");
+
+            
+            Form form = new Form()
+            {
+                Text = "Thêm giảng viên",
+                Size = new Size(WForm, HForm),
+                StartPosition = FormStartPosition.CenterParent,
+                Controls = { HeaderAddForm}
+            };
+            form.ShowDialog();
         };
         return btn;
     }
@@ -123,6 +174,18 @@ public class GiangVien : NavBase
 
     private DataGridView GridGV()
     {
+        DataTable dt = new DataTable()
+        {
+            Columns =
+            {
+                new DataColumn("Mã giảng viên", typeof(string)),
+                new DataColumn("Họ tên",  typeof(string)),
+                new DataColumn("Ngày sinh", typeof(DateTime)),
+                new DataColumn("Giới tính", typeof(string)),
+                new DataColumn("Khoa", typeof(string)),
+            }
+        };
+        for(int i=1; i<=30; i++) dt.Rows.Add("123", "Nguyễn Thanh Sang", new DateTime(2025, 01, 01), "Nam", "Công nghệ thông tin");
         
         DataGridView dtgv = new DataGridView()
         {
@@ -204,6 +267,9 @@ public class GiangVien : NavBase
             };
             
         };
+        
+        
+        
         dtgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         return dtgv;
     }
@@ -232,9 +298,7 @@ public class GiangVien : NavBase
         };
         return mainBot;
     }
-    
-    
-    
+
     public override List<string> getComboboxList()
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);

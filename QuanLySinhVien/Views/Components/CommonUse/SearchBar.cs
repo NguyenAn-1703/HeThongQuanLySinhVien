@@ -82,6 +82,7 @@ public class SearchBar: TableLayoutPanel
         _field.Enter += (sender, args) => onEnter();
         _field.Leave += (sender, args) => onLeave();
         _field.KeyDown += (sender, args) => OnKeyDown(args);
+        _field.TextChanged += (sender, args) => OnTextChanged();
     }
 
     CustomCombobox getFilter()
@@ -126,6 +127,11 @@ public class SearchBar: TableLayoutPanel
     }
 
     void OnChangeItem()
+    {
+        KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
+    }
+
+    void OnTextChanged()
     {
         KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
     }

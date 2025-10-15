@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.GetFont;
@@ -17,6 +18,7 @@ public class FLogin : Form
     public FLogin()
     {
         Init();
+        
     }
 
     void Init()

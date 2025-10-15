@@ -1,4 +1,3 @@
-using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.Home;
 using QuanLySinhVien.Views.Forms;
 
@@ -17,10 +16,14 @@ static class Program
         
         ApplicationConfiguration.Initialize();
         
+        // using (InstalledFontCollection fontsCollection = new InstalledFontCollection())
+        // {
+        //     foreach (var family in fontsCollection.Families)
+        //     {
+        //         Console.WriteLine(family.Name);
+        //     }
+        // }
+        
         Application.Run(new FLogin());
-
-        // NganhDao.TestNganhDAO();
-        // KhoaDao.TestKhoaDAO();
-        // TaiKhoanDao.Test();
     }
 }
