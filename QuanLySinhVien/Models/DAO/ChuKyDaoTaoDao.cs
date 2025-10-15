@@ -119,4 +119,28 @@ public class ChuKyDaoTaoDao
 
         return result;
     }
+    
+    public ChuKyDaoTaoDto? GetByStartYear(int year)
+    {
+        ChuKyDaoTaoDto? result = null;
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaCKDT, NamBatDau, NamKetThuc FROM chukydaotao WHERE Status = 1 AND NamBatDau < @year AND NamKetThuc > @year",
+            conn);
+        cmd.Parameters.AddWithValue("@year", year);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new ChuKyDaoTaoDto
+            {
+                MaCKDT = reader.GetInt32("MaCKDT"),
+                NamBatDau = reader.GetString("NamBatDau"),
+                NamKetThuc = reader.GetString("NamKetThuc"),
+            };
+        }
+
+        return result;
+    }
+    
 }

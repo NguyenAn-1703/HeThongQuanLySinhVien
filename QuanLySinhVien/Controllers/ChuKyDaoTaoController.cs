@@ -48,4 +48,22 @@ public class ChuKyDaoTaoController
     {
         return _chuKyDaoTaoDao.GetById(maCKDT);
     }
+
+    public ChuKyDaoTaoDto? GetByNienKhoa(string nienKhoa)
+    {
+        string[] year = nienKhoa.Split("-");
+        int startYear = Convert.ToInt32(year[0]);
+        return _chuKyDaoTaoDao.GetByStartYear(startYear);
+    }
+    
+    public bool Validate(string nienKhoa)
+    {
+        string[] year = nienKhoa.Split("-");
+        int startYear = Convert.ToInt32(year[0]);
+        if (_chuKyDaoTaoDao.GetByStartYear(startYear) == null)
+        {
+            return false;
+        }
+        return true;
+    }
 }

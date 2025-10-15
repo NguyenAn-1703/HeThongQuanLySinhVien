@@ -128,7 +128,7 @@ public class ChuKyDaoTaoDialog : CustomDialog
         {
             ChuKyDaoTaoDto ChuKyDaoTaoNew = new ChuKyDaoTaoDto
             {
-                MaCKDT = _idChuKyDaoTao,
+                MaCKDT = ChuKyDaoTao.MaCKDT,
                 NamBatDau = namBatDau,
                 NamKetThuc = namKetThuc,
             };

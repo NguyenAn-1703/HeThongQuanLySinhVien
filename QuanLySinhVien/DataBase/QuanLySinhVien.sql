@@ -695,14 +695,15 @@ INSERT INTO ChiTietQuyen (MaCN, MaNQ, HanhDong) VALUES
 (6, 1, 'Xem'), (6, 1, 'Them'), (6, 1, 'Sua'), (6, 1, 'Xoa'),
 (7, 1, 'Xem'), (7, 1, 'Them'), (7, 1, 'Sua'), (7, 1, 'Xoa'),
 (8, 1, 'Xem'), (8, 1, 'Them'), (8, 1, 'Sua'), (8, 1, 'Xoa'),
-(9, 1, 'Xem'), (9, 1, 'Them'),
-
+(9, 1, 'Xem'), (9, 1, 'Them'), (9, 1, 'Sua'), (9, 1, 'Xoa'),
 (10, 1, 'Xem'), (10, 1, 'Them'),
+
 (11, 1, 'Xem'), (11, 1, 'Them'),
-(12, 1, 'Xem'), (12, 1, 'Them'), (12, 1, 'Sua'), (12, 1, 'Xoa'),
+(12, 1, 'Xem'), (12, 1, 'Them'),
 (13, 1, 'Xem'), (13, 1, 'Them'), (13, 1, 'Sua'), (13, 1, 'Xoa'),
 (14, 1, 'Xem'), (14, 1, 'Them'), (14, 1, 'Sua'), (14, 1, 'Xoa'),
-(15, 1, 'Xem'),
+(15, 1, 'Xem'), (15, 1, 'Them'), (15, 1, 'Sua'), (15, 1, 'Xoa'),
+(16, 1, 'Xem'),
 
 
 (1, 2, 'Xem'), (1, 2, 'Them'), (1, 2, 'Sua'), (1, 2, 'Xoa'),
@@ -718,6 +719,7 @@ INSERT INTO ChucNang (TenChucNang) VALUES
 ('HOCPHAN'),
 ('PHONGHOC'),
 ('CHUKYDAOTAO'),
+('KHOAHOC'),
 ('TOCHUCTHI'),
 ('NHAPDIEM'),
 ('HOCPHI'),

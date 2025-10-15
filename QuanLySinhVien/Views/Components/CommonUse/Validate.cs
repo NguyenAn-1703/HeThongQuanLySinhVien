@@ -71,4 +71,16 @@ public class Validate
         if (year1 > year2) return false;
         return true;
     }
+
+    public static bool IsAcademicYear(string input)
+    {
+        string[] x = input.Split("-");
+        if (x.Length != 2) return false;
+        
+        if(!IsYear(x[0]) || !IsYear(x[1])) return false;
+        
+        if(!IsStartYearAndEndYear(x[0],x[1])) return false;
+
+        return true;
+    }
 }
