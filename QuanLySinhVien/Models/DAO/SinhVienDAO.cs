@@ -1,5 +1,6 @@
 using MySqlConnector;
 using QuanLySinhVien.Database;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Models.DAO;
 
@@ -174,5 +175,15 @@ public class SinhVienDAO
         }
         
         return result;
+    }
+    
+    public int CountSinhVienByStatus(TrangThaiSV status)
+    {
+        using var conn = MyConnection.GetConnection();
+        const string sql = "SELECT COUNT(*) FROM SinhVien WHERE TrangThaiSV = @Status";
+        using var cmd = new MySqlCommand(sql, conn);
+        string statusStr = TrangThaiSVHelper.ToDbString(status);
+        cmd.Parameters.AddWithValue("@Status", statusStr);
+        return Convert.ToInt32(cmd.ExecuteScalar());
     }
 }

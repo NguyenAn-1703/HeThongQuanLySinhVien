@@ -58,6 +58,7 @@ public class NganhDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
+
         return rowAffected > 0;
     }
 
@@ -195,6 +196,15 @@ public class NganhDao
         {
             Console.WriteLine($"❌ Lỗi trong quá trình test: {ex.Message}");
         }
+    }
+
+    public int CountNganhByStatus(int status)
+    {
+        using var conn = MyConnection.GetConnection();
+        const string sql = "SELECT COUNT(*) AS Total FROM Nganh WHERE Status = @Status";
+        using var cmd = new MySqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@Status", status);
+        return Convert.ToInt32(cmd.ExecuteScalar());
     }
     
 }
