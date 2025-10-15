@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.InteropServices.JavaScript;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
@@ -16,23 +17,32 @@ public class GiangVien : NavBase
     private CUse _cUse;
     private Form formAddPopUp;
     private DataTable dt;
+    protected GiangVien ThisForm;
 
     public GiangVien()
     {
+        ThisForm = this;
         _cUse = new CUse();
         Init();
         LoadDatabase();
     }
     
     // Co so du lieu ---------------------------------------------------------------------
-    private void LoadDatabase()
+    public void LoadDatabase()
     {
-        dt.Rows.Clear();
-        foreach (var gv in GiangVienController.GetAll())
+        try
         {
-            dt.Rows.Add(gv.ToDataRow());
+            dt.Rows.Clear();
+            foreach (var gv in GiangVienController.GetAll()) if(gv.Status > 0)
+            {
+                dt.Rows.Add(gv.ToDataRow());
+            }
+            GridGV().DataSource = dt;
         }
-        GridGV().DataSource = dt;
+        catch (Exception e)
+        {
+            MessageBox.Show(e.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 
 
@@ -48,6 +58,8 @@ public class GiangVien : NavBase
                 new DataColumn("Mã giảng viên", typeof(int)),
                 new DataColumn("Họ tên",  typeof(string)),
                 new DataColumn("Khoa", typeof(string)),
+                new DataColumn("Ngày sinh", typeof(DateOnly)),
+                new DataColumn("Giới tính", typeof(string)),
                 new DataColumn("Số điện thoại", typeof(string)),
                 new DataColumn("Email", typeof(string)),
                 new DataColumn("Trạng thái", typeof(string)),
@@ -80,34 +92,9 @@ public class GiangVien : NavBase
         lb.Width += 50;
         return lb;
     }
-
-
-    // Form Add ----------------------------------------------
-    private Panel PanelTop(string txt)
-    {
-        Label lb = new Label()
-        {
-            Text = txt,
-            Font = GetFont.GetFont.GetMainFont(10, FontType.Bold),
-            Dock = DockStyle.Left,
-            BackColor = Color.Transparent,
-            ForeColor = Color.Black,
-            Height = 30,
-            Width = 300,
-            // AutoSize = true,
-            TextAlign = ContentAlignment.MiddleRight,
-        };
-        
-        Panel pn = new Panel()
-        {
-            Dock = DockStyle.Top,
-            Height = 50,
-            Width = 300,
-            // AutoSize = true,
-            Controls = { lb }
-        };
-        return pn;
-    }
+    
+    
+    // Add Form --------------------------------------------------------------------
     private Button AddButton()
     {
         Button btn = new Button()
@@ -125,35 +112,9 @@ public class GiangVien : NavBase
 
         btn.Click += (s, e) =>
         {
-            int WForm = 600;
-            int HForm = 600;
-
-            Label HeaderAddForm = new Label()
-            {
-                Text = "Thêm giảng viên",
-                Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold),
-                ForeColor = MyColor.White,
-                Dock = DockStyle.Top,
-                BackColor = MyColor.MainColor,
-                Height = 70,
-                TextAlign = ContentAlignment.MiddleCenter,
-            };
-            
-            Panel pnMa = PanelTop("Mã giảng viên: ");
-            Panel pnTen = PanelTop("Họ tên: ");
-            Panel pnNgaySinh = PanelTop("Ngày sinh: ");
-            Panel pnGioiTinh = PanelTop("Giới tính: ");
-            Panel pnKhoa = PanelTop("Khoa: ");
-
-            
-            Form form = new Form()
-            {
-                Text = "Thêm giảng viên",
-                Size = new Size(WForm, HForm),
-                StartPosition = FormStartPosition.CenterParent,
-                Controls = { HeaderAddForm}
-            };
-            form.ShowDialog();
+            formAddPopUp = new FormAddGV(ThisForm);
+            Console.WriteLine("fewfewewfewfwe");
+            formAddPopUp.ShowDialog();
         };
         return btn;
     }
@@ -171,18 +132,6 @@ public class GiangVien : NavBase
 
     private DataGridView GridGV()
     {
-        DataTable dt = new DataTable()
-        {
-            Columns =
-            {
-                new DataColumn("Mã giảng viên", typeof(string)),
-                new DataColumn("Họ tên",  typeof(string)),
-                new DataColumn("Ngày sinh", typeof(DateTime)),
-                new DataColumn("Giới tính", typeof(string)),
-                new DataColumn("Khoa", typeof(string)),
-            }
-        };
-        for(int i=1; i<=30; i++) dt.Rows.Add("123", "Nguyễn Thanh Sang", new DateTime(2025, 01, 01), "Nam", "Công nghệ thông tin");
         
         DataGridView dtgv = new DataGridView()
         {
@@ -203,7 +152,7 @@ public class GiangVien : NavBase
             {
                 BackColor = ColorTranslator.FromHtml("#07689F"),
                 ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
-                Font = GetFont.GetFont.GetMainFont(11, FontType.Bold),
+                Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
                 Alignment = DataGridViewContentAlignment.MiddleCenter,
             },
             AllowUserToAddRows = false,
@@ -258,15 +207,42 @@ public class GiangVien : NavBase
                 if (e.RowIndex < 0) return;
                 if (e.ColumnIndex == dtgv.Columns["Sửa"]?.Index)
                 {
-                    Console.WriteLine("Sửa");
+                    try
+                    {
+                        var row = dtgv.Rows[e.RowIndex];
+                        int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
+                        GiangVienDto gv = GiangVienController.GetGVById(id);
+                        FormUpdateGV form = new FormUpdateGV(gv, ThisForm);
+                        form.ShowDialog();
+                    }
+                    catch (Exception exception)
+                    {
+                        MessageBox.Show(exception.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-                else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index) { Console.WriteLine("xoa"); }
+                else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index)
+                {
+                    var ResBox = MessageBox.Show("Bạn có chắc chắn muốn xóa?", "Xác nhận", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                    if (ResBox == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            var row = dtgv.Rows[e.RowIndex];
+                            int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
+                            GiangVienController.SoftDeleteById(id);
+                            MessageBox.Show("Xóa giảng viên thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadDatabase();
+                            
+                        }
+                        catch (Exception exception)
+                        {
+                            MessageBox.Show(exception.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
             };
             
         };
-        
-        
-        
         dtgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         return dtgv;
     }
@@ -295,7 +271,9 @@ public class GiangVien : NavBase
         };
         return mainBot;
     }
-
+    
+    
+    
     public override List<string> getComboboxList()
     {
         return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
