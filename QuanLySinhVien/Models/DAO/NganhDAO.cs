@@ -10,7 +10,11 @@ public class NganhDao
     // lấy danh sách khoa ( hàm dùng mỗi ln loadData )
 
     private static NganhDao _instance;
-    private NganhDao(){}
+
+    private NganhDao()
+    {
+    }
+
     public static NganhDao GetInstance()
     {
         if (_instance == null)
@@ -20,9 +24,8 @@ public class NganhDao
 
         return _instance;
     }
-    
-    
-    
+
+
     public List<NganhDto> GetAll()
     {
         List<NganhDto> result = new();
@@ -58,6 +61,7 @@ public class NganhDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
+
         return rowAffected > 0;
     }
 
@@ -126,53 +130,13 @@ public class NganhDao
 
         return result;
     }
-
-    public static void TestNganhDAO()
-    {
-        try
-        {
-            var dao = new NganhDao();
-
-            Console.WriteLine("===== BẮT ĐẦU TEST NGANHDAO =====");
-
-            // 1️⃣ Test Insert
-            var newNganh = new NganhDto
-            {
-                MaKhoa = 1, // giả sử khoa có ID = 1
-                TenNganh = "Ngành Thử Nghiệm"
-            };
-
-            bool insertResult = dao.Insert(newNganh);
-            Console.WriteLine($"[INSERT] Kết quả: {(insertResult ? "Thành công" : "Thất bại")}");
-
-            // 2️⃣ Test GetAll
-            var allNganh = dao.GetAll();
-            Console.WriteLine("[GET ALL] Danh sách ngành (Status=1):");
-            foreach (var nganh in allNganh)
-            {
-                Console.WriteLine($" - MaNganh={nganh.MaNganh}, MaKhoa={nganh.MaKhoa}, TenNganh={nganh.TenNganh}");
-            }
-
-            // 3️⃣ Test GetById (lấy phần tử mới nhất)
-            var lastNganh = allNganh[^1]; // phần tử cuối danh sách
-            var getByIdResult = dao.GetNganhById(lastNganh.MaNganh);
-            Console.WriteLine($"[GET BY ID] MaNganh={getByIdResult.MaNganh}, TenNganh={getByIdResult.TenNganh}");
-
-            // 4️⃣ Test Update
-            getByIdResult.TenNganh = "Ngành Sau Khi Cập Nhật";
-            bool updateResult = dao.Update(getByIdResult);
-            Console.WriteLine($"[UPDATE] Kết quả: {(updateResult ? "Thành công" : "Thất bại")}");
-
-            // 5️⃣ Test Delete
-            bool deleteResult = dao.Delete(getByIdResult.MaNganh);
-            Console.WriteLine($"[DELETE] Kết quả: {(deleteResult ? "Thành công" : "Thất bại")}");
-
-            Console.WriteLine("===== KẾT THÚC TEST NGANHDAO =====");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Lỗi trong quá trình test: {ex.Message}");
-        }
-    }
     
+    public int CountNganhByStatus(int status)
+    {
+        using var conn = MyConnection.GetConnection();
+        const string sql = "SELECT COUNT(*) AS Total FROM Nganh WHERE Status = @Status";
+        using var cmd = new MySqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@Status", status);
+        return Convert.ToInt32(cmd.ExecuteScalar());
+    }
 }
