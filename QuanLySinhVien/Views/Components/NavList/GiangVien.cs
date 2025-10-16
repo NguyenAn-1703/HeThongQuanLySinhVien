@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.InteropServices.JavaScript;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
@@ -16,23 +17,32 @@ public class GiangVien : NavBase
     private CUse _cUse;
     private Form formAddPopUp;
     private DataTable dt;
+    protected GiangVien ThisForm;
 
     public GiangVien()
     {
+        ThisForm = this;
         _cUse = new CUse();
         Init();
         LoadDatabase();
     }
     
     // Co so du lieu ---------------------------------------------------------------------
-    private void LoadDatabase()
+    public void LoadDatabase()
     {
-        dt.Rows.Clear();
-        foreach (var gv in GiangVienController.GetAll())
+        try
         {
-            dt.Rows.Add(gv.ToDataRow());
+            dt.Rows.Clear();
+            foreach (var gv in GiangVienController.GetAll()) if(gv.Status > 0)
+            {
+                dt.Rows.Add(gv.ToDataRow());
+            }
+            GridGV().DataSource = dt;
         }
-        GridGV().DataSource = dt;
+        catch (Exception e)
+        {
+            MessageBox.Show(e.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 
 
@@ -48,6 +58,8 @@ public class GiangVien : NavBase
                 new DataColumn("Mã giảng viên", typeof(int)),
                 new DataColumn("Họ tên",  typeof(string)),
                 new DataColumn("Khoa", typeof(string)),
+                new DataColumn("Ngày sinh", typeof(DateOnly)),
+                new DataColumn("Giới tính", typeof(string)),
                 new DataColumn("Số điện thoại", typeof(string)),
                 new DataColumn("Email", typeof(string)),
                 new DataColumn("Trạng thái", typeof(string)),
@@ -100,7 +112,7 @@ public class GiangVien : NavBase
 
         btn.Click += (s, e) =>
         {
-            formAddPopUp = new FormAddGV();
+            formAddPopUp = new FormAddGV(ThisForm);
             Console.WriteLine("fewfewewfewfwe");
             formAddPopUp.ShowDialog();
         };
@@ -140,7 +152,7 @@ public class GiangVien : NavBase
             {
                 BackColor = ColorTranslator.FromHtml("#07689F"),
                 ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
-                Font = GetFont.GetFont.GetMainFont(11, FontType.Bold),
+                Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
                 Alignment = DataGridViewContentAlignment.MiddleCenter,
             },
             AllowUserToAddRows = false,
@@ -195,9 +207,39 @@ public class GiangVien : NavBase
                 if (e.RowIndex < 0) return;
                 if (e.ColumnIndex == dtgv.Columns["Sửa"]?.Index)
                 {
-                    Console.WriteLine("Sửa");
+                    try
+                    {
+                        var row = dtgv.Rows[e.RowIndex];
+                        int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
+                        GiangVienDto gv = GiangVienController.GetGVById(id);
+                        FormUpdateGV form = new FormUpdateGV(gv, ThisForm);
+                        form.ShowDialog();
+                    }
+                    catch (Exception exception)
+                    {
+                        MessageBox.Show(exception.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-                else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index) { Console.WriteLine("xoa"); }
+                else if (e.ColumnIndex == dtgv.Columns["Xóa"]?.Index)
+                {
+                    var ResBox = MessageBox.Show("Bạn có chắc chắn muốn xóa?", "Xác nhận", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                    if (ResBox == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            var row = dtgv.Rows[e.RowIndex];
+                            int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
+                            GiangVienController.SoftDeleteById(id);
+                            MessageBox.Show("Xóa giảng viên thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadDatabase();
+                            
+                        }
+                        catch (Exception exception)
+                        {
+                            MessageBox.Show(exception.Message,"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
             };
             
         };
