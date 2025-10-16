@@ -255,7 +255,7 @@ public class CustomTable : TableLayoutPanel
     void OnResize()
     {
         int tableWidth = this.Width - 24;
-        int columnSize = _action ? tableWidth / (_headerContent.Count + 1) : tableWidth / _headerContent.Count;
+        int columnSize = tableWidth / _headerContent.Count;
        
         foreach (Control c in _header.Controls)
         {

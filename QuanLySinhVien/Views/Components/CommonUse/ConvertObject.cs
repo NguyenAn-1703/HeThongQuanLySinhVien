@@ -19,4 +19,13 @@ public class ConvertObject
             .Cast<object>()
             .ToList();
     }
+
+    public static List<TResult> ConvertDtoToDto<T, TResult>(
+        IEnumerable<T> source,
+        Func<T, TResult> selector
+        )
+    {
+        return source.Select(selector)
+            .ToList();
+    }
 }
