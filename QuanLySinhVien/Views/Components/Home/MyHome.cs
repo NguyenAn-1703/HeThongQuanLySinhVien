@@ -126,14 +126,15 @@ public class MyHome : Form
         logo.Controls.Add(logoPb);
         logo.Controls.Add(logoText);
         
-        navBar = new NavBar();
         
         navListContainer = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Padding = new Padding(0, 15, 0, 0)
+            Padding = new Padding(0, 15, 0, 0),
         };
+
+        navBar = new NavBar();
         
         //Nút thu gọn
         toggleButton = new ToggleButton();
@@ -371,7 +372,9 @@ public class MyHome : Form
         
         logoutButton.Controls[1].Visible = false;
         
+        navBar.UpdateSize();
         ResumeForToggle();
+
     }
     
     public void UnToggleNavbar()
@@ -391,8 +394,9 @@ public class MyHome : Form
         
         logoutButton.Controls[1].Visible = true;
         
+        navBar.UpdateSize();
         ResumeForToggle();
-        
+
     }
 
     void SuspendForToggle()
@@ -401,6 +405,8 @@ public class MyHome : Form
         {
             item.Controls[2].SuspendLayout();
         }
+
+
         mainLayout.SuspendLayout();
     }
 
@@ -410,6 +416,8 @@ public class MyHome : Form
         {
             item.Controls[2].ResumeLayout();
         }
+        
+
         mainLayout.ResumeLayout();
     }
 

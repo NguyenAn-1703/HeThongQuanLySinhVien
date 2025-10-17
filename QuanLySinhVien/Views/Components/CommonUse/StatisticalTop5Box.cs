@@ -21,7 +21,7 @@ public class StatisticalTop5Box : RoundTLP
 
     void Init()
     {
-        this.BackColor = MyColor.GrayBackGround;
+        this.BackColor = MyColor.White;
         this.Dock = DockStyle.Fill;
         this.AutoSize = true;
         this.Margin = new Padding(5);

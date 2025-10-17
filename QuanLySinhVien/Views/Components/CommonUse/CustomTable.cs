@@ -13,7 +13,7 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CustomTable : TableLayoutPanel
 {
-    CustomDataGridView _dataGridView;
+    public CustomDataGridView _dataGridView;
     List<string> _headerContent;
     private FlowLayoutPanel _header;
     private List<object> _cellDatas;
@@ -91,6 +91,7 @@ public class CustomTable : TableLayoutPanel
         {
             var column = new DataGridViewTextBoxColumn
             {
+                Name = _columnNames[i],
                 HeaderText = _headerContent[i],
                 DataPropertyName = _columnNames[i],
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
@@ -255,7 +256,8 @@ public class CustomTable : TableLayoutPanel
     void OnResize()
     {
         int tableWidth = this.Width - 24;
-        int columnSize = _action ? tableWidth / (_headerContent.Count + 1) : tableWidth / _headerContent.Count;
+        int columnSize = tableWidth / _header.Controls.Count;
+       
         foreach (Control c in _header.Controls)
         {
             c.Size = new Size(columnSize, c.Height);

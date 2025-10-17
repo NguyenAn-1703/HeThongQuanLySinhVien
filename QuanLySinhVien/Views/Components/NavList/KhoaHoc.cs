@@ -2,43 +2,38 @@ using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
-using QuanLySinhVien.Views.Components.CommonUse.Search.SearchObject;
-using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Enums;
 using QuanLySinhVien.Views.Structs;
 
-namespace QuanLySinhVien.Views.Components;
+namespace QuanLySinhVien.Views.Components.NavList;
 
-public class ChuongTrinhDaoTao : NavBase
+public class KhoaHoc : NavBase
 {
-    
-    private string _title = "Chương trình đào tạo";
+    private string _title = "Khóa học";
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
-    private ChuongTrinhDaoTaoController _ChuongTrinhDaoTaoController;
-    private NganhController _nganhController;
+    private KhoaHocController _KhoaHocController;
     private ChuKyDaoTaoController _chuKyDaoTaoController;
-    string[] _headerArray = new string[] { "Mã chương trình đào tạo", "Tên ngành", "Chu kỳ","Loại hình đào tạo", "Trình độ" };
+    string[] _headerArray = new string[] { "Mã khóa học", "Tên khóa học", "Niên khóa học" };
     List<string> _headerList;
 
     private TitleButton _insertButton;
 
-    List<ChuongTrinhDaoTaoDto> _rawData;
+    List<KhoaHocDto> _rawData;
     List<object> _displayData;
 
-    private ChuongTrinhDaoTaoSearch _ChuongTrinhDaoTaoSearch;
+    private KhoaHocSearch _KhoaHocSearch;
 
-    private ChuongTrinhDaoTaoDialog _ChuongTrinhDaoTaoDialog;
+    private KhoaHocDialog _KhoaHocDialog;
 
     private List<InputFormItem> _listIFI;
 
-    public ChuongTrinhDaoTao()
+    public KhoaHoc()
     {
-        _rawData = new List<ChuongTrinhDaoTaoDto>();
+        _rawData = new List<KhoaHocDto>();
         _displayData = new List<object>();
-        _ChuongTrinhDaoTaoController = ChuongTrinhDaoTaoController.GetInstance();
-        _nganhController = NganhController.GetInstance();
+        _KhoaHocController = KhoaHocController.GetInstance();
         _chuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
         Init();
     }
@@ -133,11 +128,10 @@ public class ChuongTrinhDaoTao : NavBase
 
     void SetDataTableFromDb()
     {
-        _rawData = _ChuongTrinhDaoTaoController.GetAll();
+        _rawData = _KhoaHocController.GetAll();
         SetDisplayData();
 
-        
-        string[] columnNames = new[] { "MaCTDT", "TenNganh", "ChuKy", "LoaiHinhDT", "TrinhDo" };
+        string[] columnNames = new[] { "MaKhoaHoc", "TenKhoaHoc", "NienKhoaHoc" };
         List<string> columnNamesList = columnNames.ToList();
 
         _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
@@ -145,30 +139,26 @@ public class ChuongTrinhDaoTao : NavBase
 
     void SetDisplayData()
     {
-        _displayData = ConvertListCTDTToObj(_rawData);
+        _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new
+            {
+                MaKhoaHoc = x.MaKhoaHoc,
+                TenKhoaHoc = x.TenKhoaHoc,
+                NienKhoaHoc = x.NienKhoaHoc
+            }
+        );
     }
 
 
     void SetSearch()
     {
-        List<ChuongTrinhDaoTaoDisplayObject> list = ConvertObject.ConvertDtoToDto(_rawData, x => new ChuongTrinhDaoTaoDisplayObject
-            {
-                MaCTDT = x.MaCTDT,
-                TenNganh = _nganhController.GetNganhById(x.MaNganh).TenNganh,
-                ChuKy = _chuKyDaoTaoController.GetById(x.MaNganh).NamBatDau + "-" + _chuKyDaoTaoController.GetById(x.MaNganh).NamKetThuc,
-                LoaiHinhDT = x.LoaiHinhDT,
-                TrinhDo = x.TrinhDo,
-            }
-        );
-        
-        _ChuongTrinhDaoTaoSearch = new ChuongTrinhDaoTaoSearch(list);
+        _KhoaHocSearch = new KhoaHocSearch(_rawData);
     }
 
     void SetAction()
     {
-        _ChuongTrinhDaoTaoSearch.FinishSearch += dtos =>
+        _KhoaHocSearch.FinishSearch += dtos =>
         {
-            UpdateDataDisplaySearch(dtos);
+            UpdateDataDisplay(dtos);
             this._table.UpdateData(_displayData);
         };
 
@@ -178,113 +168,98 @@ public class ChuongTrinhDaoTao : NavBase
         _table.OnDelete += index => { Delete(index); };
     }
 
-    void UpdateDataDisplay(List<ChuongTrinhDaoTaoDto> dtos)
+    void UpdateDataDisplay(List<KhoaHocDto> dtos)
     {
-        _displayData = ConvertListCTDTToObj(dtos);
+        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaKhoaHoc = x.MaKhoaHoc,
+            TenKhoaHoc = x.TenKhoaHoc,
+            NienKhoaHoc = x.NienKhoaHoc
+        });
     }
-
-    void UpdateDataDisplaySearch(List<ChuongTrinhDaoTaoDisplayObject> listDisplay)
-    {
-        _displayData = listDisplay.Cast<object>().ToList();
-    }
-
-    List<object> ConvertListCTDTToObj(List<ChuongTrinhDaoTaoDto> dtos)
-    {
-        List<object> list = ConvertObject.ConvertToDisplay(dtos, x => new ChuongTrinhDaoTaoDisplayObject
-            {
-                MaCTDT = x.MaCTDT,
-                TenNganh = _nganhController.GetNganhById(x.MaNganh).TenNganh,
-                ChuKy = _chuKyDaoTaoController.GetById(x.MaNganh).NamBatDau + "-" + _chuKyDaoTaoController.GetById(x.MaNganh).NamKetThuc,
-                LoaiHinhDT = x.LoaiHinhDT,
-                TrinhDo = x.TrinhDo,
-            }
-        );
-        return list;
-    }
-    
-
 
     void Insert()
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Ngành", TextFieldType.Combobox),
-            new InputFormItem("Chu kỳ", TextFieldType.Combobox),
+            new InputFormItem("Tên khóa học", TextFieldType.NormalText),
+            new InputFormItem("Niên khóa học", TextFieldType.NormalText),
         };
+        
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
 
-        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Thêm chương trình đào tạo", DialogType.Them, list, _ChuongTrinhDaoTaoController);
-        
-        _ChuongTrinhDaoTaoDialog.Finish += () =>
+        _KhoaHocDialog = new KhoaHocDialog("Thêm khóa học", DialogType.Them, list, _KhoaHocController, _chuKyDaoTaoController);
+
+        _KhoaHocDialog.Finish += () =>
         {
-            UpdateDataDisplay(_ChuongTrinhDaoTaoController.GetAll());
-            
+            UpdateDataDisplay(_KhoaHocController.GetAll());
             this._table.UpdateData(_displayData);
         };
-        this._ChuongTrinhDaoTaoDialog.ShowDialog();
+        this._KhoaHocDialog.ShowDialog();
     }
 
     void Update(int id)
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Ngành", TextFieldType.Combobox),
-            new InputFormItem("Chu kỳ", TextFieldType.Combobox),
+            new InputFormItem("Tên khóa học", TextFieldType.NormalText),
+            new InputFormItem("Niên khóa học", TextFieldType.NormalText),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
-        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Sửa chương trình đào tạo", DialogType.Sua, list, _ChuongTrinhDaoTaoController, id);
-        _ChuongTrinhDaoTaoDialog.Finish += () =>
+        _KhoaHocDialog = new KhoaHocDialog("Sửa khóa học", DialogType.Sua, list, _KhoaHocController,_chuKyDaoTaoController, id);
+        _KhoaHocDialog.Finish += () =>
         {
-            UpdateDataDisplay(_ChuongTrinhDaoTaoController.GetAll());
+            UpdateDataDisplay(_KhoaHocController.GetAll());
             this._table.UpdateData(_displayData);
         };
-        this._ChuongTrinhDaoTaoDialog.ShowDialog();
+        this._KhoaHocDialog.ShowDialog();
     }
 
     void Detail(int id)
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Ngành", TextFieldType.Combobox),
-            new InputFormItem("Chu kỳ", TextFieldType.Combobox),
+            new InputFormItem("Tên khóa học", TextFieldType.NormalText),
+            new InputFormItem("Niên khóa học", TextFieldType.NormalText),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
-        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Chi tiết chương trình đào tạo", DialogType.ChiTiet, list, _ChuongTrinhDaoTaoController, id);
-        this._ChuongTrinhDaoTaoDialog.ShowDialog();
+        _KhoaHocDialog = new KhoaHocDialog("Chi tiết khóa học", DialogType.ChiTiet, list,
+            _KhoaHocController, _chuKyDaoTaoController, id);
+        this._KhoaHocDialog.ShowDialog();
     }
 
     void Delete(int index)
     {
-        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo,
+            MessageBoxIcon.Information);
         if (select == DialogResult.No)
         {
             return;
         }
-        if (_ChuongTrinhDaoTaoController.Delete(index))
+
+        if (_KhoaHocController.Delete(index))
         {
-            MessageBox.Show("Xóa chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            UpdateDataDisplay(_ChuongTrinhDaoTaoController.GetAll());
+            MessageBox.Show("Xóa khóa học thành công!", "Thành công", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            UpdateDataDisplay(_KhoaHocController.GetAll());
             this._table.UpdateData(_displayData);
         }
         else
         {
-            MessageBox.Show("Xóa chương trình đào tạo thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Xóa khóa học thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
     
-
-    /// ///////////////////////////SETBOTTOM////////////////////////////////////
- 
     public override List<string> getComboboxList()
     {
         return this._listSelectionForComboBox;
     }
-    
+
     public override void onSearch(string txtSearch, string filter)
     {
-        this._ChuongTrinhDaoTaoSearch.Search(txtSearch, filter);
+        this._KhoaHocSearch.Search(txtSearch, filter);
     }
 }

@@ -24,9 +24,11 @@ public class LabelTextField : TableLayoutPanel
 
     void Init()
     {
+        
         this.RowCount = 2;
         this.AutoSize = true;
         this.Dock = DockStyle.Fill;
+        
         
         Label label = new Label();
         label.Text = this._title;

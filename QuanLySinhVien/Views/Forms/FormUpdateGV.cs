@@ -1,15 +1,17 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components;
+using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Enums;
 using Svg;
 
 namespace QuanLySinhVien.Views.Forms;
 
-public class FormAddGV : Form
+public class FormUpdateGV : Form
 {
     private Form myForm;
     private GiangVien formParent;
+    private GiangVienDto giangVien;
     private TextBox txbMaGV = new TextBox()
     {
         BorderStyle = BorderStyle.FixedSingle,
@@ -105,8 +107,9 @@ public class FormAddGV : Form
         Anchor = AnchorStyles.None,
     };
     
-    public FormAddGV(GiangVien formParent)
+    public FormUpdateGV(GiangVienDto giangVien, GiangVien formParent)
     {
+        this.giangVien = giangVien;
         this.formParent = formParent;
         Size = new Size(600, 1000);
         StartPosition = FormStartPosition.CenterParent;
@@ -119,19 +122,22 @@ public class FormAddGV : Form
 
     private void Load()
     {
-        txbMaGV.Text = "";
-        txbTenGV.Text = "";
+        txbMaGV.Text = giangVien.MaGV + "";
+        txbTenGV.Text = giangVien.TenGV;
         KhoaController khoaController = new KhoaController();
         List<KhoaDto> listKhoa = khoaController.GetDanhSachKhoa();
         cbbKhoa.DataSource = listKhoa;
         cbbKhoa.DisplayMember = "TenKhoa";
         cbbKhoa.ValueMember = "MaKhoa";
-        dtpkNgaySinh.Value = DateTime.Now;
-        tbGioiTinh.Controls["rdbNam"].Select();
-        txbSoDienThoai.Text = "";
-        txbEmail.Text = "";
+        cbbKhoa.SelectedValue = giangVien.MaKhoa;
+        dtpkNgaySinh.Value = giangVien.NgaySinhGV.ToDateTime(TimeOnly.MinValue);
+        if(giangVien.GioiTinhGV == "Nam") tbGioiTinh.Controls["rdbNam"].Select();
+        else tbGioiTinh.Controls["rdbNu"].Select();
+        txbSoDienThoai.Text = giangVien.SoDienThoai;
+        txbEmail.Text = giangVien.Email;
         List<string> cbbStatus = new List<string> { "Đang công tác", "Đang nghỉ phép" };
         cbbTrangThai.DataSource =  cbbStatus;
+        cbbTrangThai.SelectedItem = giangVien.TrangThai;
     }
 
     private Label JLable(string txt)
@@ -153,7 +159,7 @@ public class FormAddGV : Form
         // TopDialog
         var textLabel = new Label
         {
-            Text = "Thêm thông tin giảng viên",
+            Text = "Sửa thông tin giảng viên",
             TextAlign = ContentAlignment.MiddleCenter,
             Font = Components.GetFont.GetFont.GetMainFont(13, FontType.Bold),
             Width = 300,
@@ -270,7 +276,7 @@ public class FormAddGV : Form
         };
         var addButton = new Button
         {
-            Text = "Thêm",
+            Text = "Sửa",
             TextAlign = ContentAlignment.MiddleCenter,
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.Green,
@@ -285,23 +291,21 @@ public class FormAddGV : Form
         {
             try
             {
-                GiangVienDto gv = new GiangVienDto()
-                {
-                    TenGV = txbTenGV.Text,
-                    MaTK = 1, // Fix
-                    MaKhoa = ((KhoaDto)cbbKhoa.SelectedItem).MaKhoa,
-                    TenKhoa = ((KhoaDto)cbbKhoa.SelectedItem).TenKhoa,
-                    NgaySinhGV = DateOnly.FromDateTime(dtpkNgaySinh.Value),
-                    GioiTinhGV = ((RadioButton)tbGioiTinh.Controls["rdbNam"]).Checked ? "Nam" : "Nữ",
-                    SoDienThoai = txbSoDienThoai.Text,
-                    Email = txbEmail.Text,
-                    TrangThai = cbbTrangThai.SelectedItem.ToString(),
-                    AnhDaiDien = "abc", // Fix
-                };
-                GiangVienController.InsertGV(gv);
-                MessageBox.Show("Thêm thông tin giảng viên thành công", "Thông báo",  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                GiangVienDto gv = giangVien;
+                gv.TenGV = txbTenGV.Text;
+                KhoaDto khoaDto = new KhoaDto();
+                khoaDto = (KhoaDto) cbbKhoa.SelectedItem;
+                gv.MaKhoa = khoaDto.MaKhoa;
+                gv.TenKhoa = khoaDto.TenKhoa;
+                gv.NgaySinhGV = DateOnly.FromDateTime(dtpkNgaySinh.Value);
+                if (((RadioButton)tbGioiTinh.Controls["rdbNam"]).Checked) gv.GioiTinhGV = "Nam";
+                else gv.GioiTinhGV = "Nữ";
+                gv.SoDienThoai = txbSoDienThoai.Text;
+                gv.Email = txbEmail.Text;
+                gv.TrangThai = cbbTrangThai.SelectedItem.ToString();
+                GiangVienController.UpdateGV(gv);
+                MessageBox.Show("Cập nhật thông tin giảng viên thành công", "Thông báo",  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 formParent.LoadDatabase();
-                Close();
             }
             catch (Exception exception)
             {
@@ -325,6 +329,8 @@ public class FormAddGV : Form
         {
             try
             {
+                int MaGV = giangVien.MaGV;
+                giangVien = GiangVienController.GetGVById(MaGV);
                 Load();
             }
             catch (Exception exception)
