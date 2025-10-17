@@ -32,29 +32,21 @@ public class TaiKhoanController
 
     public bool Insert(TaiKhoanDto taiKhoanDto)
     {
-        //Validate
         
         return (_taiKhoanDao.Insert(taiKhoanDto));
     }
 
-    // edit khoa
     public bool Update(TaiKhoanDto taiKhoanDto)
     {
-        //Validate
-        
-        
         return  (_taiKhoanDao.Update(taiKhoanDto));
     }
 
 
-    // delete khoa
     public bool Delete(int idTaiKhoan)
     {
-        // call DAO function
         return _taiKhoanDao.Delete(idTaiKhoan);
     }
 
-    // get name by ID ( khoa.cs <-> dao )
     public TaiKhoanDto GetTaiKhoanById(int id)
     {
         return _taiKhoanDao.GetTaiKhoanById(id);;

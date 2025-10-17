@@ -172,10 +172,10 @@ public class ChuongTrinhDaoTao : NavBase
             this._table.UpdateData(_displayData);
         };
 
-        // _insertButton._mouseDown += () => { Insert(); };
-        // _table.OnEdit += index => { Update(index); };
-        // _table.OnDetail += index => { Detail(index); };
-        // _table.OnDelete += index => { Delete(index); };
+        _insertButton._mouseDown += () => { Insert(); };
+        _table.OnEdit += index => { Update(index); };
+        _table.OnDetail += index => { Detail(index); };
+        _table.OnDelete += index => { Delete(index); };
     }
 
     void UpdateDataDisplay(List<ChuongTrinhDaoTaoDto> dtos)
@@ -208,14 +208,13 @@ public class ChuongTrinhDaoTao : NavBase
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
-            new InputFormItem("Mật khẩu", TextFieldType.NormalText),
-            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+            new InputFormItem("Ngành", TextFieldType.Combobox),
+            new InputFormItem("Chu kỳ", TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
 
-        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Thêm tài khoản", DialogType.Them, list, _ChuongTrinhDaoTaoController);
+        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Thêm chương trình đào tạo", DialogType.Them, list, _ChuongTrinhDaoTaoController);
         
         _ChuongTrinhDaoTaoDialog.Finish += () =>
         {
@@ -230,12 +229,12 @@ public class ChuongTrinhDaoTao : NavBase
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
-            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+            new InputFormItem("Ngành", TextFieldType.Combobox),
+            new InputFormItem("Chu kỳ", TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
-        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Sửa tài khoản", DialogType.Sua, list, _ChuongTrinhDaoTaoController, id);
+        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Sửa chương trình đào tạo", DialogType.Sua, list, _ChuongTrinhDaoTaoController, id);
         _ChuongTrinhDaoTaoDialog.Finish += () =>
         {
             UpdateDataDisplay(_ChuongTrinhDaoTaoController.GetAll());
@@ -248,12 +247,12 @@ public class ChuongTrinhDaoTao : NavBase
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
-            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
+            new InputFormItem("Ngành", TextFieldType.Combobox),
+            new InputFormItem("Chu kỳ", TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
-        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Chi tiết tài khoản", DialogType.ChiTiet, list, _ChuongTrinhDaoTaoController, id);
+        _ChuongTrinhDaoTaoDialog = new ChuongTrinhDaoTaoDialog("Chi tiết chương trình đào tạo", DialogType.ChiTiet, list, _ChuongTrinhDaoTaoController, id);
         this._ChuongTrinhDaoTaoDialog.ShowDialog();
     }
 
@@ -266,13 +265,13 @@ public class ChuongTrinhDaoTao : NavBase
         }
         if (_ChuongTrinhDaoTaoController.Delete(index))
         {
-            MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Xóa chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             UpdateDataDisplay(_ChuongTrinhDaoTaoController.GetAll());
             this._table.UpdateData(_displayData);
         }
         else
         {
-            MessageBox.Show("Xóa tài khoản thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Xóa chương trình đào tạo thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
     

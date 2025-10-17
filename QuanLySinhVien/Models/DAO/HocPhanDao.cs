@@ -5,6 +5,20 @@ namespace QuanLySinhVien.Models.DAO;
 
 public class HocPhanDao
 {
+    
+    private static HocPhanDao _instance;
+    private HocPhanDao() { }
+
+    public static HocPhanDao GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new HocPhanDao();
+        }
+        return _instance;
+    }
+    
+    
     // lấy danh sách học phần ( hàm dùng mỗi ln loadData )
     public List<HocPhanDto> GetAll()
     {
