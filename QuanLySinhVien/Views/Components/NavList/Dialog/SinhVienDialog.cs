@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Controllers;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
@@ -18,7 +19,6 @@ public class SinhVienDialog : Form
     private TextBox txtTenSinhVien;
     private DateTimePicker dtpNgaySinh;
     private ComboBox cbbNganh;
-    private ComboBox cbbKhoaHoc;
     private ComboBox cbbLop;
     private RadioButton rbNam;
     private RadioButton rbNu;
@@ -28,10 +28,10 @@ public class SinhVienDialog : Form
     private TextBox txtCCCD;
     private ComboBox cbbTrangThai;
     
-    // DAO instances
-    private NganhDao nganhDao;
-    private KhoaHocDAO khoaHocDao;
     private LopDAO lopDao;
+    private SinhVienController controller;
+    private bool isLoadingData = false;
+    private int initialMaLop = 0;
 
     public SinhVienDialog(DialogMode mode, SinhVienDTO sinhVienDto = null)
     {
@@ -41,11 +41,9 @@ public class SinhVienDialog : Form
         StartPosition = FormStartPosition.CenterParent;
         ShowInTaskbar = false;
         BackColor = ColorTranslator.FromHtml("#F3F4F6");
-
-        // Initialize DAOs
-        nganhDao = new NganhDao();
-        khoaHocDao = new KhoaHocDAO();
+        
         lopDao = new LopDAO();
+        controller = new SinhVienController();
 
         var headerPanel = CreateHeaderPanel(mode);
         var buttonPanel = CreateButtonPanel(mode);
@@ -54,6 +52,14 @@ public class SinhVienDialog : Form
         Controls.Add(contentPanel);
         Controls.Add(buttonPanel);
         Controls.Add(headerPanel);
+        
+        this.Load += (s, e) => 
+        {
+            if (sinhVienDto == null)
+            {
+                LoadNganhData();
+            }
+        };
     }
 
     private Panel CreateHeaderPanel(DialogMode mode)
@@ -116,17 +122,32 @@ public class SinhVienDialog : Form
         {
             LoadData(sinhVienDto);
         }
+        else
+        {
+            // Trường hợp tạo mới - load ngành ngay từ đầu
+            LoadNganhData();
+        }
 
-        bool ok = true;
-        if(mode == DialogMode.Edit) SetControlsEnabled(ok);
-        else if(mode == DialogMode.Delete) SetControlsEnabled2(!ok);
+        // Thiết lập trạng thái enable/disable của controls theo mode
+        if(mode == DialogMode.View)
+        {
+            SetControlsEnabled(false); // Chỉ xem, không cho sửa
+        }
+        else if(mode == DialogMode.Delete)
+        {
+            SetControlsEnabled(false); // Xóa cũng không cho sửa
+        }
+        else // Create hoặc Edit
+        {
+            SetControlsEnabled(true); // Cho phép nhập/sửa
+        }
 
         var layout = new TableLayoutPanel
         {
             Dock = DockStyle.Top,
             AutoSize = true,
             ColumnCount = 2,
-            RowCount = 12,
+            RowCount = 11,
             Padding = new Padding(0),
             CellBorderStyle = TableLayoutPanelCellBorderStyle.None
         };
@@ -134,7 +155,7 @@ public class SinhVienDialog : Form
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 270));
 
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 11; i++)
         {
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 60));
         }
@@ -201,16 +222,6 @@ public class SinhVienDialog : Form
             Margin = new Padding(0)
         };
 
-        cbbKhoaHoc = new ComboBox
-        {
-            Width = 300,
-            Height = 32,
-            Font = new Font("Montserrat", 10),
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Padding = new Padding(6, 6, 6, 6),
-            Margin = new Padding(0),
-            Enabled = false
-        };
 
         cbbLop = new ComboBox
         {
@@ -222,14 +233,11 @@ public class SinhVienDialog : Form
             Margin = new Padding(0),
             Enabled = false
         };
+        
+        // KHÔNG load ngành ở đây nữa, sẽ load trong LoadData hoặc sau khi dialog hiển thị
+        // LoadNganhData(); // <-- XÓA DÒNG NÀY
 
-        // Load initial data
-        LoadNganhData();
-        LoadKhoaHocData();
-
-        // Add event handlers for cascading
         cbbNganh.SelectedIndexChanged += CbbNganh_SelectedIndexChanged;
-        cbbKhoaHoc.SelectedIndexChanged += CbbKhoaHoc_SelectedIndexChanged;
 
         
         rbNam = new RadioButton
@@ -250,7 +258,6 @@ public class SinhVienDialog : Form
             TextAlign = ContentAlignment.MiddleLeft,
             Margin = new Padding(0, 2, 0, 0)
         };
-        rbNam.Checked = true;
 
         
         txtSoDienThoai = new TextBox
@@ -314,89 +321,101 @@ public class SinhVienDialog : Form
     {
         try
         {
-            var nganhList = nganhDao.GetAll();
+            isLoadingData = true; // Set flag to prevent event triggering
+            
+            var nganhList = controller.GetAllNganh();
+            if (nganhList == null || nganhList.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu ngành trong hệ thống.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            
             cbbNganh.Items.Clear();
             cbbNganh.DisplayMember = "TenNganh";
             cbbNganh.ValueMember = "MaNganh";
-            cbbNganh.DataSource = nganhList;
+            
+            foreach (var nganh in nganhList)
+            {
+                cbbNganh.Items.Add(nganh);
+            }
+            
+            // Enable combobox if data is loaded
+            cbbNganh.Enabled = true;
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Lỗi khi tải dữ liệu ngành: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-    }
-
-    private void LoadKhoaHocData()
-    {
-        try
+        finally
         {
-            var khoaHocList = khoaHocDao.GetAllWithDisplayText();
-            cbbKhoaHoc.Items.Clear();
-            cbbKhoaHoc.DisplayMember = "DisplayText";
-            cbbKhoaHoc.ValueMember = "MaKhoaHoc";
-            cbbKhoaHoc.DataSource = khoaHocList;
-            cbbKhoaHoc.Enabled = true;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Lỗi khi tải dữ liệu khóa học: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            isLoadingData = false; // Reset flag after loading
         }
     }
 
-    private void LoadLopData(int maNganh, string tenKhoaHoc)
+    private void LoadLopData(int maNganh)
     {
         try
         {
-            var lopList = lopDao.GetByNganhAndKhoaHoc(maNganh, tenKhoaHoc);
+            isLoadingData = true; // Set flag to prevent event triggering
+            
+            var lopList = controller.GetLopByNganh(maNganh);
             cbbLop.Items.Clear();
-            cbbLop.DisplayMember = "DisplayText";
+            
+            if (lopList == null || lopList.Count == 0)
+            {
+                cbbLop.Enabled = false;
+                MessageBox.Show("Không có lớp nào thuộc ngành này.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            
+            cbbLop.DisplayMember = "TenLop";
             cbbLop.ValueMember = "MaLop";
-            cbbLop.DataSource = lopList;
+            
+            foreach (var lop in lopList)
+            {
+                cbbLop.Items.Add(lop);
+            }
+            
+            if (cbbLop.Items.Count > 0)
+            {
+                cbbLop.SelectedIndex = 0;
+            }
+            
             cbbLop.Enabled = true;
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Lỗi khi tải dữ liệu lớp: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            cbbLop.Enabled = false;
+        }
+        finally
+        {
+            isLoadingData = false; // Reset flag after loading
         }
     }
 
     private void CbbNganh_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (cbbNganh.SelectedValue != null && cbbKhoaHoc.SelectedValue != null)
+        // Chỉ xử lý khi KHÔNG đang load data
+        if (isLoadingData) return;
+        
+        try
         {
-            int maNganh = (int)cbbNganh.SelectedValue;
-            string tenKhoaHoc = cbbKhoaHoc.SelectedItem?.GetType().GetProperty("DisplayText")?.GetValue(cbbKhoaHoc.SelectedItem)?.ToString() ?? "";
-            
-            // Extract khoa hoc name (e.g., "K21" from "K21 (2021-2025)")
-            if (tenKhoaHoc.Contains("("))
+            if (cbbNganh.SelectedItem is NganhDto selectedNganh)
             {
-                tenKhoaHoc = tenKhoaHoc.Substring(0, tenKhoaHoc.IndexOf("(")).Trim();
+                LoadLopData(selectedNganh.MaNganh);
             }
-            
-            LoadLopData(maNganh, tenKhoaHoc);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi chọn ngành: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
-    private void CbbKhoaHoc_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        if (cbbNganh.SelectedValue != null && cbbKhoaHoc.SelectedValue != null)
-        {
-            int maNganh = (int)cbbNganh.SelectedValue;
-            string tenKhoaHoc = cbbKhoaHoc.SelectedItem?.GetType().GetProperty("DisplayText")?.GetValue(cbbKhoaHoc.SelectedItem)?.ToString() ?? "";
-            
-            // Extract khoa hoc name (e.g., "K21" from "K21 (2021-2025)")
-            if (tenKhoaHoc.Contains("("))
-            {
-                tenKhoaHoc = tenKhoaHoc.Substring(0, tenKhoaHoc.IndexOf("(")).Trim();
-            }
-            
-            LoadLopData(maNganh, tenKhoaHoc);
-        }
-    }
 
     private Label[] CreateLabels()
     {
-        var labelTexts = new[] { "Mã SV:", "Tên SV:", "Ngày sinh:", "Ngành:", "Khóa học:", "Lớp:", "Giới tính:", "SĐT:", "Quê quán:", "Email:", "CCCD:", "Trạng thái:" };
+        var labelTexts = new[] { "Mã SV:", "Tên SV:", "Ngày sinh:", "Ngành:", "Lớp:", "Giới tính:", "SĐT:", "Quê quán:", "Email:", "CCCD:", "Trạng thái:" };
         var labels = new Label[labelTexts.Length];
 
         for (int i = 0; i < labelTexts.Length; i++)
@@ -432,7 +451,6 @@ public class SinhVienDialog : Form
             CreateControlPanel(txtTenSinhVien),
             CreateControlPanel(dtpNgaySinh),
             CreateControlPanel(cbbNganh),
-            CreateControlPanel(cbbKhoaHoc),
             CreateControlPanel(cbbLop),
             genderPanel,
             CreateControlPanel(txtSoDienThoai),
@@ -457,97 +475,161 @@ public class SinhVienDialog : Form
 
     private void LoadData(SinhVienDTO sinhVienDto)
     {
-        txtMaSinhVien.Text = sinhVienDto.MaSinhVien.ToString();
-        txtTenSinhVien.Text = sinhVienDto.TenSinhVien;
+        // Bật flag để tránh trigger event
+        isLoadingData = true;
         
-        if (DateTime.TryParse(sinhVienDto.NgaySinh, out DateTime ngaySinh))
+        try
         {
-            dtpNgaySinh.Value = ngaySinh;
-        }
-
-        if (!string.IsNullOrEmpty(sinhVienDto.Nganh))
-        {
-            var nganhList = nganhDao.GetAll();
-            var selectedNganh = nganhList.FirstOrDefault(n => n.TenNganh == sinhVienDto.Nganh);
-            if (selectedNganh != null)
+            txtMaSinhVien.Text = sinhVienDto.MaSinhVien.ToString();
+            txtTenSinhVien.Text = sinhVienDto.TenSinhVien;
+            
+            if (DateTime.TryParse(sinhVienDto.NgaySinh, out DateTime ngaySinh))
             {
-                cbbNganh.SelectedValue = selectedNganh.MaNganh;
-                
-                // Load khóa học và lớp nếu có thông tin
-                if (sinhVienDto.MaKhoaHoc > 0)
-                {
-                    cbbKhoaHoc.SelectedValue = sinhVienDto.MaKhoaHoc;
+                dtpNgaySinh.Value = ngaySinh;
+            }
+
+            // Set giới tính - đảm bảo chỉ 1 được chọn
+            if (sinhVienDto.GioiTinh == "Nam")
+            {
+                rbNam.Checked = true;
+                rbNu.Checked = false;
+            }
+            else if (sinhVienDto.GioiTinh == "Nữ")
+            {
+                rbNu.Checked = true;
+                rbNam.Checked = false;
+            }
+
+             // Load ngành và lớp dựa trên MaLop từ DB
+             if (sinhVienDto.MaLop > 0)
+             {
+                 // Lấy thông tin lớp hiện tại từ DB
+                 var lopHienTai = lopDao.GetById(sinhVienDto.MaLop);
+                 
+                 if (lopHienTai != null && lopHienTai.MaNganh > 0)
+                 {
+                     // Load danh sách ngành và đảm bảo ngành hiện tại có trong list
+                    var nganhList = controller.GetAllNganh() ?? new List<NganhDto>();
+                    var nganhHienTai = controller.GetNganhById(lopHienTai.MaNganh);
                     
-                    // Load lớp theo ngành và khóa học
-                    if (sinhVienDto.MaLop > 0)
+                    if (nganhHienTai != null && nganhList.All(x => x.MaNganh != nganhHienTai.MaNganh))
                     {
-                        var khoaHoc = khoaHocDao.GetById(sinhVienDto.MaKhoaHoc);
-                        if (khoaHoc != null)
-                        {
-                            string tenKhoaHoc = khoaHoc.TenKhoaHoc;
-                            LoadLopData(selectedNganh.MaNganh, tenKhoaHoc);
-                            cbbLop.SelectedValue = sinhVienDto.MaLop;
-                        }
+                        nganhList.Insert(0, nganhHienTai);
                     }
+                    
+                    if (nganhList.Count > 0)
+                    {
+                        // TẮT event handler trước khi bind
+                        cbbNganh.SelectedIndexChanged -= CbbNganh_SelectedIndexChanged;
+                        
+                        // Dùng Items.AddRange thay vì DataSource
+                        cbbNganh.Items.Clear();
+                        cbbNganh.DisplayMember = "TenNganh";
+                        cbbNganh.ValueMember = "MaNganh";
+                        
+                        foreach (var nganh in nganhList)
+                        {
+                            cbbNganh.Items.Add(nganh);
+                        }
+                        
+                        cbbNganh.Enabled = true;
+                        
+                        // Đợi bind xong
+                        Application.DoEvents();
+                        
+                        // Chọn ngành bằng SelectedIndex
+                        int nganhIndex = nganhList.FindIndex(x => x.MaNganh == lopHienTai.MaNganh);
+                        
+                        if (nganhIndex >= 0 && nganhIndex < cbbNganh.Items.Count)
+                        {
+                            cbbNganh.SelectedIndex = nganhIndex;
+                        }
+                        
+                        // BẬT lại event handler
+                        cbbNganh.SelectedIndexChanged += CbbNganh_SelectedIndexChanged;
+                    }
+
+                     // Load danh sách lớp theo ngành và đảm bảo lớp hiện tại có trong list
+                     var lopList = controller.GetLopByNganh(lopHienTai.MaNganh) ?? new List<LopDto>();
+                     
+                     // Kiểm tra xem lớp hiện tại có trong danh sách không
+                     if (lopList.All(x => x.MaLop != lopHienTai.MaLop))
+                     {
+                         // Nếu không có (bị lọc Status), thêm vào đầu danh sách
+                         lopList.Insert(0, lopHienTai);
+                     }
+
+                    // Bind danh sách lớp bằng Items.Add
+                    cbbLop.Items.Clear();
+                    cbbLop.DisplayMember = "TenLop";
+                    cbbLop.ValueMember = "MaLop";
+                    
+                    foreach (var lop in lopList)
+                    {
+                        cbbLop.Items.Add(lop);
+                    }
+                    
+                    cbbLop.Enabled = true;
+
+                    // Đợi bind xong
+                    Application.DoEvents();
+
+                    // Chọn lớp bằng SelectedIndex
+                    int lopIndex = lopList.FindIndex(x => x.MaLop == sinhVienDto.MaLop);
+                    
+                    if (lopIndex >= 0 && lopIndex < cbbLop.Items.Count)
+                    {
+                        cbbLop.SelectedIndex = lopIndex;
+                    }
+                 }
+                 else
+                 {
+                     // Nếu không tìm thấy lớp, vẫn load danh sách ngành
+                     LoadNganhData();
+                     MessageBox.Show("Không tìm thấy thông tin lớp của sinh viên này trong hệ thống.", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                 }
+             }
+             else
+             {
+                 // Trường hợp tạo mới - load ngành
+                 LoadNganhData();
+             }
+
+            txtSoDienThoai.Text = sinhVienDto.SdtSinhVien ?? "";
+            txtQueQuan.Text = sinhVienDto.QueQuanSinhVien ?? "";
+            txtEmail.Text = sinhVienDto.Email ?? "";
+            txtCCCD.Text = sinhVienDto.CCCD ?? "";
+
+            // Set trạng thái
+            for (int i = 0; i < cbbTrangThai.Items.Count; i++)
+            {
+                if (cbbTrangThai.Items[i].ToString() == sinhVienDto.TrangThai)
+                {
+                    cbbTrangThai.SelectedIndex = i;
+                    break;
                 }
             }
         }
-                
-        if (sinhVienDto.GioiTinh == "Nam")
+        finally
         {
-            rbNam.Checked = true;
-        }
-        else if (sinhVienDto.GioiTinh == "Nữ")
-        {
-            rbNu.Checked = true;
-        }
-
-        txtSoDienThoai.Text = sinhVienDto.SdtSinhVien ?? "";
-        txtQueQuan.Text = sinhVienDto.QueQuanSinhVien ?? "";
-        txtEmail.Text = sinhVienDto.Email ?? "";
-        txtCCCD.Text = sinhVienDto.CCCD ?? "";
-
-        
-        for (int i = 0; i < cbbTrangThai.Items.Count; i++)
-        {
-            if (cbbTrangThai.Items[i].ToString() == sinhVienDto.TrangThai)
-            {
-                cbbTrangThai.SelectedIndex = i;
-                break;
-            }
+            // Tắt flag sau khi load xong
+            isLoadingData = false;
         }
     }
 
     private void SetControlsEnabled(bool enabled)
     {
-        txtTenSinhVien.Enabled = !enabled;
-        dtpNgaySinh.Enabled = !enabled;
-        cbbNganh.Enabled = !enabled;
-        cbbKhoaHoc.Enabled = !enabled;
-        cbbLop.Enabled = !enabled;
-        rbNam.Enabled = !enabled;
-        rbNu.Enabled = !enabled;
+        txtTenSinhVien.Enabled = enabled;
+        dtpNgaySinh.Enabled = enabled;
+        cbbNganh.Enabled = enabled;
+        cbbLop.Enabled = enabled;
+        rbNam.Enabled = enabled;
+        rbNu.Enabled = enabled;
         txtSoDienThoai.Enabled = enabled;
-        txtQueQuan.Enabled = !enabled;
+        txtQueQuan.Enabled = enabled;
         txtEmail.Enabled = enabled;
-        txtCCCD.Enabled = !enabled;
+        txtCCCD.Enabled = enabled;
         cbbTrangThai.Enabled = enabled;
-    }
-
-    private void SetControlsEnabled2(bool disable)
-    {
-        txtTenSinhVien.Enabled = disable;
-        dtpNgaySinh.Enabled = disable;
-        cbbNganh.Enabled = disable;
-        cbbKhoaHoc.Enabled = disable;
-        cbbLop.Enabled = disable;
-        rbNam.Enabled = disable;
-        rbNu.Enabled = disable;
-        txtSoDienThoai.Enabled = disable;
-        txtQueQuan.Enabled = disable;
-        txtEmail.Enabled = disable;
-        txtCCCD.Enabled = disable;
-        cbbTrangThai.Enabled = disable;
     }
 
     private Panel CreateButtonPanel(DialogMode mode)
@@ -657,22 +739,15 @@ public class SinhVienDialog : Form
             return false;
         }
         
-        // Validate cascading dropdown
-        if (cbbNganh.SelectedIndex < 0 || cbbNganh.SelectedValue == null)
+        if (cbbNganh.SelectedIndex < 0 || cbbNganh.SelectedItem == null)
         {
             MessageBox.Show("Vui lòng chọn ngành.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             cbbNganh.Focus();
             return false;
         }
         
-        if (cbbKhoaHoc.SelectedIndex < 0 || cbbKhoaHoc.SelectedValue == null)
-        {
-            MessageBox.Show("Vui lòng chọn khóa học.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            cbbKhoaHoc.Focus();
-            return false;
-        }
         
-        if (cbbLop.SelectedIndex < 0 || cbbLop.SelectedValue == null)
+        if (cbbLop.SelectedIndex < 0 || cbbLop.SelectedItem == null)
         {
             MessageBox.Show("Vui lòng chọn lớp.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             cbbLop.Focus();
@@ -684,28 +759,51 @@ public class SinhVienDialog : Form
 
     private SinhVienDTO CreateSinhVienDto()
     {
-        // Get nganh name from selected value
         string nganhName = "";
-        if (cbbNganh.SelectedValue != null)
+        int maLop = 0;
+        
+        // Lấy ngành từ SelectedItem (vì không dùng DataSource)
+        if (cbbNganh.SelectedItem is NganhDto selectedNganh)
         {
-            var selectedNganh = nganhDao.GetNganhById((int)cbbNganh.SelectedValue);
             nganhName = selectedNganh.TenNganh;
         }
 
-        return new SinhVienDTO
+        // Lấy lớp từ SelectedItem (vì không dùng DataSource)
+        if (cbbLop.SelectedItem is LopDto selectedLop)
+        {
+            maLop = selectedLop.MaLop;
+        }
+        else
+        {
+            throw new Exception("Không thể lấy mã lớp. Vui lòng chọn lại lớp.");
+        }
+
+        var dto = new SinhVienDTO
         {
             MaSinhVien = string.IsNullOrEmpty(txtMaSinhVien.Text) ? 0 : int.Parse(txtMaSinhVien.Text),
             TenSinhVien = txtTenSinhVien.Text.Trim(),
             NgaySinh = dtpNgaySinh.Value.ToString("yyyy-MM-dd"),
             GioiTinh = rbNam.Checked ? "Nam" : "Nữ",
             Nganh = nganhName,
-            MaKhoaHoc = cbbKhoaHoc.SelectedValue != null ? (int)cbbKhoaHoc.SelectedValue : 0,
-            MaLop = cbbLop.SelectedValue != null ? (int)cbbLop.SelectedValue : 0,
+            MaLop = maLop,
             SdtSinhVien = txtSoDienThoai.Text.Trim(),
             QueQuanSinhVien = txtQueQuan.Text.Trim(),
             Email = txtEmail.Text.Trim(),
             CCCD = txtCCCD.Text.Trim(),
             TrangThai = cbbTrangThai.SelectedItem?.ToString() ?? "Đang học"
         };
+
+        // Lấy MaKhoaHoc từ sinh viên hiện tại (khi edit) hoặc mặc định là 1 (khi tạo mới)
+        if (!string.IsNullOrEmpty(txtMaSinhVien.Text))
+        {
+            var currentSinhVien = controller.GetSinhVienById(int.Parse(txtMaSinhVien.Text));
+            dto.MaKhoaHoc = currentSinhVien.MaKhoaHoc;
+        }
+        else
+        {
+            dto.MaKhoaHoc = 1; // Mặc định cho sinh viên mới
+        }
+
+        return dto;
     }
 }

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public class KhoaHocDao
 {
     private static KhoaHocDao _instance;
-    private KhoaHocDao() { }
+    public KhoaHocDao() { }
 
     public static KhoaHocDao GetInstance()
     {

@@ -25,7 +25,6 @@ public class SinhVien : NavBase
     private TextBox txtTenSinhVien;
     private TextBox txtNgaySinh;
     private ComboBox cbbNganh;
-    private ComboBox cbbKhoaHoc;
     private ComboBox cbbLop;
     private RadioButton rbNam;
     private RadioButton rbNu;
@@ -262,7 +261,7 @@ public class SinhVien : NavBase
         buttonContainer.Controls.Add(addButton);
         bottomDialog.Controls.Add(buttonContainer);   
         //borderMiddleLeft.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Ngành: " , "Khóa học: " , "Lớp: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái"};
+        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Ngành: " , "Lớp: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái"};
         float tile = 60f / list.Count;
         List<Control> rightComponents = new List<Control>();
         var radioNam = new RadioButton
@@ -299,7 +298,6 @@ public class SinhVien : NavBase
             Anchor = AnchorStyles.None,
         };
         panelRadioButton.Controls.Add(tableRadioButton);
-        // Cascading Dropdown: Ngành
         cbbNganh = new ComboBox()
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
@@ -308,17 +306,7 @@ public class SinhVien : NavBase
             Anchor = AnchorStyles.None,
         };
         
-        // Cascading Dropdown: Khóa học
-        cbbKhoaHoc = new ComboBox()
-        {
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Width = 300,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-            Enabled = false
-        };
         
-        // Cascading Dropdown: Lớp
         cbbLop = new ComboBox()
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
@@ -328,12 +316,9 @@ public class SinhVien : NavBase
             Enabled = false
         };
         
-        // Load initial data for cascading dropdown
         LoadCascadingData();
         
-        // Add event handlers for cascading
         cbbNganh.SelectedIndexChanged += CbbNganh_SelectedIndexChanged;
-        cbbKhoaHoc.SelectedIndexChanged += CbbKhoaHoc_SelectedIndexChanged;
         
         txtTenSinhVien = new TextBox()
         {
@@ -403,7 +388,6 @@ public class SinhVien : NavBase
         rightComponents.Add(txtTenSinhVien);
         rightComponents.Add(dtpNgaySinh);
         rightComponents.Add(cbbNganh);
-        rightComponents.Add(cbbKhoaHoc);
         rightComponents.Add(cbbLop);
         rightComponents.Add(panelRadioButton);
         rightComponents.Add(txtSoDienThoai);
@@ -493,12 +477,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    if (cbbKhoaHoc.SelectedIndex < 0 || cbbKhoaHoc.SelectedValue == null)
-                    {
-                        MessageBox.Show("Vui lòng chọn khóa học.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        cbbKhoaHoc.Focus();
-                        return;
-                    }
                     
                     if (cbbLop.SelectedIndex < 0 || cbbLop.SelectedValue == null)
                     {
@@ -584,7 +562,6 @@ public class SinhVien : NavBase
                         CCCD = txtCCCD.Text.Trim(),
                         TrangThai = cbbTrangThai.SelectedItem?.ToString() ?? "Đang học",
                         MaLop = (int)cbbLop.SelectedValue,
-                        MaKhoaHoc = (int)cbbKhoaHoc.SelectedValue,
                         Nganh = cbbNganh.SelectedItem?.GetType().GetProperty("TenNganh")?.GetValue(cbbNganh.SelectedItem)?.ToString() ?? ""
                     };
                     
@@ -599,9 +576,7 @@ public class SinhVien : NavBase
                     dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
                     cbbTrangThai.SelectedIndex = 0;
                     cbbNganh.SelectedIndex = -1;
-                    cbbKhoaHoc.SelectedIndex = -1;
                     cbbLop.SelectedIndex = -1;
-                    cbbKhoaHoc.Enabled = false;
                     cbbLop.Enabled = false;
 
                     form.Close();
@@ -864,26 +839,17 @@ public class SinhVien : NavBase
             MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message);
         }
     }
-
-    // Cascading Dropdown Methods
+    
     private void LoadCascadingData()
     {
         try
         {
-            // Load ngành
             var nganhList = _controller.GetAllNganh();
             cbbNganh.DataSource = null;
             cbbNganh.DisplayMember = "TenNganh";
             cbbNganh.ValueMember = "MaNganh";
             cbbNganh.DataSource = nganhList;
 
-            // Load khóa học
-            var khoaHocList = _controller.GetAllKhoaHoc();
-            cbbKhoaHoc.DataSource = null;
-            cbbKhoaHoc.DisplayMember = "DisplayText";
-            cbbKhoaHoc.ValueMember = "MaKhoaHoc";
-            cbbKhoaHoc.DataSource = khoaHocList;
-            cbbKhoaHoc.Enabled = true;
         }
         catch (Exception ex)
         {
@@ -893,45 +859,21 @@ public class SinhVien : NavBase
 
     private void CbbNganh_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (cbbNganh.SelectedValue != null && cbbKhoaHoc.SelectedValue != null)
+        if (cbbNganh.SelectedValue != null)
         {
             int maNganh = (int)cbbNganh.SelectedValue;
-            string tenKhoaHoc = cbbKhoaHoc.SelectedItem?.GetType().GetProperty("DisplayText")?.GetValue(cbbKhoaHoc.SelectedItem)?.ToString() ?? "";
-            
-            // Extract khoa hoc name (e.g., "K21" from "K21 (2021-2025)")
-            if (tenKhoaHoc.Contains("("))
-            {
-                tenKhoaHoc = tenKhoaHoc.Substring(0, tenKhoaHoc.IndexOf("(")).Trim();
-            }
-            
-            LoadLopData(maNganh, tenKhoaHoc);
+            LoadLopData(maNganh);
         }
     }
 
-    private void CbbKhoaHoc_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        if (cbbNganh.SelectedValue != null && cbbKhoaHoc.SelectedValue != null)
-        {
-            int maNganh = (int)cbbNganh.SelectedValue;
-            string tenKhoaHoc = cbbKhoaHoc.SelectedItem?.GetType().GetProperty("DisplayText")?.GetValue(cbbKhoaHoc.SelectedItem)?.ToString() ?? "";
-            
-            // Extract khoa hoc name (e.g., "K21" from "K21 (2021-2025)")
-            if (tenKhoaHoc.Contains("("))
-            {
-                tenKhoaHoc = tenKhoaHoc.Substring(0, tenKhoaHoc.IndexOf("(")).Trim();
-            }
-            
-            LoadLopData(maNganh, tenKhoaHoc);
-        }
-    }
 
-    private void LoadLopData(int maNganh, string tenKhoaHoc)
+    private void LoadLopData(int maNganh)
     {
         try
         {
-            var lopList = _controller.GetLopByNganhAndKhoaHoc(maNganh, tenKhoaHoc);
+            var lopList = _controller.GetLopByNganh(maNganh);
             cbbLop.DataSource = null;
-            cbbLop.DisplayMember = "DisplayText";
+            cbbLop.DisplayMember = "TenLop";
             cbbLop.ValueMember = "MaLop";
             cbbLop.DataSource = lopList;
             cbbLop.Enabled = true;

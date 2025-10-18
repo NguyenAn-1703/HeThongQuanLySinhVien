@@ -108,8 +108,8 @@ public class ChuongTrinhDaoTaoDao
     {
         int rowAffected = 0;
         using var conn = MyConnection.GetConnection();
-        string query = @"UPDATE chuongtrinhdaotao 
-                         SET Status = 0 
+        string query = @"UPDATE chuongtrinhdaotao
+                         SET Status = 0
                          WHERE MaCTDT = @MaCTDT";
         using var cmd = new MySqlCommand(query, conn);
         cmd.Parameters.AddWithValue("@MaCTDT", maCTDT);

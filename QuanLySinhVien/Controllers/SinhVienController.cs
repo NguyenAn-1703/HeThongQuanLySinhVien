@@ -1,84 +1,65 @@
-namespace QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
+
+namespace QuanLySinhVien.Controllers;
+
 public class SinhVienController
 {
-    public SinhVienDAO sinhVienDAO;
-    public NganhDao nganhDao;
-    public KhoaHocDAO khoaHocDao;
-    public LopDAO lopDao;
+    public SinhVienDAO SinhVienDao;
+    public NganhDao NganhDao;
+    public LopDAO LopDao;
     
     public SinhVienController()
     {   
-        sinhVienDAO = new SinhVienDAO();
-        nganhDao = new NganhDao();
-        khoaHocDao = new KhoaHocDAO();
-        lopDao = new LopDAO();
+        SinhVienDao = new SinhVienDAO();
+        NganhDao = NganhDao.GetInstance();
+        LopDao = new LopDAO();
     }
 
     public List<SinhVienDTO> LayDanhSachSinhVienTable()
     {
-        return sinhVienDAO.getTableSinhVien();
+        return SinhVienDao.getTableSinhVien();
     }
 
     public void EditSinhVien(SinhVienDTO sinhVien)
     {
         
-        sinhVienDAO.Update(sinhVien);
+        SinhVienDao.Update(sinhVien);
     }
 
     public void DeleteSinhVien(int id)
     {
-        sinhVienDAO.Delete(id);
+        SinhVienDao.Delete(id);
     }
 
     public SinhVienDTO GetSinhVienById(int id)
     {
-        return sinhVienDAO.GetSinhVienById(id);
+        return SinhVienDao.GetSinhVienById(id);
     }
 
     public void AddSinhVien(SinhVienDTO sinhVien)
     {
-        sinhVienDAO.Add(sinhVien);
+        SinhVienDao.Add(sinhVien);
     }
 
     public List<SinhVienDTO> Search(string text, string filter)
     {
-        return sinhVienDAO.Search(text, filter);
+        return SinhVienDao.Search(text, filter);
     }
     
     public List<NganhDto> GetAllNganh()
     {
-        return nganhDao.GetAll();
-    }
-
-    public List<dynamic> GetAllKhoaHoc()
-    {
-        return khoaHocDao.GetAllWithDisplayText();
+        return NganhDao.GetAll();
     }
 
     public List<LopDto> GetLopByNganh(int maNganh)
     {
-        return lopDao.GetByNganh(maNganh);
+        return LopDao.GetByNganh(maNganh);
     }
 
-    public List<LopDto> GetLopByNganhAndKhoaHoc(int maNganh, string tenKhoaHoc)
-    {
-        return lopDao.GetByNganhAndKhoaHoc(maNganh, tenKhoaHoc);
-    }
 
     public NganhDto GetNganhById(int maNganh)
     {
-        return nganhDao.GetNganhById(maNganh);
-    }
-
-    public KhoaHocDto GetKhoaHocById(int maKhoaHoc)
-    {
-        return khoaHocDao.GetById(maKhoaHoc);
-    }
-
-    public LopDto GetLopById(int maLop)
-    {
-        return lopDao.GetById(maLop);
+        return NganhDao.GetNganhById(maNganh);
     }
 }
