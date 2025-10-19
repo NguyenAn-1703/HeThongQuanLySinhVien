@@ -16,7 +16,7 @@ namespace QuanLySinhVien.Views.Components.CommonUse.Chart;
 
 public class OverviewChart : RoundTLP
 {
-    public OverviewChart()
+    public OverviewChart(string[] labels, double[] values)
     {
         Size = new System.Drawing.Size(50, 50);
         Margin = new Padding(10);
@@ -27,7 +27,8 @@ public class OverviewChart : RoundTLP
         {
             new ColumnSeries<double>
             {
-                Values = values2,
+                // Values = values2,
+                Values = values,
                 IgnoresBarPosition = true
             }
         };
@@ -35,12 +36,13 @@ public class OverviewChart : RoundTLP
         var yAxis = new Axis
         {
             MinLimit = 0,
-            MaxLimit = 10
+            MaxLimit = values.Max()
         };
 
         var xAxis = new Axis
         {
-            Labels = new string[] { "2018", "2019", "2020", "2021", "2022", "2023", "2024" },
+            // Labels = new string[] { "2018", "2019", "2020", "2021", "2022", "2023", "2024" },
+            Labels = labels,
             LabelsRotation = 0, 
         };
         
