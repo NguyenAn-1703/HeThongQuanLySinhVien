@@ -15,6 +15,7 @@ public class PhanQuyen : NavBase
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
     private NhomQuyenController _nhomQuyenController;
+    private ChiTietQuyenController _chiTietQuyenController;
     string[] _headerArray = new string[] { "Mã nhóm quyền", "Tên nhóm quyền" };
     List<string> _headerList;
 
@@ -33,6 +34,7 @@ public class PhanQuyen : NavBase
         _rawData = new List<NhomQuyenDto>();
         _displayData = new List<object>();
         _nhomQuyenController = NhomQuyenController.GetInstance();
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
         Init();
     }
 
@@ -209,7 +211,7 @@ public class PhanQuyen : NavBase
         {
             return;
         }
-        if (_nhomQuyenController.Delete(index))
+        if (_nhomQuyenController.Delete(index) && _chiTietQuyenController.DeleteAllCTQ(index))
         {
             MessageBox.Show("Xóa thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             UpdateDataDisplay(_nhomQuyenController.GetAll());
@@ -220,6 +222,8 @@ public class PhanQuyen : NavBase
             MessageBox.Show("Xóa thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+    
+        
     
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////

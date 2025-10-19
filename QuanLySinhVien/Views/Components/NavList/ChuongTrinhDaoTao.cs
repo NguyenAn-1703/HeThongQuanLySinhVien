@@ -19,6 +19,7 @@ public class ChuongTrinhDaoTao : NavBase
     private ChuongTrinhDaoTaoController _ChuongTrinhDaoTaoController;
     private NganhController _nganhController;
     private ChuKyDaoTaoController _chuKyDaoTaoController;
+    private ChuongTrinhDaoTao_HocPhanController _chuongTrinhDaoTao_HocPhanController;
     string[] _headerArray = new string[] { "Mã chương trình đào tạo", "Tên ngành", "Chu kỳ","Loại hình đào tạo", "Trình độ" };
     List<string> _headerList;
 
@@ -40,6 +41,7 @@ public class ChuongTrinhDaoTao : NavBase
         _ChuongTrinhDaoTaoController = ChuongTrinhDaoTaoController.GetInstance();
         _nganhController = NganhController.GetInstance();
         _chuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
+        _chuongTrinhDaoTao_HocPhanController = ChuongTrinhDaoTao_HocPhanController.GetInstance();
         Init();
     }
 
@@ -210,6 +212,8 @@ public class ChuongTrinhDaoTao : NavBase
         {
             new InputFormItem("Ngành", TextFieldType.Combobox),
             new InputFormItem("Chu kỳ", TextFieldType.Combobox),
+            new InputFormItem("Loại hình đào tạo",  TextFieldType.Combobox),
+            new InputFormItem("Trình độ đào tạo",  TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
@@ -231,6 +235,8 @@ public class ChuongTrinhDaoTao : NavBase
         {
             new InputFormItem("Ngành", TextFieldType.Combobox),
             new InputFormItem("Chu kỳ", TextFieldType.Combobox),
+            new InputFormItem("Loại hình đào tạo",  TextFieldType.Combobox),
+            new InputFormItem("Trình độ đào tạo",  TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
@@ -249,6 +255,8 @@ public class ChuongTrinhDaoTao : NavBase
         {
             new InputFormItem("Ngành", TextFieldType.Combobox),
             new InputFormItem("Chu kỳ", TextFieldType.Combobox),
+            new InputFormItem("Loại hình đào tạo",  TextFieldType.Combobox),
+            new InputFormItem("Trình độ đào tạo",  TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
         list.AddRange(arr);
@@ -263,16 +271,19 @@ public class ChuongTrinhDaoTao : NavBase
         {
             return;
         }
-        if (_ChuongTrinhDaoTaoController.Delete(index))
+        if (_ChuongTrinhDaoTaoController.Delete(index) && _chuongTrinhDaoTao_HocPhanController.DeleteAllByMaCTDT(index))
         {
             MessageBox.Show("Xóa chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             UpdateDataDisplay(_ChuongTrinhDaoTaoController.GetAll());
             this._table.UpdateData(_displayData);
+            
         }
+
         else
         {
             MessageBox.Show("Xóa chương trình đào tạo thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+        
     }
     
 

@@ -115,4 +115,44 @@ public class ChuongTrinhDaoTao_HocPhanDao
 
         return result;
     }
+    
+    public bool HardDelete(int maCTDT, int maHP)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"DELETE FROM chuongtrinhdaotao_hocphan
+                             WHERE MaCTDT = @MaCTDT
+                             AND MaHP = @MaHP
+                            ;";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaCTDT", maCTDT);
+                cmd.Parameters.AddWithValue("@MaHP", maHP);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+
+        return rowAffected > 0;
+    }
+    
+    public bool DeleteAllByMaCTDT(int maCTDT)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"DELETE FROM chuongtrinhdaotao_hocphan
+                             WHERE MaCTDT = @MaCTDT
+                            ;";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaCTDT", maCTDT);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+
+        return rowAffected > 0;
+    }
+    
+    
 }

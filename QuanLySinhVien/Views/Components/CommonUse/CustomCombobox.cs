@@ -1,4 +1,5 @@
 using QuanLySinhVien.Views.Components.ViewComponents;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
@@ -18,6 +19,8 @@ public class CustomCombobox : RoundTLP
         this.Border = true;
 
         this.AutoSize = true;
+        
+        
         combobox.DropDownStyle = ComboBoxStyle.DropDownList;
         combobox.AutoSize = true;
         combobox.Dock = DockStyle.Fill;

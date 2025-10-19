@@ -1,5 +1,6 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.ViewComponents;
@@ -50,6 +51,13 @@ public class ChuongTrinhDaoTaoDialog : Form
     private ChuKyDaoTaoController _chuKyDaoTaoController;
     private ChuongTrinhDaoTao_HocPhanController _chuongTrinhDaoTao_HocPhanController;
     
+    private string[] _arrLHDT = new []{"Chính quy","Văn bằng 2","Vừa học vừa làm"};
+    private List<string> _listLHDT;
+    private string[] _arrTDDT = new []{"Cử nhân","Thạc sĩ","Tiến sĩ"};
+    private List<string> _listTDDT;
+
+    private List<HocPhanDto> _oldListUpdate;
+    private List<HocPhanDto> _newListUpdate;
     
 
     public ChuongTrinhDaoTaoDialog(string title, DialogType dialogType, List<InputFormItem> listIFI, ChuongTrinhDaoTaoController chuongTrinhDaoTaoController, int idChuongTrinhDaoTao = -1)
@@ -69,6 +77,8 @@ public class ChuongTrinhDaoTaoDialog : Form
         
         _header = _headerArray.ToList();
         _headerDetail = _headerDetailArray.ToList();
+        _listLHDT = _arrLHDT.ToList();
+        _listTDDT = _arrTDDT.ToList();
         
         _nganhController = NganhController.GetInstance();
         _chuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
@@ -222,6 +232,7 @@ public class ChuongTrinhDaoTaoDialog : Form
             Margin = new Padding(0),
             BackColor = MyColor.LightGray,
             ColumnCount = 2,
+            RowCount = 2,
             // Padding = new Padding(100, 10, 100, 10),
         };
         
@@ -368,6 +379,16 @@ public class ChuongTrinhDaoTaoDialog : Form
         _leftTable.BtnClick += id => InsertHP(id);
         _rightTable.BtnClick += id => DeleteHP(id);
 
+        _leftTable.OnDetail += i =>
+        {
+            new HocPhanDialog(DialogType.ChiTiet, _hocPhanController.GetHocPhanById(i), HocPhanDao.GetInstance()).ShowDialog();
+        };
+        
+        _rightTable.OnDetail += i =>
+        {
+            new HocPhanDialog(DialogType.ChiTiet, _hocPhanController.GetHocPhanById(i), HocPhanDao.GetInstance()).ShowDialog();
+        };
+
         if (_dialogType == DialogType.Them)
         {
             _btnLuu._mouseDown += () => Insert();
@@ -390,32 +411,23 @@ public class ChuongTrinhDaoTaoDialog : Form
 
     void SetupInsert()
     {
-        List<NganhDto> listNganh = _nganhController.GetAll();
-        List<string> listTenNganh = listNganh.Select(x => x.TenNganh).ToList();
-        _listTextBox[0].SetComboboxList(listTenNganh);
-        _listTextBox[0].SetComboboxSelection(listTenNganh[0]);
-        
-        List<ChuKyDaoTaoDto> listChuKy = _chuKyDaoTaoController.GetAll();
-        List<string> listTenChuKy = listChuKy.Select(x => (x.NamBatDau + " - " + x.NamKetThuc)).ToList();
-        _listTextBox[1].SetComboboxList(listTenChuKy);
-        _listTextBox[1].SetComboboxSelection(listTenChuKy[0]);
+        SetupCombobox();
     }
 
     void SetupUpdate()
     {
+        SetupCombobox();
+        
         ChuongTrinhDaoTaoDto chuongTrinh = _chuongTrinhDaoTaoController.GetById(_idChuongTrinhDaoTao);
+        
         NganhDto nganh = _nganhController.GetNganhById(chuongTrinh.MaNganh);
         ChuKyDaoTaoDto chuKy = _chuKyDaoTaoController.GetById(chuongTrinh.MaCKDT);
         
-        List<NganhDto> listNganh = _nganhController.GetAll();
-        List<string> listTenNganh = listNganh.Select(x => x.TenNganh).ToList();
-        _listTextBox[0].SetComboboxList(listTenNganh);
         _listTextBox[0].SetComboboxSelection(nganh.TenNganh);
-        
-        List<ChuKyDaoTaoDto> listChuKy = _chuKyDaoTaoController.GetAll();
-        List<string> listTenChuKy = listChuKy.Select(x => (x.NamBatDau + " - " + x.NamKetThuc)).ToList();
-        _listTextBox[1].SetComboboxList(listTenChuKy);
         _listTextBox[1].SetComboboxSelection(chuKy.NamBatDau + " - " + chuKy.NamKetThuc);
+        _listTextBox[2].SetComboboxSelection(chuongTrinh.LoaiHinhDT);
+        _listTextBox[3].SetComboboxSelection(chuongTrinh.TrinhDo);
+        
 
         List<ChuongTrinhDaoTao_HocPhanDto> listCTDT_HP = _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(_idChuongTrinhDaoTao);
         
@@ -427,24 +439,27 @@ public class ChuongTrinhDaoTaoDialog : Form
         _rightRawData = listHocPhan;
         _leftRawData.RemoveAll(a => listHocPhan.Any(b => a.MaHP == b.MaHP));
         UpdateTableWNewRawData();
+        
+        //chỉ cần lấy mã để so sánh
+        _oldListUpdate = _rightRawData
+            .Select(x => new HocPhanDto
+            {
+                MaHP = x.MaHP,
+            })
+            .ToList();;
     }
 
     void SetupDetail()
     {
-        Console.WriteLine("chitiet");
+        SetupCombobox();
         ChuongTrinhDaoTaoDto chuongTrinh = _chuongTrinhDaoTaoController.GetById(_idChuongTrinhDaoTao);
         NganhDto nganh = _nganhController.GetNganhById(chuongTrinh.MaNganh);
         ChuKyDaoTaoDto chuKy = _chuKyDaoTaoController.GetById(chuongTrinh.MaCKDT);
         
-        List<NganhDto> listNganh = _nganhController.GetAll();
-        List<string> listTenNganh = listNganh.Select(x => x.TenNganh).ToList();
-        _listTextBox[0].SetComboboxList(listTenNganh);
         _listTextBox[0].SetComboboxSelection(nganh.TenNganh);
-        
-        List<ChuKyDaoTaoDto> listChuKy = _chuKyDaoTaoController.GetAll();
-        List<string> listTenChuKy = listChuKy.Select(x => (x.NamBatDau + " - " + x.NamKetThuc)).ToList();
-        _listTextBox[1].SetComboboxList(listTenChuKy);
         _listTextBox[1].SetComboboxSelection(chuKy.NamBatDau + " - " + chuKy.NamKetThuc);
+        _listTextBox[2].SetComboboxSelection(chuongTrinh.LoaiHinhDT);
+        _listTextBox[3].SetComboboxSelection(chuongTrinh.TrinhDo);
 
         List<ChuongTrinhDaoTao_HocPhanDto> listCTDT_HP = _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(_idChuongTrinhDaoTao);
         
@@ -463,8 +478,28 @@ public class ChuongTrinhDaoTaoDialog : Form
         _rightTable.EnableActionColumn();
         _listTextBox[0].GetComboboxField().Enabled = false;
         _listTextBox[1].GetComboboxField().Enabled = false;
+        _listTextBox[2].GetComboboxField().Enabled = false;
+        _listTextBox[3].GetComboboxField().Enabled = false;
 
+    }
 
+    void SetupCombobox()
+    {
+        List<NganhDto> listNganh = _nganhController.GetAll();
+        List<string> listTenNganh = listNganh.Select(x => x.TenNganh).ToList();
+        _listTextBox[0].SetComboboxList(listTenNganh);
+        _listTextBox[0].SetComboboxSelection(listTenNganh[0]);
+        
+        List<ChuKyDaoTaoDto> listChuKy = _chuKyDaoTaoController.GetAll();
+        List<string> listTenChuKy = listChuKy.Select(x => (x.NamBatDau + " - " + x.NamKetThuc)).ToList();
+        _listTextBox[1].SetComboboxList(listTenChuKy);
+        _listTextBox[1].SetComboboxSelection(listTenChuKy[0]);
+        
+        _listTextBox[2].SetComboboxList(_listLHDT);
+        _listTextBox[2].SetComboboxSelection(_listLHDT[0]);
+        
+        _listTextBox[3].SetComboboxList(_listTDDT);
+        _listTextBox[3].SetComboboxSelection(_listTDDT[0]);
     }
     
     void SetRightDisplayData()
@@ -554,11 +589,125 @@ public class ChuongTrinhDaoTaoDialog : Form
     {
         string startendYear = _listTextBox[1].GetSelectionCombobox();
         ChuKyDaoTaoDto chuky = _chuKyDaoTaoController.GetByStartYearEndYear(startendYear);
-        Console.WriteLine("machuky: " + chuky.MaCKDT);
         
         string tenNganh = _listTextBox[0].GetSelectionCombobox();
         NganhDto nganh = _nganhController.GetByTen(tenNganh);
-        Console.WriteLine("maNganh: " + nganh.MaNganh);
+        
+        string loaiHinhDaoTao = _listTextBox[2].GetSelectionCombobox();
+        string trinhDoDaoTao = _listTextBox[2].GetSelectionCombobox();
+
+        if (!_chuongTrinhDaoTaoController.ValidateNganhChuKy(nganh.MaNganh, chuky.MaCKDT))
+        {
+            MessageBox.Show("Đã tồn tại chương trình đào tạo của ngành này thuộc chu kỳ này!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        List<HocPhanDto> listSelected = _rightRawData;
+        if (listSelected.Count == 0)
+        {
+            MessageBox.Show("Chưa có học phần nào được chọn!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        if (!_chuongTrinhDaoTaoController.Insert(new ChuongTrinhDaoTaoDto
+            {
+                MaCKDT = chuky.MaCKDT,
+                MaNganh = nganh.MaNganh,
+                LoaiHinhDT = loaiHinhDaoTao,
+                TrinhDo = trinhDoDaoTao,
+            }))
+        {
+            MessageBox.Show("Lỗi thêm chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        int MaCTDT = _chuongTrinhDaoTaoController.GetLastAutoIncrement();
+
+        foreach (HocPhanDto dto in listSelected)
+        {
+            if (
+                !_chuongTrinhDaoTao_HocPhanController.Insert(new ChuongTrinhDaoTao_HocPhanDto
+                {
+                    MaHP = dto.MaHP,
+                    MaCTDT = MaCTDT,
+                }))
+            {
+                MessageBox.Show("Lỗi thêm chi tiết chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+        }
+        
+        MessageBox.Show("Thêm chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        
+        this.Close();
+        Finish?.Invoke();
+    }
+    
+    void Update()
+    {
+        _newListUpdate = _rightRawData;
+        
+        string startendYear = _listTextBox[1].GetSelectionCombobox();
+        ChuKyDaoTaoDto chuky = _chuKyDaoTaoController.GetByStartYearEndYear(startendYear);
+        
+        string tenNganh = _listTextBox[0].GetSelectionCombobox();
+        NganhDto nganh = _nganhController.GetByTen(tenNganh);
+        
+        string loaiHinhDaoTao = _listTextBox[2].GetSelectionCombobox();
+        string trinhDoDaoTao = _listTextBox[2].GetSelectionCombobox();
+
+        if (!_chuongTrinhDaoTaoController.ValidateNganhChuKy(_idChuongTrinhDaoTao,nganh.MaNganh, chuky.MaCKDT))
+        {
+            MessageBox.Show("Đã tồn tại chương trình đào tạo của ngành này thuộc chu kỳ này!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        List<HocPhanDto> listSelected = _rightRawData;
+        if (listSelected.Count == 0)
+        {
+            MessageBox.Show("Chưa có học phần nào được chọn!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        
+        if (!_chuongTrinhDaoTaoController.Update(new ChuongTrinhDaoTaoDto
+            {
+                MaCTDT = _idChuongTrinhDaoTao,
+                MaCKDT = chuky.MaCKDT,
+                MaNganh = nganh.MaNganh,
+                LoaiHinhDT = loaiHinhDaoTao,
+                TrinhDo = trinhDoDaoTao,
+            }))
+        {
+            MessageBox.Show("Lỗi thêm chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        
+
+        //List cũ có, mới không có -> xóa
+        foreach (HocPhanDto dto in _oldListUpdate)
+        {
+            if (!_newListUpdate.Any(x => x.MaHP == dto.MaHP))
+            {
+                _chuongTrinhDaoTao_HocPhanController.HardDelete(_idChuongTrinhDaoTao, dto.MaHP);
+            }
+        }
+        //List cũ không có, mới có -> thêm
+        foreach (HocPhanDto dto in _newListUpdate)
+        {
+            if (!_oldListUpdate.Any(x => x.MaHP == dto.MaHP))
+            {
+                _chuongTrinhDaoTao_HocPhanController.Insert(new ChuongTrinhDaoTao_HocPhanDto()
+                {
+                    MaCTDT = _idChuongTrinhDaoTao,
+                    MaHP = dto.MaHP,
+                });
+            }
+        }
+        
+        MessageBox.Show("Sửa chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        
+        this.Close();
+        Finish?.Invoke();
     }
 
     void UpdateTK(ChuongTrinhDaoTaoDto ChuongTrinhDaoTao)

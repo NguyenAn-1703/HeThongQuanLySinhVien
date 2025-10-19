@@ -151,5 +151,22 @@ public class ChiTietQuyenDao
         }
         return result;
     }
+    public bool DeleteAllCTQ(int maNQ)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"DELETE FROM chitietquyen
+                             WHERE MaNQ = @MaNQ
+                            ;";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaNQ", maNQ);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+
+        return rowAffected > 0;
+    } 
     
 }

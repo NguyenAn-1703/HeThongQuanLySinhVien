@@ -40,6 +40,11 @@ public class ChuongTrinhDaoTao_HocPhanController
     {
         return _dao.Delete(maCTDT, maHP);
     }
+    
+    public bool HardDelete(int maCTDT, int maHP)
+    {
+        return _dao.HardDelete(maCTDT, maHP);
+    }
 
     public ChuongTrinhDaoTao_HocPhanDto GetById(int maCTDT, int maHP)
     {
@@ -49,6 +54,11 @@ public class ChuongTrinhDaoTao_HocPhanController
     public List<ChuongTrinhDaoTao_HocPhanDto> GetByMaCTDT(int MaCTDT)
     {
         return _dao.GetByMaCTDT(MaCTDT);
+    }
+
+    public bool DeleteAllByMaCTDT(int maCTDT)
+    {
+        return _dao.DeleteAllByMaCTDT(maCTDT);
     }
     
 }

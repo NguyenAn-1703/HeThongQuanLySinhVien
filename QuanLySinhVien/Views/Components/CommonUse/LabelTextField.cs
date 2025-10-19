@@ -118,14 +118,14 @@ public class LabelTextField : TableLayoutPanel
         if (statusEp)
         {
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-close.svg");
-            this._field.contentTextBox.PasswordChar = '*';
+            this._password.contentTextBox.PasswordChar = '*';
             statusEp = false;
         }
         // đóng -> mở
         else
         {
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-open.svg");
-            this._field.contentTextBox.PasswordChar = '\0';
+            this._password.contentTextBox.PasswordChar = '\0';
             statusEp = true;
         }
     }

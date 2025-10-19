@@ -27,6 +27,8 @@ public class CTDTTable : CustomTable
     private string _columnName;
 
 
+
+
     public event Action<int> BtnClick;
     public CTDTTable(List<string> headerContent, List<string> columnNames, List<object> cells, TableCTDTType type)
         : base(headerContent, columnNames, cells,
@@ -246,5 +248,5 @@ public class CTDTTable : CustomTable
     {
         _dataGridView.Columns[_columnName].Visible = false;
         _header.Controls.RemoveAt(_header.Controls.Count - 1);
-    }
+    } 
 }

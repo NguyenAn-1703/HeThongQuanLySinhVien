@@ -63,5 +63,22 @@ public class ChuongTrinhDaoTaoController
 
         return !isDuplicate;
     }
+    
+    //update
+    public bool ValidateNganhChuKy(int idChuongTrinhDaoTao, int maNganh, int maChuKy)
+    {
+        bool isDuplicate = _listChuongTrinh.Any(ct =>
+            (ct.MaNganh == maNganh) &&
+            (ct.MaCKDT == maChuKy) &&
+            (ct.MaCTDT != idChuongTrinhDaoTao)
+            );
+
+        return !isDuplicate;
+    }
+
+    public int GetLastAutoIncrement()
+    {
+        return _chuongTrinhDaoTaoDao.GetLastAutoIncrement();
+    }
 
 }

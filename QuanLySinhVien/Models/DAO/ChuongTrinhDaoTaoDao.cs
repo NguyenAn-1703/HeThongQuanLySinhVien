@@ -116,4 +116,19 @@ public class ChuongTrinhDaoTaoDao
         rowAffected = cmd.ExecuteNonQuery();
         return rowAffected > 0;
     }
+    
+    public int GetLastAutoIncrement()
+    {
+        int Id = 0;
+
+        string query = "SELECT MAX(MaCTDT) FROM chuongtrinhdaotao";
+
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(query, conn);
+        var result = cmd.ExecuteScalar();
+        if (result != DBNull.Value)
+            Id = Convert.ToInt32(result);
+
+        return Id;
+    }
 }
