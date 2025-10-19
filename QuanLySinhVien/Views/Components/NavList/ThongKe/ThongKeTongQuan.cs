@@ -75,8 +75,16 @@ public class ThongKeTongQuan : TableLayoutPanel
     OverviewChart GetOverViewChart()
     {
         // int[] soSVTheoNam = new[] { 100, 150, 110, 90, 88, 120 };
+        Dictionary<string, double> result = sinhVienDao.SoLuongSinhVienTheoNamNhapHoc();
+        
+        result = result.Take(7)
+            .OrderBy(kv => kv.Key)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
+        
+        string[] namNhapHoc = result.Keys.ToArray();
+        double[] soSVTheoNam = result.Values.ToArray();
 
-        OverviewChart chart = new OverviewChart();
+        OverviewChart chart = new OverviewChart(namNhapHoc, soSVTheoNam);
         chart.Dock = DockStyle.Fill;
         return chart;
     }
@@ -114,7 +122,7 @@ public class ThongKeTongQuan : TableLayoutPanel
         string[] dsKhoaHoc = data.Keys.ToArray();
         int total = data.Values.Sum();
         float[] percent = data.Values
-            .Select(count => (float)Math.Round((float)count / total * 100, 0))
+            .Select(count => (float)Math.Round((float)count / total * 100, 2))
             .ToArray();
 
         CustomPieChart chart = new CustomPieChart(dsKhoaHoc, percent);
