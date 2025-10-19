@@ -211,9 +211,61 @@ public class SinhVienDAO
 
         while (reader.Read())
         {
-            string maKhoaHoc = reader.GetString("TenKhoaHoc");
+            string tenKhoaHoc = reader.GetString("TenKhoaHoc");
             int soLuong = reader.GetInt32("SoLuong");
-            result[maKhoaHoc] = soLuong;
+            result[tenKhoaHoc] = soLuong;
+        }
+
+        return result;
+    }
+
+    public Dictionary<string, float> TyLeSinhVienTotNghiepTheoNganh(bool IsDesc = true)
+    {
+        var result = new Dictionary<string, float>();
+
+        try
+        {
+            using var conn = MyConnection.GetConnection();
+
+            const string sql = @"
+            SELECT 
+                Nganh.MaNganh, 
+                Nganh.TenNganh, 
+                COUNT(*) AS TongSoSinhVien, 
+                COUNT(CASE WHEN SinhVien.TrangThaiSV = 'Tốt nghiệp' THEN 1 END) AS SoLuongTotNghiep
+            FROM SinhVien
+            JOIN Lop ON SinhVien.MaLop = Lop.MaLop
+            JOIN Nganh ON Lop.MaNganh = Nganh.MaNganh
+            GROUP BY Nganh.MaNganh, Nganh.TenNganh;";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string tenNganh = reader.GetString("TenNganh");
+                int tongSoSinhVien = reader.GetInt32("TongSoSinhVien");
+                int soLuongTotNghiep = reader.GetInt32("SoLuongTotNghiep");
+
+                float tyLeTotNghiep = tongSoSinhVien == 0
+                    ? 0
+                    : (float)Math.Round((float) soLuongTotNghiep / tongSoSinhVien * 100, 2);
+
+                result[tenNganh] = tyLeTotNghiep;
+            }
+            
+            if (IsDesc)
+                result = result
+                    .OrderByDescending(kv => kv.Value)
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+            else
+                result = result
+                    .OrderBy(kv => kv.Value)
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi truy vấn dữ liệu: {ex.Message}");
         }
 
         return result;

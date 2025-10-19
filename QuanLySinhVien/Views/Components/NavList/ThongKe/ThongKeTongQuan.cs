@@ -114,9 +114,9 @@ public class ThongKeTongQuan : TableLayoutPanel
         string[] dsKhoaHoc = data.Keys.ToArray();
         int total = data.Values.Sum();
         float[] percent = data.Values
-            .Select(count => (float)Math.Round((float)count / total * 100, 2))
+            .Select(count => (float)Math.Round((float)count / total * 100, 0))
             .ToArray();
-        
+
         CustomPieChart chart = new CustomPieChart(dsKhoaHoc, percent);
         return chart;
     }
@@ -132,23 +132,29 @@ public class ThongKeTongQuan : TableLayoutPanel
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
 
-        string[] listTen1 = new string[]
-        {
-            "Công nghệ thông tin", "Công nghệ thông tin", "Công nghệ thông tin", "Công nghệ thông tin",
-            "Công nghệ thông tin"
-        };
-        float[] listPhanTram1 = new[] { 100f, 100f, 100f, 100f, 100f };
+        Dictionary<string, float> data = sinhVienDao.TyLeSinhVienTotNghiepTheoNganh();
+        
+        var top5High = data
+            .OrderByDescending(kv => kv.Value)
+            .Take(5)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
+        
+        string[] dsNganhHigh = top5High.Keys.ToArray();
+        float[] tyLeHigh = top5High.Values.ToArray();
+        
         StatisticalTop5Box box1 =
-            new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp cao nhất", listTen1, listPhanTram1);
+            new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp cao nhất", dsNganhHigh, tyLeHigh);
 
-        string[] listTen2 = new string[]
-        {
-            "Công nghệ thông tin", "Công nghệ thông tin", "Công nghệ thông tin", "Công nghệ thông tin",
-            "Công nghệ thông tin"
-        };
-        float[] listPhanTram2 = new[] { 100f, 100f, 100f, 100f, 100f };
+        var top5Low = data
+            .OrderBy(kv => kv.Value)
+            .Take(5)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+        string[] dsNganhLow = top5Low.Keys.ToArray();
+        float[] tyLeLow = top5Low.Values.ToArray();
+        
         StatisticalTop5Box box2 =
-            new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp thấp nhất", listTen2, listPhanTram2);
+            new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp thấp nhất", dsNganhLow, tyLeLow);
 
         panel.Controls.Add(box1);
         panel.Controls.Add(box2);
