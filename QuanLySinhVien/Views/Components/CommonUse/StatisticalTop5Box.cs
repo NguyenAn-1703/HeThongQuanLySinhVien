@@ -52,7 +52,7 @@ public class StatisticalTop5Box : RoundTLP
             lbl2.AutoSize = true;
             
             lbl1.Text = _listTen[i];
-            lbl2.Text = _listPhanTram[i] + "";
+            lbl2.Text = _listPhanTram[i] + "%";
 
             lbl1.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
             lbl2.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
