@@ -15,7 +15,7 @@ public class CustomTable : TableLayoutPanel
 {
     public CustomDataGridView _dataGridView;
     List<string> _headerContent;
-    private FlowLayoutPanel _header;
+    protected FlowLayoutPanel _header;
     private List<object> _cellDatas;
     private List<string> _columnNames; //để truy suất
     private BindingList<object> _displayCellData;

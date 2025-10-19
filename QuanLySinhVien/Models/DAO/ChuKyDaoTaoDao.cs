@@ -143,4 +143,29 @@ public class ChuKyDaoTaoDao
         return result;
     }
     
+    public ChuKyDaoTaoDto GetByStartYearEndYear(int startYear, int endYear)
+    {
+        ChuKyDaoTaoDto result = new ChuKyDaoTaoDto();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaCKDT, NamBatDau, NamKetThuc FROM chukydaotao WHERE Status = 1 AND NamBatDau = @StartYear AND NamKetThuc = @EndYear",
+            conn);
+        cmd.Parameters.AddWithValue("@StartYear", startYear);
+        cmd.Parameters.AddWithValue("@EndYear", endYear);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new ChuKyDaoTaoDto
+            {
+                MaCKDT = reader.GetInt32("MaCKDT"),
+                NamBatDau = reader.GetString("NamBatDau"),
+                NamKetThuc = reader.GetString("NamKetThuc"),
+            };
+        }
+
+        return result;
+    }
+    
+    
 }

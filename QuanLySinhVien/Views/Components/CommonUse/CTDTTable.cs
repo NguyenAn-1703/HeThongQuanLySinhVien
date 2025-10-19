@@ -26,7 +26,8 @@ public class CTDTTable : CustomTable
     private TableCTDTType _type;
     private string _columnName;
 
-    private event Action<int> BtnClick;
+
+    public event Action<int> BtnClick;
     public CTDTTable(List<string> headerContent, List<string> columnNames, List<object> cells, TableCTDTType type)
         : base(headerContent, columnNames, cells,
             false, false, false)
@@ -40,12 +41,14 @@ public class CTDTTable : CustomTable
         if (_type == TableCTDTType.Plus)
         {
             _columnName = "ActionPlus";
+            SetActionColumn();
         }
-        else
+        if (_type == TableCTDTType.Minus)
         {
             _columnName = "ActionMinus";
+            SetActionColumn();
         }
-        SetActionColumn();
+        
     }
 
     void SetActionColumn()
@@ -220,8 +223,10 @@ public class CTDTTable : CustomTable
     void OnClickBtn(int index)
     {
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+        _Btn.Dispose();
+        flagBtn = false;
         BtnClick?.Invoke(Id);
-    }
+    } 
 
 
     GraphicsPath GetRoundedRec(Rectangle rect, int radius)
@@ -235,5 +240,11 @@ public class CTDTTable : CustomTable
 
         path.CloseFigure();
         return path;
+    }
+
+    public void EnableActionColumn()
+    {
+        _dataGridView.Columns[_columnName].Visible = false;
+        _header.Controls.RemoveAt(_header.Controls.Count - 1);
     }
 }

@@ -125,6 +125,29 @@ public class NganhDao
 
         return result;
     }
+    
+    public NganhDto GetByTen(string tenNganh)
+    {
+        NganhDto result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd =
+            new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE TenNganh = @TenNganh",
+                conn);
+        cmd.Parameters.AddWithValue("@TenNganh", tenNganh);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new NganhDto
+            {
+                MaKhoa = reader.GetInt32("MaKhoa"),
+                MaNganh = reader.GetInt32("MaNganh"),
+                TenNganh = reader.GetString("TenNganh")
+            };
+        }
+
+        return result;
+    }
 
     public static void TestNganhDAO()
     {

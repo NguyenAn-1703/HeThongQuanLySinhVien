@@ -155,7 +155,7 @@ public class ChuongTrinhDaoTao : NavBase
             {
                 MaCTDT = x.MaCTDT,
                 TenNganh = _nganhController.GetNganhById(x.MaNganh).TenNganh,
-                ChuKy = _chuKyDaoTaoController.GetById(x.MaNganh).NamBatDau + "-" + _chuKyDaoTaoController.GetById(x.MaNganh).NamKetThuc,
+                ChuKy = _chuKyDaoTaoController.GetById(x.MaCKDT).NamBatDau + "-" + _chuKyDaoTaoController.GetById(x.MaCKDT).NamKetThuc,
                 LoaiHinhDT = x.LoaiHinhDT,
                 TrinhDo = x.TrinhDo,
             }
@@ -194,7 +194,7 @@ public class ChuongTrinhDaoTao : NavBase
             {
                 MaCTDT = x.MaCTDT,
                 TenNganh = _nganhController.GetNganhById(x.MaNganh).TenNganh,
-                ChuKy = _chuKyDaoTaoController.GetById(x.MaNganh).NamBatDau + "-" + _chuKyDaoTaoController.GetById(x.MaNganh).NamKetThuc,
+                ChuKy = _chuKyDaoTaoController.GetById(x.MaCKDT).NamBatDau + "-" + _chuKyDaoTaoController.GetById(x.MaCKDT).NamKetThuc,
                 LoaiHinhDT = x.LoaiHinhDT,
                 TrinhDo = x.TrinhDo,
             }

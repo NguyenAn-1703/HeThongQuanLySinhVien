@@ -49,4 +49,19 @@ public class ChuongTrinhDaoTaoController
     {
         return _chuongTrinhDaoTaoDao.Delete(id);
     }
+
+    public bool ValidateNganhChuKy(int maNganh, int maChuKy)
+    {
+        // Kiểm tra nếu danh sách trống
+        if (_listChuongTrinh.Count == 0)
+            return true;
+
+        // Tìm xem có chương trình nào có cùng mã ngành và mã chu kỳ không
+        bool isDuplicate = _listChuongTrinh.Any(ct =>
+            (ct.MaNganh == maNganh) &&
+            (ct.MaCKDT == maChuKy));
+
+        return !isDuplicate;
+    }
+
 }
