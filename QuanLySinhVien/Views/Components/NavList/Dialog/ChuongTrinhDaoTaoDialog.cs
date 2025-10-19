@@ -709,16 +709,6 @@ public class ChuongTrinhDaoTaoDialog : Form
         this.Close();
         Finish?.Invoke();
     }
-
-    void UpdateTK(ChuongTrinhDaoTaoDto ChuongTrinhDaoTao)
-    {
-        
-    }
-
-    bool Validate(TextBox TxtTenDangNhap, TextBox TxtMatKhau, string tenDangNhap, string matKhau)
-    {
-        return true;
-    }
     
     
 }

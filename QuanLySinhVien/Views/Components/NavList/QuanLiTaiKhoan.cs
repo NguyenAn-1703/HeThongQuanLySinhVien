@@ -184,8 +184,9 @@ public class QuanLiTaiKhoan : NavBase
     {
         InputFormItem[] arr = new InputFormItem[]
         {
-            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Tên đăng nhập", TextFieldType.NormalText),
             new InputFormItem("Mật khẩu", TextFieldType.NormalText),
+            new InputFormItem("Loại tài khoản", TextFieldType.Combobox),
             new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
@@ -207,6 +208,7 @@ public class QuanLiTaiKhoan : NavBase
         InputFormItem[] arr = new InputFormItem[]
         {
             new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Loại tài khoản", TextFieldType.Combobox),
             new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();
@@ -226,6 +228,7 @@ public class QuanLiTaiKhoan : NavBase
         InputFormItem[] arr = new InputFormItem[]
         {
             new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
+            new InputFormItem("Loại tài khoản", TextFieldType.Combobox),
             new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
         };
         List<InputFormItem> list = new List<InputFormItem>();

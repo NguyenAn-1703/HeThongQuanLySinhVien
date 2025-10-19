@@ -1,4 +1,4 @@
-DROP DATABASE `QuanLySinhVien`
+DROP DATABASE `QuanLySinhVien`;
 CREATE DATABASE `QuanLySinhVien`;
 USE `QuanLySinhVien`;
 
@@ -265,6 +265,7 @@ CREATE TABLE TaiKhoan (
                           MaNQ INT ,
                           TenDangNhap VARCHAR(255),
                           MatKhau VARCHAR(255),
+			  Type VARCHAR(255) DEFAULT 'Quản trị viên',
                           Status TINYINT DEFAULT 1
 );
 
@@ -680,39 +681,44 @@ INSERT INTO ChuongTrinhDaoTao (MaCKDT, MaNganh, LoaiHinhDT, TrinhDo) VALUES
 
 
 -- 26
+-- tài khoản quản trị viên
 INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau) VALUES
-                                                      (1, 'admin', '123456'),
-                                                      (2, 'an', '123456');
+                                                      (2, 'admin', '123456'),
+                                                      (3, 'an', '123456');
+-- tài khoản sinh viên
+INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau, Type) VALUES
+						      (1, 'sinhvien', '123456', 'Sinh viên');
 
 
 -- 27
 INSERT INTO NhomQuyen (TenNhomQuyen) VALUES
+					('SinhVien'),
                                          ('Admin'),
                                          ('AnQuyen');
 
 -- 28
 INSERT INTO ChiTietQuyen (MaCN, MaNQ, HanhDong) VALUES
-                                                    (1, 1, 'Xem'), (1, 1, 'Them'), (1, 1, 'Sua'), (1, 1, 'Xoa'),
-                                                    (2, 1, 'Xem'), (2, 1, 'Them'), (2, 1, 'Sua'), (2, 1, 'Xoa'),
-                                                    (3, 1, 'Xem'), (3, 1, 'Them'), (3, 1, 'Sua'), (3, 1, 'Xoa'),
-                                                    (4, 1, 'Xem'), (4, 1, 'Them'), (4, 1, 'Sua'), (4, 1, 'Xoa'),
-                                                    (5, 1, 'Xem'), (5, 1, 'Them'), (5, 1, 'Sua'), (5, 1, 'Xoa'),
-                                                    (6, 1, 'Xem'), (6, 1, 'Them'), (6, 1, 'Sua'), (6, 1, 'Xoa'),
-                                                    (7, 1, 'Xem'), (7, 1, 'Them'), (7, 1, 'Sua'), (7, 1, 'Xoa'),
-                                                    (8, 1, 'Xem'), (8, 1, 'Them'), (8, 1, 'Sua'), (8, 1, 'Xoa'),
-                                                    (9, 1, 'Xem'), (9, 1, 'Them'), (9, 1, 'Sua'), (9, 1, 'Xoa'),
-                                                    (10, 1, 'Xem'), (10, 1, 'Them'),
 
-                                                    (11, 1, 'Xem'), (11, 1, 'Them'),
-                                                    (12, 1, 'Xem'), (12, 1, 'Them'),
-                                                    (13, 1, 'Xem'), (13, 1, 'Them'), (13, 1, 'Sua'), (13, 1, 'Xoa'),
-                                                    (14, 1, 'Xem'), (14, 1, 'Them'), (14, 1, 'Sua'), (14, 1, 'Xoa'),
-                                                    (15, 1, 'Xem'), (15, 1, 'Them'), (15, 1, 'Sua'), (15, 1, 'Xoa'),
-                                                    (16, 1, 'Xem'),
+(1, 2, 'Xem'), (1, 2, 'Them'), (1, 2, 'Sua'), (1, 2, 'Xoa'),
+(2, 2, 'Xem'), (2, 2, 'Them'), (2, 2, 'Sua'), (2, 2, 'Xoa'),
+(3, 2, 'Xem'), (3, 2, 'Them'), (3, 2, 'Sua'), (3, 2, 'Xoa'),
+(4, 2, 'Xem'), (4, 2, 'Them'), (4, 2, 'Sua'), (4, 2, 'Xoa'),
+(5, 2, 'Xem'), (5, 2, 'Them'), (5, 2, 'Sua'), (5, 2, 'Xoa'),
+(6, 2, 'Xem'), (6, 2, 'Them'), (6, 2, 'Sua'), (6, 2, 'Xoa'),
+(7, 2, 'Xem'), (7, 2, 'Them'), (7, 2, 'Sua'), (7, 2, 'Xoa'),
+(8, 2, 'Xem'), (8, 2, 'Them'), (8, 2, 'Sua'), (8, 2, 'Xoa'),
+(9, 2, 'Xem'), (9, 2, 'Them'), (9, 2, 'Sua'), (9, 2, 'Xoa'),
+(10, 2, 'Xem'), (10, 2, 'Them'),
 
+(11, 2, 'Xem'), (11, 2, 'Them'),
+(12, 2, 'Xem'), (12, 2, 'Them'),
+(13, 2, 'Xem'), (13, 2, 'Them'), (13, 2, 'Sua'), (13, 2, 'Xoa'),
+(14, 2, 'Xem'), (14, 2, 'Them'), (14, 2, 'Sua'), (14, 2, 'Xoa'),
+(15, 2, 'Xem'), (15, 2, 'Them'), (15, 2, 'Sua'), (15, 2, 'Xoa'),
+(16, 2, 'Xem'),
 
-                                                    (1, 2, 'Xem'), (1, 2, 'Them'), (1, 2, 'Sua'), (1, 2, 'Xoa'),
-                                                    (2, 2, 'Xem'), (2, 2, 'Them'), (2, 2, 'Sua'), (2, 2, 'Xoa');
+                                                    (1, 3, 'Xem'), (1, 3, 'Them'), (1, 3, 'Sua'), (1, 3, 'Xoa'),
+                                                    (2, 3, 'Xem'), (2, 3, 'Them'), (2, 3, 'Sua'), (2, 3, 'Xoa');
 
 -- 29
 INSERT INTO ChucNang (TenChucNang) VALUES

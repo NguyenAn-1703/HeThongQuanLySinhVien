@@ -1,4 +1,6 @@
 using System.Drawing.Drawing2D;
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components;
 using QuanLySinhVien.Views.Components.CommonUse;
@@ -14,9 +16,11 @@ public class FLogin : Form
 {
     private LabelTextField _usrnameTfl;
     private LabelTextField _passTfl;
+    private NhomQuyenController _nhomQuyenController;
     
     public FLogin()
     {
+        _nhomQuyenController = NhomQuyenController.GetInstance();
         Init();
         
     }
@@ -204,6 +208,9 @@ public class FLogin : Form
     void onClickBtnDangNhap()
     {
         this.Hide();
+        
+        
+        
         Form home = new MyHome();
         home.FormClosed += (s, args) => this.Show();
         home.ShowDialog();
