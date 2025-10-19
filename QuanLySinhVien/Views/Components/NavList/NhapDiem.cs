@@ -135,7 +135,7 @@ public class NhapDiem : NavBase
         // add database
         for (int i = 0; i < 30; i++)
         {
-            table.Rows.Add("3123410025", "Nguyễn âu gia bảo", 1 , 1 , 1 , 1, 1);
+            table.Rows.Add("3123410025", "Nguyễn âu gia bảo", "1" , "1" , "1" , "1", "1");
         }
         
         // set Width

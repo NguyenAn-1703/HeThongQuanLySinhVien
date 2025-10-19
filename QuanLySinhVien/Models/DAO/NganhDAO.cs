@@ -103,13 +103,12 @@ public class NganhDao
         return rowAffected > 0;
     }
 
-    // id -> data (1row)
     public NganhDto GetNganhById(int maNganh)
     {
         NganhDto result = new();
         using var conn = MyConnection.GetConnection();
         using var cmd =
-            new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE Status = 1 AND MaNganh = @MaNganh",
+            new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE MaNganh = @MaNganh",
                 conn);
         cmd.Parameters.AddWithValue("@MaNganh", maNganh);
         using var reader = cmd.ExecuteReader();

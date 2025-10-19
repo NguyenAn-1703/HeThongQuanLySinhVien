@@ -34,7 +34,7 @@ public class SinhVienDAO
     public SinhVienDTO GetSinhVienById(int maSinhVien){ 
         SinhVienDTO result = new();
         using var conn = MyConnection.GetConnection();
-        const string sql = @"SELECT s.* , IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh 
+        const string sql = @"SELECT s.* , IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh, s.MaLop, s.MaKhoaHoc
                             FROM SinhVien s 
                             LEFT JOIN Lop l ON s.MaLop = l.MaLop 
                             LEFT JOIN Nganh n ON n.MaNganh = l.MaNganh
@@ -53,6 +53,8 @@ public class SinhVienDAO
             result.CCCD = reader.GetString(reader.GetOrdinal("CCCDSV"));
             result.TrangThai = reader.GetString(reader.GetOrdinal("TrangThaiSV"));
             result.Nganh = reader.GetString(reader.GetOrdinal("Nganh"));
+            result.MaLop = reader.GetInt32(reader.GetOrdinal("MaLop"));
+            result.MaKhoaHoc = reader.GetInt32(reader.GetOrdinal("MaKhoaHoc"));
         }
         return result;
     }
@@ -67,7 +69,7 @@ public class SinhVienDAO
         using var cmd = new MySqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@MaTK", sinhVien.MaTk ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("@MaLop", sinhVien.MaLop);
-        cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVien.MaKhoaHoc);
+        cmd.Parameters.AddWithValue("@MaKhoaHoc", 1);
         cmd.Parameters.AddWithValue("@TenSV", sinhVien.TenSinhVien);
         cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVien.SdtSinhVien);
         cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVien.NgaySinh);
@@ -92,12 +94,30 @@ public class SinhVienDAO
     public void Update(SinhVienDTO sinhVienDto)
     {
         using var conn = MyConnection.GetConnection();
-        const string sql = "UPDATE SinhVien SET TrangThaiSV = @TrangThaiSV, EmailSV = @Email, SoDienThoaiSV = @SdtSinhVien WHERE MaSV = @MaSV";
+        const string sql = @"UPDATE SinhVien SET 
+                            TenSV = @TenSV,
+                            NgaySinhSV = @NgaySinhSV,
+                            GioiTinhSV = @GioiTinhSV,
+                            MaLop = @MaLop,
+                            MaKhoaHoc = @MaKhoaHoc,
+                            SoDienThoaiSV = @SoDienThoaiSV,
+                            QueQuanSV = @QueQuanSV,
+                            EmailSV = @EmailSV,
+                            CCCDSV = @CCCDSV,
+                            TrangThaiSV = @TrangThaiSV
+                            WHERE MaSV = @MaSV";
         using var cmd = new MySqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@MaSV", sinhVienDto.MaSinhVien);
+        cmd.Parameters.AddWithValue("@TenSV", sinhVienDto.TenSinhVien);
+        cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVienDto.NgaySinh);
+        cmd.Parameters.AddWithValue("@GioiTinhSV", sinhVienDto.GioiTinh);
+        cmd.Parameters.AddWithValue("@MaLop", sinhVienDto.MaLop);
+        cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVienDto.MaKhoaHoc);
+        cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVienDto.SdtSinhVien);
+        cmd.Parameters.AddWithValue("@QueQuanSV", sinhVienDto.QueQuanSinhVien);
+        cmd.Parameters.AddWithValue("@EmailSV", sinhVienDto.Email);
+        cmd.Parameters.AddWithValue("@CCCDSV", sinhVienDto.CCCD);
         cmd.Parameters.AddWithValue("@TrangThaiSV", sinhVienDto.TrangThai);
-        cmd.Parameters.AddWithValue("@Email", sinhVienDto.Email);
-        cmd.Parameters.AddWithValue("@SdtSinhVien", sinhVienDto.SdtSinhVien);
         cmd.ExecuteNonQuery();
     }
 

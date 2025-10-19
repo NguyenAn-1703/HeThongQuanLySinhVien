@@ -25,6 +25,7 @@ public class SinhVien : NavBase
     private TextBox txtTenSinhVien;
     private TextBox txtNgaySinh;
     private ComboBox cbbNganh;
+    private ComboBox cbbLop;
     private RadioButton rbNam;
     private RadioButton rbNu;
     private TextBox txtSoDienThoai;
@@ -32,8 +33,6 @@ public class SinhVien : NavBase
     private TextBox txtEmail;
     private TextBox txtCCCD;
     private ComboBox cbbTrangThai;
-    private TextBox txtKhoaHoc;
-    private TextBox txtMaLop;
     private DateTimePicker dtpNgaySinh;
     
     public SinhVien()
@@ -262,9 +261,8 @@ public class SinhVien : NavBase
         buttonContainer.Controls.Add(addButton);
         bottomDialog.Controls.Add(buttonContainer);   
         //borderMiddleLeft.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
-        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Ngành: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái" , "Khóa Học"};
+        List<string> list = new List<string>{"Tên Sinh Viên: " , "Ngày sinh: " , "Ngành: " , "Lớp: " , "Giới tính: " , "Số điện thoại" , "Quê Quán" , "Email" , "CCCD" , "Trạng thái"};
         float tile = 60f / list.Count;
-        string[] cbb = new []{"--Chọn--", "Công nghệ thông tin", "Mạng máy tính", "Hệ thống thông tin" };
         List<Control> rightComponents = new List<Control>();
         var radioNam = new RadioButton
         {
@@ -300,24 +298,27 @@ public class SinhVien : NavBase
             Anchor = AnchorStyles.None,
         };
         panelRadioButton.Controls.Add(tableRadioButton);
-        var combo = new ComboBox()
+        cbbNganh = new ComboBox()
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
             Width = 300,
             Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
             Anchor = AnchorStyles.None,
-            // Margin = new Padding(0 , 0 , 0 , 0),
         };
-        combo.Items.AddRange(cbb);
-        combo.SelectedIndex = 0;
         
-        combo.SelectedIndexChanged += (s, e) =>
+        
+        cbbLop = new ComboBox()
         {
-            if (combo.SelectedIndex == 0)
-            {
-                MessageBox.Show("Vui lòng chọn một ngành.");
-            }
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Width = 300,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
+            Anchor = AnchorStyles.None,
+            Enabled = false
         };
+        
+        LoadCascadingData();
+        
+        cbbNganh.SelectedIndexChanged += CbbNganh_SelectedIndexChanged;
         
         txtTenSinhVien = new TextBox()
         {
@@ -384,25 +385,16 @@ public class SinhVien : NavBase
         cbbTrangThai.SelectedIndex = 0;
         
         
-        txtKhoaHoc = new TextBox()
-        {
-            BorderStyle = BorderStyle.FixedSingle,
-            Width = 300,
-            Height = 100,
-            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
-            Anchor = AnchorStyles.None,
-        };
-        
         rightComponents.Add(txtTenSinhVien);
         rightComponents.Add(dtpNgaySinh);
-        rightComponents.Add(combo);
+        rightComponents.Add(cbbNganh);
+        rightComponents.Add(cbbLop);
         rightComponents.Add(panelRadioButton);
         rightComponents.Add(txtSoDienThoai);
         rightComponents.Add(txtQueQuan);
         rightComponents.Add(txtEmail);
         rightComponents.Add(txtCCCD);
         rightComponents.Add(cbbTrangThai);
-        rightComponents.Add(txtKhoaHoc);
         
         
         // Console.WriteLine(tile);
@@ -449,7 +441,6 @@ public class SinhVien : NavBase
             {
                 try
                 {
-                    // Validate tên sinh viên
                     if (string.IsNullOrWhiteSpace(txtTenSinhVien.Text))
                     {
                         MessageBox.Show("Tên sinh viên không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -464,7 +455,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate ngày sinh (>= 18 tuổi)
                     var age = DateTime.Now.Year - dtpNgaySinh.Value.Year;
                     if (dtpNgaySinh.Value > DateTime.Now.AddYears(-age)) age--;
                     
@@ -480,22 +470,27 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate ngành
-                    if (combo.SelectedIndex == 0)
+                    if (cbbNganh.SelectedIndex < 0 || cbbNganh.SelectedValue == null)
                     {
                         MessageBox.Show("Vui lòng chọn ngành.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        combo.Focus();
+                        cbbNganh.Focus();
                         return;
                     }
                     
-                    // Validate giới tính
+                    
+                    if (cbbLop.SelectedIndex < 0 || cbbLop.SelectedValue == null)
+                    {
+                        MessageBox.Show("Vui lòng chọn lớp.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        cbbLop.Focus();
+                        return;
+                    }
+                    
                     if (!radioNam.Checked && !radioNu.Checked)
                     {
                         MessageBox.Show("Vui lòng chọn giới tính.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
                     
-                    // Validate số điện thoại
                     if (string.IsNullOrWhiteSpace(txtSoDienThoai.Text))
                     {
                         MessageBox.Show("Số điện thoại không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -511,7 +506,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate quê quán
                     if (string.IsNullOrWhiteSpace(txtQueQuan.Text))
                     {
                         MessageBox.Show("Quê quán không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -519,7 +513,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate email
                     if (string.IsNullOrWhiteSpace(txtEmail.Text))
                     {
                         MessageBox.Show("Email không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -535,7 +528,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate CCCD
                     if (string.IsNullOrWhiteSpace(txtCCCD.Text))
                     {
                         MessageBox.Show("CCCD không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -551,7 +543,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate trạng thái
                     if (cbbTrangThai.SelectedIndex == 0)
                     {
                         MessageBox.Show("Vui lòng chọn trạng thái.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -559,13 +550,6 @@ public class SinhVien : NavBase
                         return;
                     }
                     
-                    // Validate khóa học
-                    if (string.IsNullOrWhiteSpace(txtKhoaHoc.Text))
-                    {
-                        MessageBox.Show("Khóa học không được để trống.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        txtKhoaHoc.Focus();
-                        return;
-                    }
                     
                     var sinhVien = new SinhVienDTO
                     {
@@ -577,8 +561,8 @@ public class SinhVien : NavBase
                         Email = txtEmail.Text.Trim(),
                         CCCD = txtCCCD.Text.Trim(),
                         TrangThai = cbbTrangThai.SelectedItem?.ToString() ?? "Đang học",
-                        // MaLop = combo.SelectedValue?.ToString(),
-                        // MaKhoaHoc = txtKhoaHoc.Text,
+                        MaLop = (int)cbbLop.SelectedValue,
+                        Nganh = cbbNganh.SelectedItem?.GetType().GetProperty("TenNganh")?.GetValue(cbbNganh.SelectedItem)?.ToString() ?? ""
                     };
                     
                     _controller.AddSinhVien(sinhVien);
@@ -589,9 +573,11 @@ public class SinhVien : NavBase
                     txtQueQuan.Clear();
                     txtEmail.Clear();
                     txtCCCD.Clear();
-                    txtKhoaHoc.Clear();
                     dtpNgaySinh.Value = DateTime.Now.AddYears(-18);
                     cbbTrangThai.SelectedIndex = 0;
+                    cbbNganh.SelectedIndex = -1;
+                    cbbLop.SelectedIndex = -1;
+                    cbbLop.Enabled = false;
 
                     form.Close();
                     LoadSinhVienData();
@@ -851,6 +837,50 @@ public class SinhVien : NavBase
         catch (Exception ex)
         {
             MessageBox.Show("Lỗi khi tìm kiếm: " + ex.Message);
+        }
+    }
+    
+    private void LoadCascadingData()
+    {
+        try
+        {
+            var nganhList = _controller.GetAllNganh();
+            cbbNganh.DataSource = null;
+            cbbNganh.DisplayMember = "TenNganh";
+            cbbNganh.ValueMember = "MaNganh";
+            cbbNganh.DataSource = nganhList;
+
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi tải dữ liệu: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void CbbNganh_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (cbbNganh.SelectedValue != null)
+        {
+            int maNganh = (int)cbbNganh.SelectedValue;
+            LoadLopData(maNganh);
+        }
+    }
+
+
+    private void LoadLopData(int maNganh)
+    {
+        try
+        {
+            var lopList = _controller.GetLopByNganh(maNganh);
+            cbbLop.DataSource = null;
+            cbbLop.DisplayMember = "TenLop";
+            cbbLop.ValueMember = "MaLop";
+            cbbLop.DataSource = lopList;
+            cbbLop.Enabled = true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi tải dữ liệu lớp: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
