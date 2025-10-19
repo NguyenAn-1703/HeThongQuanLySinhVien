@@ -1,4 +1,4 @@
-DROP DATABASE `QuanLySinhVien`
+DROP DATABASE `QuanLySinhVien`;
 CREATE DATABASE `QuanLySinhVien`;
 USE `QuanLySinhVien`;
 
