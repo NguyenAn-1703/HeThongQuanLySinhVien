@@ -53,7 +53,7 @@ public class ThongKeTongQuan : TableLayoutPanel
             giangVienDao.CountGiangVienByStatus(TrangThaiGV.DangCongTac), StatisticalIndex.second));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số ngành", nganhDao.CountNganhByStatus(1),
             StatisticalIndex.third));
-        mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", 123, StatisticalIndex.fourth));
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", sinhVienDao.TongHocPhiDaThu(), StatisticalIndex.fourth));
 
         OverviewChart chart = GetOverViewChart();
         chart.BackColor = MyColor.White;

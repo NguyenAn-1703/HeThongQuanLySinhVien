@@ -270,4 +270,17 @@ public class SinhVienDAO
 
         return result;
     }
+    
+    // Viết tạm chờ Học phí
+    public ulong TongHocPhiDaThu()
+    {
+        ulong tongHocPhi = 0;
+        using var conn = MyConnection.GetConnection();
+        const string sql = @"SELECT SUM(DaThu) AS TongHocPhiDaThu FROM HocPhiSV WHERE Status = 1 ;";
+        using var cmd = new MySqlCommand(sql, conn);
+        var result = cmd.ExecuteScalar();
+        tongHocPhi = result == DBNull.Value ? 0UL : Convert.ToUInt64(result);
+
+        return tongHocPhi;
+    }
 }
