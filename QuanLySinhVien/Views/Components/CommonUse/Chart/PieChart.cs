@@ -42,7 +42,7 @@ public class CustomPieChart : TableLayoutPanel
         List<ISeries> list = new List<ISeries>();
         for (int i = 0; i < _content.Length; i++)
         {
-            list.Add(new PieSeries<float> {Values = new float[]{_percent[i]}, Name = _content[i]});
+            list.Add(new PieSeries<float> {Values = new float[]{_percent[i]}, Name = _content[i], ToolTipLabelFormatter = (point) => $"{point.Label}: {Math.Round(point.Model, 2)}%",});
         }
         return list;
     }
