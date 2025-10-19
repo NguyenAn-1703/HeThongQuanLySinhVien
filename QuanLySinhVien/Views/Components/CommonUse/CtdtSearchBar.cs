@@ -6,7 +6,7 @@ namespace QuanLySinhVien.Views.Components.CommonUse.Search;
 public class CtdtSearchBar : RoundTLP
 {
     TextBox _txtSearch;
-    public event Action<string> KeyDown;
+    public new event Action<string> KeyDown;
     public int TxtWidth { get; set; } = 200;
     
     public CtdtSearchBar()

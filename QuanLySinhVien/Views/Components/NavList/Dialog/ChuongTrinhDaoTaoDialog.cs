@@ -36,6 +36,9 @@ public class ChuongTrinhDaoTaoDialog : Form
     private List<HocPhanDto> _rightRawData;
     private List<object> _rightDisplayData;
 
+    private CtdtSearchBar _leftSearchBar;
+    private CtdtSearchBar _rightSearchBar;
+
     private string[] _headerArray = new[] { "Mã học phần", "Tên học phần", "Hành động" };
     private List<string> _header;
     
@@ -82,11 +85,14 @@ public class ChuongTrinhDaoTaoDialog : Form
         SetTopBar();
         SetTitleBar();
         SetContent();
+        SetBottom();
         
         this.Controls.Add(_mainLayout);
-        
-        
-        
+
+        SetAction();
+
+
+
         // if (_dialogType == DialogType.Them)
         // {
         //     SetupInsert();
@@ -99,7 +105,7 @@ public class ChuongTrinhDaoTaoDialog : Form
         // {
         //     SetupDetail();
         // }
-        
+
     }
     
     void SetTopBar()
@@ -192,10 +198,10 @@ public class ChuongTrinhDaoTaoDialog : Form
         _contentPanel.Controls.Add(lblhp);
         _contentPanel.Controls.Add(lblhpct);
         
-        CtdtSearchBar leftSearchBar = new CtdtSearchBar(){Dock = DockStyle.Right};
-        CtdtSearchBar rightSearchBar = new CtdtSearchBar(){Dock = DockStyle.Right};
-        _contentPanel.Controls.Add(leftSearchBar);
-        _contentPanel.Controls.Add(rightSearchBar);
+        _leftSearchBar = new CtdtSearchBar(){Dock = DockStyle.Right};
+        _rightSearchBar = new CtdtSearchBar(){Dock = DockStyle.Right};
+        _contentPanel.Controls.Add(_leftSearchBar);
+        _contentPanel.Controls.Add(_rightSearchBar);
         
         SetTable();
         
@@ -255,11 +261,51 @@ public class ChuongTrinhDaoTaoDialog : Form
         string[] leftColumnNameArr = new[] { "MaHP", "TenHP", "ActionPlus" };
         _leftTable = new CTDTTable(_header, leftColumnNameArr.ToList(), _leftDisplayData, TableCTDTType.Plus);
         _contentPanel.Controls.Add(_leftTable);
-        
+
+        SetRightDisplayData();
         string[] rightColumnNameArr = new[] { "MaHP", "TenHP", "ActionMinus" };
-        _rightTable = new CTDTTable(_header, rightColumnNameArr.ToList(), _leftDisplayData, TableCTDTType.Minus);
+        _rightTable = new CTDTTable(_header, rightColumnNameArr.ToList(), _rightDisplayData, TableCTDTType.Minus);
         _contentPanel.Controls.Add(_rightTable);
         
+    }
+    
+    void SetBottom()
+    {
+        //Thêm có Đặt lại, Lưu, Hủy
+        TableLayoutPanel panel = new TableLayoutPanel
+        {
+            AutoSize = true,
+            Dock = DockStyle.Fill,
+            ColumnCount = 3,
+        };
+        
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
+        {
+            panel.Controls.Add(new Panel{Height = 0});
+        
+            _btnLuu = new TitleButton("Lưu");
+            panel.Controls.Add(_btnLuu);
+        
+            TitleButton btnHuy = new TitleButton("Hủy");
+            btnHuy._mouseDown += () => this.Close();
+            
+            panel.Controls.Add(btnHuy);
+        }
+        else
+        {
+            panel.Controls.Add(new Panel{Height = 0});
+        
+            TitleButton btnThoat = new TitleButton("Thoát");
+            btnThoat._mouseDown += () => this.Close();
+            panel.Controls.Add(btnThoat, 2, 0);
+        }
+
+        
+        this._mainLayout.Controls.Add(panel, 0, 3);
     }
 
     void SetLeftDisplayData()
@@ -269,6 +315,65 @@ public class ChuongTrinhDaoTaoDialog : Form
             MaHP = x.MaHP,
             TenHP = x.TenHP,
         }); 
+    }
+    
+    void SetRightDisplayData()
+    {
+        _rightDisplayData = ConvertObject.ConvertToDisplay(_rightRawData, x => new
+        {                          
+            MaHP = x.MaHP,
+            TenHP = x.TenHP,
+        }); 
+    }
+
+    void UpdateLeftDisplayData(List<HocPhanDto> dtos)
+    {
+        this._leftDisplayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaHP = x.MaHP,
+            TenHP = x.TenHP,
+        });
+    }
+    
+    void UpdateRightDisplayData(List<HocPhanDto> dtos)
+    {
+        this._rightDisplayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaHP = x.MaHP,
+            TenHP = x.TenHP,
+        });
+    }
+
+    void SetAction()
+    {
+        _leftSearchBar.KeyDown += s => OnLeftSearch(s);
+        _rightSearchBar.KeyDown += s => OnRightSearch(s);
+    }
+
+    void OnLeftSearch(string input)
+    {
+        string keyword = input.ToLower().Trim();
+        List<HocPhanDto> result = _leftRawData
+            .Where(x => x.MaHP.ToString().ToLower().Contains(keyword) || 
+                        x.TenHP.ToString().ToLower().Contains(keyword)
+            )
+            .ToList();
+ 
+        UpdateLeftDisplayData(result);
+        _leftTable._dataGridView.DataSource = _leftDisplayData;
+    }
+    
+    void OnRightSearch(string input)
+    {
+        string keyword = input.ToLower().Trim();
+        List<HocPhanDto> result = _rightRawData
+            .Where(x => x.MaHP.ToString().ToLower().Contains(keyword) || 
+                        x.TenHP.ToString().ToLower().Contains(keyword)
+            )
+            .ToList();
+
+        UpdateRightDisplayData(result);
+        _rightTable._dataGridView.DataSource = _rightDisplayData;
     }
     
 
