@@ -33,7 +33,7 @@ public class StatisticalBox : RoundTLP
         titleLbl.Margin = new Padding(3, 10, 3, 3);
         
         Label numberLbl = new Label();
-        numberLbl.Text = number + "";
+        numberLbl.Text = number.ToString("N0");
         numberLbl.ForeColor = MyColor.White;
         numberLbl.Font = GetFont.GetFont.GetMainFont(14, FontType.Black);
         numberLbl.AutoSize = true;
