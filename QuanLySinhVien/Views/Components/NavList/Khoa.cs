@@ -1,17 +1,23 @@
 using System.Data;
+using System.Diagnostics;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
+using QuanLySinhVien.Views.Components.NavList.Dialog;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class Khoa : NavBase
 {
+    
+    private string ID = "KHOA";
     // variable
     private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
 
     private KhoaController _kcontroller;
+    private SearchBar _searchBar;
     
     private CustomTable _table;
     private List<KhoaDto> listKhoa;
@@ -21,25 +27,68 @@ public class Khoa : NavBase
     private Button btnThem;
     private Button btnSua;
     private Button btnXoa;
+    
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
 
-
-    public Khoa()
+    public Khoa(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _kcontroller = new KhoaController();
         Init();
         loadData();
         setActionListener();
+        try
+        {
+            if (this._searchBar != null)
+            {
+                this._searchBar.UpdateListCombobox(_listSelectionForComboBox.ToList());
+                this._searchBar.KeyDown += (txt, filter) => onSearch(txt, filter);
+            }
+        }
+        catch
+        {
+            // khong co gi..
+        }
     }
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
         _mainBot = Bottom();
         Controls.Add(_mainBot);
         Controls.Add(Top());
-
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private new Panel Top()
@@ -60,17 +109,18 @@ public class Khoa : NavBase
         };
         btnThem.Click += BtnThem_Click;
         mainTop.Controls.Add(btnThem);
-
         
-        mainTop.Controls.Add(btnXoa);
-
         return mainTop;
     }
 
     void setActionListener()
     {
-        this._table.OnEdit += i => BtnSua_Click(i);
-        this._table.OnDelete += i => BtnXoa_Click(i);
+        if (_table != null)
+        {
+            this._table.OnEdit += maKhoa => BtnSua_Click(maKhoa);
+            this._table.OnDelete += maKhoa => BtnXoa_Click(maKhoa);
+            this._table.OnDetail += maKhoa => BtnChiTiet_Click(maKhoa);
+        }
     }
 
     private new Panel Bottom()
@@ -80,92 +130,50 @@ public class Khoa : NavBase
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
             Padding = new Padding(20, 0, 20, 0)
-            
         };
-
-        
-        
         
         return mainBot;
     }
 
-
-    // load data function
     public void loadData()
     {
         listKhoa = _kcontroller.GetDanhSachKhoa();
         
-        string[] headerArray = new string[] { "Mã khoa", "Tên khoa", "email", "Địa chỉ" };
-        List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
-        var columnNames = new List<string> { "MaKhoa", "TenKhoa", "Email","DiaChi"};
+        //  == null -> create new table else ...
+        if (_table == null)
+        {
+            string[] headerArray = new string[] { "Mã khoa", "Tên khoa", "email", "Địa chỉ" };
+            List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
+            var columnNames = new List<string> { "MaKhoa", "TenKhoa", "Email", "DiaChi" };
             
-        var cells = listKhoa.Cast<object>().ToList();
-        _table = new CustomTable(headerList, columnNames,cells, true, true, true);
-        _mainBot.Controls.Add(_table);
+            var cells = listKhoa.Cast<object>().ToList();
+            _table = new CustomTable(headerList, columnNames, cells, true, true, true);
+            _mainBot.Controls.Add(_table);
+        }
+        else
+        {
+            _table.UpdateData(listKhoa.Cast<object>().ToList());
+        }
     }
 
-    // envent
+    // event
     private void BtnThem_Click(object? sender, EventArgs e)
     {
         try
         {
-            // call function (controller)
-            // form
-            Form form = new Form()
+            using (var dialog = new KhoaDialog("Thêm Khoa mới", DialogType.Them))
             {
-                Text = "Thêm Khoa mới",
-                Size = new System.Drawing.Size(400, 300), // form lớn hơn
-                StartPosition = FormStartPosition.CenterScreen // hiện giữa màn hình
-            };
-
-            // Label, TextBox
-            Label lblTen = new Label() { Text = "Tên Khoa:", Top = 30, Left = 30, Width = 100 };
-            TextBox txtTen = new TextBox() { Top = 30, Left = 140, Width = 200 };
-
-            Label lblEmail = new Label() { Text = "Email:", Top = 80, Left = 30, Width = 100 };
-            TextBox txtEmail = new TextBox() { Top = 80, Left = 140, Width = 200 };
-
-            Label lblDiaChi = new Label() { Text = "Địa chỉ:", Top = 130, Left = 30, Width = 100 };
-            TextBox txtDiaChi = new TextBox() { Top = 130, Left = 140, Width = 200 };
-
-            // button
-            Button btnOk = new Button()
-                { Text = "OK", Top = 200, Left = 80, Width = 80, DialogResult = DialogResult.OK };
-            Button btnCancel = new Button()
-                { Text = "Cancel", Top = 200, Left = 200, Width = 80, DialogResult = DialogResult.Cancel };
-
-            // add
-            form.Controls.Add(lblTen);
-            form.Controls.Add(txtTen);
-            form.Controls.Add(lblEmail);
-            form.Controls.Add(txtEmail);
-            form.Controls.Add(lblDiaChi);
-            form.Controls.Add(txtDiaChi);
-            form.Controls.Add(btnOk);
-            form.Controls.Add(btnCancel);
-
-            form.AcceptButton = btnOk;
-            form.CancelButton = btnCancel;
-
-            // check OK, -> call function
-            DialogResult rs = form.ShowDialog();
-            if (rs == DialogResult.OK)
-            {
-                if (string.IsNullOrWhiteSpace(txtTen.Text))
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Tên Khoa không được để trống!", "Lỗi");
-                    return;
+                    _kcontroller.ThemKhoa(
+                        dialog.TxtTenKhoa.Text.Trim(), 
+                        dialog.TxtEmail.Text.Trim(), 
+                        dialog.TxtDiaChi.Text.Trim()
+                    );
+                    MessageBox.Show("Thêm thành công!", "Thông báo");
+                    loadData();
                 }
-
-                _kcontroller.ThemKhoa(txtTen.Text.Trim(), txtEmail.Text.Trim(), txtDiaChi.Text.Trim());
             }
-            else if (rs == DialogResult.Cancel)
-            {
-                MessageBox.Show("Hủy thêm khoa mới", "Thông báo");
-            }
-
-            // reload table
-            loadData();
         }
         catch (Exception ex)
         {
@@ -174,69 +182,34 @@ public class Khoa : NavBase
     }
 
     // edit button
-    private void BtnSua_Click(int index)
+    private void BtnSua_Click(int maKhoa)
     {
-        index++;
         try
         {
-            // check null
-            if (index <= 0)
+            // Tìm khoa theo MaKhoa
+            KhoaDto khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
+            if (khoa == null)
             {
-                MessageBox.Show("Vui lòng chọn dòng cần sửa!", "Thông báo");
+                MessageBox.Show("Không tìm thấy khoa!", "Thông báo");
                 return;
             }
     
-            // check null
-            if (index <= 0)
-                throw new ArgumentException("ID khoa không hợp lệ!");
-    
-            // get data by id -> show in dialog
-            KhoaDto khoa = _kcontroller.GetKhoaById(index);
-            if (khoa == null)
-                throw new Exception("Khoa không tồn tại!");
-    
-            // variable -> function
-            string tenKhoaMoi = khoa.TenKhoa;
-            string emailMoi = khoa.Email;
-            string diaChiMoi = khoa.DiaChi;
-    
-            // create dialog
-            using (Form inputForm = new Form())
+            using (var dialog = new KhoaDialog("Sửa thông tin Khoa", DialogType.Sua))
             {
-                // form
-                inputForm.Text = "Sửa thông tin Khoa";
-                inputForm.Size = new Size(400, 300);
-                inputForm.StartPosition = FormStartPosition.CenterScreen;
-    
-                // item
-                TextBox txtTen = new TextBox() { Text = tenKhoaMoi, Location = new Point(20, 20), Width = 340 };
-                TextBox txtEmail = new TextBox() { Text = emailMoi, Location = new Point(20, 70), Width = 340 };
-                TextBox txtDiaChi = new TextBox() { Text = diaChiMoi, Location = new Point(20, 120), Width = 340 };
-                Button btnOK = new Button()
-                    { Text = "OK", Location = new Point(100, 200), DialogResult = DialogResult.OK };
-                Button btnCancel = new Button()
-                    { Text = "Hủy", Location = new Point(200, 200), DialogResult = DialogResult.Cancel };
-    
-                // add item
-                inputForm.Controls.Add(txtTen);
-                inputForm.Controls.Add(txtEmail);
-                inputForm.Controls.Add(txtDiaChi);
-                inputForm.Controls.Add(btnOK);
-                inputForm.Controls.Add(btnCancel);
-    
-                inputForm.AcceptButton = btnOK;
-                inputForm.CancelButton = btnCancel;
-    
-                // button OK on click
-                if (inputForm.ShowDialog() == DialogResult.OK)
+                dialog.LoadData(khoa);
+                
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    // call controller function
-                    _kcontroller.SuaKhoa(index, txtTen.Text, txtEmail.Text, txtDiaChi.Text);
+                    _kcontroller.SuaKhoa(
+                        maKhoa, 
+                        dialog.TxtTenKhoa.Text.Trim(), 
+                        dialog.TxtEmail.Text.Trim(), 
+                        dialog.TxtDiaChi.Text.Trim()
+                    );
+                    MessageBox.Show("Cập nhật thành công!", "Thông báo");
+                    loadData();
                 }
             }
-    
-            // reload table
-            loadData();
         }
         catch (Exception ex)
         {
@@ -245,39 +218,74 @@ public class Khoa : NavBase
     }
 
     // del button
-    private void BtnXoa_Click(int index)
+    private void BtnXoa_Click(int maKhoa)
     {
-        index++;
         try
         {
-            // call functon(controller) 
-            // check null
-            if (index <= 0)
-                throw new ArgumentException("ID khoa không hợp lệ!");
+            // Tìm khoa theo MaKhoa
+            KhoaDto khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
+            if (khoa == null)
+            {
+                MessageBox.Show("Không tìm thấy khoa!", "Thông báo");
+                return;
+            }
     
             // Button y/n
-            DialogResult rs =
-                MessageBox.Show(
-                    "Bạn chắc chắn muốn xóa khoa " + _kcontroller.GetKhoaById(index).TenKhoa,
-                    "Cảnh báo",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
+            DialogResult rs = MessageBox.Show(
+                $"Bạn chắc chắn muốn xóa khoa {khoa.TenKhoa}?",
+                "Cảnh báo",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+                
             if (rs == DialogResult.Yes)
             {
-                // call controller function
-                _kcontroller.XoaKhoa(index);
+                _kcontroller.XoaKhoa(maKhoa);
+                loadData();
             }
             else if (rs == DialogResult.No)
             {
                 MessageBox.Show("Đã hủy xóa khoa", "Thông báo");
             }
-    
-            // reload table
-            loadData();
         }
         catch (Exception ex)
         {
             MessageBox.Show("Lỗi khi xóa khoa: " + ex.Message);
+        }
+    }
+
+    // detail button - xem chi tiết
+    private void BtnChiTiet_Click(int maKhoa)
+    {
+        try
+        {
+            // Tìm khoa theo MaKhoa
+            KhoaDto khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
+            if (khoa == null)
+            {
+                MessageBox.Show("Không tìm thấy khoa!", "Thông báo");
+                return;
+            }
+
+            // Kiểm tra KhoaDialog có tồn tại không
+            if (typeof(KhoaDialog) == null)
+            {
+                MessageBox.Show("KhoaDialog chưa được khởi tạo!", "Lỗi");
+                return;
+            }
+
+            using (var dialog = new KhoaDialog("Chi tiết Khoa", DialogType.ChiTiet))
+            {
+                dialog.LoadData(khoa);
+                dialog.ShowDialog();
+            }
+        }
+        catch (NullReferenceException ex)
+        {
+            MessageBox.Show($"Lỗi null reference: {ex.Message}\n\nStack trace: {ex.StackTrace}", "Lỗi");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Lỗi khi xem chi tiết: {ex.Message}\n\nStack trace: {ex.StackTrace}", "Lỗi");
         }
     }
 
@@ -288,5 +296,51 @@ public class Khoa : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
+        var f = (filter ?? string.Empty).Trim();
+        var txt = (txtSearch ?? string.Empty).Trim();
+
+        //  trả về tất cả
+        if (string.IsNullOrWhiteSpace(txt) || string.Equals(f, "Tất cả", StringComparison.OrdinalIgnoreCase))
+        {
+            if (_table != null && listKhoa != null)
+                _table.UpdateData(listKhoa.Cast<object>().ToList());
+            return;
+        }
+        
+        var searchTerm = txt.ToLowerInvariant();
+        var filteredList = new List<KhoaDto>();
+
+        if (string.Equals(f, "Tất cả", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(f))
+        {
+            // Tìm trong tất cả cột
+            filteredList = listKhoa.Where(k =>
+                k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                || (!string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.Email) && k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.DiaChi) && k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+            ).ToList();
+        }
+        else
+        {
+            // Lọc theo combobox đã chọn
+            filteredList = listKhoa.Where(k =>
+            {
+                switch (f)
+                {
+                    case "Mã khoa":
+                        return k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
+                    case "Tên khoa":
+                        return !string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
+                    default:
+                        return k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                            || (!string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                            || (!string.IsNullOrEmpty(k.Email) && k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                            || (!string.IsNullOrEmpty(k.DiaChi) && k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
+                }
+            }).ToList();
+        }
+        // reaload
+        if (_table != null)
+            _table.UpdateData(filteredList.Cast<object>().ToList());
     }
 }

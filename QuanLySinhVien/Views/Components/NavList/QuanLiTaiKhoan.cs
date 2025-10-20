@@ -12,6 +12,7 @@ namespace QuanLySinhVien.Views.Components;
 
 public class QuanLiTaiKhoan : NavBase
 {
+    private string ID = "TAIKHOAN";
     private string _title = "Tài Khoản";
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
@@ -31,17 +32,30 @@ public class QuanLiTaiKhoan : NavBase
 
     private List<InputFormItem> _listIFI;
 
-    public QuanLiTaiKhoan()
+    private List<ChiTietQuyenDto> _listAccess;
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
+    
+
+    public QuanLiTaiKhoan(NhomQuyenDto quyen) : base(quyen)
     {
         _rawData = new List<TaiKhoanDto>();
         _displayData = new List<object>();
         _taiKhoanController = TaiKhoanController.getInstance();
         _nhomQuyenController = NhomQuyenController.GetInstance();
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         Init();
     }
 
     private void Init()
     {
+        CheckQuyen();
+        
         Dock = DockStyle.Fill;
 
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -57,6 +71,31 @@ public class QuanLiTaiKhoan : NavBase
 
         Controls.Add(mainLayout);
     }
+
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
+        
+    }
+    
 
     private Panel Top()
     {
@@ -75,11 +114,16 @@ public class QuanLiTaiKhoan : NavBase
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         panel.Controls.Add(getTitle());
+        
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
+        
 
         return panel;
     }
@@ -136,7 +180,7 @@ public class QuanLiTaiKhoan : NavBase
         string[] columnNames = new[] { "MaTK", "TenDangNhap", "TenNhomQuyen" };
         List<string> columnNamesList = columnNames.ToList();
 
-        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
 
     void SetDisplayData()

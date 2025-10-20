@@ -61,4 +61,9 @@ public class ChiTietQuyenController
     {
         return _ChiTietQuyenDao.DeleteAllCTQ(maNQ);
     }
+
+    public List<ChiTietQuyenDto> GetByMaNQ(int maNQ)
+    {
+        return _ChiTietQuyenDao.GetByMaNQ(maNQ);
+    }
 }

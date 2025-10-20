@@ -1,29 +1,51 @@
 using System.Data;
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Enums;
 namespace QuanLySinhVien.Views.Components;
 public class NhapDiem : NavBase
 {
+    private string ID = "NHAPDIEM";
     private string[] _listSelectionForComboBox = new []{""};
     
     private DataGridView dataGridView1;
     private DataTable table;
     private CUse _cUse;
-    public NhapDiem()
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    public NhapDiem(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _cUse = new CUse();
         Init();
         SetupDataGridView();
     }
+    
+
         
     private void Init()
     {
+        CheckQuyen();
         //BackColor = Color.Blue;
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
         Controls.Add(Bottom());
         Controls.Add(Top());
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
     }
 
     private Panel Top()

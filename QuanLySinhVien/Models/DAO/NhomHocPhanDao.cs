@@ -1,0 +1,139 @@
+using MySqlConnector;
+using QuanLySinhVien.Database;
+
+namespace QuanLySinhVien.Models.DAO;
+
+using System.Collections.Generic;
+
+public class NhomHocPhanDao
+{
+    private static NhomHocPhanDao _instance;
+    private NhomHocPhanDao() { }
+
+    public static NhomHocPhanDao GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new NhomHocPhanDao();
+        }
+        return _instance;
+    }
+
+    public List<NhomHocPhanDto> GetAll()
+    {
+        List<NhomHocPhanDto> result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo, Type FROM NhomHocPhan WHERE Status = 1", conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new NhomHocPhanDto
+            {
+                MaNHP = reader.GetInt32("MaNHP"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaHP = reader.GetInt32("MaHP"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam"),
+                SiSo = reader.GetInt32("SiSo"),
+                Type = reader.GetString("Type")
+                
+            });
+        }
+
+        return result;
+    }
+
+    public bool Insert(NhomHocPhanDto dto)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"INSERT INTO NhomHocPhan (MaGV, MaHP, HocKy, Nam, SiSo, Type)
+                             VALUES (@MaGV, @MaHP, @HocKy, @Nam, @SiSo, @Type)";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaGV", dto.MaGV);
+                cmd.Parameters.AddWithValue("@MaHP", dto.MaHP);
+                cmd.Parameters.AddWithValue("@HocKy", dto.HocKy);
+                cmd.Parameters.AddWithValue("@Nam", dto.Nam);
+                cmd.Parameters.AddWithValue("@SiSo", dto.SiSo);
+                cmd.Parameters.AddWithValue("@Type", dto.Type);
+
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+        return rowAffected > 0;
+    }
+
+    public bool Update(NhomHocPhanDto dto)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"UPDATE NhomHocPhan
+                             SET MaGV = @MaGV,
+                                 MaHP = @MaHP,
+                                 HocKy = @HocKy,
+                                 Nam = @Nam,
+                                 SiSo = @SiSo,
+                                 Type = @Type
+                             WHERE MaNHP = @MaNHP";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaNHP", dto.MaNHP);
+                cmd.Parameters.AddWithValue("@MaGV", dto.MaGV);
+                cmd.Parameters.AddWithValue("@MaHP", dto.MaHP);
+                cmd.Parameters.AddWithValue("@HocKy", dto.HocKy);
+                cmd.Parameters.AddWithValue("@Nam", dto.Nam);
+                cmd.Parameters.AddWithValue("@SiSo", dto.SiSo);
+                cmd.Parameters.AddWithValue("@Type", dto.Type);
+
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+        return rowAffected > 0;
+    }
+
+    public bool Delete(int maNHP)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"UPDATE NhomHocPhan
+                             SET Status = 0
+                             WHERE MaNHP = @MaNHP";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaNHP", maNHP);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+        return rowAffected > 0;
+    }
+
+    public NhomHocPhanDto GetById(int maNHP)
+    {
+        NhomHocPhanDto result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo , Type FROM NhomHocPhan WHERE Status = 1 AND MaNHP = @MaNHP", conn);
+        cmd.Parameters.AddWithValue("@MaNHP", maNHP);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new NhomHocPhanDto
+            {
+                MaNHP = reader.GetInt32("MaNHP"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaHP = reader.GetInt32("MaHP"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam"),
+                SiSo = reader.GetInt32("SiSo"),
+                Type = reader.GetString("Type")
+            };
+        }
+
+        return result;
+    }
+}

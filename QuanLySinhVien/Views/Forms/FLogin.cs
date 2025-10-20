@@ -2,6 +2,7 @@ using System.Drawing.Drawing2D;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.utils;
 using QuanLySinhVien.Views.Components;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.GetFont;
@@ -17,12 +18,14 @@ public class FLogin : Form
     private LabelTextField _usrnameTfl;
     private LabelTextField _passTfl;
     private NhomQuyenController _nhomQuyenController;
+    private TaiKhoanController _taiKhoanController;
+    private RoundTLP btnDangNhap;
     
     public FLogin()
     {
         _nhomQuyenController = NhomQuyenController.GetInstance();
+        _taiKhoanController = TaiKhoanController.getInstance();
         Init();
-        
     }
 
     void Init()
@@ -42,7 +45,14 @@ public class FLogin : Form
         
         mainPanel.Controls.Add(GetImg());
         mainPanel.Controls.Add(GetControlPanel());
+
+
+        _usrnameTfl.SetText("admin");
+        _passTfl.SetPassword("123456");
+        
         this.Controls.Add(mainPanel);
+
+        SetAciton();
 
     }
     
@@ -176,7 +186,7 @@ public class FLogin : Form
 
     RoundTLP GetButtonDangNhap()
     {
-        RoundTLP btnDangNhap = new RoundTLP();
+        btnDangNhap = new RoundTLP();
         btnDangNhap.BorderRadius = 60;
         btnDangNhap.BackColor = MyColor.MainColor;
         btnDangNhap.Dock = DockStyle.Top;
@@ -190,29 +200,68 @@ public class FLogin : Form
         lblDangNhap.AutoSize = true;
         
         btnDangNhap.Controls.Add(lblDangNhap);
+        btnDangNhap.Cursor = Cursors.Hand;
         
+
+        
+        return btnDangNhap;
+    }
+
+    void SetAciton()
+    {
         btnDangNhap.MouseClick += (sender, args) => onClickBtnDangNhap(); 
         btnDangNhap.MouseEnter += (sender, args) => { btnDangNhap.BackColor = MyColor.GrayHoverColor; };
         btnDangNhap.MouseLeave +=  (sender, args) => { btnDangNhap.BackColor = MyColor.MainColor; };
 
         foreach (Control c in btnDangNhap.Controls)
         {
+            c.Cursor =  Cursors.Hand;
             c.MouseClick += (sender, args) => onClickBtnDangNhap();
             c.MouseEnter += (sender, args) => { btnDangNhap.BackColor = MyColor.GrayHoverColor; };
             c.MouseLeave +=  (sender, args) => { btnDangNhap.BackColor = MyColor.MainColor; };
         }
         
-        return btnDangNhap;
+        _usrnameTfl.GetTextField().KeyDown +=  (sender, args) => OnKeyDown(sender, args);
+        _passTfl.GetPasswordField().KeyDown +=   (sender, args) => OnKeyDown(sender, args);
+    }
+
+    void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter)
+        {
+            onClickBtnDangNhap();
+        }
     }
 
     void onClickBtnDangNhap()
     {
+
+        string username = _usrnameTfl.GetTextTextField();
+        string password = _passTfl.GetTextPasswordField();
+
+        TaiKhoanDto? taikhoan = _taiKhoanController.GetTaiKhoanByUsrName(username);
+
+        if (taikhoan == null)
+        {
+            Console.WriteLine("hi");
+            MessageBox.Show("Tên đăng nhập hoặc mật khẩu không chính xác", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        
+        if (!PasswordHasher.VerifyPassword(password,taikhoan.MatKhau))
+        {
+            MessageBox.Show("Tên đăng nhập hoặc mật khẩu không chính xác", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        NhomQuyenDto nhomQuyen = _nhomQuyenController.GetById(taikhoan.MaNQ);
+        
         this.Hide();
         
-        
-        
-        Form home = new MyHome();
+        Form home = new MyHome(nhomQuyen);
         home.FormClosed += (s, args) => this.Show();
         home.ShowDialog();
     }
+
+    
 }

@@ -129,6 +129,31 @@ public class TaiKhoanDao
         return result;
     }
     
+    public TaiKhoanDto? GetTaiKhoanByUsrName(string usrName)
+    {
+        TaiKhoanDto? result = null;
+        using var conn = MyConnection.GetConnection();
+        using var cmd =
+            new MySqlCommand("SELECT MaTK, MaNQ, TenDangNhap, MatKhau, Type FROM taikhoan WHERE Status = 1 AND TenDangNhap = @UsrName",
+                conn);
+        cmd.Parameters.AddWithValue("@UsrName", usrName);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new TaiKhoanDto
+            {
+                MaTK = reader.GetInt32("MaTK"),
+                MaNQ = reader.GetInt32("MaNQ"),
+                TenDangNhap = reader.GetString("TenDangNhap"),
+                MatKhau = reader.GetString("MatKhau"),
+                Type = reader.GetString("Type")
+            };
+        }
+
+        return result;
+    }
+    
     // ⚡⚡⚡ HÀM STATIC TEST TOÀN BỘ CRUD ⚡⚡⚡
     public static void Test()
     {

@@ -10,6 +10,7 @@ namespace QuanLySinhVien.Views.Components.NavList;
 
 public class KhoaHoc : NavBase
 {
+    private string ID = "KHOAHOC";
     private string _title = "Khóa học";
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
@@ -28,18 +29,30 @@ public class KhoaHoc : NavBase
     private KhoaHocDialog _KhoaHocDialog;
 
     private List<InputFormItem> _listIFI;
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
-    public KhoaHoc()
+    public KhoaHoc(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _rawData = new List<KhoaHocDto>();
         _displayData = new List<object>();
         _KhoaHocController = KhoaHocController.GetInstance();
         _chuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
         Init();
     }
+    
+
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
 
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -54,6 +67,28 @@ public class KhoaHoc : NavBase
         mainLayout.Controls.Add(Bottom());
 
         Controls.Add(mainLayout);
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private Panel Top()
@@ -77,7 +112,11 @@ public class KhoaHoc : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
+        
 
         return panel;
     }
@@ -134,7 +173,7 @@ public class KhoaHoc : NavBase
         string[] columnNames = new[] { "MaKhoaHoc", "TenKhoaHoc", "NienKhoaHoc" };
         List<string> columnNamesList = columnNames.ToList();
 
-        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
 
     void SetDisplayData()

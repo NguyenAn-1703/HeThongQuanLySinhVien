@@ -1,3 +1,5 @@
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 
@@ -5,12 +7,18 @@ namespace QuanLySinhVien.Views.Components;
 
 public class ToChucThi : NavBase
 {
-    
+    private string ID = "TOCHUCTHI";
     private string[] _listSelectionForComboBox = new []{""};
-    public ToChucThi()
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    private List<ChiTietQuyenDto> _listAccess;
+    public ToChucThi(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         Init();
     }
+    
     
     
     // -------------- Graphics --------------- //
@@ -51,6 +59,7 @@ public class ToChucThi : NavBase
         
     private void Init()
     {
+        CheckQuyen();
         //BackColor = Color.Blue;
         Dock = DockStyle.Bottom;
         Size = new Size(1200, 900);
@@ -62,6 +71,16 @@ public class ToChucThi : NavBase
         borderTop.Controls.Add(Top());
         Controls.Add(borderTop);
         Controls.Add(Bottom());
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
     }
 
     private Panel Top()

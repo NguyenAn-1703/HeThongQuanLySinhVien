@@ -1,3 +1,4 @@
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.ViewComponents;
@@ -14,7 +15,7 @@ public class TrangChu : NavBase
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
     private TableLayoutPanel _leftPanel;
 
-    public TrangChu()
+    public TrangChu(NhomQuyenDto quyen) : base(quyen)
     {
         Init();
     }

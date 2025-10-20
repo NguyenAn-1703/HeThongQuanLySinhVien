@@ -61,4 +61,9 @@ public class CustomTextBox : RoundTLP
             contentTextBox.BackColor = MyColor.White;
         }
     }
+
+    public void SetText(string input)
+    {
+        contentTextBox.Text = input;
+    }
 }

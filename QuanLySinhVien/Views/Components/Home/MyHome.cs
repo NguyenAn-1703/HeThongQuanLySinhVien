@@ -19,9 +19,9 @@ public class MyHome : Form
 {
     private int IndexButton = 0;
     private string ButtonClickNavList = "";
-    private NavListController navListController = new NavListController();
+    private NavListController navListController;
     //Trang bắt đầu
-    NavBase rightBottomChange = new TrangChu();
+    NavBase rightBottomChange;
     private Panel rightBottomHost;
     private NavBar navBar;
     //Cho phan thu gon navbar
@@ -41,12 +41,16 @@ public class MyHome : Form
     //panel trống cho chức năng không cần đến rightTop
     private TableLayoutPanel _emptyForUnTopBar;
 
+    private NhomQuyenDto _quyen;
+
     // private NhomQuyenDto _quyen;
     
-    public MyHome()
+    public MyHome(NhomQuyenDto nhomQuyen)
     {
-        // _quyen = quyen;
-        // Console.WriteLine(quyen.TenNhomQuyen);
+        _quyen =  nhomQuyen;
+        navBar = new NavBar(_quyen);
+        rightBottomChange = new TrangChu(_quyen);
+        navListController = new NavListController(_quyen);
         Init();
     }
 
@@ -139,7 +143,7 @@ public class MyHome : Form
             Padding = new Padding(0, 15, 0, 0),
         };
 
-        navBar = new NavBar();
+        
         
         //Nút thu gọn
         toggleButton = new ToggleButton();
@@ -377,6 +381,7 @@ public class MyHome : Form
         
         logoutButton.Controls[1].Visible = false;
         
+        
         navBar.UpdateSize();
         ResumeForToggle();
 
@@ -398,6 +403,7 @@ public class MyHome : Form
         toggleButton.ChangeImg("toggle.svg");
         
         logoutButton.Controls[1].Visible = true;
+        
         
         navBar.UpdateSize();
         ResumeForToggle();

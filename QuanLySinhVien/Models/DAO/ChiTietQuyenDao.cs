@@ -151,6 +151,27 @@ public class ChiTietQuyenDao
         }
         return result;
     }
+    
+    public List<ChiTietQuyenDto> GetByMaNQ(int maNQ)
+    {
+        List<ChiTietQuyenDto> result = new();
+        using var con = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaCN, MaNQ, HanhDong FROM chitietquyen WHERE Status = 1 AND MaNQ = @MaNQ ", con);
+        cmd.Parameters.AddWithValue("@MaNQ", maNQ);
+        using var reader = cmd.ExecuteReader();
+        
+        while (reader.Read())
+        {
+            result.Add(new ChiTietQuyenDto
+            {
+                MaCN = reader.GetInt32("MaCN"),
+                MaNQ = reader.GetInt32("MaNQ"),
+                HanhDong = reader.GetString("HanhDong")
+            });
+        }
+        return result;
+    }
     public bool DeleteAllCTQ(int maNQ)
     {
         int rowAffected = 0;
