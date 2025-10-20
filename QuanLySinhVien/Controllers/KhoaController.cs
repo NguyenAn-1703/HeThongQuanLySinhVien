@@ -6,11 +6,23 @@ namespace QuanLySinhVien.Controllers
 {
     public class KhoaController
     {
+        private static KhoaController _instance;
         private readonly KhoaDao _khoaDao;
 
         public KhoaController()
         {
             _khoaDao = new KhoaDao();
+        }
+        
+        // Lấy instance duy nhất
+        public static KhoaController GetInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = new KhoaController();
+            }
+
+            return _instance;
         }
 
         // get databse (all)
