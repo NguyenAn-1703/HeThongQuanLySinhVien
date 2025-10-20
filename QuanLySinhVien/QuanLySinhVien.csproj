@@ -166,6 +166,10 @@
   	<Content Include="img\upload.svg">
   	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   	</Content>
+  	<None Remove="config\Permission.json" />
+  	<Content Include="config\Permission.json">
+  	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	</Content>
     </ItemGroup>
 
 </Project>

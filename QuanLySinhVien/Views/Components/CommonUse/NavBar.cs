@@ -13,6 +13,7 @@ public class NavBar : Panel
     public List<NavItem> ButtonArray;
 
     private NavItemValue[] _arrDataNavItem;
+    private NavItemValue[] _arrDataNavItemForSV;
 
     //item đang được chọn
     public NavItem SelectedItem;
@@ -26,21 +27,23 @@ public class NavBar : Panel
 
     private NhomQuyenDto _nhomQuyen;
     private List<ChucNangDto> _listAccess = new List<ChucNangDto>();
-    
+
+    private string _roleType = "admin";
+
 
     public NavBar(NhomQuyenDto nhomQuyen)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
-        _chucNangController =  ChucNangController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _nhomQuyen = nhomQuyen;
- 
+
         //     "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học", "Chu kỳ đào tạo","Khóa học",
         //     "Tổ chức thi", "Nhập điểm", "Học phí", "Mở đăng ký học phần", "Quản lí tài khoản", "Phân quyền", "Thống kê"
-     
+
 
         //     "trangchu", "sinhvien", "giangvien", "khoa", "nganh", "chuongtrinhdaotao", "hocphan", "phonghoc","chukydaotao","khoahoc",
         //     "tochucthi", "nhapdiem", "hocphi", "modangkyhocphan", "taikhoan", "phanquyen", "thongke"
-        
+
 
         _arrDataNavItem = new[]
         {
@@ -62,7 +65,13 @@ public class NavBar : Panel
             new NavItemValue { ID = "PHANQUYEN", Svg = "phanquyen", Name = "Phân quyền" },
             new NavItemValue { ID = "THONGKE", Svg = "thongke", Name = "Thống kê" }
         };
-        
+
+        _arrDataNavItemForSV = new[]
+        {
+            new NavItemValue { ID = "TRANGCHU", Svg = "trangchu", Name = "Trang chủ" },
+            new NavItemValue { ID = "THONGTINSINHVIEN", Svg = "sinhvien", Name = "Thông tin cá nhân" },
+        };
+
         ButtonArray = new List<NavItem>();
         this.Init();
     }
@@ -81,33 +90,51 @@ public class NavBar : Panel
             Margin = new Padding(0),
         };
 
-        
-        
         CheckRole();
 
-        for (int i = 0; i < _arrDataNavItem.Length; i++)
+        if (_roleType.Equals("admin"))
         {
-            if (_listAccess.Any(x => x.TenCN.Equals(_arrDataNavItem[i].ID) || _arrDataNavItem[i].ID.Equals("TRANGCHU")))
+            for (int i = 0; i < _arrDataNavItem.Length; i++)
             {
-                NavItem navItem = new NavItem(i, _arrDataNavItem[i].Svg + ".svg", _arrDataNavItem[i].Name);
+                if (_listAccess.Any(x =>
+                        x.TenCN.Equals(_arrDataNavItem[i].ID) || _arrDataNavItem[i].ID.Equals("TRANGCHU")))
+                {
+                    NavItem navItem = new NavItem(i, _arrDataNavItem[i].Svg + ".svg", _arrDataNavItem[i].Name);
+                    navItem.OnClickThisItem += this.UpdateStatusNavBar;
+                    ButtonArray.Add(navItem);
+                    _mainLayout.Controls.Add(ButtonArray[i]);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < _arrDataNavItemForSV.Length; i++)
+            {
+                NavItem navItem = new NavItem(i, _arrDataNavItemForSV[i].Svg + ".svg", _arrDataNavItemForSV[i].Name);
                 navItem.OnClickThisItem += this.UpdateStatusNavBar;
                 ButtonArray.Add(navItem);
                 _mainLayout.Controls.Add(ButtonArray[i]);
             }
         }
 
+
         this.Controls.Add(_mainLayout);
-        
+
         UpdateSize();
 
         //Mặc định item đầu được chọn
         SelectedItem = ButtonArray[0];
         SelectedItem.ChangeToSelectStatus();
-        
     }
 
     void CheckRole()
     {
+        if (_nhomQuyen.TenNhomQuyen.Equals("SinhVien"))
+        {
+            _roleType = "SinhVien";
+            return;
+        }
+
         List<ChiTietQuyenDto> listCTQ = _chiTietQuyenController.GetByMaNQ(_nhomQuyen.MaNQ);
         foreach (ChiTietQuyenDto ct in listCTQ)
         {
