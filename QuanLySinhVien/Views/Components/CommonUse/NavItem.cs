@@ -64,6 +64,7 @@ public class NavItem : RoundTLP
 
         Label content = new Label
         {
+            MinimumSize = new Size(200, 0),
             Margin = new Padding(0, 3, 3, 3),
             Anchor = AnchorStyles.None,
             Dock = DockStyle.Fill,

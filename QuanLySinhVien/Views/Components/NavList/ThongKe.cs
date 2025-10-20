@@ -1,4 +1,5 @@
 using LiveChartsCore.SkiaSharpView.WinForms;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Chart;
 // using QuanLySinhVien.Views.Components.CommonUse.Chart;
@@ -17,7 +18,7 @@ public class ThongKe : NavBase
     private string[] items = new[] { "Tổng quan", "Học lực" };
     private string selectedItem;
     private TableLayoutPanel mainLayout;
-    public ThongKe()
+    public ThongKe(NhomQuyenDto quyen) : base(quyen)
     {
         selectedItem = items[0];
         Init();

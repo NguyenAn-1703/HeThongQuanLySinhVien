@@ -683,8 +683,8 @@ INSERT INTO ChuongTrinhDaoTao (MaCKDT, MaNganh, LoaiHinhDT, TrinhDo) VALUES
 -- 26
 -- tài khoản quản trị viên
 INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau) VALUES
-                                                      (2, 'admin', '123456'),
-                                                      (3, 'an', '123456');
+                                                      (2, 'admin', '$2a$11$MVrjcR5/HRmUmTiWNV2uX.6uGJyg/hwl.d9Mcr.g.M5N133J0Timu'),
+                                                      (3, 'an', '$2a$11$YZQfbakMQk1uUZ0ojbU.gOg5zrd7ncbMcz4402rhq4nc4PjDYrtMK');
 -- tài khoản sinh viên
 INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau, Type) VALUES
 						      (1, 'sinhvien', '123456', 'Sinh viên');

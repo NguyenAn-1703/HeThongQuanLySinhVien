@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList;
@@ -17,6 +18,8 @@ namespace QuanLySinhVien.Views.Components.NavList;
 
 public class HocPhan : NavBase
 {
+    
+    private string ID = "HOCPHAN";
     private string[] _listSelectionForComboBox = new[] { "Mã HP", "Tên HP", "Mã HP Trước", "Số Tín Chỉ" };
 
     private CustomTable _table;
@@ -27,15 +30,27 @@ public class HocPhan : NavBase
     private HocPhanDao hocPhanDAO = HocPhanDao.GetInstance();
 
     private TitleButton _insertButton;
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
-    public HocPhan()
+    public HocPhan(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         Init();
         LoadData();
     }
+    
+
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
 
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -50,6 +65,27 @@ public class HocPhan : NavBase
         mainLayout.Controls.Add(Bottom());
 
         Controls.Add(mainLayout);
+    }
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private Panel Top()
@@ -71,7 +107,10 @@ public class HocPhan : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
 
         _insertButton._mouseDown += () =>
         {
@@ -134,7 +173,7 @@ public class HocPhan : NavBase
             List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
             var columnNames = new List<string> { "MaHP", "MaHPTruoc", "TenHP", "SoTinChi", "HeSoHocPhan", "SoTietLyThuyet", "SoTietThucHanh" };
 
-            _table = new CustomTable(headerList, columnNames, hocPhansAsObjectList, true, true, true);
+            _table = new CustomTable(headerList, columnNames, hocPhansAsObjectList, sua || xoa,sua, xoa);
 
             _table.OnEdit += (id) =>
             {

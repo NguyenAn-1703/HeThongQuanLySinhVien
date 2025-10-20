@@ -11,6 +11,7 @@ namespace QuanLySinhVien.Views.Components;
 
 public class PhanQuyen : NavBase
 {
+    private string ID = "PHANQUYEN";
     private string _title = "Phân quyền";
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
@@ -27,19 +28,31 @@ public class PhanQuyen : NavBase
     private NhomQuyenSearch _nhomQuyenSearch;
     
     private PhanQuyenDialog _phanQuyenDialog;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
 
-    public PhanQuyen()
+    public PhanQuyen(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _rawData = new List<NhomQuyenDto>();
         _displayData = new List<object>();
         _nhomQuyenController = NhomQuyenController.GetInstance();
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         Init();
     }
+    
+
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
 
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -54,6 +67,28 @@ public class PhanQuyen : NavBase
         mainLayout.Controls.Add(Bottom());
 
         Controls.Add(mainLayout);
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private Panel Top()
@@ -77,7 +112,11 @@ public class PhanQuyen : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
+        
 
         return panel;
     }
@@ -134,7 +173,7 @@ public class PhanQuyen : NavBase
         string[] columnNames = new[] { "MaNQ", "TenNhomQuyen"};
         List<string> columnNamesList = columnNames.ToList();
 
-        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
 
     void SetDisplayData()

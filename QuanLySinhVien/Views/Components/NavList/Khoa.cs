@@ -8,6 +8,8 @@ namespace QuanLySinhVien.Views.Components;
 
 public class Khoa : NavBase
 {
+    
+    private string ID = "KHOA";
     // variable
     private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
 
@@ -21,11 +23,20 @@ public class Khoa : NavBase
     private Button btnThem;
     private Button btnSua;
     private Button btnXoa;
+    
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
 
-
-    public Khoa()
+    public Khoa(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _kcontroller = new KhoaController();
         Init();
         loadData();
@@ -34,12 +45,35 @@ public class Khoa : NavBase
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
         _mainBot = Bottom();
         Controls.Add(_mainBot);
         Controls.Add(Top());
 
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private new Panel Top()

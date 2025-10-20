@@ -58,6 +58,7 @@ public class NhomQuyenController
 
     public List<string> GetAllTenNhomQuyen()
     {
+        listNhomQuyen = _nhomQuyenDao.GetAll();
         List<string> listTenNhomQuyen = new List<string>();
         foreach (var item in listNhomQuyen)
         {

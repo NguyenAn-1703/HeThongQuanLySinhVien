@@ -12,15 +12,23 @@ namespace QuanLySinhVien.Views.Components;
 
 public class GiangVien : NavBase
 {
+    private string ID = "GIANGVIEN";
     private string[] _listSelectionForComboBox = new []{"Mã giảng viên", "Tên giảng viên"};
     private int PanelTopHeight = 90;
     private CUse _cUse;
     private Form formAddPopUp;
     private DataTable dt;
     protected GiangVien ThisForm;
+    
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
 
-    public GiangVien()
+    public GiangVien(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         ThisForm = this;
         _cUse = new CUse();
         Init();
@@ -51,6 +59,7 @@ public class GiangVien : NavBase
     // Giao dien --------------------------------------------------------------------------
     private void Init()
     {
+        CheckQuyen();
         dt = new DataTable()
         {
             Columns =
@@ -77,6 +86,16 @@ public class GiangVien : NavBase
         borderTop.Controls.Add(Top());
         Controls.Add(borderTop);
         Controls.Add(Bottom());
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
     }
     private Label HeaderLabel()
     {

@@ -1,5 +1,6 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.utils;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Enums;
 using QuanLySinhVien.Views.Structs;
@@ -152,12 +153,14 @@ public class TaiKhoanDialog : CustomDialog
 
         int maNQ = _nhomQuyenController.GetMaNhomQuyenByTen(tenNhomQuyen);
 
+        string hashPassword = PasswordHasher.HashPassword(matKhau);
+
         if (ValidateInsert(TxtTenDangNhap, TxtMatKhau, tenDangNhap, matKhau))
         {
             TaiKhoanDto taiKhoan = new TaiKhoanDto
             {
                 TenDangNhap = tenDangNhap,
-                MatKhau = matKhau,
+                MatKhau = hashPassword,
                 MaNQ = maNQ,
                 Type = type,
             };

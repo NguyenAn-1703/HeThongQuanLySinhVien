@@ -14,6 +14,8 @@ namespace QuanLySinhVien.Views.Components;
 
 public class SinhVien : NavBase
 {
+    
+    private string ID = "SINHVIEN";
     private String[] columns;
     private SinhVienController _controller;
     private string[] _listSelectionForComboBox = new []{"Mã sinh viên", "Tên sinh viên"};
@@ -34,9 +36,15 @@ public class SinhVien : NavBase
     private TextBox txtCCCD;
     private ComboBox cbbTrangThai;
     private DateTimePicker dtpNgaySinh;
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
     
-    public SinhVien()
+    private List<ChiTietQuyenDto> _listAccess;
+    
+    public SinhVien(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _cUse = new CUse();
         sinhVienDao = new SinhVienDAO();
         _controller = new SinhVienController();
@@ -46,12 +54,22 @@ public class SinhVien : NavBase
     }
         
     private void Init()
-    {   
+    {
+        CheckQuyen();
         //BackColor = Color.Blue;
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
         Controls.Add(Bottom());
         Controls.Add(Top());
+    }
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
     }
     
     private Label JLable(string txt)

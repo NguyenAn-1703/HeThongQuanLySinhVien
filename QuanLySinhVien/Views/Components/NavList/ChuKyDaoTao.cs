@@ -10,6 +10,7 @@ namespace QuanLySinhVien.Views.Components.NavList;
 
 public class ChuKyDaoTao : NavBase
 {
+    private string ID = "CHUKYDAOTAO";
     private string _title = "Chu kỳ đào tạo";
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
@@ -28,9 +29,19 @@ public class ChuKyDaoTao : NavBase
     private ChuKyDaoTaoDialog _ChuKyDaoTaoDialog;
 
     private List<InputFormItem> _listIFI;
-
-    public ChuKyDaoTao()
+    
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
+    
+    public ChuKyDaoTao(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _rawData = new List<ChuKyDaoTaoDto>();
         _displayData = new List<object>();
         _ChuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
@@ -40,6 +51,7 @@ public class ChuKyDaoTao : NavBase
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
 
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -54,6 +66,28 @@ public class ChuKyDaoTao : NavBase
         mainLayout.Controls.Add(Bottom());
 
         Controls.Add(mainLayout);
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private Panel Top()
@@ -77,7 +111,10 @@ public class ChuKyDaoTao : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
 
         return panel;
     }
@@ -134,7 +171,7 @@ public class ChuKyDaoTao : NavBase
         string[] columnNames = new[] { "MaCKDT", "NamBatDau", "NamKetThuc" };
         List<string> columnNamesList = columnNames.ToList();
 
-        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
 
     void SetDisplayData()

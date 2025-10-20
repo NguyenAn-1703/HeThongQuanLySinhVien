@@ -12,7 +12,7 @@ namespace QuanLySinhVien.Views.Components;
 
 public class ChuongTrinhDaoTao : NavBase
 {
-    
+    private string ID = "CHUONGTRINHDAOTAO";
     private string _title = "Chương trình đào tạo";
     private List<string> _listSelectionForComboBox;
     private CustomTable _table;
@@ -33,9 +33,19 @@ public class ChuongTrinhDaoTao : NavBase
     private ChuongTrinhDaoTaoDialog _ChuongTrinhDaoTaoDialog;
 
     private List<InputFormItem> _listIFI;
+    
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
-    public ChuongTrinhDaoTao()
+    public ChuongTrinhDaoTao(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _rawData = new List<ChuongTrinhDaoTaoDto>();
         _displayData = new List<object>();
         _ChuongTrinhDaoTaoController = ChuongTrinhDaoTaoController.GetInstance();
@@ -47,6 +57,7 @@ public class ChuongTrinhDaoTao : NavBase
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
 
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -61,6 +72,28 @@ public class ChuongTrinhDaoTao : NavBase
         mainLayout.Controls.Add(Bottom());
 
         Controls.Add(mainLayout);
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private Panel Top()
@@ -84,7 +117,10 @@ public class ChuongTrinhDaoTao : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
 
         return panel;
     }
@@ -142,7 +178,7 @@ public class ChuongTrinhDaoTao : NavBase
         string[] columnNames = new[] { "MaCTDT", "TenNganh", "ChuKy", "LoaiHinhDT", "TrinhDo" };
         List<string> columnNamesList = columnNames.ToList();
 
-        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+        _table = new CustomTable(_headerList, columnNamesList, _displayData,sua || xoa,sua, xoa);
     }
 
     void SetDisplayData()

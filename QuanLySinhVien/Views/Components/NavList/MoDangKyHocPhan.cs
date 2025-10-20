@@ -1,4 +1,6 @@
 using System.Data;
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using Svg;
@@ -6,6 +8,8 @@ namespace QuanLySinhVien.Views.Components;
 
 public class MoDangKyHocPhan : NavBase
 {
+    private string ID = "MODANGKYHOCPHAN";
+    
     private string[] _listSelectionForComboBox = new []{""};
     
     private DataGridView dataGridView;
@@ -13,20 +17,39 @@ public class MoDangKyHocPhan : NavBase
     private TableLayoutPanel tableLayout;
     private Panel topCenter, botCenter;
     private CUse _cUse; 
-    public MoDangKyHocPhan()
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    public MoDangKyHocPhan(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         _cUse = new CUse();
         Init();
         SetupDataGridView();
     }
     
+
+    
     private void Init()
     {
+        CheckQuyen();
         //BackColor = Color.Blue;
         Dock = DockStyle.Fill;
         Size = new Size(1200, 900);
         Controls.Add(Bottom());
         Controls.Add(Top());
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
     }
 
     private Panel Top()

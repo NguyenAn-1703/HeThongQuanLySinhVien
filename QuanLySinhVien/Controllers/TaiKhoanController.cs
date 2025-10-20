@@ -51,4 +51,9 @@ public class TaiKhoanController
     {
         return _taiKhoanDao.GetTaiKhoanById(id);;
     }
+
+    public TaiKhoanDto? GetTaiKhoanByUsrName(string usrName)
+    {
+        return _taiKhoanDao.GetTaiKhoanByUsrName(usrName);
+    }
 }

@@ -143,6 +143,16 @@ public class LabelTextField : TableLayoutPanel
         this._combobox.SetSelectionCombobox(input);
     }
 
+    public void SetText(string input)
+    {
+        _field.SetText(input);
+    }
+    
+    public void SetPassword(string input)
+    {
+        _password.SetText(input);
+    }
+
     public TextBox GetTextField()
     {
         return _field.contentTextBox;

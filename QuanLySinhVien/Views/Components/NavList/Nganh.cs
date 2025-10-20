@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList;
@@ -18,6 +19,8 @@ namespace QuanLySinhVien.Views.Components;
 
 public class NganhPanel : NavBase
 {
+    
+    private string ID = "NGANH";
     private string[] _listSelectionForComboBox = new[] { "Mã ngành", "Tên ngành", "Mã khoa", "Tên khoa" };
 
     private CustomTable _table;
@@ -29,15 +32,27 @@ public class NganhPanel : NavBase
     private NganhDao nganhDAO = NganhDao.GetInstance();
 
     private TitleButton _insertButton;
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    
+    private List<ChiTietQuyenDto> _listAccess;
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
 
-    public NganhPanel()
+    public NganhPanel(NhomQuyenDto quyen) : base(quyen)
     {
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
         Init();
         LoadData();
     }
+    
+
 
     private void Init()
     {
+        CheckQuyen();
         Dock = DockStyle.Fill;
         
         TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -52,6 +67,28 @@ public class NganhPanel : NavBase
         mainLayout.Controls.Add(Bottom());
 
         Controls.Add(mainLayout);
+    }
+    
+    void CheckQuyen()
+    {
+        int maCN = _chucNangController.GetByTen(ID).MaCN;
+        _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
+        foreach (ChiTietQuyenDto x in _listAccess)
+        {
+            Console.WriteLine(x.HanhDong);
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
     }
 
     private Panel Top()
@@ -73,7 +110,11 @@ public class NganhPanel : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        panel.Controls.Add(_insertButton);
+        if (them)
+        {
+            panel.Controls.Add(_insertButton);
+        }
+        
 
         _insertButton._mouseDown += () =>
         {
@@ -136,7 +177,7 @@ public class NganhPanel : NavBase
             List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
             var columnNames = new List<string> { "MaNganh", "MaKhoa", "TenNganh" };
 
-            _table = new CustomTable(headerList, columnNames, nganhsAsObjectList, true, true, true);
+            _table = new CustomTable(headerList, columnNames, nganhsAsObjectList, sua || xoa, sua, xoa);
 
             _table.OnEdit += (id) =>
             {
