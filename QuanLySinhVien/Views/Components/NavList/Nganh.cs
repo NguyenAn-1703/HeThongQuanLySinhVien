@@ -4,12 +4,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
-using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Enums;
 using Svg;
@@ -18,28 +18,37 @@ namespace QuanLySinhVien.Views.Components;
 
 public class NganhPanel : NavBase
 {
-    private string[] _listSelectionForComboBox = new[] { "Mã ngành", "Tên ngành", "Mã khoa", "Tên khoa" };
-
+    private string _title = "Ngành";
     private CustomTable _table;
-    private Panel _tableContainer;
-    private List<NganhDto> _currentNganhs;
-    
-    private NganhSearch _nganhSearch;
+    private List<string> _listSelectionForComboBox;
 
-    private NganhDao nganhDAO = NganhDao.GetInstance();
+    private NganhController _nganhController;
+    private KhoaController _khoaController;
+    string[] _headerArray = new[] { "Mã ngành", "Tên ngành", "Tên khoa" };
+    List<string> _headerList;
 
     private TitleButton _insertButton;
 
+    List<NganhDto> _rawData;
+    List<object> _displayData;
+
+    private NganhSearch _nganhSearch;
+
+    private NganhDialog _nganhDialog;
+
     public NganhPanel()
     {
+        _rawData = new List<NganhDto>();
+        _displayData = new List<object>();
+        _nganhController = NganhController.GetInstance();
+        _khoaController = KhoaController.GetInstance();
         Init();
-        LoadData();
     }
 
     private void Init()
     {
         Dock = DockStyle.Fill;
-        
+
         TableLayoutPanel mainLayout = new TableLayoutPanel
         {
             RowCount = 2,
@@ -75,14 +84,27 @@ public class NganhPanel : NavBase
         _insertButton.Anchor = AnchorStyles.Right;
         panel.Controls.Add(_insertButton);
 
-        _insertButton._mouseDown += () =>
+        return panel;
+    }
+
+    private Panel Bottom()
+    {
+        Panel panel = new Panel
         {
-            using (var dialog = new NganhDialog(DialogType.Them, null, nganhDAO))
-            {
-                dialog.Finish += () => LoadData();
-                dialog.ShowDialog();
-            }
+            Dock = DockStyle.Fill,
+            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
+            Padding = new Padding(20)
         };
+        
+        SetCombobox();
+
+        SetDataTableFromDb();
+
+        SetSearch();
+
+        SetAction();
+
+        panel.Controls.Add(_table);
 
         return panel;
     }
@@ -98,108 +120,121 @@ public class NganhPanel : NavBase
         return titlePnl;
     }
 
-    private Panel Bottom()
+    void SetCombobox()
     {
-        Panel mainBot = new Panel
-        {
-            Dock = DockStyle.Fill,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Padding = new Padding(20)
-        };
-
-        _tableContainer = new Panel
-        {
-            Dock = DockStyle.Fill
-        };
-
-        mainBot.Controls.Add(_tableContainer);
-        return mainBot;
+        _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
+        _listSelectionForComboBox = _headerList;
     }
 
-    private void LoadData()
+    void SetDataTableFromDb()
     {
-        try
+        _rawData = _nganhController.GetAll();
+        SetDisplayData();
+
+        string[] columnNames = new[] { "MaNganh", "TenNganh", "TenKhoa" };
+        List<string> columnNamesList = columnNames.ToList();
+
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
+    }
+
+    void SetDisplayData()
+    {
+        _displayData = ConvertObject.ConvertToDisplay(_rawData, dto => new
         {
-            _currentNganhs = nganhDAO.GetAll() ?? new List<NganhDto>();
+            MaNganh = dto.MaNganh,
+            TenNganh = dto.TenNganh,
+            TenKhoa = _khoaController.GetKhoaById(dto.MaKhoa).TenKhoa
+        });
+    }
+
+    void SetSearch()
+    {
+        _nganhSearch = new NganhSearch(_rawData);
+    }
+
+    void SetAction()
+    {
+        _nganhSearch.FinishSearch += dtos =>
+        {
+            UpdateDataDisplay(dtos);
+            this._table.UpdateData(_displayData);
+        };
+        
+        _insertButton._mouseDown += () => { Insert(); };
+        _table.OnEdit += index => { Update(index); };
+        _table.OnDetail += index => { Detail(index); };
+        _table.OnDelete += index => { Delete(index); };
+    }
+    
+    void UpdateDataDisplay(List<NganhDto> dtos)
+    {
+        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaNganh = x.MaNganh,
+            TenNganh = x.TenNganh,
+            TenKhoa = _khoaController.GetKhoaById(x.MaKhoa).TenKhoa
+        });
+    }
+
+    void Insert()
+    {
+        _nganhDialog = new NganhDialog(DialogType.Them, new NganhDto(), NganhDao.GetInstance());
+        _nganhDialog.Finish += () =>
+        {
+            UpdateDataDisplay(_nganhController.GetAll());
+            this._table.UpdateData(_displayData);
+        };
+        _nganhDialog.ShowDialog();
+    }
+
+    void Update(int id)
+    {
+        var nganh = _rawData.FirstOrDefault(n => n.MaNganh == id);
+        _nganhDialog = new NganhDialog(DialogType.Sua, nganh, NganhDao.GetInstance());
+        
+        _nganhDialog.Finish += () =>
+        {
+            UpdateDataDisplay(_nganhController.GetAll());
+            this._table.UpdateData(_displayData);
+        };
+        _nganhDialog.ShowDialog();
+    }
+    
+    void Detail(int id)
+    {
+        var nganh = _rawData.FirstOrDefault(n => n.MaNganh == id);
+        _nganhDialog = new NganhDialog(DialogType.ChiTiet, nganh, NganhDao.GetInstance());
+        
+        _nganhDialog.ShowDialog();
+    }
+
+    void Delete(int id)
+    {
+        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+        if (select == DialogResult.No)
+        {
+            return;
         }
-        catch (Exception ex)
+        if (_nganhController.Delete(id))
         {
-            _currentNganhs = new List<NganhDto>();
-            MessageBox.Show($"Lỗi khi tải danh sách ngành: {ex.Message}");
-        }
-
-        var nganhsAsObjectList = _currentNganhs.Cast<object>().ToList();
-
-        if (_table == null)
-        {
-            string[] headerArray = new string[] { "Mã ngành", "Mã khoa", "Tên ngành" };
-            List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
-            var columnNames = new List<string> { "MaNganh", "MaKhoa", "TenNganh" };
-
-            _table = new CustomTable(headerList, columnNames, nganhsAsObjectList, true, true, true);
-
-            _table.OnEdit += (id) =>
-            {
-                var nganh = _currentNganhs.FirstOrDefault(n => n.MaNganh == id);
-                if (nganh != null)
-                {
-                    using (var dialog = new NganhDialog(DialogType.Sua, nganh, nganhDAO))
-                    {
-                        dialog.Finish += () => LoadData();
-                        dialog.ShowDialog();
-                    }
-                }
-            };
-
-            _table.OnDelete += (id) =>
-            {
-                var nganh = _currentNganhs.FirstOrDefault(n => n.MaNganh == id);
-                if (nganh != null)
-                {
-                    var confirm = MessageBox.Show($"Bạn có chắc muốn xóa ngành '{nganh.TenNganh}'?", "Xác nhận xóa",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (confirm == DialogResult.Yes)
-                    {
-                        try
-                        {
-                            nganhDAO.Delete(nganh.MaNganh);
-                            LoadData();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Lỗi khi xóa ngành: {ex.Message}");
-                        }
-                    }
-                }
-            };
-
-            _table.OnDetail += (id) =>
-            {
-                var nganh = _currentNganhs.FirstOrDefault(n => n.MaNganh == id);
-                if (nganh != null)
-                {
-                    using (var dialog = new NganhDialog(DialogType.ChiTiet, nganh, nganhDAO))
-                    {
-                        dialog.ShowDialog();
-                    }
-                }
-            };
-
-
-            _tableContainer.Controls.Add(_table);
+            MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            UpdateDataDisplay(_nganhController.GetAll());
+            this._table.UpdateData(_displayData);
         }
         else
         {
-            _table.UpdateData(nganhsAsObjectList);
+            MessageBox.Show("Xóa tài khoản thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-
+    
 
     public override List<string> getComboboxList()
     {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        return this._listSelectionForComboBox;
     }
-    
+
     public override void onSearch(string txtSearch, string filter)
-    { }
+    {
+        this._nganhSearch.Search(txtSearch, filter);
+    }
 }
