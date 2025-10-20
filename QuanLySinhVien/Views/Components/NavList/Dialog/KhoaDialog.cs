@@ -15,25 +15,28 @@ namespace QuanLySinhVien.Views.Components.NavList.Dialog
             // init
             InitializeKhoaControls();
             
-            _btnLuu.Click += (sender, e) =>
+            // QUAN TRỌNG: Dùng _mouseDown delegate thay vì Click event
+            if (dialogType != DialogType.ChiTiet)
             {
-                if (ValidateInput())
+                _btnLuu._mouseDown += () =>
                 {
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
-                }
-            };
+                    if (ValidateInput())
+                    {
+                        this.DialogResult = DialogResult.OK;
+                        this.Close();
+                    }
+                };
+            }
+            
             if (dialogType == DialogType.ChiTiet)
             {
                 // Vô hiệu hóa các ô nhập liệu
                 TxtTenKhoa.Enabled = false;
                 TxtEmail.Enabled = false;
                 TxtDiaChi.Enabled = false;
-        
-                // Ẩn nút Lưu
-                _btnLuu.Visible = false;
             }
         }
+        
         public void LoadData(KhoaDto khoa)
         {
             if (khoa != null)
@@ -43,6 +46,7 @@ namespace QuanLySinhVien.Views.Components.NavList.Dialog
                 TxtDiaChi.Text = khoa.DiaChi;
             }
         }
+        
         private void InitializeKhoaControls()
         {
             _textBoxsContainer.RowCount = 3;

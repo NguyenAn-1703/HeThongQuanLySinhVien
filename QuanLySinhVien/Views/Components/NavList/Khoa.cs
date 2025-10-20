@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
@@ -14,6 +15,7 @@ public class Khoa : NavBase
     private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
 
     private KhoaController _kcontroller;
+    private SearchBar _searchBar;
     
     private CustomTable _table;
     private List<KhoaDto> listKhoa;
@@ -28,6 +30,18 @@ public class Khoa : NavBase
         Init();
         loadData();
         setActionListener();
+        try
+        {
+            if (this._searchBar != null)
+            {
+                this._searchBar.UpdateListCombobox(_listSelectionForComboBox.ToList());
+                this._searchBar.KeyDown += (txt, filter) => onSearch(txt, filter);
+            }
+        }
+        catch
+        {
+            // khong co gi..
+        }
     }
 
     private void Init()
@@ -65,7 +79,6 @@ public class Khoa : NavBase
     {
         if (_table != null)
         {
-            // CustomTable truyền MaKhoa (ID) vào, không phải index
             this._table.OnEdit += maKhoa => BtnSua_Click(maKhoa);
             this._table.OnDelete += maKhoa => BtnXoa_Click(maKhoa);
             this._table.OnDetail += maKhoa => BtnChiTiet_Click(maKhoa);
@@ -84,13 +97,11 @@ public class Khoa : NavBase
         return mainBot;
     }
 
-    // load data function - OPTIMIZED
     public void loadData()
     {
-        // Controller đã filter Status = 1 rồi nên lấy trực tiếp
         listKhoa = _kcontroller.GetDanhSachKhoa();
         
-        // Nếu table chưa tồn tại -> tạo mới lần đầu
+        //  == null -> create new table else ...
         if (_table == null)
         {
             string[] headerArray = new string[] { "Mã khoa", "Tên khoa", "email", "Địa chỉ" };
@@ -103,7 +114,6 @@ public class Khoa : NavBase
         }
         else
         {
-            // Nếu table đã có -> chỉ cần update data
             _table.UpdateData(listKhoa.Cast<object>().ToList());
         }
     }
@@ -248,23 +258,51 @@ public class Khoa : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
-        if (string.IsNullOrWhiteSpace(txtSearch))
+        var f = (filter ?? string.Empty).Trim();
+        var txt = (txtSearch ?? string.Empty).Trim();
+
+        //  trả về tất cả
+        if (string.IsNullOrWhiteSpace(txt) || string.Equals(f, "Tất cả", StringComparison.OrdinalIgnoreCase))
         {
-            _table.UpdateData(listKhoa.Cast<object>().ToList());
+            if (_table != null && listKhoa != null)
+                _table.UpdateData(listKhoa.Cast<object>().ToList());
             return;
         }
+        
+        var searchTerm = txt.ToLowerInvariant();
+        var filteredList = new List<KhoaDto>();
 
-        var searchTerm = txtSearch.ToLower().Trim();
-        var filteredList = listKhoa.Where(k =>
+        if (string.Equals(f, "Tất cả", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(f))
         {
-            return filter switch
+            // Tìm trong tất cả cột
+            filteredList = listKhoa.Where(k =>
+                k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                || (!string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.Email) && k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.DiaChi) && k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+            ).ToList();
+        }
+        else
+        {
+            // Lọc theo combobox đã chọn
+            filteredList = listKhoa.Where(k =>
             {
-                "Mã khoa" => k.MaKhoa.ToString().Contains(searchTerm),
-                "Tên khoa" => k.TenKhoa?.ToLower().Contains(searchTerm) == true,
-                _ => false
-            };
-        }).ToList();
-
-        _table.UpdateData(filteredList.Cast<object>().ToList());
+                switch (f)
+                {
+                    case "Mã khoa":
+                        return k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
+                    case "Tên khoa":
+                        return !string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
+                    default:
+                        return k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                            || (!string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                            || (!string.IsNullOrEmpty(k.Email) && k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                            || (!string.IsNullOrEmpty(k.DiaChi) && k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
+                }
+            }).ToList();
+        }
+        // reaload
+        if (_table != null)
+            _table.UpdateData(filteredList.Cast<object>().ToList());
     }
 }

@@ -16,19 +16,34 @@ namespace QuanLySinhVien.Views.Components
     {
         // variable
         private readonly string[] _listSelectionForComboBox = { "Mã phòng", "Tên phòng", "Loại phòng", "Cơ sở" };
-        private PhongHocController _phongHocController = default!;
-        private CustomTable _table = default!;
-        private List<PhongHocDto> _listPhongHoc = default!;
-        private Panel _mainBot = default!;
-        private Button _btnThem = default!;
+        private PhongHocController _phongHocController;
+        private CustomTable _table;
+        private SearchBar _searchBar;
+        
+        private List<PhongHocDto> _listPhongHoc;
+        
+        private Panel _mainBot;
+        private Button _btnThem;
 
         public PhongHoc()
         {
             _phongHocController = new PhongHocController();
             Init();
             LoadData();
-            // 1. setActionListener được gọi ở cuối constructor, sau khi _table đã được tạo
-            SetActionListener(); 
+            SetActionListener();
+            try
+            {
+                if (this._searchBar != null)
+                {
+                    this._searchBar.UpdateListCombobox(_listSelectionForComboBox.ToList());
+                    this._searchBar.KeyDown += (txt, filter) => onSearch(txt, filter);
+                }
+            }
+            catch
+            {
+                // khong co gi..
+            }
+
         }
 
         private void Init()
@@ -42,36 +57,61 @@ namespace QuanLySinhVien.Views.Components
 
         private new Panel Top()
         {
-            Panel mainTop = new Panel { Dock = DockStyle.Top, BackColor = MyColor.GrayBackGround, Height = 90 };
-            _btnThem = new Button { Text = "Thêm phòng học", Size = new Size(150, 40), Location = new Point(30, 25) };
+            Panel mainTop = new Panel 
+            { 
+                Dock = DockStyle.Top, 
+                BackColor = MyColor.GrayBackGround, 
+                Height = 90 
+            };
+            
+            _btnThem = new Button 
+            { 
+                Text = "Thêm phòng học", 
+                Size = new Size(150, 40), 
+                Location = new Point(30, 25) 
+            };
             _btnThem.Click += BtnThem_Click;
             mainTop.Controls.Add(_btnThem);
+            
             return mainTop;
         }
 
         private new Panel Bottom()
         {
-            return new Panel { Dock = DockStyle.Fill, BackColor = MyColor.GrayBackGround, Padding = new Padding(20, 0, 20, 20) };
+            return new Panel 
+            { 
+                Dock = DockStyle.Fill, 
+                BackColor = MyColor.GrayBackGround, 
+                Padding = new Padding(20, 0, 20, 20) 
+            };
         }
-
         private void SetActionListener()
         {
             if (_table != null)
             {
-                _table.OnEdit += index => BtnSua_Click(index);
-                _table.OnDelete += index => BtnXoa_Click(index);
-                _table.OnDetail += index => BtnChiTiet_Click(index);
+                _table.OnEdit += maPH => BtnSua_Click(maPH);
+                _table.OnDelete += maPH => BtnXoa_Click(maPH);
+                _table.OnDetail += maPH => BtnChiTiet_Click(maPH);
             }
         }
 
+        private void ShowSchedule(int maPh)
+        {
+            throw new NotImplementedException();
+        }
+        
         public void LoadData()
         {
             _listPhongHoc = _phongHocController.GetDanhSachPhongHoc();
+            
             if (_table == null)
             {
                 string[] headerArray = { "Mã PH", "Tên phòng", "Loại phòng", "Cơ sở", "Sức chứa", "Tình trạng" };
+                var headerList = headerArray.ToList();
                 var columnNames = new List<string> { "MaPH", "TenPH", "LoaiPH", "CoSo", "SucChua", "TinhTrang" };
-                _table = new CustomTable(headerArray.ToList(), columnNames, _listPhongHoc.Cast<object>().ToList(), true, true, true);
+                
+                var cells = _listPhongHoc.Cast<object>().ToList();
+                _table = new CustomTable(headerList, columnNames, cells, true, true, true);
                 _mainBot.Controls.Add(_table);
             }
             else
@@ -83,55 +123,118 @@ namespace QuanLySinhVien.Views.Components
         // event
         private void BtnThem_Click(object? sender, EventArgs e)
         {
-            // 2. Sử dụng Dialog mới theo đúng mẫu
-            using (var dialog = new PhongHocDialog("Thêm Phòng học mới", DialogType.Them))
+            try
             {
-                if (dialog.ShowDialog() == DialogResult.OK)
+                using (var dialog = new PhongHocDialog("Thêm Phòng học mới", DialogType.Them))
                 {
-                    _phongHocController.ThemPhongHoc(dialog.GetResult());
-                    MessageBox.Show("Thêm thành công!", "Thông báo");
-                    LoadData();
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var resultDto = dialog.GetResult();
+                        _phongHocController.ThemPhongHoc(resultDto);
+                        MessageBox.Show("Thêm thành công!", "Thông báo");
+                        LoadData();
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi thêm phòng học: " + ex.Message);
+            }
         }
 
-        private void BtnSua_Click(int index)
+        private void BtnSua_Click(int maPH)
         {
-            var selectedItem = _listPhongHoc[index];
-            using (var dialog = new PhongHocDialog("Sửa thông tin phòng học", DialogType.Sua))
+            try
             {
-                dialog.LoadData(selectedItem); // Nạp dữ liệu vào dialog
-                if (dialog.ShowDialog() == DialogResult.OK)
+                var selectedItem = _listPhongHoc.FirstOrDefault(p => p.MaPH == maPH);
+                
+                if (selectedItem == null)
                 {
-                    _phongHocController.SuaPhongHoc(dialog.GetResult());
-                    MessageBox.Show("Cập nhật thành công!", "Thông báo");
-                    LoadData();
+                    MessageBox.Show("Không tìm thấy phòng học!", "Thông báo");
+                    return;
+                }
+                
+                using (var dialog = new PhongHocDialog("Sửa thông tin phòng học", DialogType.Sua))
+                {
+                    dialog.LoadData(selectedItem);
+                    
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var resultDto = dialog.GetResult();
+                        _phongHocController.SuaPhongHoc(resultDto);
+                        MessageBox.Show("Cập nhật thành công!", "Thông báo");
+                        LoadData();
+                    }
                 }
             }
-        }
-
-        private void BtnXoa_Click(int index)
-        {
-            var selectedItem = _listPhongHoc[index];
-            var confirm = MessageBox.Show($"Bạn có chắc muốn xóa phòng '{selectedItem.TenPH}'?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-            if (confirm == DialogResult.Yes)
+            catch (Exception ex)
             {
-                _phongHocController.XoaPhongHoc(selectedItem.MaPH);
-                MessageBox.Show("Xóa thành công!", "Thông báo");
-                LoadData();
+                MessageBox.Show("Lỗi khi sửa phòng học: " + ex.Message);
             }
         }
-        
-        private void BtnChiTiet_Click(int index)
+
+        private void BtnXoa_Click(int maPH)
         {
-            var selectedItem = _listPhongHoc[index];
-            using (var dialog = new PhongHocDialog("Chi tiết phòng học", DialogType.ChiTiet))
+            try
             {
-                dialog.LoadData(selectedItem);
-                // Bạn có thể cần thêm logic trong PhongHocDialog để xử lý mode ChiTiet
-                // ví dụ: vô hiệu hóa các textbox, ẩn nút Lưu
-                dialog.ShowDialog();
+                var selectedItem = _listPhongHoc.FirstOrDefault(p => p.MaPH == maPH);
+                
+                if (selectedItem == null)
+                {
+                    MessageBox.Show("Không tìm thấy phòng học!", "Thông báo");
+                    return;
+                }
+                
+                // Button y/n
+                DialogResult rs = MessageBox.Show(
+                    $"Bạn có chắc muốn xóa phòng '{selectedItem.TenPH}'?", 
+                    "Cảnh báo",
+                    MessageBoxButtons.YesNo, 
+                    MessageBoxIcon.Warning);
+
+                if (rs == DialogResult.Yes)
+                {
+                    bool success = _phongHocController.XoaPhongHoc(maPH);
+                    
+                    if (success)
+                    {
+                        MessageBox.Show("Xóa thành công!", "Thông báo");
+                        LoadData();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Xóa thất bại!", "Lỗi");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa phòng học: " + ex.Message);
+            }
+        }
+
+        private void BtnChiTiet_Click(int maPH)
+        {
+            try
+            {
+                // Tìm phòng theo MaPH
+                var selectedItem = _listPhongHoc.FirstOrDefault(p => p.MaPH == maPH);
+                
+                if (selectedItem == null)
+                {
+                    MessageBox.Show("Không tìm thấy phòng học!", "Thông báo");
+                    return;
+                }
+                
+                // Mở dialog lịch học
+                using (var dialog = new PhongHocScheduleDialog(selectedItem))
+                {
+                    dialog.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xem lịch học: " + ex.Message);
             }
         }
 
@@ -140,27 +243,46 @@ namespace QuanLySinhVien.Views.Components
         {
             return _listSelectionForComboBox.ToList();
         }
-
+        
         public override void onSearch(string txtSearch, string filter)
         {
-            if (string.IsNullOrWhiteSpace(txtSearch))
+            // check null -> gán giá trị
+            var f = (filter ?? string.Empty).Trim();
+            var txt = txtSearch ?? string.Empty;
+
+            // tất cả -> trả về tất cả
+            if (string.IsNullOrWhiteSpace(txt) || string.Equals(f, "Tất cả", StringComparison.OrdinalIgnoreCase))
             {
                 _table.UpdateData(_listPhongHoc.Cast<object>().ToList());
                 return;
             }
-            var searchTerm = txtSearch.ToLower().Trim();
+
+            // lọc khoảng trắng
+            var searchTerm = txt.ToLower().Trim();
+
+            // lọc tìm kiếm
             var filteredList = _listPhongHoc.Where(ph =>
             {
-                switch (filter)
+                switch (f)
                 {
-                    case "Mã phòng": return ph.MaPH.ToString().Contains(searchTerm);
-                    case "Tên phòng": return ph.TenPH?.ToLower().Contains(searchTerm) == true;
-                    case "Loại phòng": return ph.LoaiPH?.ToLower().Contains(searchTerm) == true;
-                    case "Cơ sở": return ph.CoSo?.ToLower().Contains(searchTerm) == true;
-                    default: return false;
+                    case "Mã phòng":
+                        return ph.MaPH.ToString().Contains(searchTerm);
+                    case "Tên phòng":
+                        return ph.TenPH?.ToLower().Contains(searchTerm) == true;
+                    case "Loại phòng":
+                        return ph.LoaiPH?.ToLower().Contains(searchTerm) == true;
+                    case "Cơ sở":
+                        return ph.CoSo?.ToLower().Contains(searchTerm) == true;
+                    default:
+                        return (ph.TenPH?.ToLower().Contains(searchTerm) == true)
+                               || (ph.LoaiPH?.ToLower().Contains(searchTerm) == true)
+                               || (ph.CoSo?.ToLower().Contains(searchTerm) == true)
+                               || ph.MaPH.ToString().Contains(searchTerm);
                 }
             }).ToList();
+
             _table.UpdateData(filteredList.Cast<object>().ToList());
         }
+
     }
 }
