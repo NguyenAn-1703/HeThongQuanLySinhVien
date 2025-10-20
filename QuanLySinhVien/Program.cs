@@ -24,6 +24,8 @@ static class Program
         //     }
         // }
         
-        Application.Run(new FLogin());
+        // Application.Run(new FLogin());
+        Application.Run(new MyHome());
+
     }
 }

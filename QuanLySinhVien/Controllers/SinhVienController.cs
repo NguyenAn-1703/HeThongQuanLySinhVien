@@ -1,42 +1,65 @@
-namespace QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
+
+namespace QuanLySinhVien.Controllers;
+
 public class SinhVienController
 {
-    public SinhVienDAO sinhVienDAO;
+    public SinhVienDAO SinhVienDao;
+    public NganhDao NganhDao;
+    public LopDAO LopDao;
+    
     public SinhVienController()
     {   
-        sinhVienDAO = new SinhVienDAO();
+        SinhVienDao = new SinhVienDAO();
+        NganhDao = NganhDao.GetInstance();
+        LopDao = new LopDAO();
     }
 
     public List<SinhVienDTO> LayDanhSachSinhVienTable()
     {
-        return sinhVienDAO.getTableSinhVien();
+        return SinhVienDao.getTableSinhVien();
     }
 
     public void EditSinhVien(SinhVienDTO sinhVien)
     {
         
-        sinhVienDAO.Update(sinhVien);
+        SinhVienDao.Update(sinhVien);
     }
 
     public void DeleteSinhVien(int id)
     {
-        sinhVienDAO.Delete(id);
+        SinhVienDao.Delete(id);
     }
 
     public SinhVienDTO GetSinhVienById(int id)
     {
-        return sinhVienDAO.GetSinhVienById(id);
+        return SinhVienDao.GetSinhVienById(id);
     }
 
     public void AddSinhVien(SinhVienDTO sinhVien)
     {
-        sinhVienDAO.Add(sinhVien);
+        SinhVienDao.Add(sinhVien);
     }
 
     public List<SinhVienDTO> Search(string text, string filter)
     {
-        return sinhVienDAO.Search(text, filter);
+        return SinhVienDao.Search(text, filter);
+    }
+    
+    public List<NganhDto> GetAllNganh()
+    {
+        return NganhDao.GetAll();
+    }
+
+    public List<LopDto> GetLopByNganh(int maNganh)
+    {
+        return LopDao.GetByNganh(maNganh);
+    }
+
+
+    public NganhDto GetNganhById(int maNganh)
+    {
+        return NganhDao.GetNganhById(maNganh);
     }
 }

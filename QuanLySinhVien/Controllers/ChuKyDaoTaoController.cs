@@ -66,4 +66,12 @@ public class ChuKyDaoTaoController
         }
         return true;
     }
+
+    public ChuKyDaoTaoDto GetByStartYearEndYear(string startendyear)
+    {
+        string[] years = startendyear.Split("-");
+        int startYear = Int16.Parse(years[0]);
+        int endYear = Int16.Parse(years[1]);
+        return _chuKyDaoTaoDao.GetByStartYearEndYear(startYear, endYear);
+    }
 }

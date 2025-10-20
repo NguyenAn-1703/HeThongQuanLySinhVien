@@ -1,5 +1,6 @@
 using MySqlConnector;
 using QuanLySinhVien.Database;
+using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Models.DAO;
 
@@ -9,12 +10,13 @@ public class SinhVienDAO
     {
         List<SinhVienDTO> result = new();
         using var conn = MyConnection.GetConnection();
-        const string sql = @" SELECT s.MaSV,s.TenSV,s.NgaySinhSV,s.GioiTinhSV,IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh,s.TrangThaiSV AS TrangThai
+        const string sql =
+            @" SELECT s.MaSV,s.TenSV,s.NgaySinhSV,s.GioiTinhSV,IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh,s.TrangThaiSV AS TrangThai
         FROM SinhVien s
         LEFT JOIN Lop l   ON s.MaLop = l.MaLop
         LEFT JOIN Nganh n ON l.MaNganh = n.MaNganh
         ORDER BY s.MaSV;";
-        using var cmd = new MySqlCommand(sql, conn);    
+        using var cmd = new MySqlCommand(sql, conn);
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read())
@@ -28,10 +30,12 @@ public class SinhVienDAO
                 reader.GetString(reader.GetOrdinal("TrangThai"))
             ));
         }
+
         return result;
     }
 
-    public SinhVienDTO GetSinhVienById(int maSinhVien){ 
+    public SinhVienDTO GetSinhVienById(int maSinhVien)
+    {
         SinhVienDTO result = new();
         using var conn = MyConnection.GetConnection();
         const string sql = @"SELECT s.* , IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh 
@@ -42,7 +46,8 @@ public class SinhVienDAO
         using var cmd = new MySqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@MaSV", maSinhVien);
         using var reader = cmd.ExecuteReader();
-        while (reader.Read()){
+        while (reader.Read())
+        {
             result.MaSinhVien = reader.GetInt32(reader.GetOrdinal("MaSV"));
             result.TenSinhVien = reader.GetString(reader.GetOrdinal("TenSV"));
             result.NgaySinh = reader.GetString(reader.GetOrdinal("NgaySinhSV"));
@@ -53,7 +58,10 @@ public class SinhVienDAO
             result.CCCD = reader.GetString(reader.GetOrdinal("CCCDSV"));
             result.TrangThai = reader.GetString(reader.GetOrdinal("TrangThaiSV"));
             result.Nganh = reader.GetString(reader.GetOrdinal("Nganh"));
+            result.MaLop = reader.GetInt32(reader.GetOrdinal("MaLop"));
+            result.MaKhoaHoc = reader.GetInt32(reader.GetOrdinal("MaKhoaHoc"));
         }
+
         return result;
     }
 
@@ -79,7 +87,7 @@ public class SinhVienDAO
         cmd.Parameters.AddWithValue("@AnhDaiDienSV", sinhVien.AnhDaiDienSinhVien ?? (object)DBNull.Value);
         cmd.ExecuteNonQuery();
     }
-    
+
     public void Delete(int maSinhVien)
     {
         using var conn = MyConnection.GetConnection();
@@ -92,9 +100,30 @@ public class SinhVienDAO
     public void Update(SinhVienDTO sinhVienDto)
     {
         using var conn = MyConnection.GetConnection();
-        const string sql = "UPDATE SinhVien SET TrangThaiSV = @TrangThaiSV, EmailSV = @Email, SoDienThoaiSV = @SdtSinhVien WHERE MaSV = @MaSV";
+        const string sql =
+            @"UPDATE SinhVien SET 
+                            TenSV = @TenSV,
+                            NgaySinhSV = @NgaySinhSV,
+                            GioiTinhSV = @GioiTinhSV,
+                            MaLop = @MaLop,
+                            MaKhoaHoc = @MaKhoaHoc,
+                            SoDienThoaiSV = @SoDienThoaiSV,
+                            QueQuanSV = @QueQuanSV,
+                            EmailSV = @EmailSV,
+                            CCCDSV = @CCCDSV,
+                            TrangThaiSV = @TrangThaiSV
+                            WHERE MaSV = @MaSV";
         using var cmd = new MySqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@MaSV", sinhVienDto.MaSinhVien);
+        cmd.Parameters.AddWithValue("@TenSV", sinhVienDto.TenSinhVien);
+        cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVienDto.NgaySinh);
+        cmd.Parameters.AddWithValue("@GioiTinhSV", sinhVienDto.GioiTinh);
+        cmd.Parameters.AddWithValue("@MaLop", sinhVienDto.MaLop);
+        cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVienDto.MaKhoaHoc);
+        cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVienDto.SdtSinhVien);
+        cmd.Parameters.AddWithValue("@QueQuanSV", sinhVienDto.QueQuanSinhVien);
+        cmd.Parameters.AddWithValue("@EmailSV", sinhVienDto.Email);
+        cmd.Parameters.AddWithValue("@CCCDSV", sinhVienDto.CCCD);
         cmd.Parameters.AddWithValue("@TrangThaiSV", sinhVienDto.TrangThai);
         cmd.Parameters.AddWithValue("@Email", sinhVienDto.Email);
         cmd.Parameters.AddWithValue("@SdtSinhVien", sinhVienDto.SdtSinhVien);
@@ -105,17 +134,17 @@ public class SinhVienDAO
     {
         List<SinhVienDTO> result = new();
         using var conn = MyConnection.GetConnection();
-        
+
         string sql = @"SELECT s.MaSV, s.TenSV, s.NgaySinhSV, s.GioiTinhSV, 
                        IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh, s.TrangThaiSV AS TrangThai
                        FROM SinhVien s
                        LEFT JOIN Lop l ON s.MaLop = l.MaLop
                        LEFT JOIN Nganh n ON l.MaNganh = n.MaNganh";
-        
+
         if (!string.IsNullOrWhiteSpace(searchText))
         {
             sql += " WHERE ";
-            
+
             if (filter == "Mã sinh viên")
             {
                 sql += "CAST(s.MaSV AS CHAR) LIKE @SearchText";
@@ -129,18 +158,18 @@ public class SinhVienDAO
                 sql += "(CAST(s.MaSV AS CHAR) LIKE @SearchText OR s.TenSV LIKE @SearchText)";
             }
         }
-        
+
         sql += " ORDER BY s.MaSV";
-        
+
         using var cmd = new MySqlCommand(sql, conn);
-        
+
         if (!string.IsNullOrWhiteSpace(searchText))
         {
             cmd.Parameters.AddWithValue("@SearchText", "%" + searchText + "%");
         }
-        
+
         using var reader = cmd.ExecuteReader();
-        
+
         while (reader.Read())
         {
             result.Add(new SinhVienDTO(
@@ -152,7 +181,93 @@ public class SinhVienDAO
                 reader.GetString(reader.GetOrdinal("TrangThai"))
             ));
         }
-        
+
+        return result;
+    }
+
+    public int CountSinhVienByStatus(TrangThaiSV status)
+    {
+        using var conn = MyConnection.GetConnection();
+        const string sql = "SELECT COUNT(*) FROM SinhVien WHERE TrangThaiSV = @Status";
+        using var cmd = new MySqlCommand(sql, conn);
+        string statusStr = TrangThaiSVHelper.ToDbString(status);
+        cmd.Parameters.AddWithValue("@Status", statusStr);
+        return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
+    // Thống kê số lượng sinh viên còn đang học theo khóa học
+    public Dictionary<string, int> GetSinhVienCountByKhoaHoc()
+    {
+        var result = new Dictionary<string, int>();
+
+        using var conn = MyConnection.GetConnection();
+        const string sql = @"SELECT KhoaHoc.MaKhoaHoc, KhoaHoc.TenKhoaHoc, COUNT(*) AS SoLuong 
+                             FROM SinhVien JOIN KhoaHoc ON SinhVien.MaKhoaHoc = KhoaHoc.MaKhoaHoc
+                             WHERE TrangThaiSV = 'Đang học'
+                             GROUP BY KhoaHoc.MaKhoaHoc, KhoaHoc.TenKhoaHoc;";
+
+        using var cmd = new MySqlCommand(sql, conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            string tenKhoaHoc = reader.GetString("TenKhoaHoc");
+            int soLuong = reader.GetInt32("SoLuong");
+            result[tenKhoaHoc] = soLuong;
+        }
+
+        return result;
+    }
+
+    public Dictionary<string, float> TyLeSinhVienTotNghiepTheoNganh(bool IsDesc = true)
+    {
+        var result = new Dictionary<string, float>();
+
+        try
+        {
+            using var conn = MyConnection.GetConnection();
+
+            const string sql = @"
+            SELECT 
+                Nganh.MaNganh, 
+                Nganh.TenNganh, 
+                COUNT(*) AS TongSoSinhVien, 
+                COUNT(CASE WHEN SinhVien.TrangThaiSV = 'Tốt nghiệp' THEN 1 END) AS SoLuongTotNghiep
+            FROM SinhVien
+            JOIN Lop ON SinhVien.MaLop = Lop.MaLop
+            JOIN Nganh ON Lop.MaNganh = Nganh.MaNganh
+            GROUP BY Nganh.MaNganh, Nganh.TenNganh;";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string tenNganh = reader.GetString("TenNganh");
+                int tongSoSinhVien = reader.GetInt32("TongSoSinhVien");
+                int soLuongTotNghiep = reader.GetInt32("SoLuongTotNghiep");
+
+                float tyLeTotNghiep = tongSoSinhVien == 0
+                    ? 0
+                    : (float)Math.Round((float) soLuongTotNghiep / tongSoSinhVien * 100, 2);
+
+                result[tenNganh] = tyLeTotNghiep;
+            }
+            
+            if (IsDesc)
+                result = result
+                    .OrderByDescending(kv => kv.Value)
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+            else
+                result = result
+                    .OrderBy(kv => kv.Value)
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi truy vấn dữ liệu: {ex.Message}");
+        }
+
         return result;
     }
 }

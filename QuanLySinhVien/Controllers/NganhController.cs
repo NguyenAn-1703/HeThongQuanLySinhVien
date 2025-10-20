@@ -58,4 +58,9 @@ public class NganhController
     {
         return _nganhDao.GetNganhById(id);
     }
+
+    public NganhDto GetByTen(string ten)
+    {
+        return _nganhDao.GetByTen(ten);
+    }
 }

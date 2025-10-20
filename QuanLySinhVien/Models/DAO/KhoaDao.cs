@@ -98,7 +98,7 @@ namespace QuanLySinhVien.Models.DAO
             return rowAffected > 0;
         }
 
-        
+
         // id -> data (1row)
         public KhoaDto GetKhoaById(int maKhoa)
         {
@@ -174,6 +174,6 @@ namespace QuanLySinhVien.Models.DAO
             Console.WriteLine("\n=== KẾT THÚC TEST ===");
         }
 
-        
+
     }
 }

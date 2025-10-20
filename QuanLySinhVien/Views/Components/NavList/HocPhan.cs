@@ -24,7 +24,7 @@ public class HocPhan : NavBase
     private List<HocPhanDto> _currentHocPhans;
     
 
-    private HocPhanDao hocPhanDAO = new HocPhanDao();
+    private HocPhanDao hocPhanDAO = HocPhanDao.GetInstance();
 
     private TitleButton _insertButton;
 

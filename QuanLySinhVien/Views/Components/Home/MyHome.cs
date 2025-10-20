@@ -8,6 +8,7 @@ using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 using System.Windows.Forms;
 using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using Timer = System.Windows.Forms.Timer;
@@ -39,9 +40,13 @@ public class MyHome : Form
     private TableLayoutPanel mainLayout;
     //panel trống cho chức năng không cần đến rightTop
     private TableLayoutPanel _emptyForUnTopBar;
+
+    // private NhomQuyenDto _quyen;
     
     public MyHome()
     {
+        // _quyen = quyen;
+        // Console.WriteLine(quyen.TenNhomQuyen);
         Init();
     }
 

@@ -21,7 +21,7 @@ public class TaiKhoanDao
     {
         List<TaiKhoanDto> result = new();
         using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand("SELECT MaTK, MaNQ, TenDangNhap, MatKhau FROM taikhoan WHERE Status = 1", conn);
+        using var cmd = new MySqlCommand("SELECT MaTK, MaNQ, TenDangNhap, MatKhau, Type FROM taikhoan WHERE Status = 1", conn);
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read())
@@ -32,6 +32,7 @@ public class TaiKhoanDao
                 MaNQ = reader.GetInt32("MaNQ"),
                 TenDangNhap = reader.GetString("TenDangNhap"),
                 MatKhau = reader.GetString("MatKhau"),
+                Type = reader.GetString("Type")
             });
         }
 
@@ -44,19 +45,19 @@ public class TaiKhoanDao
         using (MySqlConnection conn = MyConnection.GetConnection())
         {
             // status = 1, id auto +1
-            string query = @"INSERT INTO taikhoan (MaTK, MaNQ, TenDangNhap, MatKhau)
-                                 VALUES (@MaTK, @MaNQ, @TenDangNhap, @MatKhau)";
+            string query = @"INSERT INTO taikhoan (MaTK, MaNQ, TenDangNhap, MatKhau, Type)
+                                 VALUES (@MaTK, @MaNQ, @TenDangNhap, @MatKhau, @Type)";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@MaTK", taiKhoanDto.MaTK);
                 cmd.Parameters.AddWithValue("@MaNQ", taiKhoanDto.MaNQ);
                 cmd.Parameters.AddWithValue("@TenDangNhap", taiKhoanDto.TenDangNhap);
                 cmd.Parameters.AddWithValue("@MatKhau", taiKhoanDto.MatKhau);
+                cmd.Parameters.AddWithValue("@Type", taiKhoanDto.Type);
                 
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
-        Console.WriteLine("ne" + rowAffected);
         return rowAffected > 0;
     }
 
@@ -68,7 +69,8 @@ public class TaiKhoanDao
             string query = @"UPDATE taikhoan 
                                  SET MaNQ = @MaNQ,
                                      TenDangNhap = @TenDangNhap,
-                                     MatKhau = @MatKhau
+                                     MatKhau = @MatKhau,
+                                     Type = @Type
                                  WHERE MaTK = @MaTK";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
@@ -76,6 +78,7 @@ public class TaiKhoanDao
                 cmd.Parameters.AddWithValue("@MaNQ", taiKhoanDto.MaNQ);
                 cmd.Parameters.AddWithValue("@TenDangNhap", taiKhoanDto.TenDangNhap);
                 cmd.Parameters.AddWithValue("@MatKhau", taiKhoanDto.MatKhau);
+                cmd.Parameters.AddWithValue("@Type", taiKhoanDto.Type);
                 
                 rowAffected = cmd.ExecuteNonQuery();
             }
@@ -106,7 +109,7 @@ public class TaiKhoanDao
         TaiKhoanDto result = new();
         using var conn = MyConnection.GetConnection();
         using var cmd =
-            new MySqlCommand("SELECT MaTK, MaNQ, TenDangNhap, MatKhau FROM taikhoan WHERE Status = 1 AND MaTK = @MaTK",
+            new MySqlCommand("SELECT MaTK, MaNQ, TenDangNhap, MatKhau, Type FROM taikhoan WHERE Status = 1 AND MaTK = @MaTK",
                 conn);
         cmd.Parameters.AddWithValue("@MaTK", maTk);
         using var reader = cmd.ExecuteReader();
@@ -119,6 +122,7 @@ public class TaiKhoanDao
                 MaNQ = reader.GetInt32("MaNQ"),
                 TenDangNhap = reader.GetString("TenDangNhap"),
                 MatKhau = reader.GetString("MatKhau"),
+                Type = reader.GetString("Type")
             };
         }
 

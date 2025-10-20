@@ -58,6 +58,7 @@ public class NganhDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
+
         return rowAffected > 0;
     }
 
@@ -103,15 +104,37 @@ public class NganhDao
         return rowAffected > 0;
     }
 
-    // id -> data (1row)
     public NganhDto GetNganhById(int maNganh)
     {
         NganhDto result = new();
         using var conn = MyConnection.GetConnection();
         using var cmd =
-            new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE Status = 1 AND MaNganh = @MaNganh",
+            new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE MaNganh = @MaNganh",
                 conn);
         cmd.Parameters.AddWithValue("@MaNganh", maNganh);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new NganhDto
+            {
+                MaKhoa = reader.GetInt32("MaKhoa"),
+                MaNganh = reader.GetInt32("MaNganh"),
+                TenNganh = reader.GetString("TenNganh")
+            };
+        }
+
+        return result;
+    }
+    
+    public NganhDto GetByTen(string tenNganh)
+    {
+        NganhDto result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd =
+            new MySqlCommand("SELECT MaNganh, MaKhoa, TenNganh FROM nganh WHERE TenNganh = @TenNganh",
+                conn);
+        cmd.Parameters.AddWithValue("@TenNganh", tenNganh);
         using var reader = cmd.ExecuteReader();
 
         if (reader.Read())
@@ -173,6 +196,15 @@ public class NganhDao
         {
             Console.WriteLine($"❌ Lỗi trong quá trình test: {ex.Message}");
         }
+    }
+
+    public int CountNganhByStatus(int status)
+    {
+        using var conn = MyConnection.GetConnection();
+        const string sql = "SELECT COUNT(*) AS Total FROM Nganh WHERE Status = @Status";
+        using var cmd = new MySqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@Status", status);
+        return Convert.ToInt32(cmd.ExecuteScalar());
     }
     
 }

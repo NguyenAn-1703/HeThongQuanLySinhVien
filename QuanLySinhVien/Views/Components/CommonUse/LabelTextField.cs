@@ -24,9 +24,11 @@ public class LabelTextField : TableLayoutPanel
 
     void Init()
     {
+        
         this.RowCount = 2;
         this.AutoSize = true;
         this.Dock = DockStyle.Fill;
+        
         
         Label label = new Label();
         label.Text = this._title;
@@ -116,14 +118,14 @@ public class LabelTextField : TableLayoutPanel
         if (statusEp)
         {
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-close.svg");
-            this._field.contentTextBox.PasswordChar = '*';
+            this._password.contentTextBox.PasswordChar = '*';
             statusEp = false;
         }
         // đóng -> mở
         else
         {
             _eyePb.Image = GetSvgBitmap.GetBitmap("eye-open.svg");
-            this._field.contentTextBox.PasswordChar = '\0';
+            this._password.contentTextBox.PasswordChar = '\0';
             statusEp = true;
         }
     }
@@ -135,6 +137,10 @@ public class LabelTextField : TableLayoutPanel
         {
             this._combobox.combobox.Items.Add(s);
         }
+    }
+    public void SetComboboxSelection(string input)
+    {
+        this._combobox.SetSelectionCombobox(input);
     }
 
     public TextBox GetTextField()

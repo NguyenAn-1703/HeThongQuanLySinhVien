@@ -448,7 +448,7 @@ public class PhanQuyenDialog : Form
             return;
         }
         
-        NhomQuyenDto nhomquyen = new  NhomQuyenDto
+        NhomQuyenDto nhomquyen = new NhomQuyenDto
         {
             TenNhomQuyen = _txtTenNQ.GetTextField().Text,
         };

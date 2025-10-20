@@ -75,14 +75,12 @@ public class CustomDataGridView : DataGridView
     
     void SetActionColumn()
     {
-
         CellPainting += (sender, args) => DrawBtn(sender, args);
         CellMouseMove +=  (sender, args) => OnHoverCell(sender, args);
     }
     
     void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
     {
-        
         if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Action"].Index)
         {
             //Cai dat cell trong nhu binh thuong
