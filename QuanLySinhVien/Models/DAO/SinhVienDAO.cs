@@ -249,11 +249,11 @@ public class SinhVienDAO
 
                 float tyLeTotNghiep = tongSoSinhVien == 0
                     ? 0
-                    : (float)Math.Round((float) soLuongTotNghiep / tongSoSinhVien * 100, 2);
+                    : (float)Math.Round((float)soLuongTotNghiep / tongSoSinhVien * 100, 2);
 
                 result[tenNganh] = tyLeTotNghiep;
             }
-            
+
             if (IsDesc)
                 result = result
                     .OrderByDescending(kv => kv.Value)
@@ -262,6 +262,53 @@ public class SinhVienDAO
                 result = result
                     .OrderBy(kv => kv.Value)
                     .ToDictionary(kv => kv.Key, kv => kv.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi truy vấn dữ liệu: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    // Viết tạm chờ Học phí
+    public ulong TongHocPhiDaThu()
+    {
+        ulong tongHocPhi = 0;
+        using var conn = MyConnection.GetConnection();
+        const string sql = @"SELECT SUM(DaThu) AS TongHocPhiDaThu FROM HocPhiSV WHERE Status = 1 ;";
+        using var cmd = new MySqlCommand(sql, conn);
+        var result = cmd.ExecuteScalar();
+        tongHocPhi = result == DBNull.Value ? 0UL : Convert.ToUInt64(result);
+
+        return tongHocPhi;
+    }
+
+    public Dictionary<string, double> SoLuongSinhVienTheoNamNhapHoc()
+    {
+        var result = new Dictionary<string, double>();
+
+        try
+        {
+            using var conn = MyConnection.GetConnection();
+
+            const string sql = @"
+            SELECT  LEFT(khoahoc.NienKhoaHoc, 4) AS NamNhapHoc, COUNT(*) AS TongSo 
+            FROM sinhvien
+            JOIN khoahoc ON sinhvien.makhoahoc = khoahoc.makhoahoc
+            GROUP BY khoahoc.NienKhoaHoc
+            ORDER BY NamNhapHoc DESC";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string namNhapHoc = reader.GetString("NamNhapHoc");
+                double tongSo = reader.GetInt32("TongSo");
+
+                result[namNhapHoc] = tongSo;
+            }
         }
         catch (Exception ex)
         {

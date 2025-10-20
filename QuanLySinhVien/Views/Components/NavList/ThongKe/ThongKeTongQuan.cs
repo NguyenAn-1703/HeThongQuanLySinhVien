@@ -3,9 +3,6 @@ using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using LiveChartsCore.SkiaSharpView.WinForms;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
-using QuanLySinhVien.Views.Components.CommonUse;
-using QuanLySinhVien.Views.Components.CommonUse.Chart;
-// using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 using QuanLySinhVien.Views.Structs;
@@ -13,151 +10,200 @@ using QuanLySinhVien.Views.Structs;
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class ThongKeTongQuan : TableLayoutPanel
-
 {
-    SinhVienDAO sinhVienDao = new SinhVienDAO();
-    GiangVienDao giangVienDao = new GiangVienDao();
-    NganhDao nganhDao = NganhDao.GetInstance();
+    #region Constants
+    private const int OVERVIEW_CHART_ITEM_LIMIT = 7;
+    private const int TOP_5_ITEM_LIMIT = 5;
+    private const int ACTIVE_STATUS = 1;
+    private const int COLUMN_COUNT = 4;
+    private const int ROW_COUNT = 3;
+    private const int COLUMN_PERCENTAGE = 25;
+    private const int BOTTOM_CONTAINER_COLUMN_COUNT = 2;
+    private const int BOTTOM_CONTAINER_COLUMN_PERCENTAGE = 50;
+    private const int PIE_CHART_ROW_COUNT = 2;
+    private const int PADDING_VALUE = 10;
+    #endregion
 
+    #region Fields
+    private readonly SinhVienDAO _sinhVienDao = new SinhVienDAO();
+    private readonly GiangVienDao _giangVienDao = new GiangVienDao();
+    private readonly NganhDao _nganhDao = NganhDao.GetInstance();
+    #endregion
+
+    #region Constructor
     public ThongKeTongQuan()
     {
-        Init();
+        InitializeComponent();
     }
+    #endregion
 
-    void Init()
+    #region Initialization
+    private void InitializeComponent()
     {
-        this.Dock = DockStyle.Fill;
-        this.Margin = new Padding(0);
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        Dock = DockStyle.Fill;
+        Margin = new Padding(0);
+        
+        var mainLayout = new TableLayoutPanel
         {
-            RowCount = 3,
-            ColumnCount = 4,
+            RowCount = ROW_COUNT,
+            ColumnCount = COLUMN_COUNT,
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
-            Padding = new Padding(0, 10, 0, 0),
-            Margin = new Padding(0),
+            Padding = new Padding(0, PADDING_VALUE, 0, 0),
+            Margin = new Padding(0)
         };
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
-
+        
+        for (int i = 0; i < COLUMN_COUNT; i++)
+        {
+            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, COLUMN_PERCENTAGE));
+        }
+        
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-
+        // Add statistical boxes
         mainLayout.Controls.Add(new StatisticalBox("Tổng số sinh viên",
-            sinhVienDao.CountSinhVienByStatus(TrangThaiSV.DangHoc), StatisticalIndex.first));
+            _sinhVienDao.CountSinhVienByStatus(TrangThaiSV.DangHoc), StatisticalIndex.first));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số giảng viên",
-            giangVienDao.CountGiangVienByStatus(TrangThaiGV.DangCongTac), StatisticalIndex.second));
-        mainLayout.Controls.Add(new StatisticalBox("Tổng số ngành", nganhDao.CountNganhByStatus(1),
+            _giangVienDao.CountGiangVienByStatus(TrangThaiGV.DangCongTac), StatisticalIndex.second));
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số ngành", _nganhDao.CountNganhByStatus(ACTIVE_STATUS),
             StatisticalIndex.third));
-        mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", 123, StatisticalIndex.fourth));
+        mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", _sinhVienDao.TongHocPhiDaThu(), StatisticalIndex.fourth));
 
-        OverviewChart chart = GetOverViewChart();
-        chart.BackColor = MyColor.White;
-        mainLayout.Controls.Add(chart);
-        mainLayout.SetColumnSpan(chart, 3);
+        // Add overview chart
+        var overviewChart = CreateOverviewChart();
+        overviewChart.BackColor = MyColor.White;
+        mainLayout.Controls.Add(overviewChart);
+        mainLayout.SetColumnSpan(overviewChart, 3);
 
-        TableLayoutPanel sideContainer = GetPieChartContainer();
-        mainLayout.Controls.Add(sideContainer);
-        mainLayout.SetRowSpan(sideContainer, 2);
+        // Add pie chart container
+        var pieChartContainer = CreatePieChartContainer();
+        mainLayout.Controls.Add(pieChartContainer);
+        mainLayout.SetRowSpan(pieChartContainer, 2);
 
-        TableLayoutPanel bottomBoxContainer = this.GetBottomContainer();
-        mainLayout.Controls.Add(bottomBoxContainer);
-        mainLayout.SetColumnSpan(bottomBoxContainer, 3);
+        // Add bottom container
+        var bottomContainer = CreateBottomContainer();
+        mainLayout.Controls.Add(bottomContainer);
+        mainLayout.SetColumnSpan(bottomContainer, 3);
 
+        Controls.Add(mainLayout);
+    }
+    #endregion
 
-        this.Controls.Add(mainLayout);
+    #region Chart Creation Methods
+    
+    // Tong so sinh vien nhap hoc 7 nam gan nhat
+    private OverviewChart CreateOverviewChart()
+    {
+        var studentData = _sinhVienDao.SoLuongSinhVienTheoNamNhapHoc();
+        
+        var processedData = GetTopNItems(studentData, OVERVIEW_CHART_ITEM_LIMIT, false, sortByKey: true);
+        var (years, counts) = ExtractKeysAndValues(processedData);
+
+        return new OverviewChart(years, counts)
+        {
+            Dock = DockStyle.Fill
+        };
     }
 
-    OverviewChart GetOverViewChart()
+    // So sinh vien theo khoa hoc panel
+    private RoundTLP CreatePieChartContainer()
     {
-        // int[] soSVTheoNam = new[] { 100, 150, 110, 90, 88, 120 };
-
-        OverviewChart chart = new OverviewChart();
-        chart.Dock = DockStyle.Fill;
-        return chart;
-    }
-
-    RoundTLP GetPieChartContainer()
-    {
-        RoundTLP panel = new RoundTLP
+        var panel = new RoundTLP
         {
             Dock = DockStyle.Fill,
-            RowCount = 2,
+            RowCount = PIE_CHART_ROW_COUNT,
             AutoSize = true,
-            Padding = new Padding(10),
-            Margin = new Padding(10)
+            Padding = new Padding(PADDING_VALUE),
+            Margin = new Padding(PADDING_VALUE),
+            BackColor = MyColor.White
         };
-        panel.BackColor = MyColor.White;
-        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        Label title = new Label();
-        title.AutoSize = true;
-        title.Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold);
-        title.Text = "Số sinh viên theo khóa";
+        // Configure row styles
+        for (int i = 0; i < PIE_CHART_ROW_COUNT; i++)
+        {
+            panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        }
+
+        var title = new Label
+        {
+            AutoSize = true,
+            Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold),
+            Text = "Số sinh viên theo khóa"
+        };
 
         panel.Controls.Add(title);
-        panel.Controls.Add(GetPieChart());
-        panel.Controls.Add(new Panel());
-        // panel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        panel.Controls.Add(CreatePieChart());
+
         return panel;
     }
 
-    CustomPieChart GetPieChart()
+    // Pie Chart Ti le so sinh vien theo khoa hoc
+    private CustomPieChart CreatePieChart()
     {
-        Dictionary<string, int> data = sinhVienDao.GetSinhVienCountByKhoaHoc();
-
-        string[] dsKhoaHoc = data.Keys.ToArray();
-        int total = data.Values.Sum();
-        float[] percent = data.Values
-            .Select(count => (float)Math.Round((float)count / total * 100, 0))
+        var courseData = _sinhVienDao.GetSinhVienCountByKhoaHoc();
+        var (courseNames, counts) = ExtractKeysAndValues(courseData);
+        
+        var total = counts.Sum();
+        var percentages = counts
+            .Select(count => (float)Math.Round((float)count / total * 100, 2))
             .ToArray();
 
-        CustomPieChart chart = new CustomPieChart(dsKhoaHoc, percent);
-        return chart;
+        return new CustomPieChart(courseNames, percentages);
     }
-
-    //chứa 2 box top5
-    TableLayoutPanel GetBottomContainer()
+    
+    private TableLayoutPanel CreateBottomContainer()
     {
-        TableLayoutPanel panel = new TableLayoutPanel();
-        panel.ColumnCount = 2;
-        panel.Dock = DockStyle.Fill;
-        panel.AutoSize = true;
+        var panel = new TableLayoutPanel
+        {
+            ColumnCount = BOTTOM_CONTAINER_COLUMN_COUNT,
+            Dock = DockStyle.Fill,
+            AutoSize = true
+        };
 
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-
-        Dictionary<string, float> data = sinhVienDao.TyLeSinhVienTotNghiepTheoNganh();
+        // Configure column styles
+        for (int i = 0; i < BOTTOM_CONTAINER_COLUMN_COUNT; i++)
+        {
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, BOTTOM_CONTAINER_COLUMN_PERCENTAGE));
+        }
         
-        var top5High = data
-            .OrderByDescending(kv => kv.Value)
-            .Take(5)
-            .ToDictionary(kv => kv.Key, kv => kv.Value);
+        var graduationData = _sinhVienDao.TyLeSinhVienTotNghiepTheoNganh();
         
-        string[] dsNganhHigh = top5High.Keys.ToArray();
-        float[] tyLeHigh = top5High.Values.ToArray();
-        
-        StatisticalTop5Box box1 =
-            new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp cao nhất", dsNganhHigh, tyLeHigh);
+        // Top 5 nganh co ti le tot nghiep cao nhat
+        var top5HighData = GetTopNItems(graduationData, TOP_5_ITEM_LIMIT, true);
+        var (highMajors, highRates) = ExtractKeysAndValues(top5HighData);
+        var highBox = new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp cao nhất", highMajors, highRates);
 
-        var top5Low = data
-            .OrderBy(kv => kv.Value)
-            .Take(5)
-            .ToDictionary(kv => kv.Key, kv => kv.Value);
+        // Top 5 nganh co ti le tot nghiep thap nhat
+        var top5LowData = GetTopNItems(graduationData, TOP_5_ITEM_LIMIT, false);
+        var (lowMajors, lowRates) = ExtractKeysAndValues(top5LowData);
+        var lowBox = new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp thấp nhất", lowMajors, lowRates);
 
-        string[] dsNganhLow = top5Low.Keys.ToArray();
-        float[] tyLeLow = top5Low.Values.ToArray();
-        
-        StatisticalTop5Box box2 =
-            new StatisticalTop5Box("Top 5 ngành có tỉ lệ tốt nghiệp thấp nhất", dsNganhLow, tyLeLow);
-
-        panel.Controls.Add(box1);
-        panel.Controls.Add(box2);
+        panel.Controls.Add(highBox);
+        panel.Controls.Add(lowBox);
         return panel;
     }
+    #endregion
+
+    #region Helper Methods
+    
+    private Dictionary<TKey, TValue> GetTopNItems<TKey, TValue>(Dictionary<TKey, TValue> data, int count, bool descending, bool sortByKey = false)
+        where TKey : IComparable<TKey>
+        where TValue : IComparable<TValue>
+    {
+        var orderedData = sortByKey
+            ? (descending ? data.OrderByDescending(kv => kv.Key) : data.OrderBy(kv => kv.Key))
+            : (descending ? data.OrderByDescending(kv => kv.Value) : data.OrderBy(kv => kv.Value));
+            
+        return orderedData
+            .Take(count)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
+    }
+
+    private (TKey[] keys, TValue[] values) ExtractKeysAndValues<TKey, TValue>(Dictionary<TKey, TValue> data)
+    {
+        return (data.Keys.ToArray(), data.Values.ToArray());
+    }
+    #endregion
 }
