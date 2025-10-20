@@ -10,6 +10,7 @@ using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.ViewComponents;
+using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Enums;
 using Svg;
@@ -18,14 +19,19 @@ namespace QuanLySinhVien.Views.Components.NavList;
 
 public class HocPhan : NavBase
 {
+    private string _title = "Học phần";
+    private string[] _headerArray = new string[] { "Mã HP", "Mã HP Trước", "Tên HP", "Số Tín Chỉ", "Hệ Số", "Số Tiết LT", "Số Tiết TH" };
+    private List<string> _listSelectionForComboBox;
+    private List<string> _headerList;
     
     private string ID = "HOCPHAN";
-    private string[] _listSelectionForComboBox = new[] { "Mã HP", "Tên HP", "Mã HP Trước", "Số Tín Chỉ" };
 
     private CustomTable _table;
     private Panel _tableContainer;
-    private List<HocPhanDto> _currentHocPhans;
-    
+    private List<HocPhanDto> _rawData;
+    private List<object> _displayData;
+
+    private HocPhanSearch _hocPhanSearch;
 
     private HocPhanDao hocPhanDAO = HocPhanDao.GetInstance();
 
@@ -40,13 +46,12 @@ public class HocPhan : NavBase
 
     public HocPhan(NhomQuyenDto quyen) : base(quyen)
     {
+        _rawData = new List<HocPhanDto>();
+        _displayData = new List<object>();
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
         Init();
-        LoadData();
     }
-    
-
 
     private void Init()
     {
@@ -112,15 +117,6 @@ public class HocPhan : NavBase
             panel.Controls.Add(_insertButton);
         }
 
-        _insertButton._mouseDown += () =>
-        {
-            using (var dialog = new HocPhanDialog(DialogType.Them, null, hocPhanDAO))
-            {
-                dialog.Finish += () => LoadData();
-                dialog.ShowDialog();
-            }
-        };
-
         return panel;
     }
 
@@ -128,7 +124,7 @@ public class HocPhan : NavBase
     {
         Label titlePnl = new Label
         {
-            Text = "Học phần",
+            Text = _title,
             Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
             AutoSize = true,
         };
@@ -149,93 +145,161 @@ public class HocPhan : NavBase
             Dock = DockStyle.Fill
         };
 
+        SetCombobox();
+        SetDataTableFromDb();
+        SetSearch();
+        SetAction();
+
         mainBot.Controls.Add(_tableContainer);
+        _tableContainer.Controls.Add(_table);
         return mainBot;
     }
 
-    private void LoadData()
+    void SetCombobox()
+    {
+        _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
+        _listSelectionForComboBox = _headerList;
+    }
+
+    void SetDataTableFromDb()
     {
         try
         {
-            _currentHocPhans = hocPhanDAO.GetAll() ?? new List<HocPhanDto>();
+            _rawData = hocPhanDAO.GetAll() ?? new List<HocPhanDto>();
         }
         catch (Exception ex)
         {
-            _currentHocPhans = new List<HocPhanDto>();
+            _rawData = new List<HocPhanDto>();
             MessageBox.Show($"Lỗi khi tải danh sách học phần: {ex.Message}");
         }
 
-        var hocPhansAsObjectList = _currentHocPhans.Cast<object>().ToList();
+        SetDisplayData();
 
-        if (_table == null)
+        var columnNames = new List<string> { "MaHP", "MaHPTruoc", "TenHP", "SoTinChi", "HeSoHocPhan", "SoTietLyThuyet", "SoTietThucHanh" };
+
+        _table = new CustomTable(_headerList, columnNames, _displayData, true, true, true);
+    }
+
+    void SetDisplayData()
+    {
+        _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new
         {
-            string[] headerArray = new string[] { "Mã HP", "Mã HP Trước", "Tên HP", "Số Tín Chỉ", "Hệ Số", "Số Tiết LT", "Số Tiết TH" };
-            List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
-            var columnNames = new List<string> { "MaHP", "MaHPTruoc", "TenHP", "SoTinChi", "HeSoHocPhan", "SoTietLyThuyet", "SoTietThucHanh" };
+            MaHP = x.MaHP,
+            MaHPTruoc = x.MaHPTruoc,
+            TenHP = x.TenHP,
+            SoTinChi = x.SoTinChi,
+            HeSoHocPhan = x.HeSoHocPhan,
+            SoTietLyThuyet = x.SoTietLyThuyet,
+            SoTietThucHanh = x.SoTietThucHanh
+        });
+    }
 
-            _table = new CustomTable(headerList, columnNames, hocPhansAsObjectList, sua || xoa,sua, xoa);
+    void SetSearch()
+    {
+        _hocPhanSearch = new HocPhanSearch(_rawData);
+    }
 
-            _table.OnEdit += (id) =>
+    void SetAction()
+    {
+        _hocPhanSearch.FinishSearch += dtos =>
+        {
+            UpdateDataDisplay(dtos);
+            this._table.UpdateData(_displayData);
+        };
+
+        _insertButton._mouseDown += () => { Insert(); };
+        _table.OnEdit += id => { Update(id); };
+        _table.OnDetail += id => { Detail(id); };
+        _table.OnDelete += id => { Delete(id); };
+    }
+
+    void UpdateDataDisplay(List<HocPhanDto> dtos)
+    {
+        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaHP = x.MaHP,
+            MaHPTruoc = x.MaHPTruoc,
+            TenHP = x.TenHP,
+            SoTinChi = x.SoTinChi,
+            HeSoHocPhan = x.HeSoHocPhan,
+            SoTietLyThuyet = x.SoTietLyThuyet,
+            SoTietThucHanh = x.SoTietThucHanh
+        });
+    }
+
+    void Insert()
+    {
+        using (var dialog = new HocPhanDialog(DialogType.Them, null, hocPhanDAO))
+        {
+            dialog.Finish += () =>
             {
-                var hocPhan = _currentHocPhans.FirstOrDefault(h => h.MaHP == id);
-                if (hocPhan != null)
-                {
-                    using (var dialog = new HocPhanDialog(DialogType.Sua, hocPhan, hocPhanDAO))
-                    {
-                        dialog.Finish += () => LoadData();
-                        dialog.ShowDialog();
-                    }
-                }
+                UpdateDataDisplay(hocPhanDAO.GetAll());
+                this._table.UpdateData(_displayData);
             };
-
-            _table.OnDelete += (id) =>
-            {
-                var hocPhan = _currentHocPhans.FirstOrDefault(h => h.MaHP == id);
-                if (hocPhan != null)
-                {
-                    var confirm = MessageBox.Show($"Bạn có chắc muốn xóa học phần '{hocPhan.TenHP}'?", "Xác nhận xóa",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (confirm == DialogResult.Yes)
-                    {
-                        try
-                        {
-                            hocPhanDAO.Delete(hocPhan.MaHP);
-                            LoadData();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Lỗi khi xóa học phần: {ex.Message}");
-                        }
-                    }
-                }
-            };
-
-            _table.OnDetail += (id) =>
-            {
-                var hocPhan = _currentHocPhans.FirstOrDefault(h => h.MaHP == id);
-                if (hocPhan != null)
-                {
-                    using (var dialog = new HocPhanDialog(DialogType.ChiTiet, hocPhan, hocPhanDAO))
-                    {
-                        dialog.ShowDialog();
-                    }
-                }
-            };
-
-            _tableContainer.Controls.Add(_table);
+            dialog.ShowDialog();
         }
-        else
+    }
+
+    void Update(int id)
+    {
+        var hocPhan = _rawData.FirstOrDefault(h => h.MaHP == id);
+        if (hocPhan != null)
         {
-            _table.UpdateData(hocPhansAsObjectList);
+            using (var dialog = new HocPhanDialog(DialogType.Sua, hocPhan, hocPhanDAO))
+            {
+                dialog.Finish += () =>
+                {
+                    UpdateDataDisplay(hocPhanDAO.GetAll());
+                    this._table.UpdateData(_displayData);
+                };
+                dialog.ShowDialog();
+            }
+        }
+    }
+
+    void Detail(int id)
+    {
+        var hocPhan = _rawData.FirstOrDefault(h => h.MaHP == id);
+        if (hocPhan != null)
+        {
+            using (var dialog = new HocPhanDialog(DialogType.ChiTiet, hocPhan, hocPhanDAO))
+            {
+                dialog.ShowDialog();
+            }
+        }
+    }
+
+    void Delete(int id)
+    {
+        var hocPhan = _rawData.FirstOrDefault(h => h.MaHP == id);
+        if (hocPhan != null)
+        {
+            var confirm = MessageBox.Show($"Bạn có chắc muốn xóa học phần '{hocPhan.TenHP}'?", "Xác nhận xóa",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (confirm == DialogResult.Yes)
+            {
+                try
+                {
+                    hocPhanDAO.Delete(hocPhan.MaHP);
+                    UpdateDataDisplay(hocPhanDAO.GetAll());
+                    this._table.UpdateData(_displayData);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi khi xóa học phần: {ex.Message}");
+                }
+            }
         }
     }
 
 
     public override List<string> getComboboxList()
     {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        return this._listSelectionForComboBox;
     }
     
     public override void onSearch(string txtSearch, string filter)
-    { }
+    {
+        this._hocPhanSearch.Search(txtSearch, filter);
+    }
 }
