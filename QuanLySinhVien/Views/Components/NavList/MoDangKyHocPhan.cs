@@ -5,88 +5,107 @@ using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search.SearchObject;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
+using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 using QuanLySinhVien.Views.Structs;
 using Svg;
+
 namespace QuanLySinhVien.Views.Components;
 
 public class MoDangKyHocPhan : NavBase
 {
     private string ID = "MODANGKYHOCPHAN";
-    
+
     private List<string> _listSelectionForComboBox;
-    private string _title = "Tài Khoản";
-    
+    private string _title = "Mở đăng ký học phần";
+
+    string[] _headerArray = new string[]
+    {
+        "Mã nhóm HP",
+        "Tên HP",
+        "Sĩ số",
+        "Giảng viên",
+    };
+
     private CustomTable _table;
     private DataGridView dataGridView;
     private DataTable table;
     private TableLayoutPanel tableLayout;
     private Panel topCenter, botCenter;
-    private CUse _cUse; 
+    private CUse _cUse;
+
+    List<NhomHocPhanDto> _rawData;
+    List<object> _displayData;
+    List<string> _headerList;
+
+    private TableLayoutPanel _mainLayout;
+
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
     private NhomHocPhanController _nhomHocPhanController;
+    private LichHocController _lichHocController;
     private HocPhanController _hocPhanController;
     private GiangVienController _giangVienController;
-    // private Lic
-    
-    List<NhomHocPhanDto> _rawData;
-    List<object> _displayData;
-    
-    string[] _headerArray = new string[]
-    {
-        "Mã nhóm học phần", 
-        "Tên học phần", 
-        "Sĩ số",
-        "Giảng viên",
-        "Loại",
-        "Thứ",
-        "Tiết bắt đầu",
-        "Số tiết",
-        "Phòng",
-    };// ///////
-    List<string> _headerList;
+    private PhongHocController _phongHocController;
 
     private TitleButton _insertButton;
-    
-    private NhomHocPhanSearch _NhomHocPhanSearch;
+    private TitleButton _updateTimeButton;
+
+    private NhomHocPhanSearch _nhomHocPhanSearch;
 
     private NhomHocPhanDialog _NhomHocPhanDialog;
 
     private List<InputFormItem> _listIFI;
-    
+
+    private TableLayoutPanel _panelTop;
+    private RoundTLP _panelBottom;
+    private TableLayoutPanel _bottomTimePnl;
+
     private List<ChiTietQuyenDto> _listAccess;
     private bool them = false;
     private bool sua = false;
     private bool xoa = false;
+
     public MoDangKyHocPhan(NhomQuyenDto quyen) : base(quyen)
     {
         _rawData = new List<NhomHocPhanDto>();
         _displayData = new List<object>();
+        _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
+        _lichHocController = LichHocController.GetInstance();
+        _hocPhanController = HocPhanController.GetInstance();
+        _giangVienController = GiangVienController.GetInstance();
+        _phongHocController = PhongHocController.getInstance();
         Init();
     }
 
     private void Init()
     {
         CheckQuyen();
-        
+
         Dock = DockStyle.Fill;
 
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        _mainLayout = new TableLayoutPanel
         {
-            RowCount = 2,
+            RowCount = 3,
             Dock = DockStyle.Fill,
         };
-        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _mainLayout.RowStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        mainLayout.Controls.Add(Top());
-        mainLayout.Controls.Add(Bottom());
+        setTop();
+        setBottom();
+        SetBottomTimePnl();
+        
+        SetCombobox();
+        SetSearch();
+        SetAction();
+        
 
-        Controls.Add(mainLayout);
+        Controls.Add(_mainLayout);
     }
 
     void CheckQuyen()
@@ -102,70 +121,107 @@ public class MoDangKyHocPhan : NavBase
         {
             them = true;
         }
+
         if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
         {
             sua = true;
         }
+
         if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
         {
             xoa = true;
         }
-        
     }
-    
 
-    private Panel Top()
+
+    private void setTop()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        _panelTop = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
-            // CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
-            Padding = new Padding(10),
-            ColumnCount = 2,
+            Padding = new Padding(10, 7, 10, 0),
+            ColumnCount = 3,
             BackColor = MyColor.GrayBackGround
         };
 
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        _panelTop.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _panelTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        _panelTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _panelTop.Controls.Add(getTitle());
+        SetHKyNamContainer();
+        
+        _mainLayout.Controls.Add(_panelTop);
+    }
 
-        panel.Controls.Add(getTitle());
+    private void SetHKyNamContainer()
+    {
+        TableLayoutPanel panel = new TableLayoutPanel
+        {
+            ColumnCount = 2,
+            AutoSize = true,
+        };
+
+        LabelTextField _hocKyField = new LabelTextField("Học kỳ", TextFieldType.Combobox);
+        _hocKyField._combobox.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
+        string[] listHK = new[] { "Học kỳ 1", "Học kỳ 2" };
+        _hocKyField.SetComboboxList(listHK.ToList());
+        
+        LabelTextField _namField = new LabelTextField("Năm", TextFieldType.Year);
+        _namField.Font =  GetFont.GetFont.GetMainFont(14, FontType.Regular);
+        
+        
+        panel.Controls.Add(_hocKyField);
+        panel.Controls.Add(_namField);
+        
+        _panelTop.Controls.Add(panel);
+    }
+    
+    
+
+    private void setBottom()
+    {
+        _panelBottom = new RoundTLP
+        {
+            Border = true,
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            RowCount = 2,
+            ColumnCount = 2,
+            Padding = new Padding(10),
+        };
+
+        _panelBottom.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _panelBottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        Label lblNhomHocPhan = new Label
+        {
+            Margin = new Padding(5),
+            AutoSize = true,
+            Text="Nhóm học phần",
+            Font = GetFont.GetFont.GetMainFont(13, FontType.Black),
+        };
+        
+        _panelBottom.Controls.Add(lblNhomHocPhan);
         
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
+        
         if (them)
         {
-            panel.Controls.Add(_insertButton);
+            _panelBottom.Controls.Add(_insertButton);
         }
-        
-
-        return panel;
-    }
-
-    private Panel Bottom()
-    {
-        TableLayoutPanel panel = new TableLayoutPanel
-        {
-            Dock = DockStyle.Fill,
-        };
-
-        SetCombobox();
 
         SetDataTableFromDb();
+        _panelBottom.Controls.Add(_table);
+        _panelBottom.SetColumnSpan(_table, 2);
 
-        SetSearch();
-
-        SetAction();
-
-        panel.Controls.Add(_table);
-
-        return panel;
+        _mainLayout.Controls.Add(_panelBottom);
     }
 
-    //////////////////////////////SETTOP///////////////////////////////
     Label getTitle()
     {
         Label titlePnl = new Label
@@ -173,18 +229,61 @@ public class MoDangKyHocPhan : NavBase
             Text = _title,
             Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
             AutoSize = true,
+            Anchor = AnchorStyles.Left
         };
         return titlePnl;
     }
 
+    void SetBottomTimePnl()
+    {
+        _bottomTimePnl = new RoundTLP
+        {
+            Border = true,
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            ColumnCount = 3,
+            Padding = new Padding(10, 10, 10, 30),
+        };
+        
+        _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-    //////////////////////////////SETTOP///////////////////////////////
+        // Label lblStart = new Label
+        // {
+        //     Margin = new Padding(5),
+        //     AutoSize = true,
+        //     Text = "Thời gian bắt đầu",
+        //     Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
+        // };
+        // Label lblEnd = new Label
+        // {
+        //     Margin = new Padding(5),
+        //     AutoSize = true,
+        //     Text = "Thời gian kết thúc",
+        //     Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
+        // };
 
+        LabelTextField startDTField = new LabelTextField("Thời gian bắt đầu", TextFieldType.DateTime);
+        _bottomTimePnl.Controls.Add(startDTField);
+        LabelTextField endDTField = new LabelTextField("Thời gian kết thúc", TextFieldType.DateTime);
+        _bottomTimePnl.Controls.Add(endDTField);
+        
+        
+        _updateTimeButton = new TitleButton("Cập nhật", "reload.svg");
+        _updateTimeButton.Margin = new Padding(3, 3, 20, 3);
+        _updateTimeButton.Anchor = AnchorStyles.None;
+        _updateTimeButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
+        
+        _bottomTimePnl.Controls.Add(_updateTimeButton);
+        
+        _mainLayout.Controls.Add(_bottomTimePnl);
+    }
+    
+    
 
-    /// ///////////////////////////SETBOTTOM////////////////////////////////////
     void SetCombobox()
     {
-        _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _listSelectionForComboBox = _headerList;
     }
 
@@ -196,15 +295,10 @@ public class MoDangKyHocPhan : NavBase
 
         string[] columnNames = new[]
         {
-            "MaNHP", 
-            "TenHP", 
+            "MaNHP",
+            "TenHP",
             "Siso",
-            "TenGV",
-            "Type",
-            "TenPhong",
-            "Thu",
-            "TietBatDau",
-            "SoTiet"
+            "TenGiangVien",
         };
         List<string> columnNamesList = columnNames.ToList();
 
@@ -213,15 +307,17 @@ public class MoDangKyHocPhan : NavBase
 
     void SetDisplayData()
     {
-        // _displayData = ConvertListCTDTToObj(_rawData);
+        _displayData = ConvertListNhomHPoObj(_rawData);
     }
-    
+
     List<object> ConvertListNhomHPoObj(List<NhomHocPhanDto> dtos)
     {
         List<object> list = ConvertObject.ConvertToDisplay(dtos, x => new NhomHocPhanDisplay()
             {
                 MaNHP = x.MaNHP,
-                // TenHP = vb
+                TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
+                Siso = x.SiSo,
+                TenGiangVien = _giangVienController.GetById(x.MaGV).TenGV,
             }
         );
         return list;
@@ -230,14 +326,23 @@ public class MoDangKyHocPhan : NavBase
 
     void SetSearch()
     {
-        // _NhomHocPhanSearch = new NhomHocPhanSearch(_rawData);
+        List<NhomHocPhanDisplay> list = ConvertObject.ConvertDtoToDto(_rawData, x => new NhomHocPhanDisplay
+            {
+                MaNHP = x.MaNHP,
+                TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
+                Siso = x.SiSo,
+                TenGiangVien = _giangVienController.GetById(x.MaGV).TenGV,
+            }
+        );
+        
+        _nhomHocPhanSearch = new NhomHocPhanSearch(list);
     }
 
     void SetAction()
     {
-        _NhomHocPhanSearch.FinishSearch += dtos =>
+        _nhomHocPhanSearch.FinishSearch += dtos =>
         {
-            // UpdateDataDisplay(dtos);
+            UpdateDataDisplay(dtos);
             this._table.UpdateData(_displayData);
         };
 
@@ -247,95 +352,32 @@ public class MoDangKyHocPhan : NavBase
         _table.OnDelete += index => { Delete(index); };
     }
 
-    void UpdateDataDisplay(List<NhomHocPhanDto> dtos)
+    void UpdateDataDisplay(List<NhomHocPhanDisplay> list)
     {
-        // this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
-        // {
-        //     MaTK = x.MaTK,
-        //     TenDangNhap = x.TenDangNhap,
-        //     TenNhomQuyen = _nhomQuyenController.GetTenQuyenByID(x.MaNQ),
-        // });
+        this._displayData = list.Cast<object>().ToList();
     }
 
     void Insert()
     {
-        InputFormItem[] arr = new InputFormItem[]
-        {
-            new InputFormItem("Tên đăng nhập", TextFieldType.NormalText),
-            new InputFormItem("Mật khẩu", TextFieldType.NormalText),
-            new InputFormItem("Loại tài khoản", TextFieldType.Combobox),
-            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
-        };
-        List<InputFormItem> list = new List<InputFormItem>();
-        list.AddRange(arr);
-
-        // _NhomHocPhanDialog = new NhomHocPhanDialog("Thêm tài khoản", DialogType.Them, list, _NhomHocPhanController,
-        //     _nhomQuyenController);
-        //
-        // _NhomHocPhanDialog.Finish += () =>
-        // {
-        //     UpdateDataDisplay(_NhomHocPhanController.GetAll());
-        //     this._table.UpdateData(_displayData);
-        // };
-        this._NhomHocPhanDialog.ShowDialog();
+        
     }
 
     void Update(int id)
     {
-        InputFormItem[] arr = new InputFormItem[]
-        {
-            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
-            new InputFormItem("Loại tài khoản", TextFieldType.Combobox),
-            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
-        };
-        List<InputFormItem> list = new List<InputFormItem>();
-        list.AddRange(arr);
-        // _NhomHocPhanDialog = new NhomHocPhanDialog("Sửa tài khoản", DialogType.Sua, list, _NhomHocPhanController,
-        //     _nhomQuyenController, id);
-        // _NhomHocPhanDialog.Finish += () =>
-        // {
-        //     UpdateDataDisplay(_NhomHocPhanController.GetAll());
-            this._table.UpdateData(_displayData);
-        // };
-        // this._NhomHocPhanDialog.ShowDialog();
+        
     }
 
     void Detail(int id)
     {
-        InputFormItem[] arr = new InputFormItem[]
-        {
-            new InputFormItem("Tên tài khoản", TextFieldType.NormalText),
-            new InputFormItem("Loại tài khoản", TextFieldType.Combobox),
-            new InputFormItem("Nhóm quyền", TextFieldType.Combobox),
-        };
-        List<InputFormItem> list = new List<InputFormItem>();
-        list.AddRange(arr);
-        // _NhomHocPhanDialog = new NhomHocPhanDialog("Chi tiết tài khoản", DialogType.ChiTiet, list, _NhomHocPhanController,
-            // _nhomQuyenController, id);
-        // this._NhomHocPhanDialog.ShowDialog();
+        
     }
 
     void Delete(int index)
     {
-        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-        if (select == DialogResult.No)
-        {
-            return;
-        }
-        // if (_NhomHocPhanController.Delete(index))
-        // {
-        //     MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //     UpdateDataDisplay(_NhomHocPhanController.GetAll());
-        //     this._table.UpdateData(_displayData);
-        // }
-        else
-        {
-            MessageBox.Show("Xóa tài khoản thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
+        
     }
-    
 
-    /// ///////////////////////////SETBOTTOM////////////////////////////////////
+
     public override List<string> getComboboxList()
     {
         return this._listSelectionForComboBox;
@@ -343,6 +385,6 @@ public class MoDangKyHocPhan : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._NhomHocPhanSearch.Search(txtSearch, filter);
+        this._nhomHocPhanSearch.Search(txtSearch, filter);
     }
 }

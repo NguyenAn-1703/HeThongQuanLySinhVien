@@ -25,7 +25,7 @@ namespace QuanLySinhVien.Views.Components.NavList.Dialog
         public PhongHocScheduleDialog(PhongHocDto phongHoc)
         {
             _phongHoc = phongHoc;
-            _lichHocDao = new LichHocDao();
+            _lichHocDao = LichHocDao.GetInstance();
             InitializeDialog();
             LoadScheduleData();
         }

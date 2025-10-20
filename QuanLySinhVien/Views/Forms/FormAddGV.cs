@@ -8,6 +8,7 @@ namespace QuanLySinhVien.Views.Forms;
 
 public class FormAddGV : Form
 {
+    private GiangVienController _giangVienController;
     private Form myForm;
     private GiangVien formParent;
     private TextBox txbMaGV = new TextBox()
@@ -298,7 +299,7 @@ public class FormAddGV : Form
                     TrangThai = cbbTrangThai.SelectedItem.ToString(),
                     AnhDaiDien = "abc", // Fix
                 };
-                GiangVienController.InsertGV(gv);
+                _giangVienController.Insert(gv);
                 MessageBox.Show("Thêm thông tin giảng viên thành công", "Thông báo",  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 formParent.LoadDatabase();
                 Close();

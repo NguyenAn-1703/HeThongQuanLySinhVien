@@ -33,7 +33,7 @@ public class PhongHoc : NavBase
         {
             _chiTietQuyenController = ChiTietQuyenController.getInstance();
             _chucNangController = ChucNangController.getInstance();
-            _phongHocController = new PhongHocController();
+            _phongHocController = PhongHocController.getInstance();
             Init();
             LoadData();
             SetActionListener();

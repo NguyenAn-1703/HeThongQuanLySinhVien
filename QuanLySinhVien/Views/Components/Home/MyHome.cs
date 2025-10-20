@@ -71,7 +71,7 @@ public class MyHome : Form
         // Client
         Text = "Hệ thống quản lí sinh viên";
         StartPosition = FormStartPosition.CenterScreen;
-        ClientSize = new Size(1600, 1000);
+        ClientSize = new Size(1600, 950);
 
         // layout border
         parLeft = new Panel

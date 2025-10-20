@@ -1,3 +1,4 @@
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.Home;
 using QuanLySinhVien.Views.Forms;
 
@@ -24,8 +25,14 @@ static class Program
         //     }
         // }
         
-        Application.Run(new FLogin());
-        // Application.Run(new MyHome());
+        // Application.Run(new FLogin());
+        
+        NhomQuyenDto nhomQuyen = new NhomQuyenDto
+        {
+            MaNQ = 2,
+            TenNhomQuyen = "admin", 
+        };
+        Application.Run(new MyHome(nhomQuyen));
 
     }
 }

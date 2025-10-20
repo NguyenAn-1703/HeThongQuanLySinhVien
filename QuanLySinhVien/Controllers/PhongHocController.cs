@@ -8,9 +8,20 @@ namespace QuanLySinhVien.Controllers
     {
         private readonly PhongHocDao _dao;
 
-        public PhongHocController()
+        private static PhongHocController _instance;
+
+        private PhongHocController()
         {
             _dao = new PhongHocDao();
+        }
+
+        public static PhongHocController getInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = new PhongHocController();
+            }
+            return _instance;
         }
         
         public List<PhongHocDto> GetDanhSachPhongHoc()

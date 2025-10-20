@@ -159,7 +159,10 @@ public class CustomTable : TableLayoutPanel
         int rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
-        _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor);
+        _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor)
+        {
+            Cursor = Cursors.Hand,
+        };
 
         Point myPoint = _topForm.PointToClient(rec);
 
@@ -177,7 +180,10 @@ public class CustomTable : TableLayoutPanel
         int rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
         _topForm = this.FindForm();
-        _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover);
+        _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover)
+        {
+            Cursor = Cursors.Hand,
+        };
 
         Point myPoint = _topForm.PointToClient(rec);
 

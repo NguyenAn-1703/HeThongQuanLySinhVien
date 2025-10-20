@@ -23,7 +23,7 @@ public class NhomHocPhanDao
     {
         List<NhomHocPhanDto> result = new();
         using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo, Type FROM NhomHocPhan WHERE Status = 1", conn);
+        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo FROM NhomHocPhan WHERE Status = 1", conn);
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read())
@@ -36,7 +36,6 @@ public class NhomHocPhanDao
                 HocKy = reader.GetInt32("HocKy"),
                 Nam = reader.GetString("Nam"),
                 SiSo = reader.GetInt32("SiSo"),
-                Type = reader.GetString("Type")
                 
             });
         }
@@ -49,8 +48,8 @@ public class NhomHocPhanDao
         int rowAffected = 0;
         using (MySqlConnection conn = MyConnection.GetConnection())
         {
-            string query = @"INSERT INTO NhomHocPhan (MaGV, MaHP, HocKy, Nam, SiSo, Type)
-                             VALUES (@MaGV, @MaHP, @HocKy, @Nam, @SiSo, @Type)";
+            string query = @"INSERT INTO NhomHocPhan (MaGV, MaHP, HocKy, Nam, SiSo)
+                             VALUES (@MaGV, @MaHP, @HocKy, @Nam, @SiSo)";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@MaGV", dto.MaGV);
@@ -58,7 +57,6 @@ public class NhomHocPhanDao
                 cmd.Parameters.AddWithValue("@HocKy", dto.HocKy);
                 cmd.Parameters.AddWithValue("@Nam", dto.Nam);
                 cmd.Parameters.AddWithValue("@SiSo", dto.SiSo);
-                cmd.Parameters.AddWithValue("@Type", dto.Type);
 
                 rowAffected = cmd.ExecuteNonQuery();
             }
@@ -76,8 +74,7 @@ public class NhomHocPhanDao
                                  MaHP = @MaHP,
                                  HocKy = @HocKy,
                                  Nam = @Nam,
-                                 SiSo = @SiSo,
-                                 Type = @Type
+                                 SiSo = @SiSo
                              WHERE MaNHP = @MaNHP";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
@@ -87,7 +84,6 @@ public class NhomHocPhanDao
                 cmd.Parameters.AddWithValue("@HocKy", dto.HocKy);
                 cmd.Parameters.AddWithValue("@Nam", dto.Nam);
                 cmd.Parameters.AddWithValue("@SiSo", dto.SiSo);
-                cmd.Parameters.AddWithValue("@Type", dto.Type);
 
                 rowAffected = cmd.ExecuteNonQuery();
             }
@@ -116,7 +112,7 @@ public class NhomHocPhanDao
     {
         NhomHocPhanDto result = new();
         using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo , Type FROM NhomHocPhan WHERE Status = 1 AND MaNHP = @MaNHP", conn);
+        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo  FROM NhomHocPhan WHERE Status = 1 AND MaNHP = @MaNHP", conn);
         cmd.Parameters.AddWithValue("@MaNHP", maNHP);
         using var reader = cmd.ExecuteReader();
 
@@ -130,7 +126,6 @@ public class NhomHocPhanDao
                 HocKy = reader.GetInt32("HocKy"),
                 Nam = reader.GetString("Nam"),
                 SiSo = reader.GetInt32("SiSo"),
-                Type = reader.GetString("Type")
             };
         }
 

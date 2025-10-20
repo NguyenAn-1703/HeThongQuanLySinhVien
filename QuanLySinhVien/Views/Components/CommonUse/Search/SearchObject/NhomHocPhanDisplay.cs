@@ -6,9 +6,4 @@ public class NhomHocPhanDisplay
     public string TenHP {get; set;}
     public int Siso { get; set; }
     public string TenGiangVien { get; set; }
-    public string Type { get; set; }
-    public string TenPhong { get; set; }
-    public string Thu { get; set; }
-    public int TietBatDau { get; set; }
-    public int SoTiet { get; set; }
 }

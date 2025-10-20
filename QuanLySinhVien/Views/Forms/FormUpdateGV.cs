@@ -9,6 +9,7 @@ namespace QuanLySinhVien.Views.Forms;
 
 public class FormUpdateGV : Form
 {
+    private GiangVienController _giangVienController;
     private Form myForm;
     private GiangVien formParent;
     private GiangVienDto giangVien;
@@ -303,7 +304,7 @@ public class FormUpdateGV : Form
                 gv.SoDienThoai = txbSoDienThoai.Text;
                 gv.Email = txbEmail.Text;
                 gv.TrangThai = cbbTrangThai.SelectedItem.ToString();
-                GiangVienController.UpdateGV(gv);
+                _giangVienController.Update(gv);
                 MessageBox.Show("Cập nhật thông tin giảng viên thành công", "Thông báo",  MessageBoxButtons.OK, MessageBoxIcon.Information);
                 formParent.LoadDatabase();
             }
@@ -330,7 +331,7 @@ public class FormUpdateGV : Form
             try
             {
                 int MaGV = giangVien.MaGV;
-                giangVien = GiangVienController.GetGVById(MaGV);
+                giangVien = _giangVienController.GetById(MaGV);
                 Load();
             }
             catch (Exception exception)

@@ -5,4 +5,6 @@ public enum TextFieldType
     NormalText,
     Password,
     Combobox,
+    DateTime,
+    Year,
 }

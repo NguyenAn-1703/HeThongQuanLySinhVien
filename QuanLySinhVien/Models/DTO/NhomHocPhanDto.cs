@@ -9,5 +9,4 @@ public class NhomHocPhanDto
     public string Nam { get; set; }
     public int SiSo { get; set; }
 
-    public string Type { get; set; }
 }

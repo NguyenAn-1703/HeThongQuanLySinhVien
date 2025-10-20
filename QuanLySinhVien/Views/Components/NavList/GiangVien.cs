@@ -22,6 +22,8 @@ public class GiangVien : NavBase
     
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
+
+    private GiangVienController _giangVienController;
     
     private List<ChiTietQuyenDto> _listAccess;
 
@@ -29,6 +31,7 @@ public class GiangVien : NavBase
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
+        _giangVienController = GiangVienController.GetInstance();
         ThisForm = this;
         _cUse = new CUse();
         Init();
@@ -41,7 +44,7 @@ public class GiangVien : NavBase
         try
         {
             dt.Rows.Clear();
-            foreach (var gv in GiangVienController.GetAll()) if(gv.Status > 0)
+            foreach (var gv in _giangVienController.GetAll()) if(gv.Status > 0)
             {
                 dt.Rows.Add(gv.ToDataRow());
             }
@@ -230,7 +233,7 @@ public class GiangVien : NavBase
                     {
                         var row = dtgv.Rows[e.RowIndex];
                         int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
-                        GiangVienDto gv = GiangVienController.GetGVById(id);
+                        GiangVienDto gv = _giangVienController.GetById(id);
                         FormUpdateGV form = new FormUpdateGV(gv, ThisForm);
                         form.ShowDialog();
                     }
@@ -248,7 +251,7 @@ public class GiangVien : NavBase
                         {
                             var row = dtgv.Rows[e.RowIndex];
                             int id = Convert.ToInt32(row.Cells["Mã giảng viên"].Value);
-                            GiangVienController.SoftDeleteById(id);
+                            _giangVienController.SoftDeleteById(id);
                             MessageBox.Show("Xóa giảng viên thành công", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             LoadDatabase();
                             

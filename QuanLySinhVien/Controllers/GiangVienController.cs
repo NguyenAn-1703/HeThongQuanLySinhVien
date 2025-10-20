@@ -5,8 +5,21 @@ namespace QuanLySinhVien.Controllers;
 
 public class GiangVienController
 {
+    private static GiangVienController _instance;
     private static List<GiangVienDto> giangVien;
-    public static List<GiangVienDto> GetAll()
+    
+    private GiangVienController()
+    { }
+
+    public static GiangVienController GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new GiangVienController();
+        }
+        return _instance;
+    }
+    public List<GiangVienDto> GetAll()
     {
         try
         {
@@ -19,7 +32,7 @@ public class GiangVienController
         return giangVien;
     }
 
-    public static void HardDeleteById(int id)
+    public void HardDeleteById(int id)
     {
         try
         {
@@ -30,7 +43,7 @@ public class GiangVienController
             throw new Exception(e.Message);
         }
     }
-    public static void SoftDeleteById(int id)
+    public void SoftDeleteById(int id)
     {
         try
         {
@@ -42,7 +55,7 @@ public class GiangVienController
         }
     }
 
-    public static GiangVienDto GetGVById(int id)
+    public GiangVienDto GetById(int id)
     {
         GiangVienDto giangVien = new GiangVienDto();
         try
@@ -57,7 +70,7 @@ public class GiangVienController
         return giangVien;
     }
 
-    public static void UpdateGV(GiangVienDto giangVien)
+    public void Update(GiangVienDto giangVien)
     {
         try
         {
@@ -70,7 +83,7 @@ public class GiangVienController
         }
     }
 
-    public static void InsertGV(GiangVienDto giangVien)
+    public void Insert(GiangVienDto giangVien)
     {
         try
         {

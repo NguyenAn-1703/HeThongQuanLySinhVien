@@ -5,12 +5,13 @@ namespace QuanLySinhVien.Models
         public int MaLH { get; set; }
         public int MaPH { get; set; }
         public int MaNHP { get; set; }
-        public int Thu { get; set; }
+        public string Thu { get; set; }
         public int TietBatDau { get; set; }
         public DateTime TuNgay { get; set; }
         public DateTime DenNgay { get; set; }
         public int TietKetThuc { get; set; }
         public int SoTiet { get; set; }
+        public string Type { get; set; }
         
         // Thông tin bổ sung từ JOIN
         public string TenPH { get; set; }

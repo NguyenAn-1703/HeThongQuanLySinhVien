@@ -25,6 +25,7 @@ public class TitleButton : RoundTLP
 
     void Init()
     {
+        this.Cursor = Cursors.Hand;
         ColumnCount = 2;
         BackColor = MyColor.White;
         AutoSize = true;
@@ -68,6 +69,7 @@ public class TitleButton : RoundTLP
         this.MouseLeave += (sender, args) => { OnMouseLeave(); };
         this.MouseDown += (sender, args) => { OnMouseDown(); };
         this.MouseUp += (sender, args) => { OnMouseUp(); };
+        
         foreach (Control i in this.Controls)
         {
             i.MouseEnter += (sender, args) => { OnMouseEnter(); };

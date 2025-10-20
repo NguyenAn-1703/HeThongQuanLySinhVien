@@ -15,6 +15,11 @@ public class LabelTextField : TableLayoutPanel
     private PictureBox _eyePb;
     private bool statusEp = false;
     
+    public DateTimePicker _dTNgayField;
+    public DateTimePicker _dTGioField;
+
+    public DateTimePicker _namField;
+    
     public LabelTextField(string title, TextFieldType fieldType)
     {
         _title = title;
@@ -54,6 +59,12 @@ public class LabelTextField : TableLayoutPanel
             case TextFieldType.Combobox:
                 SetComboboxField();
                 break;
+            case TextFieldType.DateTime:
+                SetDateTimeField();
+                break;
+            case TextFieldType.Year:
+                SetNamField();
+                break;
             
         }
     }
@@ -62,7 +73,7 @@ public class LabelTextField : TableLayoutPanel
     {
         _field = new CustomTextBox();
         _field.Dock = DockStyle.Top;
-        _field.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
+        _field.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
         this.Controls.Add(_field);
     }
 
@@ -70,7 +81,7 @@ public class LabelTextField : TableLayoutPanel
     {
         _password = new CustomTextBox();
         _password.Dock = DockStyle.Top;
-        _password.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
+        _password.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
         _password.contentTextBox.PasswordChar = '*';
         setEyeButton();
         this.Controls.Add(_password);
@@ -80,9 +91,50 @@ public class LabelTextField : TableLayoutPanel
     {
         _combobox = new CustomCombobox(new string[0]);
         _combobox.Dock = DockStyle.Top;
-        _combobox.Font = GetFont.GetFont.GetMainFont(13, FontType.Regular);
+        _combobox.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
         this.Controls.Add(_combobox);
     }
+
+    void SetDateTimeField()
+    {
+        TableLayoutPanel panel = new  TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            AutoSize = true,
+        };
+        _dTNgayField = new DateTimePicker
+        {
+            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            AutoSize = true,
+        };
+        _dTNgayField.Format = DateTimePickerFormat.Short; 
+        this.Controls.Add(_dTNgayField);
+        
+        _dTGioField = new DateTimePicker
+        {
+            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            AutoSize = true,
+        };
+        _dTGioField.Format = DateTimePickerFormat.Time; 
+        _dTGioField.ShowUpDown = true;
+        panel.Controls.Add(_dTNgayField);
+        panel.Controls.Add(_dTGioField);
+        this.Controls.Add(panel);
+        
+    }
+
+    void SetNamField()
+    {
+        _namField = new DateTimePicker();
+        _namField = new DateTimePicker();
+        _namField.Format = DateTimePickerFormat.Custom;
+        _namField.CustomFormat = "yyyy";
+        _namField.ShowUpDown = true; 
+        this.Controls.Add(_namField);
+    }
+    
+    
 
     void setEyeButton()
     {

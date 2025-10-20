@@ -37,12 +37,7 @@ public class NhomHocPhanSearch
                 x.MaNHP.ToString().ToLower().Contains(keyword) ||
                 x.TenHP.ToLower().Contains(keyword) ||
                 x.Siso.ToString().ToLower().Contains(keyword) ||
-                x.TenGiangVien.ToLower().Contains(keyword) ||
-                x.Type.ToLower().Contains(keyword) ||
-                x.TenPhong.ToLower().Contains(keyword) ||
-                x.Thu.ToLower().Contains(keyword) ||
-                x.TietBatDau.ToString().ToLower().Contains(keyword) ||
-                x.SoTiet.ToString().ToLower().Contains(keyword)
+                x.TenGiangVien.ToLower().Contains(keyword) 
             )
             .ToList();
     }
@@ -63,29 +58,9 @@ public class NhomHocPhanSearch
         {
             result = _rawData.Where(x => x.Siso.ToString().ToLower().Contains(keyword)).ToList();
         }
-        else if (selection.Equals("Tên giảng viên"))
+        else
         {
             result = _rawData.Where(x => x.TenGiangVien.ToLower().Contains(keyword)).ToList();
-        }
-        else if (selection.Equals("Loại nhóm"))
-        {
-            result = _rawData.Where(x => x.Type.ToLower().Contains(keyword)).ToList();
-        }
-        else if (selection.Equals("Phòng học"))
-        {
-            result = _rawData.Where(x => x.TenPhong.ToLower().Contains(keyword)).ToList();
-        }
-        else if (selection.Equals("Thứ"))
-        {
-            result = _rawData.Where(x => x.Thu.ToLower().Contains(keyword)).ToList();
-        }
-        else if (selection.Equals("Tiết bắt đầu"))
-        {
-            result = _rawData.Where(x => x.TietBatDau.ToString().ToLower().Contains(keyword)).ToList();
-        }
-        else // Số tiết
-        {
-            result = _rawData.Where(x => x.SoTiet.ToString().ToLower().Contains(keyword)).ToList();
         }
 
         return result;
