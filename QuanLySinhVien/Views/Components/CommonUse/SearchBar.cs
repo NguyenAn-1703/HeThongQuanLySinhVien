@@ -88,7 +88,8 @@ public class SearchBar: TableLayoutPanel
     CustomCombobox getFilter()
     {
         CustomCombobox filter = new CustomCombobox(new string[]{});
-        filter.Margin = new Padding(10, 35, 10, 0);
+        filter.combobox.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
+        filter.Anchor = AnchorStyles.None;
         return filter;
     }
 

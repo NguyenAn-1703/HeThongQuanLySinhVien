@@ -28,11 +28,6 @@ public class MoDangKyHocPhan : NavBase
     };
 
     private CustomTable _table;
-    private DataGridView dataGridView;
-    private DataTable table;
-    private TableLayoutPanel tableLayout;
-    private Panel topCenter, botCenter;
-    private CUse _cUse;
 
     List<NhomHocPhanDto> _rawData;
     List<object> _displayData;
@@ -43,10 +38,10 @@ public class MoDangKyHocPhan : NavBase
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
     private NhomHocPhanController _nhomHocPhanController;
-    private LichHocController _lichHocController;
+    // private LichHocController _lichHocController;
     private HocPhanController _hocPhanController;
     private GiangVienController _giangVienController;
-    private PhongHocController _phongHocController;
+    // private PhongHocController _phongHocController;
 
     private TitleButton _insertButton;
     private TitleButton _updateTimeButton;
@@ -60,6 +55,8 @@ public class MoDangKyHocPhan : NavBase
     private TableLayoutPanel _panelTop;
     private RoundTLP _panelBottom;
     private TableLayoutPanel _bottomTimePnl;
+    private LabelTextField _hocKyField;
+    private LabelTextField _namField;
 
     private List<ChiTietQuyenDto> _listAccess;
     private bool them = false;
@@ -74,10 +71,10 @@ public class MoDangKyHocPhan : NavBase
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
-        _lichHocController = LichHocController.GetInstance();
+        // _lichHocController = LichHocController.GetInstance();
         _hocPhanController = HocPhanController.GetInstance();
         _giangVienController = GiangVienController.GetInstance();
-        _phongHocController = PhongHocController.getInstance();
+        // _phongHocController = PhongHocController.getInstance();
         Init();
     }
 
@@ -163,12 +160,13 @@ public class MoDangKyHocPhan : NavBase
             AutoSize = true,
         };
 
-        LabelTextField _hocKyField = new LabelTextField("Học kỳ", TextFieldType.Combobox);
+        _hocKyField = new LabelTextField("Học kỳ", TextFieldType.Combobox);
         _hocKyField._combobox.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
         string[] listHK = new[] { "Học kỳ 1", "Học kỳ 2" };
         _hocKyField.SetComboboxList(listHK.ToList());
+        _hocKyField.SetComboboxSelection("Học kỳ 1");
         
-        LabelTextField _namField = new LabelTextField("Năm", TextFieldType.Year);
+        _namField = new LabelTextField("Năm", TextFieldType.Year);
         _namField.Font =  GetFont.GetFont.GetMainFont(14, FontType.Regular);
         
         
@@ -350,6 +348,8 @@ public class MoDangKyHocPhan : NavBase
         _table.OnEdit += index => { Update(index); };
         _table.OnDetail += index => { Detail(index); };
         _table.OnDelete += index => { Delete(index); };
+        
+        
     }
 
     void UpdateDataDisplay(List<NhomHocPhanDisplay> list)
@@ -359,7 +359,8 @@ public class MoDangKyHocPhan : NavBase
 
     void Insert()
     {
-        
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog(_title, DialogType.Them, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam());
+        dialog.ShowDialog();
     }
 
     void Update(int id)

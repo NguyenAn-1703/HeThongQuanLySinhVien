@@ -6,5 +6,10 @@ public enum TextFieldType
     Password,
     Combobox,
     DateTime,
+    Date,
     Year,
+    ListBoxHP,
+    ListBoxGV,
+    ListBoxPH,
+    Number
 }

@@ -17,6 +17,13 @@ public class RoundTLP : TableLayoutPanel
         BottomRight = bottomright;
         BottomLeft = bottomleft;
         Border = border;
+        Init();
+        
+    }
+
+    void Init()
+    {
+        DoubleBuffered = true;
     }
         
     //override ghi đè thêm phương thức onPaint của lớp Control

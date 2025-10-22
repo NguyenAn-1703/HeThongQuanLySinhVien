@@ -1,3 +1,5 @@
+using QuanLySinhVien.Views.Components.CommonUse.GiangVien;
+using QuanLySinhVien.Views.Components.CommonUse.PhongHoc;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
@@ -10,6 +12,7 @@ public class LabelTextField : TableLayoutPanel
     private TextFieldType _fieldType;
     public CustomTextBox _field; // normal Field
     public CustomTextBox _password;
+    public CustomTextBox _numberField;
     public CustomCombobox _combobox;
     
     private PictureBox _eyePb;
@@ -19,6 +22,12 @@ public class LabelTextField : TableLayoutPanel
     public DateTimePicker _dTGioField;
 
     public DateTimePicker _namField;
+
+    public CustomCombobox _listBox;
+
+    public DateTimePicker _dField;
+
+    
     
     public LabelTextField(string title, TextFieldType fieldType)
     {
@@ -62,9 +71,25 @@ public class LabelTextField : TableLayoutPanel
             case TextFieldType.DateTime:
                 SetDateTimeField();
                 break;
+            case TextFieldType.Date:
+                SetDateField();
+                break;
             case TextFieldType.Year:
                 SetNamField();
                 break;
+            case TextFieldType.ListBoxHP:
+                SetListBox();
+                break;
+            case TextFieldType.ListBoxGV:
+                SetListBoxGV();
+                break;
+            case  TextFieldType.ListBoxPH:
+                SetListBoxPH();
+                break;
+            case  TextFieldType.Number:
+                SetListBoxNumber();
+                break;
+            
             
         }
     }
@@ -124,6 +149,18 @@ public class LabelTextField : TableLayoutPanel
         
     }
 
+    void SetDateField()
+    {
+        _dTNgayField = new DateTimePicker
+        {
+            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            AutoSize = true,
+        };
+        _dTNgayField.Format = DateTimePickerFormat.Short;
+        this.Controls.Add(_dTNgayField);
+    }
+    
+
     void SetNamField()
     {
         _namField = new DateTimePicker();
@@ -132,6 +169,54 @@ public class LabelTextField : TableLayoutPanel
         _namField.CustomFormat = "yyyy";
         _namField.ShowUpDown = true; 
         this.Controls.Add(_namField);
+    }
+
+    public CustomSearchFieldHP tb;
+    void SetListBox()
+    {
+        tb =  new CustomSearchFieldHP();
+        tb.Dock  = DockStyle.Top;
+        this.Controls.Add(tb);
+        
+    }
+    
+    public CustomSearchFieldGV tbGV;
+    void SetListBoxGV()
+    {
+        tbGV =  new CustomSearchFieldGV();
+        tbGV.Dock  = DockStyle.Top;
+        this.Controls.Add(tbGV);
+    }
+    
+    public CustomSearchFieldPH tbPH;
+    void SetListBoxPH()
+    {
+        tbPH =  new CustomSearchFieldPH();
+        tbPH.Dock  = DockStyle.Top;
+        this.Controls.Add(tbPH);
+    }
+
+
+    void SetListBoxNumber()
+    {
+        _numberField = new CustomTextBox();
+        _numberField.Dock = DockStyle.Top;
+        _numberField.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
+        this.Controls.Add(_numberField);
+
+        _numberField.contentTextBox.KeyPress += (sender, args) =>
+        {
+            if (!char.IsControl(args.KeyChar) && !char.IsDigit(args.KeyChar))
+            {
+                args.Handled = true; // Chặn ký tự
+            }
+        };
+    }
+    
+
+    public string GetTextNam()
+    {
+        return _namField.Text;
     }
     
     
