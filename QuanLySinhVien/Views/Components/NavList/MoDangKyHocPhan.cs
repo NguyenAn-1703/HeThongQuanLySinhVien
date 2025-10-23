@@ -361,24 +361,27 @@ public class MoDangKyHocPhan : NavBase
 
         _hocKyField.GetComboboxField().SelectedIndexChanged += (sender, args) => OnChangeNamHK();
         _namField._namField.ValueChanged += (sender, args) => OnChangeNamHK();
+
+
     }
 
     void OnChangeNamHK()
     {
+        UpdateRawDataFilter();
+
+        List<NhomHocPhanDisplay> list = ConvertToDtoDisplay(_rawDataFilter);
+        UpdateDataDisplay(list);
+        this._table.UpdateData(_displayData);
+    }
+
+    void UpdateRawDataFilter()
+    {
         string hocKy = _hocKyField.GetSelectionCombobox().Split(" ")[2];
         string nam = _namField.GetTextNam();
-        
-        Console.WriteLine(hocKy + " " + nam);
-        
         _rawDataFilter = _rawData.Where(x => 
             x.HocKy.ToString().Equals(hocKy) &&
             x.Nam.Equals(nam)
         ).ToList();
-
-        List<NhomHocPhanDisplay> list = ConvertToDtoDisplay(_rawDataFilter);
-        
-        UpdateDataDisplay(list);
-        this._table.UpdateData(_displayData);
     }
 
     List<NhomHocPhanDisplay> ConvertToDtoDisplay(List<NhomHocPhanDto> input)
@@ -402,6 +405,17 @@ public class MoDangKyHocPhan : NavBase
     void Insert()
     {
         NhomHocPhanDialog dialog = new NhomHocPhanDialog("Thêm nhóm học phần", DialogType.Them, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam());
+        
+        
+        dialog.Finish += () =>
+        {
+            _rawData = _nhomHocPhanController.GetAll();
+            UpdateRawDataFilter();
+            List<NhomHocPhanDisplay> list = ConvertToDtoDisplay(_rawDataFilter);
+            UpdateDataDisplay(list);
+            this._table.UpdateData(_displayData);
+        };
+        
         dialog.ShowDialog();
     }
 

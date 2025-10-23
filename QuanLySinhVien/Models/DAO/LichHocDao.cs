@@ -264,5 +264,22 @@ namespace QuanLySinhVien.Models.DAO
 
             return result;
         }
+        
+        public bool HardDelete(int maLH)
+        {
+            int rowAffected = 0;
+            using (MySqlConnection conn = MyConnection.GetConnection())
+            {
+                string query = @"DELETE FROM LichHoc WHERE MaLH = @MaLH";
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaLH", maLH);
+                    rowAffected = cmd.ExecuteNonQuery();
+                }
+            }
+
+            return rowAffected > 0;
+        }
+
     }
 }

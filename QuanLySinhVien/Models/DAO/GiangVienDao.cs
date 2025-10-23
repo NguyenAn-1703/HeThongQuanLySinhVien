@@ -184,5 +184,45 @@ public class GiangVienDao
         cmd.Parameters.AddWithValue("@Status", statusStr);
         return Convert.ToInt16(cmd.ExecuteScalar());
     }
+    
+    
+    public static GiangVienDto GetGVByTen(string tenGV)
+    {
+        GiangVienDto dto = new GiangVienDto();
+        try
+        {
+            using var con = MyConnection.GetConnection();
+            string sql = "select magv, matk, makhoa, tengv, ngaysinhgv, gioitinhgv, sodienthoai, email, trangthai, anhdaidiengv, status\nfrom giangvien\nwhere giangvien.TenGV = @TenGV";
+            MySqlCommand cmd = new MySqlCommand(sql, con);
+            cmd.Parameters.AddWithValue("@TenGV", tenGV);
+            MySqlDataReader rd = cmd.ExecuteReader();
+            while (rd.Read())
+            {
+                GiangVienDto gv = new GiangVienDto
+                {
+                    MaGV = rd.GetInt32("MaGV"),
+                    MaTK = rd.GetInt32("MaTK"),
+                    MaKhoa = rd.GetInt32("MaKhoa"),
+                    TenGV = rd.GetString("TenGV"),
+                    NgaySinhGV = rd.GetDateOnly("NgaySinhGV"),
+                    GioiTinhGV = rd.GetString("GioiTinhGV"),
+                    SoDienThoai = rd.GetString("SoDienThoai") + "",
+                    Email = rd.GetString("Email"),
+                    TrangThai = rd.GetString("TrangThai"),
+                    AnhDaiDien = rd.GetString("anhdaidiengv"),
+                    Status = rd.GetInt16("Status"),
+                };
+                dto = gv;
+            }
+
+            if (dto.MaTK == 0) throw new Exception("Không tìm thấy mã giảng viên");
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+        return dto;
+    }
+    
 
 }

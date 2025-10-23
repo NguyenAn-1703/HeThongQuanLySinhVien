@@ -3,7 +3,6 @@ namespace QuanLySinhVien.Views.Components.CommonUse.GiangVien;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 
-
 public class CustomSearchFieldGV : CustomTextBox
 {
     CustomPopup _popup;
@@ -18,10 +17,10 @@ public class CustomSearchFieldGV : CustomTextBox
     private List<object> displayDatas;
 
     private GiangVienDto selectedHP;
-    
+
     public CustomSearchFieldGV()
     {
-        _parent = new  Form();
+        _parent = new Form();
         _GiangVienController = GiangVienController.GetInstance();
         _popup = new CustomPopup();
         listHP = _GiangVienController.GetAll();
@@ -30,24 +29,19 @@ public class CustomSearchFieldGV : CustomTextBox
 
     void Init()
     {
-        
-
         SetData();
-        
         SetAction();
-        
     }
 
     void SetAction()
     {
         this.contentTextBox.TextChanged += (sender, args) => OnTextChanged();
-        this.contentTextBox.KeyDown +=  (sender, args) => OnKeyDown(args);
+        this.contentTextBox.KeyDown += (sender, args) => OnKeyDown(args);
         this._popup.KeyEnter += (index) => OnKeyEnter(index);
     }
 
     void OnKeyEnter(int index)
     {
-        
         selectedHP = _GiangVienController.GetById(index);
         contentTextBox.Text = selectedHP.TenGV;
         contentTextBox.Focus();
@@ -58,16 +52,13 @@ public class CustomSearchFieldGV : CustomTextBox
     void OnKeyDown(KeyEventArgs e)
     {
         //chọn trong list
-        if (e.KeyCode == Keys.Down)
+        if (e.KeyCode == Keys.Down && !contentTextBox.Text.Equals("") && _popup.Visible == true)
         {
-            if (_popup.Visible == true)
-            {
-                _popup._dt.Focus();
-            }
+            _popup._dt.Focus();
         }
-        
+
         //chọn trực tiếp
-        if (e.KeyCode == Keys.Enter && _popup.Visible == true)
+        if (e.KeyCode == Keys.Enter && !contentTextBox.Text.Equals("") && _popup.Visible == true)
         {
             if (_popup._dt.SelectedRows[0].Index == 0)
             {
@@ -80,7 +71,6 @@ public class CustomSearchFieldGV : CustomTextBox
 
     void OnTextChanged()
     {
-
         if (contentTextBox.Focused)
         {
             if (_parent != FindForm())
@@ -95,10 +85,8 @@ public class CustomSearchFieldGV : CustomTextBox
                 _popup.Visible = false;
                 return;
             }
-        
-            _popup.Visible = true;
 
-            List<GiangVienDto> searchList = listHP.Where(x => 
+            List<GiangVienDto> searchList = listHP.Where(x =>
                 x.MaGV.ToString().ToLower().Contains(keyword) ||
                 x.TenGV.ToLower().Contains(keyword)
             ).ToList();
@@ -118,12 +106,11 @@ public class CustomSearchFieldGV : CustomTextBox
                 _popup.Visible = true;
             }
         }
-        
     }
 
     public void SetData()
     {
-        string [] arr = new[] { "MaGV", "TenGV"};
+        string[] arr = new[] { "MaGV", "TenGV" };
         _columnNames = arr.ToList();
         displayDatas = ConvertObject.ConvertToDisplay(listHP, x => new
         {
@@ -136,14 +123,14 @@ public class CustomSearchFieldGV : CustomTextBox
     public void SetupLocation()
     {
         _parent = FindForm();
-        
+
         Point screenPoint = this.PointToScreen(new Point(0, this.Height));
         Point location = _parent.PointToClient(screenPoint);
-        
+
         _popup.Location = location;
-        
+
         _popup.Width = this.Width;
-        
+
         _parent.Controls.Add(_popup);
         _popup.BringToFront();
 

@@ -56,14 +56,14 @@ public class CustomSearchFieldPH : CustomTextBox
         //chọn trong list
         if (e.KeyCode == Keys.Down)
         {
-            if (_popup.Visible == true)
+            if (_popup.Visible == true && !contentTextBox.Text.Equals(""))
             {
                 _popup._dt.Focus();
             }
         }
 
         //chọn trực tiếp
-        if (e.KeyCode == Keys.Enter && _popup.Visible == true)
+        if (e.KeyCode == Keys.Enter && _popup.Visible == true && !contentTextBox.Text.Equals(""))
         {
             if (_popup._dt.SelectedRows[0].Index == 0)
             {

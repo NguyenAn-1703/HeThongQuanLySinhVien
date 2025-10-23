@@ -143,6 +143,33 @@ public class HocPhanDao
 
         return result;
     }
+    
+    public HocPhanDto GetHocPhanByTen(string tenHP)
+    {
+        HocPhanDto result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd =
+            new MySqlCommand("SELECT MaHP, MaHPTruoc, TenHP, SoTinChi, HeSoHocPhan, SoTietLyThuyet, SoTietThucHanh FROM hocphan WHERE Status = 1 AND TenHP = @TenHP",
+                conn);
+        cmd.Parameters.AddWithValue("@TenHP", tenHP);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new HocPhanDto
+            {
+                MaHP = reader.GetInt32(reader.GetOrdinal("MaHP")),
+                MaHPTruoc = reader.IsDBNull(reader.GetOrdinal("MaHPTruoc")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("MaHPTruoc")),
+                TenHP = reader.GetString(reader.GetOrdinal("TenHP")),
+                SoTinChi = reader.GetInt32(reader.GetOrdinal("SoTinChi")),
+                HeSoHocPhan = reader.GetFloat(reader.GetOrdinal("HeSoHocPhan")),
+                SoTietLyThuyet = reader.GetInt32(reader.GetOrdinal("SoTietLyThuyet")),
+                SoTietThucHanh = reader.GetInt32(reader.GetOrdinal("SoTietThucHanh"))
+            };
+        }
+
+        return result;
+    }
 
     // Get all HocPhan for ComboBox display (format: "MaHP - TenHP")
     public List<string> GetAllForCombobox()

@@ -53,4 +53,9 @@ public class LichHocController
     {
         return _lichHocDao.GetByMaNhp(maNhp);
     }
+
+    public bool HardDelete(int maLH)
+    {
+        return _lichHocDao.HardDelete(maLH);
+    }
 }

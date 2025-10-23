@@ -49,4 +49,23 @@ public class HocPhanController
     {
         return _hocPhanDao.GetHocPhanById(id);
     }
+    
+    public bool ExistByTen(string ten)
+    {
+        List<HocPhanDto> listPh = GetAll();
+        foreach (HocPhanDto item in listPh)
+        {
+            if (item.TenHP.Equals(ten))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public HocPhanDto GetHocPhanByTen(string ten)
+    {
+        return _hocPhanDao.GetHocPhanByTen(ten);
+    }
 }

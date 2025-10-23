@@ -57,7 +57,7 @@ public class CustomSearchFieldHP : CustomTextBox
     void OnKeyDown(KeyEventArgs e)
     {
         //chọn trong list
-        if (e.KeyCode == Keys.Down)
+        if (e.KeyCode == Keys.Down && !contentTextBox.Text.Equals(""))
         {
             if (_popup.Visible == true)
             {
@@ -66,7 +66,7 @@ public class CustomSearchFieldHP : CustomTextBox
         }
         
         //chọn trực tiếp
-        if (e.KeyCode == Keys.Enter && _popup.Visible == true)
+        if (e.KeyCode == Keys.Enter && _popup.Visible == true && !contentTextBox.Text.Equals(""))
         {
             if (_popup._dt.SelectedRows[0].Index == 0)
             {
@@ -94,7 +94,6 @@ public class CustomSearchFieldHP : CustomTextBox
                 return;
             }
         
-            _popup.Visible = true;
 
             List<HocPhanDto> searchList = listHP.Where(x => 
                 x.MaHP.ToString().ToLower().Contains(keyword) ||

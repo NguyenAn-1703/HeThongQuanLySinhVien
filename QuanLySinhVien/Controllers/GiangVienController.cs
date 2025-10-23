@@ -1,5 +1,6 @@
 using System.Data;
 using QuanLySinhVien.Models;
+using QuanLySinhVien.Models.DAO;
 
 namespace QuanLySinhVien.Controllers;
 
@@ -94,5 +95,24 @@ public class GiangVienController
         {
             throw new Exception(e.Message);
         }
+    }
+
+    public GiangVienDto GetByTen(string ten)
+    {
+        return GiangVienDao.GetGVByTen(ten);
+    }
+    
+    public bool ExistByTen(string ten)
+    {
+        List<GiangVienDto> listPh = GetAll();
+        foreach (GiangVienDto item in listPh)
+        {
+            if (item.TenGV.Equals(ten))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -38,20 +38,23 @@ public class LichHocDialog : Form
 
     private LichHocDto selectedItem;
 
+    private List<LichHocDto> _listTam;
 
-    public LichHocDialog(string title, DialogType dialogType, LichHocDto lich = null)
+
+    public LichHocDialog(string title, DialogType dialogType,List<LichHocDto> listTam , LichHocDto lich = null)
     {
         _title = title;
         _dialogType = dialogType;
         _phongController = PhongHocController.getInstance();
         selectedItem = lich;
+        _listTam = listTam;
         Init();
     }
 
     void Init()
     {
         Width = 800;
-        Height = 700;
+        Height = 600;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
         this.FormBorderStyle = FormBorderStyle.None;
@@ -245,8 +248,8 @@ public class LichHocDialog : Form
         fieldTietBd.SetComboboxList(_listAll);
         fieldTietBd.SetComboboxSelection(_listAll[0]);
 
-        fieldTietKt.SetComboboxList(_listAll);
-        fieldTietKt.SetComboboxSelection(_listAll[0]);
+        fieldTietKt.SetComboboxList(_listSang);
+        fieldTietKt.SetComboboxSelection(_listSang[0]);
 
         SetActionTiet();
         SetActionNgay();
@@ -539,7 +542,30 @@ public class LichHocDialog : Form
             fieldPhong.tbPH.contentTextBox.Focus();
             return false;
         }
+        if (DuplicateLichHoc(fieldThu.GetSelectionCombobox(), fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox()))
+        {
+            MessageBox.Show("Lịch học bị trùng!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
 
         return true;
+    }
+
+    bool DuplicateLichHoc(string thu, string tietBatDau, string tietKetThuc)
+    {
+        foreach (LichHocDto item in _listTam)
+        {
+            if (item.Thu.Equals(thu))
+            {
+                int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
+                int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
+                if (item.TietBatDau <= tietKt && tietBd <= item.TietKetThuc)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

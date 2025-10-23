@@ -50,4 +50,6 @@ public class NhomHocPhanController
     {
         return _nhomHocPhanDao.GetById(maNHP);
     }
+
+
 }
