@@ -6,7 +6,7 @@ using QuanLySinhVien.Views.Enums;
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 //Gồm title + textbox cho các form
-public class LabelTextField : TableLayoutPanel
+public class LabelTextField : MyTLP
 {
     private string _title;
     private TextFieldType _fieldType;
@@ -26,7 +26,7 @@ public class LabelTextField : TableLayoutPanel
     public CustomCombobox _listBox;
 
     public DateTimePicker _dField;
-
+//
     
     
     public LabelTextField(string title, TextFieldType fieldType)
@@ -122,7 +122,7 @@ public class LabelTextField : TableLayoutPanel
 
     void SetDateTimeField()
     {
-        TableLayoutPanel panel = new  TableLayoutPanel
+        MyTLP panel = new  MyTLP
         {
             Dock = DockStyle.Fill,
             ColumnCount = 2,

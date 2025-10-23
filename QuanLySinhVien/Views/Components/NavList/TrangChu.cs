@@ -13,7 +13,7 @@ public class TrangChu : NavBase
     private int _imgWidth = 364;
     private int _imgHeight = 626;
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
-    private TableLayoutPanel _leftPanel;
+    private MyTLP _leftPanel;
 
     public TrangChu(NhomQuyenDto quyen) : base(quyen)
     {
@@ -27,7 +27,7 @@ public class TrangChu : NavBase
         Dock = DockStyle.Fill;
         Margin = new Padding(0);
 
-        TableLayoutPanel mainLayout = new TableLayoutPanel();
+        MyTLP mainLayout = new MyTLP();
         mainLayout.SuspendLayout();
         mainLayout.Margin = new Padding(0);
         mainLayout.Dock = DockStyle.Fill;
@@ -143,9 +143,9 @@ public class TrangChu : NavBase
         return pb;
     }
 
-    TableLayoutPanel GetLeftPanel()
+    MyTLP GetLeftPanel()
     {
-        TableLayoutPanel panel = new TableLayoutPanel();
+        MyTLP panel = new MyTLP();
         panel.SuspendLayout();
         panel.Margin = new Padding(0);
         panel.Padding = new Padding(40);

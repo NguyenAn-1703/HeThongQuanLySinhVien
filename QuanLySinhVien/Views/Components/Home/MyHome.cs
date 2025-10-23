@@ -29,17 +29,17 @@ public class MyHome : Form
     private Label logoText;
     private PictureBox logoPb;
     private ToggleButton toggleButton;
-    private TableLayoutPanel navListContainer;
+    private MyTLP navListContainer;
     private Panel parLeft;
-    private TableLayoutPanel parRight;
-    private TableLayoutPanel left;
+    private MyTLP parRight;
+    private MyTLP left;
     private Panel logout;
     private LogoutButton logoutButton;
     private SearchBar _searchBar;
-    private TableLayoutPanel rightTop;
-    private TableLayoutPanel mainLayout;
+    private MyTLP rightTop;
+    private MyTLP mainLayout;
     //panel trống cho chức năng không cần đến rightTop
-    private TableLayoutPanel _emptyForUnTopBar;
+    private MyTLP _emptyForUnTopBar;
 
     private NhomQuyenDto _quyen;
 
@@ -57,7 +57,7 @@ public class MyHome : Form
     private void Init()
     {
 
-        mainLayout = new TableLayoutPanel
+        mainLayout = new MyTLP
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
@@ -83,7 +83,7 @@ public class MyHome : Form
         };
         
         // left panel
-        left = new TableLayoutPanel()
+        left = new MyTLP()
         {
             Margin = new Padding(0),
             Dock = DockStyle.Fill,
@@ -98,7 +98,7 @@ public class MyHome : Form
         left.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         
         // logo
-        var logo = new TableLayoutPanel()
+        var logo = new MyTLP()
         {
             Dock = DockStyle.Top,
             BackColor = MyColor.GrayBackGround,
@@ -136,7 +136,7 @@ public class MyHome : Form
         logo.Controls.Add(logoText);
         
         
-        navListContainer = new TableLayoutPanel
+        navListContainer = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -164,7 +164,7 @@ public class MyHome : Form
         
         // panel phải
         
-        parRight = new TableLayoutPanel   
+        parRight = new MyTLP   
         {
             Dock = DockStyle.Fill,
             BackColor = Color.White,
@@ -175,7 +175,7 @@ public class MyHome : Form
         parRight.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         parRight.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         
-        rightTop = new TableLayoutPanel
+        rightTop = new MyTLP
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
@@ -188,7 +188,7 @@ public class MyHome : Form
         rightTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
         _searchBar = new SearchBar();
-        TableLayoutPanel accountInfo = getAcountInfo();
+        MyTLP accountInfo = getAcountInfo();
             
 
         // border
@@ -203,7 +203,7 @@ public class MyHome : Form
 
          if (rightBottomChange is TrangChu)
          {
-             _emptyForUnTopBar = new TableLayoutPanel { AutoSize = true };
+             _emptyForUnTopBar = new MyTLP { AutoSize = true };
              _emptyForUnTopBar.Margin = new Padding(0);
              _emptyForUnTopBar.BackColor = MyColor.GrayBackGround;
              rightTop.Visible = false;
@@ -262,7 +262,6 @@ public class MyHome : Form
         String change = navListController.getDataButton(function);
         Console.WriteLine(change);
         rightBottomChange = navListController.update(change);
-        // Console.WriteLine(rightBottomChange);
         
         rightBottomChange.Dock = DockStyle.Fill;
         rightBottomHost.Controls.Add(rightBottomChange);
@@ -298,9 +297,9 @@ public class MyHome : Form
         this.Dispose();
     }
 
-    TableLayoutPanel getAcountInfo()
+    MyTLP getAcountInfo()
     {
-        TableLayoutPanel AccountInfo = new TableLayoutPanel
+        MyTLP AccountInfo = new MyTLP
         {
             ColumnCount = 2,
         };
@@ -309,7 +308,7 @@ public class MyHome : Form
         AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         AccountInfo.AutoSize = true;
         
-        // AccountInfo.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;        
+        // AccountInfo.CellBorderStyle = MyTLPCellBorderStyle.Single;        
         
         
         var userIcon = new PictureBox
@@ -320,7 +319,7 @@ public class MyHome : Form
             SizeMode = PictureBoxSizeMode.Zoom,
         };
         
-        var textAccount = new TableLayoutPanel {
+        var textAccount = new MyTLP {
             RowCount = 2,
             Margin = new Padding(8, 0, 0, 0),
             AutoSize = true
@@ -417,7 +416,7 @@ public class MyHome : Form
             item.Controls[2].SuspendLayout();
         }
 
-
+        
         mainLayout.SuspendLayout();
     }
 
@@ -427,7 +426,6 @@ public class MyHome : Form
         {
             item.Controls[2].ResumeLayout();
         }
-        
 
         mainLayout.ResumeLayout();
     }

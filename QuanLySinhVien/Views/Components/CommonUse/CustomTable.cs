@@ -11,11 +11,11 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 
 #endregion
 
-public class CustomTable : TableLayoutPanel
+public class CustomTable : MyTLP
 {
     public CustomDataGridView _dataGridView;
     List<string> _headerContent;
-    protected FlowLayoutPanel _header;
+    protected MyFLP _header;
     private List<object> _cellDatas;
     private List<string> _columnNames; //để truy suất
     private BindingList<object> _displayCellData;
@@ -35,7 +35,7 @@ public class CustomTable : TableLayoutPanel
         bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
-        _header = new FlowLayoutPanel();
+        _header = new MyFLP();
         _cellDatas = cells;
         _action = action;
         _edit = edit;

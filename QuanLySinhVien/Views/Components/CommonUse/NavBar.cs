@@ -18,7 +18,7 @@ public class NavBar : Panel
     //item đang được chọn
     public NavItem SelectedItem;
 
-    public TableLayoutPanel _mainLayout;
+    public MyTLP _mainLayout;
 
     public event Action<String> OnSelect1Item;
 
@@ -81,7 +81,7 @@ public class NavBar : Panel
         Dock = DockStyle.Fill;
         AutoScroll = true;
 
-        _mainLayout = new TableLayoutPanel
+        _mainLayout = new MyTLP
         {
             BackColor = MyColor.GrayBackGround,
             AutoSize = true,

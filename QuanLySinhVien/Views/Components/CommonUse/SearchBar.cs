@@ -3,7 +3,7 @@ using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
-public class SearchBar: TableLayoutPanel
+public class SearchBar: MyTLP
 {
     // private TextBox _searchBox;
     private CustomCombobox Filter;
@@ -31,7 +31,7 @@ public class SearchBar: TableLayoutPanel
         this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
-        // this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // this.CellBorderStyle = MyTLPCellBorderStyle.Single;
         SetSearchField();
 
         this.Filter = getFilter();
@@ -57,7 +57,7 @@ public class SearchBar: TableLayoutPanel
         _searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         _searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         
-        // _searchFieldPanel.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
+        // _searchFieldPanel.CellBorderStyle = MyTLPCellBorderStyle.Single;
         
 
         PictureBox iconGlass = new PictureBox

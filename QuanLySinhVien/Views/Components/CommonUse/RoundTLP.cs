@@ -1,8 +1,9 @@
 using System.Drawing.Drawing2D;
+using QuanLySinhVien.Views.Components.CommonUse;
 
 namespace QuanLySinhVien.Views.Components.ViewComponents;
-//TableLayoutPanel thêm bo góc
-public class RoundTLP : TableLayoutPanel
+//MyTLP thêm bo góc
+public class RoundTLP : MyTLP
 {
     public int BorderRadius { get; set; } = 10;
     public Boolean TopLeft, TopRight, BottomRight, BottomLeft;

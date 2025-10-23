@@ -55,7 +55,7 @@ public class NavItem : RoundTLP
         
         PictureBox pb = new PictureBox
         {
-            Margin = new Padding(3, 3, 10, 3),
+            Margin = new Padding(7, 7, 10, 7),
             Anchor = AnchorStyles.None,
             Size = new Size(20, 20),
             SizeMode = PictureBoxSizeMode.Zoom,

@@ -1,4 +1,5 @@
 using System.Diagnostics.PerformanceData;
+using Mysqlx.Crud;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
@@ -33,12 +34,15 @@ public class NhomHocPhanDialog : Form
     private string _hocKy;
     private string _nam;
 
-    private Form _lichDialog;
+    private LichHocDialog _lichDialog;
+
+    private List<LichHocDto> listLichTam;
     
     public NhomHocPhanDialog(string title, DialogType dialogType, string hocKy, string nam)
     {
         _lichDisplay = new List<object>();
         listField = new List<LabelTextField>();
+        listLichTam = new List<LichHocDto>();
         _lichHocController = LichHocController.GetInstance();
         _hocPhanController =  HocPhanController.GetInstance();
         _giangVienController = GiangVienController.GetInstance();
@@ -178,8 +182,8 @@ public class NhomHocPhanDialog : Form
 
     private void SetTableLichHoc()
     {
-        string[] header = new[] { "Thứ", "Tiết bắt đầu", "Tiết kết thúc" };
-        string[] columnNames = new[] { "Thu", "TietBatDau", "TietKetThuc" };
+        string[] header = new[] { "ID", "Thứ", "Tiết bắt đầu", "Tiết kết thúc" };
+        string[] columnNames = new[] { "ID" ,"Thu", "TietBatDau", "TietKetThuc" };
         List<string> columnNamesList = columnNames.ToList();
         _tableLichHoc = new CustomTable(header.ToList(), columnNamesList, _lichDisplay, true, true, true);
 
@@ -188,12 +192,15 @@ public class NhomHocPhanDialog : Form
 
     void UpdateDisplayDataLich(List<LichHocDto> dtos)
     {
+        int index = 1;
         _lichDisplay = ConvertObject.ConvertToDisplay(dtos, x => new
         {
+            ID = index++,
             Thu = x.Thu,
             TietBatDau = x.TietBatDau,
             TietKetThuc = x.TietKetThuc
         });
+        _tableLichHoc._dataGridView.DataSource = _lichDisplay;
     }
     
     void SetTopBar()
@@ -305,16 +312,33 @@ public class NhomHocPhanDialog : Form
 
     void SetAction()
     {
-        _insertButton._mouseDown += () => OnMouseDown();
+        _insertButton._mouseDown += () => InsertLich();
+        _tableLichHoc.OnDetail += i => DetailLich(i);
+
     }
 
-    void OnMouseDown()
+    void InsertLich()
     {
-        
-        LichHocDialog _lichDialog = new LichHocDialog("Lịch học", DialogType.Them);
+        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them);
+        _lichDialog.Finish += dto =>
+        {
+            listLichTam.Add(dto);
+            UpdateDisplayDataLich(listLichTam);
+        };
         _lichDialog.ShowDialog();
-        
     }
-    
+
+    void DetailLich(int index)
+    {
+        LichHocDto lich = GetLichById(index);
+        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet, lich);
+        _lichDialog.ShowDialog();
+    }
+
+    LichHocDto GetLichById(int ID)
+    {
+        LichHocDto result = listLichTam[ID - 1];
+        return result;
+    }
     
 }

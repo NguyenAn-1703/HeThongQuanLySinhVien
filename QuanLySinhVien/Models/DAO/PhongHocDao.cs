@@ -119,6 +119,31 @@ namespace QuanLySinhVien.Models.DAO
             return result;
         }
         
+        public PhongHocDto GetByTen(string TenPH)
+        {
+            PhongHocDto result = null;
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(
+                "SELECT MaPH, TenPH, LoaiPH, CoSo, SucChua, TinhTrang FROM PhongHoc WHERE Status = 1 AND TenPH = @TenPH",
+                conn);
+            cmd.Parameters.AddWithValue("@TenPH", TenPH);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                result = new PhongHocDto
+                {
+                    MaPH = reader.GetInt32("MaPH"),
+                    TenPH = reader.GetString("TenPH"),
+                    LoaiPH = reader.GetString("LoaiPH"),
+                    CoSo = reader.GetString("CoSo"),
+                    SucChua = reader.GetInt32("SucChua"),
+                    TinhTrang = reader.GetString("TinhTrang")
+                };
+            }
+            return result;
+        }
+        
         // lấy chi tiết lịch học ( theo ngày hiện tại )
         // maPH, tgian -> list TietHoc
         public List<LichHocChiTietDto> GetLichHocTrongNgay(int maPH, DateTime ngay)

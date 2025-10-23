@@ -58,7 +58,7 @@ public class QuanLiTaiKhoan : NavBase
         
         Dock = DockStyle.Fill;
 
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        MyTLP mainLayout = new MyTLP
         {
             RowCount = 2,
             Dock = DockStyle.Fill,
@@ -99,11 +99,11 @@ public class QuanLiTaiKhoan : NavBase
 
     private Panel Top()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
-            // CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
+            // CellBorderStyle = MyTLPCellBorderStyle.Single,
             Padding = new Padding(10),
             ColumnCount = 2,
             BackColor = MyColor.GrayBackGround
@@ -130,7 +130,7 @@ public class QuanLiTaiKhoan : NavBase
 
     private Panel Bottom()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             Dock = DockStyle.Fill,
         };

@@ -1,5 +1,9 @@
+using System.Runtime.InteropServices.JavaScript;
+using ExCSS;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using Mysqlx.Crud;
 using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
@@ -12,23 +16,40 @@ public class LichHocDialog : Form
     private string _title;
     private DialogType _dialogType;
 
-
     private TableLayoutPanel _mainLayout;
     private CustomButton _exitButton;
     private TitleButton _btnLuu;
     private List<LabelTextField> _listTextBox;
-    public event Action Finish;
 
-    public LichHocDialog(string title, DialogType dialogType)
+    private LabelTextField fieldPhong;
+    LabelTextField fieldCa;
+    LabelTextField fieldThu;
+    LabelTextField fieldTietBd;
+    LabelTextField fieldTietKt;
+    LabelTextField fieldTuNgay;
+    LabelTextField fieldDenNgay;
+    LabelTextField fieldSoTuan;
+
+
+    public event Action<LichHocDto> Finish;
+    
+    private PhongHocController _phongController;
+
+    private LichHocDto selectedItem;
+    
+
+    public LichHocDialog(string title, DialogType dialogType, LichHocDto lich = null)
     {
         _title = title;
         _dialogType = dialogType;
+        _phongController = PhongHocController.getInstance();
+        selectedItem = lich;
         Init();
     }
 
     void Init()
     {
-        Width = 600;
+        Width = 650;
         Height = 700;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
@@ -51,7 +72,17 @@ public class LichHocDialog : Form
         SetContent();
         SetBottom();
 
+        SetAction();
+
         this.Controls.Add(_mainLayout);
+
+        if (_dialogType == DialogType.ChiTiet)
+        {
+            if (_dialogType == DialogType.ChiTiet)
+            {
+                SetupDetail();
+            }
+        }
     }
 
     void SetTopBar()
@@ -173,6 +204,7 @@ public class LichHocDialog : Form
         _mainLayout.Controls.Add(_contentPanel);
 
         ConfigCombobox();
+
     }
 
     string[] temps = new[] { "Tiết 1", "Tiết 2", "Tiết 3", "Tiết 4", "Tiết 5" };
@@ -192,13 +224,14 @@ public class LichHocDialog : Form
         _listChieu = tempc.ToList();
         _listAll = tempa.ToList();
 
-        LabelTextField fieldCa = _listTextBox[1];
-        LabelTextField fieldThu = _listTextBox[2];
-        LabelTextField fieldTietBd = _listTextBox[3];
-        LabelTextField fieldTietKt = _listTextBox[4];
-        LabelTextField fieldTuNgay = _listTextBox[5];
-        LabelTextField fieldDenNgay = _listTextBox[6];
-        LabelTextField fieldSoTuan = _listTextBox[7];
+        fieldPhong = _listTextBox[0];
+        fieldCa = _listTextBox[1];
+        fieldThu = _listTextBox[2];
+        fieldTietBd = _listTextBox[3];
+        fieldTietKt = _listTextBox[4];
+        fieldTuNgay = _listTextBox[5];
+        fieldDenNgay = _listTextBox[6];
+        fieldSoTuan = _listTextBox[7];
 
         string[] ca = new[] { "Thực hành", "Lý thuyết" };
         fieldCa.SetComboboxList(ca.ToList());
@@ -214,10 +247,13 @@ public class LichHocDialog : Form
         fieldTietKt.SetComboboxList(_listAll);
         fieldTietKt.SetComboboxSelection(_listAll[0]);
 
-        SetActionTiet(fieldTietBd, fieldTietKt);
+        SetActionTiet();
+        SetActionNgay();
+        
+        
     }
 
-    void SetActionTiet(LabelTextField fieldTietBd, LabelTextField fieldTietKt)
+    void SetActionTiet()
     {
         fieldTietBd._combobox.combobox.SelectedIndexChanged += (sender, args) =>
         {
@@ -246,6 +282,137 @@ public class LichHocDialog : Form
         };
     }
 
+    void SetActionNgay()
+    {
+        fieldTuNgay._dTNgayField.TextChanged += (sender, args) =>
+        {
+            DateTime startDate = fieldTuNgay._dTNgayField.Value;
+            DateTime endDate = fieldDenNgay._dTNgayField.Value;
+
+            if (startDate > endDate)
+            {
+                fieldDenNgay._dTNgayField.Value = startDate;
+                endDate = startDate;
+            }
+            
+            TimeSpan timeSpan = endDate - startDate;
+            int days = timeSpan.Days;
+            int week = days / 7;
+            
+            fieldSoTuan._numberField.contentTextBox.Text = week + "";
+
+        };
+        
+        fieldDenNgay._dTNgayField.TextChanged += (sender, args) =>
+        {
+            DateTime startDate = fieldTuNgay._dTNgayField.Value;
+            DateTime endDate = fieldDenNgay._dTNgayField.Value;
+
+            if (startDate > endDate)
+            {
+                fieldDenNgay._dTNgayField.Value = startDate;
+                endDate = startDate;
+            }
+            
+            TimeSpan timeSpan = endDate - startDate;
+            int days = timeSpan.Days;
+            int week = days / 7;
+            
+            fieldSoTuan._numberField.contentTextBox.Text = week + "";
+        };
+        
+        fieldSoTuan._numberField.contentTextBox.TextChanged += (sender, args) =>
+        {
+            DateTime startDate = fieldTuNgay._dTNgayField.Value;
+            if (fieldSoTuan._numberField.contentTextBox.Focused == true)
+            {
+                string ngayS = fieldSoTuan._numberField.contentTextBox.Text;
+                if (!ngayS.Equals(""))
+                {
+                    int days = int.Parse(ngayS) * 7;
+                    fieldDenNgay._dTNgayField.Value = startDate.AddDays(days);
+                }
+            }
+        };
+    }
+
+    void SetupDetail()
+    {
+        // public int MaLH { get; set; }
+        // public int MaPH { get; set; }
+        // public int MaNHP { get; set; }
+        // public string Thu { get; set; }
+        // public int TietBatDau { get; set; }
+        // public DateTime TuNgay { get; set; }
+        // public DateTime DenNgay { get; set; }
+        // public int TietKetThuc { get; set; }
+        // public int SoTiet { get; set; }
+        // public string Type { get; set; }
+        fieldPhong.tbPH.contentTextBox.Text = _phongController.GetPhongHocById(selectedItem.MaPH).TenPH;
+        fieldCa.SetComboboxSelection(selectedItem.Type);
+        fieldThu.SetComboboxSelection(selectedItem.Thu);
+        fieldTietBd.SetComboboxSelection("Tiết " + selectedItem.TietBatDau);
+        fieldTietKt.SetComboboxSelection("Tiết " + selectedItem.TietKetThuc);
+        
+        fieldTuNgay._dTNgayField.Value = selectedItem.TuNgay;
+        fieldDenNgay._dTNgayField.Value = selectedItem.DenNgay;
+        
+        TimeSpan timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
+        int days = timeSpan.Days;
+        int week = days / 7;
+        
+        fieldSoTuan._numberField.contentTextBox.Text = week + "";
+        
+        // fieldTuNgay.Set
+            
+    }
+
+    void SetAction()
+    {
+        if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
+        {
+            _btnLuu._mouseDown += () => { Insert(); };
+        }
+    }
+
+    void Insert()
+    {
+    // public int MaLH { get; set; }
+    // public int MaPH { get; set; }
+    // public int MaNHP { get; set; }
+    // public string Thu { get; set; }
+    // public int TietBatDau { get; set; }
+    // public DateTime TuNgay { get; set; }
+    // public DateTime DenNgay { get; set; }
+    // public int TietKetThuc { get; set; }
+    // public int SoTiet { get; set; }
+    // public string Type { get; set; }
+
+        string tenPhong = fieldPhong.tbPH.contentTextBox.Text;
+        PhongHocDto phong = _phongController.GetByTen(tenPhong);
+
+        int tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
+        int tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
+        
+        LichHocDto lich = new LichHocDto
+        {
+            MaPH = phong.MaPH,
+            Thu = fieldThu.GetSelectionCombobox(),
+            TietBatDau = tietBd,
+            TietKetThuc = tietKt,
+            TuNgay = fieldTuNgay._dTNgayField.Value,
+            DenNgay =  fieldDenNgay._dTNgayField.Value,
+            SoTiet = tietKt - tietBd,
+            Type = fieldCa.GetSelectionCombobox(),
+        };
+        
+        Finish?.Invoke(lich);
+        this.Close();
+    }
+
+
+    
+    
     int GetTietInt(string tiet)
     {
         string[] temp = tiet.Split(' ');
@@ -287,7 +454,11 @@ public class LichHocDialog : Form
             panel.Controls.Add(btnThoat, 2, 0);
         }
 
-
         this._mainLayout.Controls.Add(panel, 0, 3);
+    }
+
+    void OnInsert()
+    {
+        
     }
 }

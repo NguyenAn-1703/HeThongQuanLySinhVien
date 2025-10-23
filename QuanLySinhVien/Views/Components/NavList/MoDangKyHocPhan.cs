@@ -33,7 +33,7 @@ public class MoDangKyHocPhan : NavBase
     List<object> _displayData;
     List<string> _headerList;
 
-    private TableLayoutPanel _mainLayout;
+    private MyTLP _mainLayout;
 
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
@@ -52,9 +52,9 @@ public class MoDangKyHocPhan : NavBase
 
     private List<InputFormItem> _listIFI;
 
-    private TableLayoutPanel _panelTop;
+    private MyTLP _panelTop;
     private RoundTLP _panelBottom;
-    private TableLayoutPanel _bottomTimePnl;
+    private RoundTLP _bottomTimePnl;
     private LabelTextField _hocKyField;
     private LabelTextField _namField;
 
@@ -84,7 +84,7 @@ public class MoDangKyHocPhan : NavBase
 
         Dock = DockStyle.Fill;
 
-        _mainLayout = new TableLayoutPanel
+        _mainLayout = new MyTLP
         {
             RowCount = 3,
             Dock = DockStyle.Fill,
@@ -133,7 +133,7 @@ public class MoDangKyHocPhan : NavBase
 
     private void setTop()
     {
-        _panelTop = new TableLayoutPanel
+        _panelTop = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -154,7 +154,7 @@ public class MoDangKyHocPhan : NavBase
 
     private void SetHKyNamContainer()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             ColumnCount = 2,
             AutoSize = true,
@@ -389,3 +389,4 @@ public class MoDangKyHocPhan : NavBase
         this._nhomHocPhanSearch.Search(txtSearch, filter);
     }
 }
+

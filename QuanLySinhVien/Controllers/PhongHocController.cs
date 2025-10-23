@@ -34,6 +34,11 @@ namespace QuanLySinhVien.Controllers
             return _dao.GetById(maPH);
         }
         
+        public PhongHocDto GetByTen(string TenPH)
+        {
+            return _dao.GetByTen(TenPH);
+        }
+        
         public bool ThemPhongHoc(PhongHocDto phongHoc)
         {
             return _dao.Insert(phongHoc);
