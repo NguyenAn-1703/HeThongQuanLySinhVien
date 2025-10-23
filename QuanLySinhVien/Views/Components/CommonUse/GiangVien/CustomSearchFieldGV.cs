@@ -80,40 +80,45 @@ public class CustomSearchFieldGV : CustomTextBox
 
     void OnTextChanged()
     {
-        if (_parent != FindForm())
-        {
-            SetupLocation();
-        }
 
-        string keyword = contentTextBox.Text.Trim().ToLower();
-
-        if (keyword.Equals(""))
+        if (contentTextBox.Focused)
         {
-            _popup.Visible = false;
-            return;
+            if (_parent != FindForm())
+            {
+                SetupLocation();
+            }
+
+            string keyword = contentTextBox.Text.Trim().ToLower();
+
+            if (keyword.Equals(""))
+            {
+                _popup.Visible = false;
+                return;
+            }
+        
+            _popup.Visible = true;
+
+            List<GiangVienDto> searchList = listHP.Where(x => 
+                x.MaGV.ToString().ToLower().Contains(keyword) ||
+                x.TenGV.ToLower().Contains(keyword)
+            ).ToList();
+            displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
+            {
+                MaGV = x.MaGV,
+                TenGV = x.TenGV
+            });
+            _popup.UpdateData(displayDatas);
+
+            if (searchList.Count == 0)
+            {
+                _popup.Visible = false;
+            }
+            else
+            {
+                _popup.Visible = true;
+            }
         }
         
-        _popup.Visible = true;
-
-        List<GiangVienDto> searchList = listHP.Where(x => 
-            x.MaGV.ToString().ToLower().Contains(keyword) ||
-            x.TenGV.ToLower().Contains(keyword)
-            ).ToList();
-        displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
-        {
-            MaGV = x.MaGV,
-            TenGV = x.TenGV
-        });
-        _popup.UpdateData(displayDatas);
-
-        if (searchList.Count == 0)
-        {
-            _popup.Visible = false;
-        }
-        else
-        {
-            _popup.Visible = true;
-        }
     }
 
     public void SetData()

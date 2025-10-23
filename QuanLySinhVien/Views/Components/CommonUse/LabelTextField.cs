@@ -18,14 +18,14 @@ public class LabelTextField : MyTLP
     private PictureBox _eyePb;
     private bool statusEp = false;
     
-    public DateTimePicker _dTNgayField;
-    public DateTimePicker _dTGioField;
+    public CustomDateField _dTNgayField;
+    public CustomDateField _dTGioField;
 
     public DateTimePicker _namField;
 
     public CustomCombobox _listBox;
 
-    public DateTimePicker _dField;
+    public CustomDateField _dField;
 //
     
     
@@ -128,21 +128,25 @@ public class LabelTextField : MyTLP
             ColumnCount = 2,
             AutoSize = true,
         };
-        _dTNgayField = new DateTimePicker
+        _dTNgayField = new CustomDateField
         {
             Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
             AutoSize = true,
+            Dock = DockStyle.Top
         };
-        _dTNgayField.Format = DateTimePickerFormat.Short; 
+
         this.Controls.Add(_dTNgayField);
         
-        _dTGioField = new DateTimePicker
+        _dTGioField = new CustomDateField()
         {
             Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
             AutoSize = true,
+            Dock = DockStyle.Top
         };
-        _dTGioField.Format = DateTimePickerFormat.Time; 
-        _dTGioField.ShowUpDown = true;
+        _dTGioField.dateField.Format = DateTimePickerFormat.Custom; 
+        _dTGioField.dateField.CustomFormat = " HH:mm:ss";
+        
+        _dTGioField.dateField.ShowUpDown = true;
         panel.Controls.Add(_dTNgayField);
         panel.Controls.Add(_dTGioField);
         this.Controls.Add(panel);
@@ -151,13 +155,15 @@ public class LabelTextField : MyTLP
 
     void SetDateField()
     {
-        _dTNgayField = new DateTimePicker
+        _dField = new CustomDateField
         {
             Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
             AutoSize = true,
+            Dock = DockStyle.Top
         };
-        _dTNgayField.Format = DateTimePickerFormat.Short;
-        this.Controls.Add(_dTNgayField);
+
+
+        this.Controls.Add(_dField);
     }
     
 
@@ -318,6 +324,21 @@ public class LabelTextField : MyTLP
     public string GetSelectionCombobox()
     {
         return _combobox.combobox.SelectedItem.ToString();
+    }
+
+    public DateTimePicker GetDField()
+    {
+        return _dField.dateField;
+    }
+    
+    public DateTimePicker GetDTNgayField()
+    {
+        return _dTNgayField.dateField;
+    }
+    
+    public DateTimePicker GetDTGioField()
+    {
+        return _dTGioField.dateField;
     }
     
 }

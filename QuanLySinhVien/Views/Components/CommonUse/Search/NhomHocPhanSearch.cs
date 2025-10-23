@@ -4,16 +4,17 @@ namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class NhomHocPhanSearch
 {
-    private List<NhomHocPhanDisplay> _rawData;
+    private List<NhomHocPhanDisplay> _filters;
     public event Action<List<NhomHocPhanDisplay>> FinishSearch;
 
-    public NhomHocPhanSearch(List<NhomHocPhanDisplay> rawData)
+    public NhomHocPhanSearch(List<NhomHocPhanDisplay> filters)
     {
-        this._rawData = rawData;
+        this._filters = filters;
     }
 
-    public void Search(string text, string selection)
+    public void Search(string text, string selection, List<NhomHocPhanDisplay> filters)
     {
+        _filters = filters;
         List<NhomHocPhanDisplay> result = new List<NhomHocPhanDisplay>();
         string keyword = text.ToLower().Trim();
         selection = selection.Trim();
@@ -32,7 +33,7 @@ public class NhomHocPhanSearch
 
     private List<NhomHocPhanDisplay> SearchAll(string keyword)
     {
-        return _rawData
+        return _filters
             .Where(x =>
                 x.MaNHP.ToString().ToLower().Contains(keyword) ||
                 x.TenHP.ToLower().Contains(keyword) ||
@@ -48,19 +49,19 @@ public class NhomHocPhanSearch
 
         if (selection.Equals("Mã nhóm học phần"))
         {
-            result = _rawData.Where(x => x.MaNHP.ToString().ToLower().Contains(keyword)).ToList();
+            result = _filters.Where(x => x.MaNHP.ToString().ToLower().Contains(keyword)).ToList();
         }
         else if (selection.Equals("Tên học phần"))
         {
-            result = _rawData.Where(x => x.TenHP.ToLower().Contains(keyword)).ToList();
+            result = _filters.Where(x => x.TenHP.ToLower().Contains(keyword)).ToList();
         }
         else if (selection.Equals("Sĩ số"))
         {
-            result = _rawData.Where(x => x.Siso.ToString().ToLower().Contains(keyword)).ToList();
+            result = _filters.Where(x => x.Siso.ToString().ToLower().Contains(keyword)).ToList();
         }
         else
         {
-            result = _rawData.Where(x => x.TenGiangVien.ToLower().Contains(keyword)).ToList();
+            result = _filters.Where(x => x.TenGiangVien.ToLower().Contains(keyword)).ToList();
         }
 
         return result;

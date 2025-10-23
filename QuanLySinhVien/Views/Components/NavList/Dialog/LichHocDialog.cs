@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices.JavaScript;
 using ExCSS;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Mysqlx.Crud;
 using QuanLySinhVien.Controllers;
@@ -32,11 +33,11 @@ public class LichHocDialog : Form
 
 
     public event Action<LichHocDto> Finish;
-    
+
     private PhongHocController _phongController;
 
     private LichHocDto selectedItem;
-    
+
 
     public LichHocDialog(string title, DialogType dialogType, LichHocDto lich = null)
     {
@@ -49,7 +50,7 @@ public class LichHocDialog : Form
 
     void Init()
     {
-        Width = 650;
+        Width = 800;
         Height = 700;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
@@ -78,10 +79,11 @@ public class LichHocDialog : Form
 
         if (_dialogType == DialogType.ChiTiet)
         {
-            if (_dialogType == DialogType.ChiTiet)
-            {
-                SetupDetail();
-            }
+            SetupDetail();
+        }
+        else if (_dialogType == DialogType.Sua)
+        {
+            SetupUpdate();
         }
     }
 
@@ -204,7 +206,6 @@ public class LichHocDialog : Form
         _mainLayout.Controls.Add(_contentPanel);
 
         ConfigCombobox();
-
     }
 
     string[] temps = new[] { "Tiết 1", "Tiết 2", "Tiết 3", "Tiết 4", "Tiết 5" };
@@ -233,7 +234,7 @@ public class LichHocDialog : Form
         fieldDenNgay = _listTextBox[6];
         fieldSoTuan = _listTextBox[7];
 
-        string[] ca = new[] { "Thực hành", "Lý thuyết" };
+        string[] ca = new[] { "Lý thuyết", "Thực hành" };
         fieldCa.SetComboboxList(ca.ToList());
         fieldCa.SetComboboxSelection(ca[0]);
 
@@ -249,8 +250,6 @@ public class LichHocDialog : Form
 
         SetActionTiet();
         SetActionNgay();
-        
-        
     }
 
     void SetActionTiet()
@@ -258,7 +257,7 @@ public class LichHocDialog : Form
         fieldTietBd._combobox.combobox.SelectedIndexChanged += (sender, args) =>
         {
             int bd = GetTietInt(fieldTietBd.GetSelectionCombobox());
-            
+
             if (bd <= 5)
             {
                 List<string> kt = _listSang.ToList();
@@ -266,6 +265,7 @@ public class LichHocDialog : Form
                 {
                     kt.RemoveAt(0);
                 }
+
                 fieldTietKt.SetComboboxList(kt);
                 fieldTietKt.SetComboboxSelection(kt[0]);
             }
@@ -276,6 +276,7 @@ public class LichHocDialog : Form
                 {
                     kt.RemoveAt(0);
                 }
+
                 fieldTietKt.SetComboboxList(kt);
                 fieldTietKt.SetComboboxSelection(kt[0]);
             }
@@ -284,53 +285,52 @@ public class LichHocDialog : Form
 
     void SetActionNgay()
     {
-        fieldTuNgay._dTNgayField.TextChanged += (sender, args) =>
+        fieldTuNgay.GetDField().TextChanged += (sender, args) =>
         {
-            DateTime startDate = fieldTuNgay._dTNgayField.Value;
-            DateTime endDate = fieldDenNgay._dTNgayField.Value;
+            DateTime startDate = fieldTuNgay.GetDField().Value;
+            DateTime endDate = fieldDenNgay.GetDField().Value;
 
             if (startDate > endDate)
             {
-                fieldDenNgay._dTNgayField.Value = startDate;
+                fieldDenNgay.GetDField().Value = startDate;
                 endDate = startDate;
             }
-            
+
             TimeSpan timeSpan = endDate - startDate;
             int days = timeSpan.Days;
             int week = days / 7;
-            
-            fieldSoTuan._numberField.contentTextBox.Text = week + "";
 
+            fieldSoTuan._numberField.contentTextBox.Text = week + "";
         };
-        
-        fieldDenNgay._dTNgayField.TextChanged += (sender, args) =>
+
+        fieldDenNgay.GetDField().TextChanged += (sender, args) =>
         {
-            DateTime startDate = fieldTuNgay._dTNgayField.Value;
-            DateTime endDate = fieldDenNgay._dTNgayField.Value;
+            DateTime startDate = fieldTuNgay.GetDField().Value;
+            DateTime endDate = fieldDenNgay.GetDField().Value;
 
             if (startDate > endDate)
             {
-                fieldDenNgay._dTNgayField.Value = startDate;
+                fieldDenNgay.GetDField().Value = startDate;
                 endDate = startDate;
             }
-            
+
             TimeSpan timeSpan = endDate - startDate;
             int days = timeSpan.Days;
             int week = days / 7;
-            
+
             fieldSoTuan._numberField.contentTextBox.Text = week + "";
         };
-        
+
         fieldSoTuan._numberField.contentTextBox.TextChanged += (sender, args) =>
         {
-            DateTime startDate = fieldTuNgay._dTNgayField.Value;
+            DateTime startDate = fieldTuNgay.GetDField().Value;
             if (fieldSoTuan._numberField.contentTextBox.Focused == true)
             {
                 string ngayS = fieldSoTuan._numberField.contentTextBox.Text;
                 if (!ngayS.Equals(""))
                 {
                     int days = int.Parse(ngayS) * 7;
-                    fieldDenNgay._dTNgayField.Value = startDate.AddDays(days);
+                    fieldDenNgay.GetDField().Value = startDate.AddDays(days);
                 }
             }
         };
@@ -353,66 +353,134 @@ public class LichHocDialog : Form
         fieldThu.SetComboboxSelection(selectedItem.Thu);
         fieldTietBd.SetComboboxSelection("Tiết " + selectedItem.TietBatDau);
         fieldTietKt.SetComboboxSelection("Tiết " + selectedItem.TietKetThuc);
-        
-        fieldTuNgay._dTNgayField.Value = selectedItem.TuNgay;
-        fieldDenNgay._dTNgayField.Value = selectedItem.DenNgay;
-        
+
+        fieldTuNgay.GetDField().Value = selectedItem.TuNgay;
+        fieldDenNgay.GetDField().Value = selectedItem.DenNgay;
+
         TimeSpan timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
         int days = timeSpan.Days;
         int week = days / 7;
-        
+
         fieldSoTuan._numberField.contentTextBox.Text = week + "";
-        
-        // fieldTuNgay.Set
-            
+
+        fieldPhong.tbPH.Enable = false;
+        fieldCa._combobox.Enable = false;
+        fieldThu._combobox.Enable = false;
+        fieldTietBd._combobox.Enable = false;
+        fieldTietKt._combobox.Enable = false;
+        fieldTuNgay._dField.Enabled = false;
+        fieldDenNgay._dField.Enabled = false;
+        fieldSoTuan._numberField.Enable = false;
+    }
+    void SetupUpdate()
+    {
+        fieldPhong.tbPH.contentTextBox.Text = _phongController.GetPhongHocById(selectedItem.MaPH).TenPH;
+        fieldCa.SetComboboxSelection(selectedItem.Type);
+        fieldThu.SetComboboxSelection(selectedItem.Thu);
+        fieldTietBd.SetComboboxSelection("Tiết " + selectedItem.TietBatDau);
+        fieldTietKt.SetComboboxSelection("Tiết " + selectedItem.TietKetThuc);
+
+        fieldTuNgay.GetDField().Value = selectedItem.TuNgay;
+        fieldDenNgay.GetDField().Value = selectedItem.DenNgay;
+
+        TimeSpan timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
+        int days = timeSpan.Days;
+        int week = days / 7;
+
+        fieldSoTuan._numberField.contentTextBox.Text = week + "";
     }
 
     void SetAction()
     {
         if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
         {
-            _btnLuu._mouseDown += () => { Insert(); };
+            _btnLuu._mouseDown += () => { OnMouseDown(); };
+        }
+    }
+
+    void OnMouseDown()
+    {
+        if (_dialogType == DialogType.Them)
+        {
+            Insert();
+        }   
+        else if (_dialogType == DialogType.Sua)
+        {
+            Update();
         }
     }
 
     void Insert()
     {
-    // public int MaLH { get; set; }
-    // public int MaPH { get; set; }
-    // public int MaNHP { get; set; }
-    // public string Thu { get; set; }
-    // public int TietBatDau { get; set; }
-    // public DateTime TuNgay { get; set; }
-    // public DateTime DenNgay { get; set; }
-    // public int TietKetThuc { get; set; }
-    // public int SoTiet { get; set; }
-    // public string Type { get; set; }
+        // public int MaLH { get; set; }
+        // public int MaPH { get; set; }
+        // public int MaNHP { get; set; }
+        // public string Thu { get; set; }
+        // public int TietBatDau { get; set; }
+        // public DateTime TuNgay { get; set; }
+        // public DateTime DenNgay { get; set; }
+        // public int TietKetThuc { get; set; }
+        // public int SoTiet { get; set; }
+        // public string Type { get; set; }
 
         string tenPhong = fieldPhong.tbPH.contentTextBox.Text;
+
+        if (!Validate(tenPhong))
+        {
+            return;
+        }
+        
         PhongHocDto phong = _phongController.GetByTen(tenPhong);
 
         int tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
         int tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
-        
+
         LichHocDto lich = new LichHocDto
         {
             MaPH = phong.MaPH,
             Thu = fieldThu.GetSelectionCombobox(),
             TietBatDau = tietBd,
             TietKetThuc = tietKt,
-            TuNgay = fieldTuNgay._dTNgayField.Value,
-            DenNgay =  fieldDenNgay._dTNgayField.Value,
+            TuNgay = fieldTuNgay.GetDField().Value,
+            DenNgay = fieldDenNgay.GetDField().Value,
             SoTiet = tietKt - tietBd,
             Type = fieldCa.GetSelectionCombobox(),
         };
+
+        Finish?.Invoke(lich);
+        this.Close();
+    }
+    
+    void Update()
+    {
+        string tenPhong = fieldPhong.tbPH.contentTextBox.Text;
+
+        if (!Validate(tenPhong))
+        {
+            return;
+        }
         
+        PhongHocDto phong = _phongController.GetByTen(tenPhong);
+
+        int tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
+        int tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
+
+        LichHocDto lich = new LichHocDto
+        {
+            MaPH = phong.MaPH,
+            Thu = fieldThu.GetSelectionCombobox(),
+            TietBatDau = tietBd,
+            TietKetThuc = tietKt,
+            TuNgay = fieldTuNgay.GetDField().Value,
+            DenNgay = fieldDenNgay.GetDField().Value,
+            SoTiet = tietKt - tietBd,
+            Type = fieldCa.GetSelectionCombobox(),
+        };
+
         Finish?.Invoke(lich);
         this.Close();
     }
 
-
-    
-    
     int GetTietInt(string tiet)
     {
         string[] temp = tiet.Split(' ');
@@ -457,8 +525,21 @@ public class LichHocDialog : Form
         this._mainLayout.Controls.Add(panel, 0, 3);
     }
 
-    void OnInsert()
+    bool Validate(string tenPhong)
     {
-        
+        if (tenPhong.Equals(""))
+        {
+            MessageBox.Show("Phòng không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            fieldPhong.tbPH.contentTextBox.Focus();
+            return false;
+        }
+        if (!_phongController.ExistByTen(tenPhong))
+        {
+            MessageBox.Show("Phòng không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            fieldPhong.tbPH.contentTextBox.Focus();
+            return false;
+        }
+
+        return true;
     }
 }

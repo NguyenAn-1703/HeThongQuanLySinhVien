@@ -30,6 +30,7 @@ public class MoDangKyHocPhan : NavBase
     private CustomTable _table;
 
     List<NhomHocPhanDto> _rawData;
+    private List<NhomHocPhanDto> _rawDataFilter;
     List<object> _displayData;
     List<string> _headerList;
 
@@ -305,7 +306,16 @@ public class MoDangKyHocPhan : NavBase
 
     void SetDisplayData()
     {
-        _displayData = ConvertListNhomHPoObj(_rawData);
+        string hocKy = _hocKyField.GetSelectionCombobox().Split(" ")[2];
+        string nam = DateTime.Now.Year.ToString();
+        
+        _rawDataFilter = _rawData.Where(x => 
+            x.HocKy.ToString().Equals(hocKy) &&
+            x.Nam.Equals(nam)
+            ).ToList();
+        
+        _displayData = ConvertListNhomHPoObj(_rawDataFilter);
+        
     }
 
     List<object> ConvertListNhomHPoObj(List<NhomHocPhanDto> dtos)
@@ -348,8 +358,40 @@ public class MoDangKyHocPhan : NavBase
         _table.OnEdit += index => { Update(index); };
         _table.OnDetail += index => { Detail(index); };
         _table.OnDelete += index => { Delete(index); };
+
+        _hocKyField.GetComboboxField().SelectedIndexChanged += (sender, args) => OnChangeNamHK();
+        _namField._namField.ValueChanged += (sender, args) => OnChangeNamHK();
+    }
+
+    void OnChangeNamHK()
+    {
+        string hocKy = _hocKyField.GetSelectionCombobox().Split(" ")[2];
+        string nam = _namField.GetTextNam();
         
+        Console.WriteLine(hocKy + " " + nam);
         
+        _rawDataFilter = _rawData.Where(x => 
+            x.HocKy.ToString().Equals(hocKy) &&
+            x.Nam.Equals(nam)
+        ).ToList();
+
+        List<NhomHocPhanDisplay> list = ConvertToDtoDisplay(_rawDataFilter);
+        
+        UpdateDataDisplay(list);
+        this._table.UpdateData(_displayData);
+    }
+
+    List<NhomHocPhanDisplay> ConvertToDtoDisplay(List<NhomHocPhanDto> input)
+    {
+        List<NhomHocPhanDisplay> list = ConvertObject.ConvertDtoToDto(input, x => new NhomHocPhanDisplay
+            {
+                MaNHP = x.MaNHP,
+                TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
+                Siso = x.SiSo,
+                TenGiangVien = _giangVienController.GetById(x.MaGV).TenGV,
+            }
+        );
+        return list;
     }
 
     void UpdateDataDisplay(List<NhomHocPhanDisplay> list)
@@ -359,18 +401,20 @@ public class MoDangKyHocPhan : NavBase
 
     void Insert()
     {
-        NhomHocPhanDialog dialog = new NhomHocPhanDialog(_title, DialogType.Them, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam());
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Thêm nhóm học phần", DialogType.Them, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam());
         dialog.ShowDialog();
     }
 
     void Update(int id)
     {
-        
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Sửa nhóm học phần", DialogType.Sua, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(), id);
+        dialog.ShowDialog();
     }
 
     void Detail(int id)
     {
-        
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Chi tiết nhóm học phần", DialogType.ChiTiet, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(), id);
+        dialog.ShowDialog();
     }
 
     void Delete(int index)
@@ -386,7 +430,7 @@ public class MoDangKyHocPhan : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._nhomHocPhanSearch.Search(txtSearch, filter);
+        this._nhomHocPhanSearch.Search(txtSearch, filter, ConvertToDtoDisplay(_rawDataFilter));
     }
 }
 

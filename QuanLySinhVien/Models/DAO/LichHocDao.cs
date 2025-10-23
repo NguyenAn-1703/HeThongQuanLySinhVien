@@ -7,9 +7,11 @@ namespace QuanLySinhVien.Models.DAO
 {
     public class LichHocDao
     {
-        
         private static LichHocDao _instance;
-        private LichHocDao() { }
+
+        private LichHocDao()
+        {
+        }
 
         public static LichHocDao GetInstance()
         {
@@ -17,75 +19,77 @@ namespace QuanLySinhVien.Models.DAO
             {
                 _instance = new LichHocDao();
             }
+
             return _instance;
         }
-        
+
         public List<LichHocDto> GetAll()
-    {
-        List<LichHocDto> result = new();
-        using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand(@"SELECT MaLH, MaPH, MaNHP, Thu, 
+        {
+            List<LichHocDto> result = new();
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(@"SELECT MaLH, MaPH, MaNHP, Thu, 
                                                   TietBatDau, TuNgay, DenNgay, 
                                                   TietKetThuc, SoTiet, Type
                                            FROM LichHoc
                                            WHERE Status = 1", conn);
-        using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReader();
 
-        while (reader.Read())
-        {
-            result.Add(new LichHocDto
+            while (reader.Read())
             {
-                MaLH = reader.GetInt32("MaLH"),
-                MaPH = reader.GetInt32("MaPH"),
-                MaNHP = reader.GetInt32("MaNHP"),
-                Thu = reader.GetString("Thu"),
-                TietBatDau = reader.GetInt32("TietBatDau"),
-                TuNgay = reader.GetDateTime("TuNgay"),
-                DenNgay = reader.GetDateTime("DenNgay"),
-                TietKetThuc = reader.GetInt32("TietKetThuc"),
-                SoTiet = reader.GetInt32("SoTiet"),
-                Type = reader.GetString("Type")
-            });
+                result.Add(new LichHocDto
+                {
+                    MaLH = reader.GetInt32("MaLH"),
+                    MaPH = reader.GetInt32("MaPH"),
+                    MaNHP = reader.GetInt32("MaNHP"),
+                    Thu = reader.GetString("Thu"),
+                    TietBatDau = reader.GetInt32("TietBatDau"),
+                    TuNgay = reader.GetDateTime("TuNgay"),
+                    DenNgay = reader.GetDateTime("DenNgay"),
+                    TietKetThuc = reader.GetInt32("TietKetThuc"),
+                    SoTiet = reader.GetInt32("SoTiet"),
+                    Type = reader.GetString("Type")
+                });
+            }
+
+            return result;
         }
 
-        return result;
-    }
-
-    public bool Insert(LichHocDto lichHocDto)
-    {
-        int rowAffected = 0;
-        using (MySqlConnection conn = MyConnection.GetConnection())
+        public bool Insert(LichHocDto lichHocDto)
         {
-            string query = @"INSERT INTO LichHoc (MaPH, MaNHP, Thu, 
+            int rowAffected = 0;
+            using (MySqlConnection conn = MyConnection.GetConnection())
+            {
+                string query = @"INSERT INTO LichHoc (MaPH, MaNHP, Thu, 
                                                   TietBatDau, TuNgay, DenNgay, 
                                                   TietKetThuc, SoTiet, Type)
                              VALUES (@MaPH, @MaNHP, @Thu, 
                                      @TietBatDau, @TuNgay, @DenNgay, 
                                      @TietKetThuc, @SoTiet, @Type)";
-            using (MySqlCommand cmd = new MySqlCommand(query, conn))
-            {
-                cmd.Parameters.AddWithValue("@MaPH", lichHocDto.MaPH);
-                cmd.Parameters.AddWithValue("@MaNHP", lichHocDto.MaNHP);
-                cmd.Parameters.AddWithValue("@Thu", lichHocDto.Thu);
-                cmd.Parameters.AddWithValue("@TietBatDau", lichHocDto.TietBatDau);
-                cmd.Parameters.AddWithValue("@TuNgay", lichHocDto.TuNgay);
-                cmd.Parameters.AddWithValue("@DenNgay", lichHocDto.DenNgay);
-                cmd.Parameters.AddWithValue("@TietKetThuc", lichHocDto.TietKetThuc);
-                cmd.Parameters.AddWithValue("@SoTiet", lichHocDto.SoTiet);
-                cmd.Parameters.AddWithValue("@Type", lichHocDto.Type);
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaPH", lichHocDto.MaPH);
+                    cmd.Parameters.AddWithValue("@MaNHP", lichHocDto.MaNHP);
+                    cmd.Parameters.AddWithValue("@Thu", lichHocDto.Thu);
+                    cmd.Parameters.AddWithValue("@TietBatDau", lichHocDto.TietBatDau);
+                    cmd.Parameters.AddWithValue("@TuNgay", lichHocDto.TuNgay);
+                    cmd.Parameters.AddWithValue("@DenNgay", lichHocDto.DenNgay);
+                    cmd.Parameters.AddWithValue("@TietKetThuc", lichHocDto.TietKetThuc);
+                    cmd.Parameters.AddWithValue("@SoTiet", lichHocDto.SoTiet);
+                    cmd.Parameters.AddWithValue("@Type", lichHocDto.Type);
 
-                rowAffected = cmd.ExecuteNonQuery();
+                    rowAffected = cmd.ExecuteNonQuery();
+                }
             }
-        }
-        return rowAffected > 0;
-    }
 
-    public bool Update(LichHocDto lichHocDto)
-    {
-        int rowAffected = 0;
-        using (MySqlConnection conn = MyConnection.GetConnection())
+            return rowAffected > 0;
+        }
+
+        public bool Update(LichHocDto lichHocDto)
         {
-            string query = @"UPDATE LichHoc
+            int rowAffected = 0;
+            using (MySqlConnection conn = MyConnection.GetConnection())
+            {
+                string query = @"UPDATE LichHoc
                              SET MaPH = @MaPH,
                                  MaNHP = @MaNHP,
                                  Thu = @Thu,
@@ -96,75 +100,76 @@ namespace QuanLySinhVien.Models.DAO
                                  SoTiet = @SoTiet,
                                  Type = @Type
                              WHERE MaLH = @MaLH";
-            using (MySqlCommand cmd = new MySqlCommand(query, conn))
-            {
-                cmd.Parameters.AddWithValue("@MaLH", lichHocDto.MaLH);
-                cmd.Parameters.AddWithValue("@MaPH", lichHocDto.MaPH);
-                cmd.Parameters.AddWithValue("@MaNHP", lichHocDto.MaNHP);
-                cmd.Parameters.AddWithValue("@Thu", lichHocDto.Thu);
-                cmd.Parameters.AddWithValue("@TietBatDau", lichHocDto.TietBatDau);
-                cmd.Parameters.AddWithValue("@TuNgay", lichHocDto.TuNgay);
-                cmd.Parameters.AddWithValue("@DenNgay", lichHocDto.DenNgay);
-                cmd.Parameters.AddWithValue("@TietKetThuc", lichHocDto.TietKetThuc);
-                cmd.Parameters.AddWithValue("@SoTiet", lichHocDto.SoTiet);
-                cmd.Parameters.AddWithValue("@Type", lichHocDto.Type);
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaLH", lichHocDto.MaLH);
+                    cmd.Parameters.AddWithValue("@MaPH", lichHocDto.MaPH);
+                    cmd.Parameters.AddWithValue("@MaNHP", lichHocDto.MaNHP);
+                    cmd.Parameters.AddWithValue("@Thu", lichHocDto.Thu);
+                    cmd.Parameters.AddWithValue("@TietBatDau", lichHocDto.TietBatDau);
+                    cmd.Parameters.AddWithValue("@TuNgay", lichHocDto.TuNgay);
+                    cmd.Parameters.AddWithValue("@DenNgay", lichHocDto.DenNgay);
+                    cmd.Parameters.AddWithValue("@TietKetThuc", lichHocDto.TietKetThuc);
+                    cmd.Parameters.AddWithValue("@SoTiet", lichHocDto.SoTiet);
+                    cmd.Parameters.AddWithValue("@Type", lichHocDto.Type);
 
-                rowAffected = cmd.ExecuteNonQuery();
+                    rowAffected = cmd.ExecuteNonQuery();
+                }
             }
-        }
-        return rowAffected > 0;
-    }
 
-    public bool Delete(int maLH)
-    {
-        int rowAffected = 0;
-        using (MySqlConnection conn = MyConnection.GetConnection())
+            return rowAffected > 0;
+        }
+
+        public bool Delete(int maLH)
         {
-            string query = @"UPDATE LichHoc
+            int rowAffected = 0;
+            using (MySqlConnection conn = MyConnection.GetConnection())
+            {
+                string query = @"UPDATE LichHoc
                              SET Status = 0
                              WHERE MaLH = @MaLH";
-            using (MySqlCommand cmd = new MySqlCommand(query, conn))
-            {
-                cmd.Parameters.AddWithValue("@MaLH", maLH);
-                rowAffected = cmd.ExecuteNonQuery();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaLH", maLH);
+                    rowAffected = cmd.ExecuteNonQuery();
+                }
             }
+
+            return rowAffected > 0;
         }
 
-        return rowAffected > 0;
-    }
-
-    public LichHocDto GetById(int maLH)
-    {
-        LichHocDto result = null;
-        using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand(@"SELECT MaLH, MaPH, MaNHP, Thu, 
+        public LichHocDto GetById(int maLH)
+        {
+            LichHocDto result = null;
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(@"SELECT MaLH, MaPH, MaNHP, Thu, 
                                                   TietBatDau, TuNgay, DenNgay, 
                                                   TietKetThuc, SoTiet, Type
                                            FROM LichHoc
                                            WHERE Status = 1 AND MaLH = @MaLH", conn);
-        cmd.Parameters.AddWithValue("@MaLH", maLH);
-        using var reader = cmd.ExecuteReader();
+            cmd.Parameters.AddWithValue("@MaLH", maLH);
+            using var reader = cmd.ExecuteReader();
 
-        if (reader.Read())
-        {
-            result = new LichHocDto
+            if (reader.Read())
             {
-                MaLH = reader.GetInt32("MaLH"),
-                MaPH = reader.GetInt32("MaPH"),
-                MaNHP = reader.GetInt32("MaNHP"),
-                Thu = reader.GetString("Thu"),
-                TietBatDau = reader.GetInt32("TietBatDau"),
-                TuNgay = reader.GetDateTime("TuNgay"),
-                DenNgay = reader.GetDateTime("DenNgay"),
-                TietKetThuc = reader.GetInt32("TietKetThuc"),
-                SoTiet = reader.GetInt32("SoTiet"),
-                Type =  reader.GetString("Type")
-            };
+                result = new LichHocDto
+                {
+                    MaLH = reader.GetInt32("MaLH"),
+                    MaPH = reader.GetInt32("MaPH"),
+                    MaNHP = reader.GetInt32("MaNHP"),
+                    Thu = reader.GetString("Thu"),
+                    TietBatDau = reader.GetInt32("TietBatDau"),
+                    TuNgay = reader.GetDateTime("TuNgay"),
+                    DenNgay = reader.GetDateTime("DenNgay"),
+                    TietKetThuc = reader.GetInt32("TietKetThuc"),
+                    SoTiet = reader.GetInt32("SoTiet"),
+                    Type = reader.GetString("Type")
+                };
+            }
+
+            return result;
         }
 
-        return result;
-    }
-        
         public List<LichHocDto> GetLichHocByPhongAndDate(int maPH, DateTime date)
         {
             var result = new List<LichHocDto>();
@@ -221,6 +226,40 @@ namespace QuanLySinhVien.Models.DAO
             catch (Exception ex)
             {
                 throw new Exception($"Lỗi khi lấy lịch học: {ex.Message}");
+            }
+
+            return result;
+        }
+        
+        // GetByMaNhp
+        public List<LichHocDto> GetByMaNhp(int maNhp)
+        {
+            List<LichHocDto> result = new();
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(@"SELECT MaLH, MaPH, MaNHP, Thu, 
+                                                  TietBatDau, TuNgay, DenNgay, 
+                                                  TietKetThuc, SoTiet, Type
+                                           FROM LichHoc
+                                           WHERE Status = 1 AND MaNHP = @MaNHP", conn);
+            cmd.Parameters.AddWithValue("@MaNHP", maNhp);
+            using var reader = cmd.ExecuteReader();
+            
+
+            while (reader.Read())
+            {
+                result.Add(new LichHocDto
+                {
+                    MaLH = reader.GetInt32("MaLH"),
+                    MaPH = reader.GetInt32("MaPH"),
+                    MaNHP = reader.GetInt32("MaNHP"),
+                    Thu = reader.GetString("Thu"),
+                    TietBatDau = reader.GetInt32("TietBatDau"),
+                    TuNgay = reader.GetDateTime("TuNgay"),
+                    DenNgay = reader.GetDateTime("DenNgay"),
+                    TietKetThuc = reader.GetInt32("TietKetThuc"),
+                    SoTiet = reader.GetInt32("SoTiet"),
+                    Type = reader.GetString("Type")
+                });
             }
 
             return result;

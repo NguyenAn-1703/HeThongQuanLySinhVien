@@ -48,4 +48,9 @@ public class LichHocController
     {
         return _lichHocDao.GetById(maLH);
     }
+
+    public List<LichHocDto> GetByMaNhp(int maNhp)
+    {
+        return _lichHocDao.GetByMaNhp(maNhp);
+    }
 }

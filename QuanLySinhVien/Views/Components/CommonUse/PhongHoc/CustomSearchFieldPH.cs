@@ -76,39 +76,43 @@ public class CustomSearchFieldPH : CustomTextBox
 
     void OnTextChanged()
     {
-        if (_parent != FindForm())
+        if (contentTextBox.Focused)
         {
-            SetupLocation();
-        }
+            if (_parent != FindForm())
+            {
+                SetupLocation();
+            }
 
-        string keyword = contentTextBox.Text.Trim().ToLower();
+            string keyword = contentTextBox.Text.Trim().ToLower();
 
-        if (keyword.Equals(""))
-        {
-            _popup.Visible = false;
-            return;
-        }
+            if (keyword.Equals(""))
+            {
+                _popup.Visible = false;
+                return;
+            }
         
 
-        List<PhongHocDto> searchList = listHP.Where(x =>
-            x.MaPH.ToString().ToLower().Contains(keyword) ||
-            x.TenPH.ToLower().Contains(keyword)
-        ).ToList();
-        displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
-        {
-            MaPH = x.MaPH,
-            TenPH = x.TenPH
-        });
-        _popup.UpdateData(displayDatas);
+            List<PhongHocDto> searchList = listHP.Where(x =>
+                x.MaPH.ToString().ToLower().Contains(keyword) ||
+                x.TenPH.ToLower().Contains(keyword)
+            ).ToList();
+            displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
+            {
+                MaPH = x.MaPH,
+                TenPH = x.TenPH
+            });
+            _popup.UpdateData(displayDatas);
 
-        if (searchList.Count == 0)
-        {
-            _popup.Visible = false;
+            if (searchList.Count == 0)
+            {
+                _popup.Visible = false;
+            }
+            else
+            {
+                _popup.Visible = true;
+            }
         }
-        else
-        {
-            _popup.Visible = true;
-        }
+        
     }
 
     public void SetData()

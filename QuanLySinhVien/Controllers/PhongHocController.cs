@@ -53,5 +53,19 @@ namespace QuanLySinhVien.Controllers
         {
             return _dao.Delete(maPH);
         }
+
+        public bool ExistByTen(string ten)
+        {
+            List<PhongHocDto> listPh = GetDanhSachPhongHoc();
+            foreach (PhongHocDto item in listPh)
+            {
+                if (item.TenPH.Equals(ten))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
