@@ -294,6 +294,21 @@ public class MoDangKyHocPhan : NavBase
         }
         NhomHocPhanDto nhp1 = _rawDataFilter[0];
         LichDangKyDto lichDangKy = _lichDangKyController.GetById(nhp1.MaLichDK);
+
+        if (lichDangKy.MaLichDK == 1) //chưa cập nhật lịch mới
+        {
+            startDTField._dTNgayField.dateField.Value = now;
+            startDTField._dTGioField.dateField.Value = now;
+            endDTField._dTNgayField.dateField.Value = now;
+            endDTField._dTGioField.dateField.Value = now;
+            
+            startDTField._dTNgayField.dateField.Enabled = true;
+            startDTField._dTGioField.dateField.Enabled = true;
+            endDTField._dTNgayField.dateField.Enabled = true;
+            endDTField._dTGioField.dateField.Enabled = true;
+            _updateTimeButton.Enabled = true;
+            return;
+        }
         
         DateTime start = lichDangKy.ThoiGianBatDau;
         DateTime end = lichDangKy.ThoiGianKetThuc;
@@ -413,7 +428,11 @@ public class MoDangKyHocPhan : NavBase
         
         string startStr = start.ToString("HH:mm:ss ") + "Ngày " + start.ToString("dd/MM/yyyy");
         string endStr = end.ToString("HH:mm:ss ") + "Ngày " + end.ToString("dd/MM/yyyy");
-        
+
+        if (!Validate())
+        {
+            return;
+        }
         
         if (start < now)
         {
@@ -429,13 +448,38 @@ public class MoDangKyHocPhan : NavBase
                             "Sau khi cập nhật sẽ không thể thay đổi!",
                 "Xác nhận",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (rs == DialogResult.Yes)
+            if (rs == DialogResult.No)
             {
-                MessageBox.Show("Cập nhật lịch đăng ký môn thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
         }
         
+        LichDangKyDto lichDk = new LichDangKyDto
+        {
+            ThoiGianBatDau = start,
+            ThoiGianKetThuc = end
+        };
+        if (!_lichDangKyController.Insert(lichDk))
+        {
+            MessageBox.Show("Thêm lịch đăng ký thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
 
+        List<LichDangKyDto> listL = _lichDangKyController.GetAll();
+        LichDangKyDto lich = listL[listL.Count - 1];
+        
+        foreach (NhomHocPhanDto item in _rawDataFilter)
+        {
+            item.MaLichDK = lich.MaLichDK;
+            if (!_nhomHocPhanController.Update(item))
+            {
+                MessageBox.Show("Cập nhật nhóm học phần thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+        
+        MessageBox.Show("Cập nhật lịch đăng ký môn thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        UpdateTimeField();
     }
 
     void OnChangeNamHK()
@@ -496,6 +540,14 @@ public class MoDangKyHocPhan : NavBase
     void Update(int id)
     {
         NhomHocPhanDialog dialog = new NhomHocPhanDialog("Sửa nhóm học phần", DialogType.Sua, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(), id);
+        dialog.Finish += () =>
+        {
+            _rawData = _nhomHocPhanController.GetAll();
+            UpdateRawDataFilter();
+            List<NhomHocPhanDisplay> list = ConvertToDtoDisplay(_rawDataFilter);
+            UpdateDataDisplay(list);
+            this._table.UpdateData(_displayData);
+        };
         dialog.ShowDialog();
     }
 
@@ -507,7 +559,33 @@ public class MoDangKyHocPhan : NavBase
 
     void Delete(int index)
     {
-        
+        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+        if (select == DialogResult.No)
+        {
+            return;
+        }
+        if (_nhomHocPhanController.Delete(index))
+        {
+            MessageBox.Show("Xóa thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            _rawData = _nhomHocPhanController.GetAll();
+            UpdateRawDataFilter();
+            UpdateDataDisplay(ConvertToDtoDisplay(_rawDataFilter));
+            this._table.UpdateData(_displayData);
+        }
+        else
+        {
+            MessageBox.Show("Xóa thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    bool Validate()
+    {
+        if (_rawDataFilter.Count == 0)
+        {
+            MessageBox.Show("Vui lòng thêm nhóm học phần!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+        return true;
     }
 
 
