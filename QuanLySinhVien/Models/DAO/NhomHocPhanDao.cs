@@ -5,6 +5,8 @@ namespace QuanLySinhVien.Models.DAO;
 
 using System.Collections.Generic;
 
+using System.Collections.Generic;
+
 public class NhomHocPhanDao
 {
     private static NhomHocPhanDao _instance;
@@ -23,7 +25,9 @@ public class NhomHocPhanDao
     {
         List<NhomHocPhanDto> result = new();
         using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo FROM NhomHocPhan WHERE Status = 1", conn);
+        using var cmd = new MySqlCommand(
+            "SELECT MaNHP, MaGV, MaHP, MaLichDK, HocKy, Nam, SiSo FROM NhomHocPhan WHERE Status = 1",
+            conn);
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read())
@@ -33,10 +37,10 @@ public class NhomHocPhanDao
                 MaNHP = reader.GetInt32("MaNHP"),
                 MaGV = reader.GetInt32("MaGV"),
                 MaHP = reader.GetInt32("MaHP"),
+                MaLichDK = reader.GetInt32("MaLichDK"),
                 HocKy = reader.GetInt32("HocKy"),
                 Nam = reader.GetString("Nam"),
                 SiSo = reader.GetInt32("SiSo"),
-                
             });
         }
 
@@ -48,12 +52,13 @@ public class NhomHocPhanDao
         int rowAffected = 0;
         using (MySqlConnection conn = MyConnection.GetConnection())
         {
-            string query = @"INSERT INTO NhomHocPhan (MaGV, MaHP, HocKy, Nam, SiSo)
-                             VALUES (@MaGV, @MaHP, @HocKy, @Nam, @SiSo)";
+            string query = @"INSERT INTO NhomHocPhan (MaGV, MaHP, MaLichDK, HocKy, Nam, SiSo)
+                             VALUES (@MaGV, @MaHP, @MaLichDK, @HocKy, @Nam, @SiSo)";
             using (MySqlCommand cmd = new MySqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@MaGV", dto.MaGV);
                 cmd.Parameters.AddWithValue("@MaHP", dto.MaHP);
+                cmd.Parameters.AddWithValue("@MaLichDK", dto.MaLichDK);
                 cmd.Parameters.AddWithValue("@HocKy", dto.HocKy);
                 cmd.Parameters.AddWithValue("@Nam", dto.Nam);
                 cmd.Parameters.AddWithValue("@SiSo", dto.SiSo);
@@ -72,6 +77,7 @@ public class NhomHocPhanDao
             string query = @"UPDATE NhomHocPhan
                              SET MaGV = @MaGV,
                                  MaHP = @MaHP,
+                                 MaLichDK = @MaLichDK,
                                  HocKy = @HocKy,
                                  Nam = @Nam,
                                  SiSo = @SiSo
@@ -81,6 +87,7 @@ public class NhomHocPhanDao
                 cmd.Parameters.AddWithValue("@MaNHP", dto.MaNHP);
                 cmd.Parameters.AddWithValue("@MaGV", dto.MaGV);
                 cmd.Parameters.AddWithValue("@MaHP", dto.MaHP);
+                cmd.Parameters.AddWithValue("@MaLichDK", dto.MaLichDK);
                 cmd.Parameters.AddWithValue("@HocKy", dto.HocKy);
                 cmd.Parameters.AddWithValue("@Nam", dto.Nam);
                 cmd.Parameters.AddWithValue("@SiSo", dto.SiSo);
@@ -112,7 +119,9 @@ public class NhomHocPhanDao
     {
         NhomHocPhanDto result = new();
         using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand("SELECT MaNHP, MaGV, MaHP, HocKy, Nam, SiSo  FROM NhomHocPhan WHERE Status = 1 AND MaNHP = @MaNHP", conn);
+        using var cmd = new MySqlCommand(
+            "SELECT MaNHP, MaGV, MaHP, MaLichDK, HocKy, Nam, SiSo FROM NhomHocPhan WHERE Status = 1 AND MaNHP = @MaNHP",
+            conn);
         cmd.Parameters.AddWithValue("@MaNHP", maNHP);
         using var reader = cmd.ExecuteReader();
 
@@ -123,6 +132,7 @@ public class NhomHocPhanDao
                 MaNHP = reader.GetInt32("MaNHP"),
                 MaGV = reader.GetInt32("MaGV"),
                 MaHP = reader.GetInt32("MaHP"),
+                MaLichDK = reader.GetInt32("MaLichDK"),
                 HocKy = reader.GetInt32("HocKy"),
                 Nam = reader.GetString("Nam"),
                 SiSo = reader.GetInt32("SiSo"),
@@ -132,3 +142,4 @@ public class NhomHocPhanDao
         return result;
     }
 }
+

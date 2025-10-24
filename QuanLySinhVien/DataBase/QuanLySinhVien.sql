@@ -126,6 +126,7 @@ CREATE TABLE `NhomHocPhan` (
                                `MaNHP` INT AUTO_INCREMENT PRIMARY KEY,
                                `MaGV` INT,
                                `MaHP` INT,
+			       `MaLichDK` INT DEFAULT 1,
                                `HocKy` INT,
                                `Nam` VARCHAR(255),
                                `SiSo` INT,
@@ -137,12 +138,13 @@ CREATE TABLE `LichHoc` (
                            `MaLH` INT AUTO_INCREMENT PRIMARY KEY,
                            `MaPH` INT,
                            `MaNHP` INT,
-                           `Thu` INT,
+                           `Thu` VARCHAR(255),
                            `TietBatDau` INT,
                            `TuNgay` date,
                            `DenNgay` date,
                            `TietKetThuc` INT,
                            `SoTiet` INT,
+			   `Type` VARCHAR(255) DEFAULT 'Lý thuyết',
                            Status TINYINT DEFAULT 1
 );
 
@@ -291,6 +293,15 @@ CREATE TABLE ChucNang  (
                            TenChucNang VARCHAR(255),
                            Status TINYINT DEFAULT 1
 );
+
+-- 30
+CREATE TABLE LichDangKy  (
+                           MaLichDK INT AUTO_INCREMENT PRIMARY KEY ,
+                           ThoiGianBatDau TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			   ThoiGianKetThuc TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           Status TINYINT DEFAULT 1
+);
+
 
 -- ------------------------INSERT-----------------------------------
 -- 1
@@ -461,43 +472,46 @@ INSERT INTO DangKy (MaNHP, MaSV) VALUES
 
 
 -- 12
-INSERT INTO NhomHocPhan (MaGV, MaHP, HocKy, Nam, SiSo) VALUES
-                                                           (1, 1, 1, 2025, 50),
-                                                           (1, 2, 1, 2025, 45),
-                                                           (2, 3, 2, 2025, 55),
-                                                           (2, 4, 2, 2025, 60),
-                                                           (3, 5, 1, 2025, 40),
-                                                           (3, 6, 1, 2025, 50),
-                                                           (4, 7, 2, 2025, 48),
-                                                           (4, 8, 2, 2025, 52),
-                                                           (5, 9, 1, 2025, 47),
-                                                           (5, 10, 2, 2025, 53),
-                                                           (6, 1, 1, 2025, 60),
-                                                           (6, 2, 2, 2025, 58),
-                                                           (7, 3, 1, 2025, 42),
-                                                           (7, 4, 2, 2025, 50),
-                                                           (8, 5, 1, 2025, 45),
-                                                           (8, 6, 2, 2025, 45);
+INSERT INTO NhomHocPhan (MaGV, MaHP, MaLichDK, HocKy, Nam, SiSo) VALUES
+(1, 1, 2, 2, 2024, 50),
+(1, 2, 3, 1, 2025, 45),
+(2, 3, 2, 2, 2024, 55),
+(2, 4, 3, 1, 2025, 60),
+(3, 5, 2, 2, 2024, 40),
+(3, 6, 3, 1, 2025, 50),
+(4, 7, 2, 2, 2024, 48),
+(4, 8, 3, 1, 2025, 52),
+(5, 9, 2, 2, 2024, 47),
+(5, 10, 3, 1, 2025, 53),
+(6, 1, 2, 2, 2024, 60),
+(6, 2, 3, 1, 2025, 58),
+(7, 3, 2, 2, 2024, 42),
+(7, 4, 3, 1, 2025, 50),
+(8, 5, 2, 2, 2024, 45),
+(8, 6, 3, 1, 2025, 45);
+
+
 
 
 -- 13
 INSERT INTO LichHoc (MaLH, MaPH, MaNHP, Thu, TietBatDau, TuNgay, DenNgay, TietKetThuc, SoTiet) VALUES
-                                                                                                   (1, 1, 1, 2, 1, '2025-02-17', '2025-06-01', 3, 3),
-                                                                                                   (2, 2, 2, 3, 4, '2025-02-17', '2025-06-01', 6, 3),
-                                                                                                   (3, 3, 3, 4, 1, '2025-02-17', '2025-06-01', 2, 2),
-                                                                                                   (4, 4, 4, 5, 7, '2025-02-17', '2025-06-01', 9, 3),
-                                                                                                   (5, 5, 5, 6, 1, '2025-02-17', '2025-06-01', 3, 3),
-                                                                                                   (6, 6, 6, 2, 4, '2025-02-17', '2025-06-01', 6, 3),
-                                                                                                   (7, 7, 7, 3, 7, '2025-02-17', '2025-06-01', 9, 3),
-                                                                                                   (8, 8, 8, 4, 1, '2025-02-17', '2025-06-01', 3, 3),
-                                                                                                   (9, 9, 9, 5, 4, '2025-02-17', '2025-06-01', 6, 3),
-                                                                                                   (10, 10, 10, 6, 7, '2025-02-17', '2025-06-01', 9, 3),
-                                                                                                   (11, 11, 11, 2, 1, '2025-02-17', '2025-06-01', 2, 2),
-                                                                                                   (12, 12, 12, 3, 4, '2025-02-17', '2025-06-01', 6, 3),
-                                                                                                   (13, 13, 13, 4, 7, '2025-02-17', '2025-06-01', 9, 3),
-                                                                                                   (14, 14, 14, 5, 1, '2025-02-17', '2025-06-01', 3, 3),
-                                                                                                   (15, 15, 15, 6, 4, '2025-02-17', '2025-06-01', 6, 3),
-                                                                                                   (16, 16, 16, 2, 7, '2025-02-17', '2025-06-01', 9, 3);
+(1, 1, 1, 'Thứ 2', 1, '2025-02-17', '2025-06-01', 3, 3),
+(2, 2, 2, 'Thứ 3', 4, '2025-02-17', '2025-06-01', 6, 3),
+(3, 3, 3, 'Thứ 4', 1, '2025-02-17', '2025-06-01', 2, 2),
+(4, 4, 4, 'Thứ 5', 7, '2025-02-17', '2025-06-01', 9, 3),
+(5, 5, 5, 'Thứ 6', 1, '2025-02-17', '2025-06-01', 3, 3),
+(6, 6, 6, 'Thứ 2', 4, '2025-02-17', '2025-06-01', 6, 3),
+(7, 7, 7, 'Thứ 3', 7, '2025-02-17', '2025-06-01', 9, 3),
+(8, 8, 8, 'Thứ 4', 1, '2025-02-17', '2025-06-01', 3, 3),
+(9, 9, 9, 'Thứ 5', 4, '2025-02-17', '2025-06-01', 6, 3),
+(10, 10, 10, 'Thứ 6', 7, '2025-02-17', '2025-06-01', 9, 3),
+(11, 11, 11, 'Thứ 2', 1, '2025-02-17', '2025-06-01', 2, 2),
+(12, 12, 12, 'Thứ 3', 4, '2025-02-17', '2025-06-01', 6, 3),
+(13, 13, 13, 'Thứ 4', 7, '2025-02-17', '2025-06-01', 9, 3),
+(14, 14, 14, 'Thứ 5', 1, '2025-02-17', '2025-06-01', 3, 3),
+(15, 15, 15, 'Thứ 6', 4, '2025-02-17', '2025-06-01', 6, 3),
+(16, 16, 16, 'Thứ 2', 7, '2025-02-17', '2025-06-01', 9, 3);
+
 
 -- 14
 INSERT INTO PhongHoc (TenPH, LoaiPH, CoSo, SucChua, TinhTrang) VALUES
@@ -739,6 +753,15 @@ INSERT INTO ChucNang (TenChucNang) VALUES
                                        ('PHANQUYEN'),
                                        ('THONGKE');
 
+-- 30
+INSERT INTO LichDangKy (ThoiGianBatDau, ThoiGianKetThuc, Status)
+VALUES
+('1990-01-01 08:00:00', '1990-01-03 08:00:00', 1),  -- Lịch ở năm 1990
+('2024-12-15 10:00:00', '2024-12-17 10:00:00', 1),  -- Lịch cuối năm 2024
+('2025-06-05 09:00:00', '2025-06-07 09:00:00', 1),  -- Lịch giữa năm 2025
+('2025-12-15 10:00:00', '2025-12-17 10:00:00', 1);  -- Lịch cuối năm 2025
+
+
 -- ---------------------Khóa Ngoại ---------------------------
 
 ALTER TABLE `SinhVien`
@@ -839,6 +862,9 @@ ALTER TABLE `ChuongTrinhDaoTao_HocPhan`
 ALTER TABLE `ChuongTrinhDaoTao`
     ADD CONSTRAINT `ChuongTrinhDaoTao_ChuKyDaoTao` FOREIGN KEY (MaCKDT) REFERENCES `ChuKyDaoTao`(MaCKDT),
     ADD CONSTRAINT `ChuongTrinhDaoTao_Nganh` FOREIGN KEY (MaNganh) REFERENCES `Nganh`(MaNganh);
+
+ALTER TABLE `NhomHocPhan`
+    ADD CONSTRAINT `NhomHocPhan_LichDangky` FOREIGN KEY (MaLichDK) REFERENCES `LichDangky`(MaLichDK);
 
 SELECT * FROM SinhVien;
 SELECT * FROM Nganh;

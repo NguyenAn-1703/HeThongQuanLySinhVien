@@ -42,7 +42,7 @@ public class MoDangKyHocPhan : NavBase
     // private LichHocController _lichHocController;
     private HocPhanController _hocPhanController;
     private GiangVienController _giangVienController;
-    // private PhongHocController _phongHocController;
+    private LichDangKyController _lichDangKyController;
 
     private TitleButton _insertButton;
     private TitleButton _updateTimeButton;
@@ -58,6 +58,9 @@ public class MoDangKyHocPhan : NavBase
     private RoundTLP _bottomTimePnl;
     private LabelTextField _hocKyField;
     private LabelTextField _namField;
+    
+    private LabelTextField startDTField;
+    private LabelTextField endDTField;
 
     private List<ChiTietQuyenDto> _listAccess;
     private bool them = false;
@@ -76,6 +79,8 @@ public class MoDangKyHocPhan : NavBase
         _hocPhanController = HocPhanController.GetInstance();
         _giangVienController = GiangVienController.GetInstance();
         // _phongHocController = PhongHocController.getInstance();
+        
+        _lichDangKyController = LichDangKyController.GetInstance();
         Init();
     }
 
@@ -263,9 +268,9 @@ public class MoDangKyHocPhan : NavBase
         //     Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
         // };
 
-        LabelTextField startDTField = new LabelTextField("Thời gian bắt đầu", TextFieldType.DateTime);
+        startDTField = new LabelTextField("Thời gian bắt đầu", TextFieldType.DateTime);
         _bottomTimePnl.Controls.Add(startDTField);
-        LabelTextField endDTField = new LabelTextField("Thời gian kết thúc", TextFieldType.DateTime);
+        endDTField = new LabelTextField("Thời gian kết thúc", TextFieldType.DateTime);
         _bottomTimePnl.Controls.Add(endDTField);
         
         
@@ -273,10 +278,35 @@ public class MoDangKyHocPhan : NavBase
         _updateTimeButton.Margin = new Padding(3, 3, 20, 3);
         _updateTimeButton.Anchor = AnchorStyles.None;
         _updateTimeButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
+
+
+
+        UpdateTimeField();
         
         _bottomTimePnl.Controls.Add(_updateTimeButton);
         
         _mainLayout.Controls.Add(_bottomTimePnl);
+    }
+
+    void UpdateTimeField()
+    {
+        if (_rawDataFilter.Count == 0) // ds theo học kỳ và năm chưa đc tao
+        {
+            startDTField._dTNgayField.dateField.Value = DateTime.Now;
+            startDTField._dTGioField.dateField.Value = DateTime.Now;
+            endDTField._dTNgayField.dateField.Value = DateTime.Now;
+            endDTField._dTGioField.dateField.Value = DateTime.Now;
+            return;
+        }
+        NhomHocPhanDto nhp1 = _rawDataFilter[0];
+        LichDangKyDto lichDangKy = _lichDangKyController.GetById(nhp1.MaLichDK);
+        
+        Console.WriteLine(lichDangKy.MaLichDK + " " + lichDangKy.ThoiGianBatDau + " " + lichDangKy.ThoiGianKetThuc) ;
+        
+        startDTField._dTNgayField.dateField.Value = lichDangKy.ThoiGianBatDau;
+        startDTField._dTGioField.dateField.Value = lichDangKy.ThoiGianBatDau;
+        endDTField._dTNgayField.dateField.Value = lichDangKy.ThoiGianKetThuc;
+        endDTField._dTGioField.dateField.Value = lichDangKy.ThoiGianKetThuc;
     }
     
     
@@ -314,8 +344,8 @@ public class MoDangKyHocPhan : NavBase
             x.Nam.Equals(nam)
             ).ToList();
         
-        _displayData = ConvertListNhomHPoObj(_rawDataFilter);
         
+        _displayData = ConvertListNhomHPoObj(_rawDataFilter);
     }
 
     List<object> ConvertListNhomHPoObj(List<NhomHocPhanDto> dtos)
@@ -368,7 +398,8 @@ public class MoDangKyHocPhan : NavBase
     void OnChangeNamHK()
     {
         UpdateRawDataFilter();
-
+        UpdateTimeField();
+        
         List<NhomHocPhanDisplay> list = ConvertToDtoDisplay(_rawDataFilter);
         UpdateDataDisplay(list);
         this._table.UpdateData(_displayData);

@@ -130,7 +130,7 @@ public class LabelTextField : MyTLP
         };
         _dTNgayField = new CustomDateField
         {
-            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
             AutoSize = true,
             Dock = DockStyle.Top
         };
@@ -139,7 +139,7 @@ public class LabelTextField : MyTLP
         
         _dTGioField = new CustomDateField()
         {
-            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
             AutoSize = true,
             Dock = DockStyle.Top
         };
@@ -157,7 +157,7 @@ public class LabelTextField : MyTLP
     {
         _dField = new CustomDateField
         {
-            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
             AutoSize = true,
             Dock = DockStyle.Top
         };
