@@ -205,14 +205,27 @@ public class CTDTTable : CustomTable
             _Btn = new CustomButton(20, 20, "minus.svg", MyColor.RedHover);
         }
         
+        _topForm.Controls.Add(_Btn);
+        _Btn.BringToFront();
 
         Point myPoint = _topForm.PointToClient(rec);
-
         _Btn.Location = myPoint;
+        
+        Point cursorPos = Cursor.Position;
+        Point cursorOnForm = _topForm.PointToClient(cursorPos);
 
-        _topForm.Controls.Add(_Btn);
-
-        _Btn.BringToFront();
+        // Nếu chuột đang nằm trong vùng nút thì hiển thị, nếu không thì ẩn
+        if (_Btn.Bounds.Contains(cursorOnForm))
+        {
+            _Btn.Visible = true;
+        }
+        else
+        {
+            _Btn.Visible = false;
+        }
+        _Btn.MouseLeave +=  (sender, args) =>_Btn.Visible = false;
+        
+        
 
         _Btn.MouseDown += (sender, args) => OnClickBtn(index);
     }

@@ -77,6 +77,8 @@ public class CustomDataGridView : DataGridView
     {
         CellPainting += (sender, args) => DrawBtn(sender, args);
         CellMouseMove +=  (sender, args) => OnHoverCell(sender, args);
+        CellMouseLeave += (sender, args) => OnLeaveCell(args.RowIndex, args.ColumnIndex);
+        MouseLeave += (sender, args) => OnLeaveDgv();
     }
     
     void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
@@ -237,6 +239,7 @@ public class CustomDataGridView : DataGridView
             SetButtonAction(dgv, recEdit, recDelete, e);
         }
     }
+    
 
     void SetActionRegion(out Rectangle recEdit, out Rectangle recDelete, Rectangle cellRect)
     {
@@ -304,7 +307,6 @@ public class CustomDataGridView : DataGridView
                 OnLeaveButtonEdit();
             }
         }
-            
         if (recDelete.Contains(mousePos))
         {
             if (!flagDelete)
@@ -321,6 +323,59 @@ public class CustomDataGridView : DataGridView
                 OnLeaveButtonDelete();
             }
         }
+    }
+
+    int i = 0;
+    void OnLeaveCell(int rowIndex, int columnIndex)
+    {
+        Rectangle cellRect = GetCellDisplayRectangle(columnIndex, rowIndex, false);
+        Point cellScreenLocation = PointToScreen(cellRect.Location);
+        Rectangle cellScreenRect = new Rectangle(cellScreenLocation, cellRect.Size);
+
+        // Lấy tọa độ con trỏ chuột hiện tại trên màn hình
+        Point cursorPos = Cursor.Position;
+
+        // Chỉ thực hiện khi chuột thật sự rời cell
+        if (!cellScreenRect.Contains(cursorPos))
+        {
+            if (flagEdit)
+            {
+                flagEdit = false;
+                OnLeaveButtonEdit();
+            }
+            if (flagDelete)
+            {
+                flagDelete = false;
+                OnLeaveButtonDelete();
+            }
+        }
+    }
+
+    void OnLeaveDgv()
+    {
+        // Lấy vị trí chuột hiện tại trên màn hình
+        Point cursorPos = Cursor.Position;
+
+        // Lấy vùng CustomDataGridView trên màn hình
+        Rectangle dgvScreenRect = this.RectangleToScreen(this.ClientRectangle);
+
+        // Nếu chuột vẫn còn trong vùng dgv thì không làm gì
+        if (!dgvScreenRect.Contains(cursorPos))
+        {
+            if (flagEdit)
+            {
+                flagEdit = false;
+                OnLeaveButtonEdit();
+            }
+            if (flagDelete)
+            {
+                flagDelete = false;
+                OnLeaveButtonDelete();
+            }
+        }
+            
+        
+        
     }
 
     void OnHoverButtonEdit(Point rec, int index)

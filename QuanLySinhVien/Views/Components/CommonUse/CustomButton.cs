@@ -8,6 +8,8 @@ public class CustomButton : RoundTLP
     public int PicHeight {get; set;}
     public string Svg {get; set;}
     public int Pad { get; set; } = 3;
+
+    public event Action LeaveActionTable;
     
 
     public event Action _mouseDown;
@@ -60,7 +62,7 @@ public class CustomButton : RoundTLP
         this.MouseDown += (sender, args) => OnMouseDown();
         this.MouseUp += (sender, args) => OnMouseUp();
         this.MouseEnter +=  (sender, args) => OnMouseEnter();
-        this.MouseLeave +=  (sender, args) => OnMouseLeave();
+        this.MouseLeave  +=  (sender, args) => OnMouseLeave();
     }
 
     void OnMouseDown()
@@ -82,6 +84,7 @@ public class CustomButton : RoundTLP
     void OnMouseLeave()
     {
         this.BackColor = this.BackgroundColor;
+        LeaveActionTable?.Invoke();
     }
 
     public void SetBorder()

@@ -163,15 +163,28 @@ public class CustomTable : MyTLP
         {
             Cursor = Cursors.Hand,
         };
-
-        Point myPoint = _topForm.PointToClient(rec);
-
-        _editBtn.Location = myPoint;
-
+        
         _topForm.Controls.Add(_editBtn);
-
         _editBtn.BringToFront();
 
+        Point myPoint = _topForm.PointToClient(rec);
+        _editBtn.Location = myPoint;
+
+        Point cursorPos = Cursor.Position;
+        Point cursorOnForm = _topForm.PointToClient(cursorPos);
+
+        // Nếu chuột đang nằm trong vùng nút thì hiển thị, nếu không thì ẩn
+        if (_editBtn.Bounds.Contains(cursorOnForm))
+        {
+            _editBtn.Visible = true;
+        }
+        else
+        {
+            _editBtn.Visible = false;
+        }
+        _editBtn.MouseLeave +=  (sender, args) =>_editBtn.Visible = false;
+        
+        
         _editBtn.MouseDown += (sender, args) => edit(index);
     }
 
@@ -184,16 +197,30 @@ public class CustomTable : MyTLP
         {
             Cursor = Cursors.Hand,
         };
-
-        Point myPoint = _topForm.PointToClient(rec);
-
-        _deleteBtn.Location = myPoint;
-
+        
         _topForm.Controls.Add(_deleteBtn);
-
         _deleteBtn.BringToFront();
 
+        Point myPoint = _topForm.PointToClient(rec);
+        _deleteBtn.Location = myPoint;
+
+        Point cursorPos = Cursor.Position;
+        Point cursorOnForm = _topForm.PointToClient(cursorPos);
+
+        // Nếu chuột đang nằm trong vùng nút thì hiển thị, nếu không thì ẩn
+        if (_deleteBtn.Bounds.Contains(cursorOnForm))
+        {
+            _deleteBtn.Visible = true;
+        }
+        else
+        {
+            _deleteBtn.Visible = false;
+        }
+        _deleteBtn.MouseLeave +=  (sender, args) =>_deleteBtn.Visible = false;
+
+
         _deleteBtn.MouseDown += (sender, args) => delete(index);
+        
     }
 
     void OnLeaveEditBtn()

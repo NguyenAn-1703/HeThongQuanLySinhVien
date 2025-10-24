@@ -252,21 +252,7 @@ public class MoDangKyHocPhan : NavBase
         _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-
-        // Label lblStart = new Label
-        // {
-        //     Margin = new Padding(5),
-        //     AutoSize = true,
-        //     Text = "Thời gian bắt đầu",
-        //     Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
-        // };
-        // Label lblEnd = new Label
-        // {
-        //     Margin = new Padding(5),
-        //     AutoSize = true,
-        //     Text = "Thời gian kết thúc",
-        //     Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
-        // };
+        
 
         startDTField = new LabelTextField("Thời gian bắt đầu", TextFieldType.DateTime);
         _bottomTimePnl.Controls.Add(startDTField);
@@ -290,24 +276,47 @@ public class MoDangKyHocPhan : NavBase
 
     void UpdateTimeField()
     {
+        DateTime now = DateTime.Now;
+        
         if (_rawDataFilter.Count == 0) // ds theo học kỳ và năm chưa đc tao
         {
-            startDTField._dTNgayField.dateField.Value = DateTime.Now;
-            startDTField._dTGioField.dateField.Value = DateTime.Now;
-            endDTField._dTNgayField.dateField.Value = DateTime.Now;
-            endDTField._dTGioField.dateField.Value = DateTime.Now;
+            startDTField._dTNgayField.dateField.Value = now;
+            startDTField._dTGioField.dateField.Value = now;
+            endDTField._dTNgayField.dateField.Value = now;
+            endDTField._dTGioField.dateField.Value = now;
+            
+            startDTField._dTNgayField.dateField.Enabled = true;
+            startDTField._dTGioField.dateField.Enabled = true;
+            endDTField._dTNgayField.dateField.Enabled = true;
+            endDTField._dTGioField.dateField.Enabled = true;
+            _updateTimeButton.Enabled = true;
             return;
         }
         NhomHocPhanDto nhp1 = _rawDataFilter[0];
         LichDangKyDto lichDangKy = _lichDangKyController.GetById(nhp1.MaLichDK);
         
-        Console.WriteLine(lichDangKy.MaLichDK + " " + lichDangKy.ThoiGianBatDau + " " + lichDangKy.ThoiGianKetThuc) ;
+        DateTime start = lichDangKy.ThoiGianBatDau;
+        DateTime end = lichDangKy.ThoiGianKetThuc;
         
-        startDTField._dTNgayField.dateField.Value = lichDangKy.ThoiGianBatDau;
-        startDTField._dTGioField.dateField.Value = lichDangKy.ThoiGianBatDau;
-        endDTField._dTNgayField.dateField.Value = lichDangKy.ThoiGianKetThuc;
-        endDTField._dTGioField.dateField.Value = lichDangKy.ThoiGianKetThuc;
+        startDTField._dTNgayField.dateField.Value = start;
+        startDTField._dTGioField.dateField.Value = start;
+        endDTField._dTNgayField.dateField.Value = end;
+        endDTField._dTGioField.dateField.Value = end;
+        
+        // nếu tgian đky đã qua ngày hiện tại thì không cho sửa lại
+        if (now > start)
+        {
+            startDTField._dTNgayField.dateField.Enabled = false;
+            startDTField._dTGioField.dateField.Enabled = false;
+            endDTField._dTNgayField.dateField.Enabled = false;
+            endDTField._dTGioField.dateField.Enabled = false;
+            
+            _updateTimeButton.Enabled = false;
+        }
+        
     }
+
+
     
     
 
@@ -392,6 +401,40 @@ public class MoDangKyHocPhan : NavBase
         _hocKyField.GetComboboxField().SelectedIndexChanged += (sender, args) => OnChangeNamHK();
         _namField._namField.ValueChanged += (sender, args) => OnChangeNamHK();
 
+        _updateTimeButton._mouseDown += () => { OnClickBtnCapNhat(); };
+
+    }
+
+    void OnClickBtnCapNhat()
+    {
+        DateTime start = startDTField._dTNgayField.dateField.Value;
+        DateTime end = endDTField._dTNgayField.dateField.Value;
+        DateTime now = DateTime.Now;
+        
+        string startStr = start.ToString("HH:mm:ss ") + "Ngày " + start.ToString("dd/MM/yyyy");
+        string endStr = end.ToString("HH:mm:ss ") + "Ngày " + end.ToString("dd/MM/yyyy");
+        
+        
+        if (start < now)
+        {
+            DialogResult rs = MessageBox.Show("Thời gian đăng ký học phần " +
+                            _hocKyField.GetSelectionCombobox() + 
+                            " Năm học: " + 
+                            _namField.GetTextNam() +
+                            "\n" +
+                            "Sẽ được mở vào: " + 
+                            startStr + "\n" + 
+                            "Cho đến: " +
+                            endStr + "\n" +
+                            "Sau khi cập nhật sẽ không thể thay đổi!",
+                "Xác nhận",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (rs == DialogResult.Yes)
+            {
+                MessageBox.Show("Cập nhật lịch đăng ký môn thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        
 
     }
 
