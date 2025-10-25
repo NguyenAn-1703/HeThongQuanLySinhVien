@@ -127,6 +127,7 @@ CREATE TABLE `NhomHocPhan` (
                                `MaGV` INT,
                                `MaHP` INT,
 			       `MaLichDK` INT DEFAULT 1,
+				`MaLop` INT,
                                `HocKy` INT,
                                `Nam` VARCHAR(255),
                                `SiSo` INT,
@@ -472,24 +473,23 @@ INSERT INTO DangKy (MaNHP, MaSV) VALUES
 
 
 -- 12
-INSERT INTO NhomHocPhan (MaGV, MaHP, MaLichDK, HocKy, Nam, SiSo) VALUES
-(1, 1, 2, 2, 2024, 50),
-(1, 2, 3, 1, 2025, 45),
-(2, 3, 2, 2, 2024, 55),
-(2, 4, 3, 1, 2025, 60),
-(3, 5, 2, 2, 2024, 40),
-(3, 6, 3, 1, 2025, 50),
-(4, 7, 2, 2, 2024, 48),
-(4, 8, 3, 1, 2025, 52),
-(5, 9, 2, 2, 2024, 47),
-(5, 10, 3, 1, 2025, 53),
-(6, 1, 2, 2, 2024, 60),
-(6, 2, 3, 1, 2025, 58),
-(7, 3, 2, 2, 2024, 42),
-(7, 4, 3, 1, 2025, 50),
-(8, 5, 2, 2, 2024, 45),
-(8, 6, 3, 1, 2025, 45);
-
+INSERT INTO NhomHocPhan (MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo) VALUES
+(1, 1, 2, 1, 1, 2024, 50),
+(1, 2, 3, 2, 2, 2025, 45),
+(2, 3, 2, 3, 1, 2024, 55),
+(2, 4, 3, 4, 2, 2025, 60),
+(3, 5, 2, 5, 1, 2024, 40),
+(3, 6, 3, 6, 2, 2025, 50),
+(4, 7, 2, 7, 1, 2024, 48),
+(4, 8, 3, 8, 2, 2025, 52),
+(5, 9, 2, 9, 1, 2024, 47),
+(5, 10, 3, 10, 2, 2025, 53),
+(6, 1, 2, 2, 1, 2024, 60),
+(6, 2, 3, 3, 2, 2025, 58),
+(7, 3, 2, 4, 1, 2024, 42),
+(7, 4, 3, 5, 2, 2025, 50),
+(8, 5, 2, 1, 1, 2024, 45),
+(8, 6, 3, 6, 2, 2025, 45);
 
 
 
@@ -701,7 +701,7 @@ INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau) VALUES
                                                       (3, 'an', '$2a$11$YZQfbakMQk1uUZ0ojbU.gOg5zrd7ncbMcz4402rhq4nc4PjDYrtMK');
 -- tài khoản sinh viên
 INSERT INTO TaiKhoan (MaNQ, TenDangNhap, MatKhau, Type) VALUES
-						      (1, 'sinhvien', '123456', 'Sinh viên');
+						      (1, 'sinhvien', '$2a$11$YZQfbakMQk1uUZ0ojbU.gOg5zrd7ncbMcz4402rhq4nc4PjDYrtMK', 'Sinh viên');
 
 
 -- 27
@@ -712,7 +712,6 @@ INSERT INTO NhomQuyen (TenNhomQuyen) VALUES
 
 -- 28
 INSERT INTO ChiTietQuyen (MaCN, MaNQ, HanhDong) VALUES
-
 (1, 2, 'Xem'), (1, 2, 'Them'), (1, 2, 'Sua'), (1, 2, 'Xoa'),
 (2, 2, 'Xem'), (2, 2, 'Them'), (2, 2, 'Sua'), (2, 2, 'Xoa'),
 (3, 2, 'Xem'), (3, 2, 'Them'), (3, 2, 'Sua'), (3, 2, 'Xoa'),
@@ -722,14 +721,15 @@ INSERT INTO ChiTietQuyen (MaCN, MaNQ, HanhDong) VALUES
 (7, 2, 'Xem'), (7, 2, 'Them'), (7, 2, 'Sua'), (7, 2, 'Xoa'),
 (8, 2, 'Xem'), (8, 2, 'Them'), (8, 2, 'Sua'), (8, 2, 'Xoa'),
 (9, 2, 'Xem'), (9, 2, 'Them'), (9, 2, 'Sua'), (9, 2, 'Xoa'),
-(10, 2, 'Xem'), (10, 2, 'Them'),
-
+(10, 2, 'Xem'), (10, 2, 'Them'), (10, 2, 'Sua'), (10, 2, 'Xoa'),
 (11, 2, 'Xem'), (11, 2, 'Them'),
 (12, 2, 'Xem'), (12, 2, 'Them'),
-(13, 2, 'Xem'), (13, 2, 'Them'), (13, 2, 'Sua'), (13, 2, 'Xoa'),
+(13, 2, 'Xem'), (13, 2, 'Them'),
 (14, 2, 'Xem'), (14, 2, 'Them'), (14, 2, 'Sua'), (14, 2, 'Xoa'),
 (15, 2, 'Xem'), (15, 2, 'Them'), (15, 2, 'Sua'), (15, 2, 'Xoa'),
-(16, 2, 'Xem'),
+(16, 2, 'Xem'), (16, 2, 'Them'), (16, 2, 'Sua'), (16, 2, 'Xoa'),
+(17, 2, 'Xem'),
+
 
                                                     (1, 3, 'Xem'), (1, 3, 'Them'), (1, 3, 'Sua'), (1, 3, 'Xoa'),
                                                     (2, 3, 'Xem'), (2, 3, 'Them'), (2, 3, 'Sua'), (2, 3, 'Xoa');
@@ -740,6 +740,7 @@ INSERT INTO ChucNang (TenChucNang) VALUES
                                        ('GIANGVIEN'),
                                        ('KHOA'),
                                        ('NGANH'),
+					('LOP'),
                                        ('CHUONGTRINHDAOTAO'),
                                        ('HOCPHAN'),
                                        ('PHONGHOC'),
@@ -865,6 +866,9 @@ ALTER TABLE `ChuongTrinhDaoTao`
 
 ALTER TABLE `NhomHocPhan`
     ADD CONSTRAINT `NhomHocPhan_LichDangky` FOREIGN KEY (MaLichDK) REFERENCES `LichDangky`(MaLichDK);
+
+ALTER TABLE `NhomHocPhan`
+    ADD CONSTRAINT `NhomHocPhan_Lop` FOREIGN KEY (MaLop) REFERENCES `Lop`(MaLop);
 
 SELECT * FROM SinhVien;
 SELECT * FROM Nganh;
