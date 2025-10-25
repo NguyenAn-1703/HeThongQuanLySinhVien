@@ -24,6 +24,7 @@ public class NavListController
         buttonClickTrans["Học phí"] = "HocPhi";
         buttonClickTrans["Học phần"] = "HocPhan";
         buttonClickTrans["Ngành"] = "Nganh";
+        buttonClickTrans["Lớp"] = "Lop";
         buttonClickTrans["Phòng học"] = "PhongHoc";
         buttonClickTrans["Chu kỳ đào tạo"] = "ChuKyDaoTao";
         buttonClickTrans["Khóa học"] = "KhoaHoc";
@@ -36,7 +37,7 @@ public class NavListController
         buttonClickTrans["Chương trình đào tạo"] = "ChuongTrinhDaoTao";
         //SV
         buttonClickTrans["Thông tin cá nhân"] = "ThongTinSinhVien";
-        
+        buttonClickTrans["Đăng ký học phần"] = "DangKyHocPhan";
     }
     
     public String getDataButton(string key)
@@ -80,6 +81,10 @@ public class NavListController
         {
             ans = new NganhPanel(_quyen);
         }
+        else if (s.Equals("Lop"))
+        {
+            ans = new QuanLiLop(_quyen);
+        }
         else if (s.Equals("PhongHoc"))
         {
             ans = new PhongHoc(_quyen);
@@ -119,6 +124,10 @@ public class NavListController
         else if(s.Equals("ThongTinSinhVien"))
         {
             ans =  new ThongTinSinhVien(_quyen);
+        }
+        else if (s.Equals("DangKyHocPhan"))
+        {
+            ans = new DangKyHocPhan(_quyen);
         }
         
         else

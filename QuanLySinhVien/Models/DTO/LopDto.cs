@@ -6,8 +6,8 @@ public class LopDto
     public int MaGV { get; set; }
     public int MaNganh { get; set; }
     public string TenLop { get; set; }
-    public int SoLuongSV { get; set; }
-    public int SoSinhVienHienTai { get; set; }
+    public int SoLuongSV { get; set; } = 0;
+    public int SoSinhVienHienTai { get; set; } = 0;
     
     // Computed property để hiển thị thông tin lớp
     public string DisplayText => $"{TenLop} ({SoSinhVienHienTai}/{SoLuongSV} SV)";

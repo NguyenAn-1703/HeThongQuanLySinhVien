@@ -42,7 +42,7 @@ public class SinhVienDialog : Form
         ShowInTaskbar = false;
         BackColor = ColorTranslator.FromHtml("#F3F4F6");
         
-        lopDao = new LopDAO();
+        lopDao = LopDAO.GetInstance();
         controller = new SinhVienController();
 
         var headerPanel = CreateHeaderPanel(mode);

@@ -180,7 +180,7 @@ public class MyHome : Form
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
             Margin = new Padding(10),
-            ColumnCount = 2
+            ColumnCount = 2,
         };
 
 
@@ -266,7 +266,18 @@ public class MyHome : Form
         rightBottomChange.Dock = DockStyle.Fill;
         rightBottomHost.Controls.Add(rightBottomChange);
 
-        if (rightBottomChange is TrangChu)
+
+        // if (rightBottomChange is DangKyHocPhan)
+        // {
+        //     _searchBar.Visible = false;
+        // }
+        // else
+        // {
+        //     _searchBar.Visible = true;
+        // }
+        
+
+        if (rightBottomChange is TrangChu || rightBottomChange is DangKyHocPhan)
         {
             rightTop.Visible = false;
             _emptyForUnTopBar.Visible = true;
@@ -297,13 +308,14 @@ public class MyHome : Form
         this.Dispose();
     }
 
+    private MyTLP AccountInfo;
     MyTLP getAcountInfo()
     {
-        MyTLP AccountInfo = new MyTLP
+        AccountInfo = new MyTLP
         {
             ColumnCount = 2,
         };
-        AccountInfo.Anchor = AnchorStyles.None;
+        AccountInfo.Anchor = AnchorStyles.Right;
         AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         AccountInfo.AutoSize = true;

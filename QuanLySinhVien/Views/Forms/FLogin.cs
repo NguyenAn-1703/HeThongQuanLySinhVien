@@ -47,7 +47,8 @@ public class FLogin : Form
         mainPanel.Controls.Add(GetControlPanel());
 
 
-        _usrnameTfl.SetText("admin");
+        // _usrnameTfl.SetText("admin");
+        _usrnameTfl.SetText("sinhvien");
         _passTfl.SetPassword("123456");
         
         this.Controls.Add(mainPanel);

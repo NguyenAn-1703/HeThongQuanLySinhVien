@@ -235,8 +235,6 @@ public class CustomTable : MyTLP
 
     void delete(int index)
     {
-        // object o = _cellDatas[index];
-        // Console.WriteLine("Xóa" + o.ToString());
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
         
         OnDelete?.Invoke(Id);
@@ -245,8 +243,6 @@ public class CustomTable : MyTLP
 
     void edit(int index)
     {
-        // object o = _cellDatas[index];
-        // Console.WriteLine("Sửa" + o.ToString());
         
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
         
@@ -264,27 +260,6 @@ public class CustomTable : MyTLP
         
         OnDetail?.Invoke(Id);
     }
-    //
-    // List<string> GetStringDataRowByIndex(int index)
-    // {
-    //     object row = _cellDatas[index];
-    //     List<string> arrayString = new List<string>();
-    //     
-    //     foreach (var item in row)
-    //     {
-    //         string value = item + "";
-    //         arrayString.Add(value);
-    //     }
-    //     return arrayString;
-    // }
-
-    // List<List<string>> getDisplayCellDatas()
-    // {
-    //     List<List<string>> listString = _cellDatas
-    //         .Select(row => row.Select(item => item?.ToString() ?? "").ToList())
-    //         .ToList();
-    //     return listString;
-    // }
 
     void OnResize()
     {

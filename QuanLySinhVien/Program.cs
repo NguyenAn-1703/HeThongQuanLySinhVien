@@ -17,15 +17,9 @@ static class Program
         
         ApplicationConfiguration.Initialize();
         
-        // using (InstalledFontCollection fontsCollection = new InstalledFontCollection())
-        // {
-        //     foreach (var family in fontsCollection.Families)
-        //     {
-        //         Console.WriteLine(family.Name);
-        //     }
-        // }
-        
         // Application.Run(new FLogin());
+        
+        // NhomQuyenDto nhomQuyen = new NhomQuyenDto*
         
         NhomQuyenDto nhomQuyen = new NhomQuyenDto
         {
@@ -33,6 +27,13 @@ static class Program
             TenNhomQuyen = "admin", 
         };
         Application.Run(new MyHome(nhomQuyen));
+        
+        // NhomQuyenDto nhomQuyen = new NhomQuyenDto
+        // {
+        //     MaNQ = 1,
+        //     TenNhomQuyen = "SinhVien", 
+        // };
+        // Application.Run(new MyHome(nhomQuyen));
 
     }
 }

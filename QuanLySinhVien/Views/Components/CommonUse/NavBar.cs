@@ -30,11 +30,14 @@ public class NavBar : Panel
 
     private string _roleType = "admin";
 
+    private LichDangKyController _lichDangKyController;
+    private List<NavItemValue> _listDataNavItemForSV;
 
     public NavBar(NhomQuyenDto nhomQuyen)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
+        _lichDangKyController = LichDangKyController.GetInstance();
         _nhomQuyen = nhomQuyen;
 
         //     "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học", "Chu kỳ đào tạo","Khóa học",
@@ -52,6 +55,7 @@ public class NavBar : Panel
             new NavItemValue { ID = "GIANGVIEN", Svg = "giangvien", Name = "Giảng viên" },
             new NavItemValue { ID = "KHOA", Svg = "khoa", Name = "Khoa" },
             new NavItemValue { ID = "NGANH", Svg = "nganh", Name = "Ngành" },
+            new NavItemValue { ID = "LOP", Svg = "lop", Name = "Lớp" },
             new NavItemValue { ID = "CHUONGTRINHDAOTAO", Svg = "chuongtrinhdaotao", Name = "Chương trình đào tạo" },
             new NavItemValue { ID = "HOCPHAN", Svg = "hocphan", Name = "Học phần" },
             new NavItemValue { ID = "PHONGHOC", Svg = "phonghoc", Name = "Phòng học" },
@@ -71,7 +75,12 @@ public class NavBar : Panel
             new NavItemValue { ID = "TRANGCHU", Svg = "trangchu", Name = "Trang chủ" },
             new NavItemValue { ID = "THONGTINSINHVIEN", Svg = "sinhvien", Name = "Thông tin cá nhân" },
         };
-
+        _listDataNavItemForSV = _arrDataNavItemForSV.ToList();
+        if (ValidateDangKyHP())
+        {
+            _listDataNavItemForSV.Add(new NavItemValue { ID = "DANGKYHOCPHAN", Svg = "dangkyhocphan", Name = "Đăng ký học phần" });
+        }
+        
         ButtonArray = new List<NavItem>();
         this.Init();
     }
@@ -108,9 +117,9 @@ public class NavBar : Panel
         }
         else
         {
-            for (int i = 0; i < _arrDataNavItemForSV.Length; i++)
+            for (int i = 0; i < _listDataNavItemForSV.Count; i++)
             {
-                NavItem navItem = new NavItem(i, _arrDataNavItemForSV[i].Svg + ".svg", _arrDataNavItemForSV[i].Name);
+                NavItem navItem = new NavItem(i, _listDataNavItemForSV[i].Svg + ".svg", _listDataNavItemForSV[i].Name);
                 navItem.OnClickThisItem += this.UpdateStatusNavBar;
                 ButtonArray.Add(navItem);
                 _mainLayout.Controls.Add(ButtonArray[i]);
@@ -159,5 +168,21 @@ public class NavBar : Panel
     {
         int w = _mainLayout.Width + 6;
         this.Width = w;
+    }
+
+    bool ValidateDangKyHP()
+    {
+        List<LichDangKyDto> listLichDk = _lichDangKyController.GetAll();
+        DateTime now = DateTime.Now;
+        foreach (LichDangKyDto lich in listLichDk)
+        {
+            if (now >= lich.ThoiGianBatDau && now <= lich.ThoiGianKetThuc)
+            {
+                Console.WriteLine(lich.MaLichDK + " " +lich.ThoiGianBatDau + " " +lich.ThoiGianKetThuc);
+                Console.WriteLine(now);
+                return true;
+            }
+        }
+        return false;
     }
 }

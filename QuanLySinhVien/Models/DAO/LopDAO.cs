@@ -5,6 +5,131 @@ namespace QuanLySinhVien.Models.DAO;
 
 public class LopDAO
 {
+    
+    private static LopDAO _instance;
+    private LopDAO() { }
+
+    public static LopDAO GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new LopDAO();
+        }
+        return _instance;
+    }
+
+    public List<LopDto> GetAll()
+    {
+        List<LopDto> result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand("SELECT MaLop, MaGV, MaNganh, TenLop, SoLuongSV FROM lop WHERE Status = 1", conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new LopDto
+            {
+                MaLop = reader.GetInt32("MaLop"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaNganh = reader.GetInt32("MaNganh"),
+                TenLop = reader.GetString("TenLop"),
+                SoLuongSV = reader.GetInt32("SoLuongSV")
+            });
+        }
+
+        return result;
+    }
+
+    public bool Insert(LopDto lopDto)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"INSERT INTO lop (MaGV, MaNganh, TenLop, SoLuongSV)
+                             VALUES (@MaGV, @MaNganh, @TenLop, @SoLuongSV)";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaGV", lopDto.MaGV);
+                cmd.Parameters.AddWithValue("@MaNganh", lopDto.MaNganh);
+                cmd.Parameters.AddWithValue("@TenLop", lopDto.TenLop);
+                cmd.Parameters.AddWithValue("@SoLuongSV", lopDto.SoLuongSV);
+
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+        return rowAffected > 0;
+    }
+
+    public bool Update(LopDto lopDto)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"UPDATE lop 
+                             SET MaGV = @MaGV,
+                                 MaNganh = @MaNganh,
+                                 TenLop = @TenLop,
+                                 SoLuongSV = @SoLuongSV
+                             WHERE MaLop = @MaLop";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaLop", lopDto.MaLop);
+                cmd.Parameters.AddWithValue("@MaGV", lopDto.MaGV);
+                cmd.Parameters.AddWithValue("@MaNganh", lopDto.MaNganh);
+                cmd.Parameters.AddWithValue("@TenLop", lopDto.TenLop);
+                cmd.Parameters.AddWithValue("@SoLuongSV", lopDto.SoLuongSV);
+
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+        return rowAffected > 0;
+    }
+
+    public bool Delete(int maLop)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"UPDATE lop
+                             SET Status = 0
+                             WHERE MaLop = @MaLop;";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaLop", maLop);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+
+        return rowAffected > 0;
+    }
+
+    public LopDto? GetLopById(int maLop)
+    {
+        LopDto? result = null;
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaLop, MaGV, MaNganh, TenLop, SoLuongSV FROM lop WHERE Status = 1 AND MaLop = @MaLop", conn);
+        cmd.Parameters.AddWithValue("@MaLop", maLop);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new LopDto
+            {
+                MaLop = reader.GetInt32("MaLop"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaNganh = reader.GetInt32("MaNganh"),
+                TenLop = reader.GetString("TenLop"),
+                SoLuongSV = reader.GetInt32("SoLuongSV")
+            };
+        }
+
+        return result;
+    }
+    
+    
+    
+    
     public List<LopDto> GetByNganh(int maNganh)
     {
         List<LopDto> result = new();

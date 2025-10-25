@@ -39,7 +39,6 @@ public class MoDangKyHocPhan : NavBase
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
     private NhomHocPhanController _nhomHocPhanController;
-    // private LichHocController _lichHocController;
     private HocPhanController _hocPhanController;
     private GiangVienController _giangVienController;
     private LichDangKyController _lichDangKyController;
@@ -261,7 +260,7 @@ public class MoDangKyHocPhan : NavBase
         
         
         _updateTimeButton = new TitleButton("Cập nhật", "reload.svg");
-        _updateTimeButton.Margin = new Padding(3, 3, 20, 3);
+        _updateTimeButton.Margin = new Padding(3, 20, 20, 3);
         _updateTimeButton.Anchor = AnchorStyles.None;
         _updateTimeButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
 
@@ -289,7 +288,9 @@ public class MoDangKyHocPhan : NavBase
             startDTField._dTGioField.dateField.Enabled = true;
             endDTField._dTNgayField.dateField.Enabled = true;
             endDTField._dTGioField.dateField.Enabled = true;
+            
             _updateTimeButton.Enabled = true;
+            _insertButton.Enabled = true;
             return;
         }
         NhomHocPhanDto nhp1 = _rawDataFilter[0];
@@ -307,6 +308,7 @@ public class MoDangKyHocPhan : NavBase
             endDTField._dTNgayField.dateField.Enabled = true;
             endDTField._dTGioField.dateField.Enabled = true;
             _updateTimeButton.Enabled = true;
+            _insertButton.Enabled = true;
             return;
         }
         
@@ -327,6 +329,7 @@ public class MoDangKyHocPhan : NavBase
             endDTField._dTGioField.dateField.Enabled = false;
             
             _updateTimeButton.Enabled = false;
+            _insertButton.Enabled = false;
         }
         
     }
@@ -522,7 +525,7 @@ public class MoDangKyHocPhan : NavBase
 
     void Insert()
     {
-        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Thêm nhóm học phần", DialogType.Them, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam());
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Thêm nhóm học phần", DialogType.Them, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(), _rawDataFilter);
         
         
         dialog.Finish += () =>
@@ -539,7 +542,7 @@ public class MoDangKyHocPhan : NavBase
 
     void Update(int id)
     {
-        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Sửa nhóm học phần", DialogType.Sua, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(), id);
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Sửa nhóm học phần", DialogType.Sua, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(),_rawDataFilter, id);
         dialog.Finish += () =>
         {
             _rawData = _nhomHocPhanController.GetAll();
@@ -553,7 +556,7 @@ public class MoDangKyHocPhan : NavBase
 
     void Detail(int id)
     {
-        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Chi tiết nhóm học phần", DialogType.ChiTiet, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(), id);
+        NhomHocPhanDialog dialog = new NhomHocPhanDialog("Chi tiết nhóm học phần", DialogType.ChiTiet, _hocKyField.GetSelectionCombobox(), _namField.GetTextNam(),_rawDataFilter, id);
         dialog.ShowDialog();
     }
 

@@ -21,6 +21,11 @@
       "Actions": ["Xem", "Them", "Sua", "Xoa"]
     },
     {
+      "Name": "Quản lý lớp",
+      "ID": "Lop",
+      "Actions": ["Xem", "Them", "Sua", "Xoa"]
+    },
+    {
       "Name": "Chương trình đào tạo",
       "ID": "CHUONGTRINHDAOTAO",
       "Actions": ["Xem", "Them", "Sua", "Xoa"]

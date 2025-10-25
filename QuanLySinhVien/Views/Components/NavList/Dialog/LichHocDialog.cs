@@ -35,19 +35,24 @@ public class LichHocDialog : Form
     public event Action<LichHocDto> Finish;
 
     private PhongHocController _phongController;
+    private LichHocController _lichController;
 
     private LichHocDto selectedItem;
 
     private List<LichHocDto> _listTam;
 
+    private List<NhomHocPhanDto> _currentListNhp;
 
-    public LichHocDialog(string title, DialogType dialogType,List<LichHocDto> listTam , LichHocDto lich = null)
+
+    public LichHocDialog(string title, DialogType dialogType,List<LichHocDto> listTam , List<NhomHocPhanDto> currentLisNhp,  LichHocDto lich = null)
     {
         _title = title;
         _dialogType = dialogType;
         _phongController = PhongHocController.getInstance();
         selectedItem = lich;
         _listTam = listTam;
+        _currentListNhp =  currentLisNhp;
+        _lichController = LichHocController.GetInstance();
         Init();
     }
 
@@ -542,30 +547,71 @@ public class LichHocDialog : Form
             fieldPhong.tbPH.contentTextBox.Focus();
             return false;
         }
-        if (DuplicateLichHoc(fieldThu.GetSelectionCombobox(), fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox()))
+        if (DuplicateLichHoc(fieldPhong.tbPH.contentTextBox.Text, fieldThu.GetSelectionCombobox(), fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox()))
         {
             MessageBox.Show("Lịch học bị trùng!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+
+        int maNhpTrung = DuplicateLichHocNhp(fieldPhong.tbPH.contentTextBox.Text, fieldThu.GetSelectionCombobox(),
+            fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox());
+        if (maNhpTrung != -1)
+        {
+            MessageBox.Show("Lịch học bị trùng với lịch của nhóm học phần: " + maNhpTrung + " !", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
 
         return true;
     }
 
-    bool DuplicateLichHoc(string thu, string tietBatDau, string tietKetThuc)
+    bool DuplicateLichHoc(string tenPhong, string thu, string tietBatDau, string tietKetThuc)
     {
+        int maPhong = _phongController.GetByTen(tenPhong).MaPH;
+        int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
+        int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
+        //trùng ở nhóm học phần hiện tại
         foreach (LichHocDto item in _listTam)
         {
-            if (item.Thu.Equals(thu))
+            if (item.Thu.Equals(thu) && item.MaPH == maPhong)
             {
-                int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
-                int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
                 if (item.TietBatDau <= tietKt && tietBd <= item.TietKetThuc)
                 {
                     return true;
                 }
             }
         }
-
+        
         return false;
+    }
+    
+    int DuplicateLichHocNhp(string tenPhong,string thu, string tietBatDau, string tietKetThuc)
+    {
+        int rs = -1;
+        int maPhong = _phongController.GetByTen(tenPhong).MaPH;
+        int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
+        int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
+        
+        //trùng ở các nhóm học phần khác cùng đợt đăng ký
+        foreach (NhomHocPhanDto item in _currentListNhp)
+        {
+            List<LichHocDto> listLichOfNhp = _lichController.GetByMaNhp(item.MaNHP);
+            
+            foreach (LichHocDto lich in listLichOfNhp)
+            {
+                //(a1, a2) //(b1, b2) //dk: a1 < b2 && b1 < a2
+                if (maPhong == lich.MaPH && thu.Equals(lich.Thu))
+                {
+                    if (lich.TietBatDau <= tietKt && tietBd <= lich.TietKetThuc)
+                    {
+                        Console.WriteLine("lich cua nhp : " + lich.MaPH + " " + lich.Thu + " " + lich.TietBatDau + " " + lich.TietKetThuc);
+                        Console.WriteLine("lich chen : " + maPhong + " " + thu + " " + tietBd + " " + tietKt);
+                        rs = item.MaNHP;
+                        return rs;
+                    }
+                }
+            }
+        }
+        
+        return rs;
     }
 }

@@ -51,5 +51,9 @@ public class NhomHocPhanController
         return _nhomHocPhanDao.GetById(maNHP);
     }
 
+    public List<NhomHocPhanDto> GetByLichMaDangKy(int maLichDk)
+    {
+        return _nhomHocPhanDao.GetByLichMaDangKy(maLichDk);
+    }
 
 }

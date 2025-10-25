@@ -13,7 +13,7 @@ public class SinhVienController
     {   
         SinhVienDao = new SinhVienDAO();
         NganhDao = NganhDao.GetInstance();
-        LopDao = new LopDAO();
+        LopDao = LopDAO.GetInstance();
     }
 
     public List<SinhVienDTO> LayDanhSachSinhVienTable()

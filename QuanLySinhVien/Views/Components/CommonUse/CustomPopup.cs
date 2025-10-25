@@ -32,7 +32,7 @@ public class CustomPopup : Panel
         _dt.ShowCellToolTips = false;
 
         _dt.Dock = DockStyle.None;
-
+        _dt.Height = 105;
         this.Controls.Add(_dt);
         SetAction();
     }

@@ -42,8 +42,10 @@ public class NhomHocPhanDialog : Form
     private int _selectedId;
 
     public event Action Finish;
+
+    private List<NhomHocPhanDto> _currentListNhp; // list nhoms học phần bên ngoài để check trùng lịch các nhóm học phần bên ngoài
     
-    public NhomHocPhanDialog(string title, DialogType dialogType, string hocKy, string nam, int index = -1)
+    public NhomHocPhanDialog(string title, DialogType dialogType, string hocKy, string nam, List<NhomHocPhanDto> currentListNhp, int index = -1)
     {
         _lichDisplay = new List<object>();
         listField = new List<LabelTextField>();
@@ -58,6 +60,7 @@ public class NhomHocPhanDialog : Form
         _hocKy = hocKy;
         _nam = nam;
         _selectedId =  index;
+        _currentListNhp = currentListNhp;
         Init();
     }
 
@@ -356,7 +359,7 @@ public class NhomHocPhanDialog : Form
     /// //////////////////////LICH/////////////////////////
     void InsertLich()
     {
-        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them, listLichTam);
+        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them, listLichTam, _currentListNhp);
         _lichDialog.Finish += dto =>
         {
             listLichTam.Add(dto);
@@ -368,14 +371,14 @@ public class NhomHocPhanDialog : Form
     void DetailLich(int index)
     {
         LichHocDto lich = GetLichById(index);
-        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet,listLichTam, lich);
+        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet,listLichTam,_currentListNhp, lich);
         _lichDialog.ShowDialog();
     }
 
     void UpdateLich(int index)
     {
         LichHocDto lich = GetLichById(index);
-        _lichDialog = new LichHocDialog("Sửa lịch học", DialogType.Sua, listLichTam, lich);
+        _lichDialog = new LichHocDialog("Sửa lịch học", DialogType.Sua, listLichTam,_currentListNhp, lich);
         
         _lichDialog.Finish += dto =>
         {
