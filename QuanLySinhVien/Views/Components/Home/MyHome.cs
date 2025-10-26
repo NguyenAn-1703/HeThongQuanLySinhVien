@@ -42,15 +42,17 @@ public class MyHome : Form
     private MyTLP _emptyForUnTopBar;
 
     private NhomQuyenDto _quyen;
+    private TaiKhoanDto _taiKhoan;
 
     // private NhomQuyenDto _quyen;
     
-    public MyHome(NhomQuyenDto nhomQuyen)
+    public MyHome(NhomQuyenDto nhomQuyen, TaiKhoanDto taiKhoan)
     {
         _quyen =  nhomQuyen;
         navBar = new NavBar(_quyen);
-        rightBottomChange = new TrangChu(_quyen);
-        navListController = new NavListController(_quyen);
+        rightBottomChange = new TrangChu(_quyen, taiKhoan);
+        navListController = new NavListController(_quyen, taiKhoan);
+        _taiKhoan = taiKhoan;
         Init();
     }
 
@@ -314,6 +316,7 @@ public class MyHome : Form
         AccountInfo = new MyTLP
         {
             ColumnCount = 2,
+            Margin = new Padding(3, 3 ,40 ,3),
         };
         AccountInfo.Anchor = AnchorStyles.Right;
         AccountInfo.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -321,8 +324,6 @@ public class MyHome : Form
         AccountInfo.AutoSize = true;
         
         // AccountInfo.CellBorderStyle = MyTLPCellBorderStyle.Single;        
-        
-        
         var userIcon = new PictureBox
         {
             Image = GetSvgBitmap.GetBitmap("user.svg"),
@@ -342,15 +343,15 @@ public class MyHome : Form
         
         var userTextName = new Label
         {
-            Text = "truy vấn sql",  
-            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            Text = _taiKhoan.TenDangNhap,  
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
             AutoSize = true
         };
         
-        var userTextGmail = new Label
+        var userTextGmail = new Label //đổi -> nq
         {   
-            Text = "truyvấnsql@gmail.com",
-            Font = GetFont.GetFont.GetMainFont(12, FontType.Regular),
+            Text = _quyen.TenNhomQuyen,
+            Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
             AutoSize = true,
             ForeColor = Color.Gray,
         };

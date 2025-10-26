@@ -8,8 +8,18 @@ public class SinhVienController
     public SinhVienDAO SinhVienDao;
     public NganhDao NganhDao;
     public LopDAO LopDao;
-    
-    public SinhVienController()
+
+    private static SinhVienController _instance;
+
+    public static SinhVienController GetInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = new SinhVienController();
+        }
+        return _instance;
+    }
+    private SinhVienController()
     {   
         SinhVienDao = new SinhVienDAO();
         NganhDao = NganhDao.GetInstance();
@@ -61,5 +71,13 @@ public class SinhVienController
     public NganhDto GetNganhById(int maNganh)
     {
         return NganhDao.GetNganhById(maNganh);
+    }
+
+    public SinhVienDTO GetByMaTK(int maTK)
+    {
+        SinhVienDTO sv = new  SinhVienDTO();
+        List<SinhVienDTO> listSv = SinhVienDao.GetAll();
+        sv = listSv.First(x => x.MaTk == maTK);
+        return sv;
     }
 }

@@ -38,7 +38,7 @@ public class ChuKyDaoTao : NavBase
     private bool sua = false;
     private bool xoa = false;
     
-    public ChuKyDaoTao(NhomQuyenDto quyen) : base(quyen)
+    public ChuKyDaoTao(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

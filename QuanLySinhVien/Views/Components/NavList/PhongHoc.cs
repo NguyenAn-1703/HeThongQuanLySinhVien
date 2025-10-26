@@ -29,7 +29,7 @@ public class PhongHoc : NavBase
         private Panel _mainBot;
         private Button _btnThem;
 
-        public PhongHoc(NhomQuyenDto quyen) : base(quyen)
+        public PhongHoc(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
         {
             _chiTietQuyenController = ChiTietQuyenController.getInstance();
             _chucNangController = ChucNangController.getInstance();

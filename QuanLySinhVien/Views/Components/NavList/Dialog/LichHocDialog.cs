@@ -566,13 +566,13 @@ public class LichHocDialog : Form
 
     bool DuplicateLichHoc(string tenPhong, string thu, string tietBatDau, string tietKetThuc)
     {
-        int maPhong = _phongController.GetByTen(tenPhong).MaPH;
+        // int maPhong = _phongController.GetByTen(tenPhong).MaPH;
         int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
         int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
         //trùng ở nhóm học phần hiện tại
         foreach (LichHocDto item in _listTam)
         {
-            if (item.Thu.Equals(thu) && item.MaPH == maPhong)
+            if (item.Thu.Equals(thu))
             {
                 if (item.TietBatDau <= tietKt && tietBd <= item.TietKetThuc)
                 {

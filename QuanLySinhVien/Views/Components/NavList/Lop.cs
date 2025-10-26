@@ -44,7 +44,7 @@ public class QuanLiLop : NavBase
     private bool xoa = false;
     
 
-    public QuanLiLop(NhomQuyenDto quyen) : base(quyen)
+    public QuanLiLop(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _rawData = new List<LopDto>();
         _displayData = new List<object>();

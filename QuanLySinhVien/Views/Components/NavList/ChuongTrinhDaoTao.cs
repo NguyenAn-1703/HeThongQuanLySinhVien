@@ -42,7 +42,7 @@ public class ChuongTrinhDaoTao : NavBase
     private bool sua = false;
     private bool xoa = false;
 
-    public ChuongTrinhDaoTao(NhomQuyenDto quyen) : base(quyen)
+    public ChuongTrinhDaoTao(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

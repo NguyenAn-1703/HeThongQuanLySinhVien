@@ -234,32 +234,33 @@ public class FLogin : Form
         }
     }
 
+    private TaiKhoanDto _taiKhoan;
     void onClickBtnDangNhap()
     {
 
         string username = _usrnameTfl.GetTextTextField();
         string password = _passTfl.GetTextPasswordField();
 
-        TaiKhoanDto? taikhoan = _taiKhoanController.GetTaiKhoanByUsrName(username);
+        _taiKhoan = _taiKhoanController.GetTaiKhoanByUsrName(username);
 
-        if (taikhoan == null)
+        if (_taiKhoan == null)
         {
             Console.WriteLine("hi");
             MessageBox.Show("Tên đăng nhập hoặc mật khẩu không chính xác", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
         
-        if (!PasswordHasher.VerifyPassword(password,taikhoan.MatKhau))
+        if (!PasswordHasher.VerifyPassword(password,_taiKhoan.MatKhau))
         {
             MessageBox.Show("Tên đăng nhập hoặc mật khẩu không chính xác", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
-        NhomQuyenDto nhomQuyen = _nhomQuyenController.GetById(taikhoan.MaNQ);
+        NhomQuyenDto nhomQuyen = _nhomQuyenController.GetById(_taiKhoan.MaNQ);
         
         this.Hide();
         
-        Form home = new MyHome(nhomQuyen);
+        Form home = new MyHome(nhomQuyen, _taiKhoan);
         home.FormClosed += (s, args) => this.Show();
         home.ShowDialog();
     }

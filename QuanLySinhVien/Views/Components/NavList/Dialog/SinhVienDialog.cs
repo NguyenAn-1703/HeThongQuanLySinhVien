@@ -43,7 +43,7 @@ public class SinhVienDialog : Form
         BackColor = ColorTranslator.FromHtml("#F3F4F6");
         
         lopDao = LopDAO.GetInstance();
-        controller = new SinhVienController();
+        controller = SinhVienController.GetInstance();
 
         var headerPanel = CreateHeaderPanel(mode);
         var buttonPanel = CreateButtonPanel(mode);

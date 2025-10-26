@@ -75,7 +75,7 @@ public class ThongTinSinhVien:NavBase
     private int currentMaSinhVien = 1;
     
 
-    public ThongTinSinhVien(NhomQuyenDto quyen) : base(quyen)
+    public ThongTinSinhVien(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _controller = new ThongTinSinhVienController();
         _diemController = new DiemSinhVienController();

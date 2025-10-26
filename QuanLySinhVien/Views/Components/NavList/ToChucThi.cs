@@ -12,7 +12,7 @@ public class ToChucThi : NavBase
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
     private List<ChiTietQuyenDto> _listAccess;
-    public ToChucThi(NhomQuyenDto quyen) : base(quyen)
+    public ToChucThi(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

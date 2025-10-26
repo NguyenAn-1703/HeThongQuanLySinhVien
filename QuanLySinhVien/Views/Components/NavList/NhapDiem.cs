@@ -17,7 +17,7 @@ public class NhapDiem : NavBase
     private ChucNangController _chucNangController;
     
     private List<ChiTietQuyenDto> _listAccess;
-    public NhapDiem(NhomQuyenDto quyen) : base(quyen)
+    public NhapDiem(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

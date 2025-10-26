@@ -1,29 +1,29 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 
-namespace QuanLySinhVien.Views.Components.CommonUse.Lop;
+namespace QuanLySinhVien.Views.Components.CommonUse.Nganh;
 
-public class CustomSearchFieldLop : CustomTextBox
+public class CustomSearchFieldNG : CustomTextBox
 {
     CustomPopup _popup;
 
     private Form _parent;
 
-    private List<LopDto> listHP;
-    private LopController _LopController;
+    private List<NganhDto> listHP;
+    private NganhController _NganhController;
 
     private List<string> _columnNames;
     private List<object> _cellDatas;
     private List<object> displayDatas;
 
-    private LopDto selectedHP;
+    private NganhDto selectedHP;
 
-    public CustomSearchFieldLop()
+    public CustomSearchFieldNG()
     {
         _parent = new Form();
-        _LopController = LopController.GetInstance();
+        _NganhController = NganhController.GetInstance();
         _popup = new CustomPopup();
-        listHP = _LopController.GetAll();
+        listHP = _NganhController.GetAll();
         Init();
     }
 
@@ -43,8 +43,9 @@ public class CustomSearchFieldLop : CustomTextBox
 
     void OnKeyEnter(int index)
     {
-        selectedHP = _LopController.GetLopById(index);
-        contentTextBox.Text = selectedHP.TenLop;
+        
+        selectedHP = _NganhController.GetNganhById(index);
+        contentTextBox.Text = selectedHP.TenNganh;
         contentTextBox.Focus();
         contentTextBox.SelectAll();
         _popup.Visible = false;
@@ -91,14 +92,14 @@ public class CustomSearchFieldLop : CustomTextBox
             }
         
 
-            List<LopDto> searchList = listHP.Where(x =>
-                x.MaLop.ToString().ToLower().Contains(keyword) ||
-                x.TenLop.ToLower().Contains(keyword)
+            List<NganhDto> searchList = listHP.Where(x =>
+                x.MaNganh.ToString().ToLower().Contains(keyword) ||
+                x.TenNganh.ToLower().Contains(keyword)
             ).ToList();
             displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
             {
-                MaLop = x.MaLop,
-                TenLop = x.TenLop
+                MaNganh = x.MaNganh,
+                TenNganh = x.TenNganh
             });
             _popup.UpdateData(displayDatas);
 
@@ -116,12 +117,12 @@ public class CustomSearchFieldLop : CustomTextBox
 
     public void SetData()
     {
-        string[] arr = new[] { "MaLop", "TenLop" };
+        string[] arr = new[] { "MaNganh", "TenNganh" };
         _columnNames = arr.ToList();
         displayDatas = ConvertObject.ConvertToDisplay(listHP, x => new
         {
-            MaLop = x.MaLop,
-            TenLop = x.TenLop
+            MaNganh = x.MaNganh,
+            TenNganh = x.TenNganh
         });
         _popup.SetData(_columnNames, displayDatas);
     }

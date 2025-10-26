@@ -44,7 +44,7 @@ public class HocPhan : NavBase
     private bool sua = false;
     private bool xoa = false;
 
-    public HocPhan(NhomQuyenDto quyen) : base(quyen)
+    public HocPhan(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _rawData = new List<HocPhanDto>();
         _displayData = new List<object>();

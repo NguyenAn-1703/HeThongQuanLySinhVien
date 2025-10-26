@@ -103,13 +103,37 @@ public class LopDAO
         return rowAffected > 0;
     }
 
-    public LopDto? GetLopById(int maLop)
+    public LopDto GetLopById(int maLop)
     {
-        LopDto? result = null;
+        LopDto result = new LopDto();
         using var conn = MyConnection.GetConnection();
         using var cmd = new MySqlCommand(
             "SELECT MaLop, MaGV, MaNganh, TenLop, SoLuongSV FROM lop WHERE Status = 1 AND MaLop = @MaLop", conn);
         cmd.Parameters.AddWithValue("@MaLop", maLop);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new LopDto
+            {
+                MaLop = reader.GetInt32("MaLop"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaNganh = reader.GetInt32("MaNganh"),
+                TenLop = reader.GetString("TenLop"),
+                SoLuongSV = reader.GetInt32("SoLuongSV")
+            };
+        }
+
+        return result;
+    }
+    
+    public LopDto GetByTen(string tenLop)
+    {
+        LopDto result = new LopDto();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaLop, MaGV, MaNganh, TenLop, SoLuongSV FROM lop WHERE Status = 1 AND TenLop = @TenLop", conn);
+        cmd.Parameters.AddWithValue("@TenLop", tenLop);
         using var reader = cmd.ExecuteReader();
 
         if (reader.Read())

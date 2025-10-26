@@ -30,6 +30,7 @@ public class CustomTable : MyTLP
     public event Action<int> OnEdit;
     public event Action<int> OnDelete;
     public event Action<int> OnDetail;
+    
 
     public CustomTable(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false,
         bool edit = false, bool delete = false)
@@ -316,5 +317,110 @@ public class CustomTable : MyTLP
         _cellDatas = newItems ?? new List<object>();
         _displayCellData = new BindingList<object>(_cellDatas);
         _dataGridView.DataSource = _displayCellData;
+    }
+
+    public void AddColumn(ColumnType columnType, string title)
+    {
+        if (columnType == ColumnType.CheckBox)
+        {
+            AddCbColumn(title);
+        }
+    }
+
+    public event Action<int, bool> ClickCB;
+
+    void AddCbColumn(string title)
+    {
+        DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn();
+        // chkCol.HeaderText = "Chọn";
+        chkCol.Name = "colChon";
+        // chkCol.Width = 50; // Tùy chỉnh độ rộng
+        chkCol.ReadOnly = false;
+        _dataGridView.Columns.Add(chkCol);
+        _dataGridView.ReadOnly = false;
+        // _dataGridView.AutoGenerateColumns = false;
+        this._header.Controls.Add(GetLabel(title));
+        
+        
+        _dataGridView.CurrentCellDirtyStateChanged += (sender, e) =>
+        {
+            if (_dataGridView.IsCurrentCellDirty)
+            {
+                _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        };
+        
+        _dataGridView.CellContentClick += (sender, e) =>
+        {
+            OnClickCB(e);
+        };
+    }
+    // Cài đặt sk click cb
+    void OnClickCB(DataGridViewCellEventArgs e)
+    {
+        if (_dataGridView.Columns[e.ColumnIndex].Name == "colChon" && e.RowIndex >= 0)
+        {
+            bool isChecked = Convert.ToBoolean(_dataGridView.Rows[e.RowIndex].Cells["colChon"].EditedFormattedValue);
+            int i = Convert.ToInt32(_dataGridView.Rows[e.RowIndex].Cells[0].Value);
+            ClickCB?.Invoke(i, isChecked);
+        }
+    }
+
+    public void FailCb(int i)
+    {
+        int rowIndex = -1;
+        foreach (DataGridViewRow row in _dataGridView.Rows)
+        {
+            if (row.Cells[0].Value != null && Convert.ToInt32(row.Cells[0].Value) == i)
+            {
+                rowIndex = row.Index;
+                break;
+            }
+        }
+        _dataGridView.Rows[rowIndex].Cells["colChon"].Value = false;
+        _dataGridView.RefreshEdit();
+        _dataGridView.Refresh();
+    }
+
+    public void tickCB(int i)
+    {
+        int rowIndex = -1;
+        foreach (DataGridViewRow row in _dataGridView.Rows)
+        {
+            if (row.Cells[0].Value != null && Convert.ToInt32(row.Cells[0].Value) == i)
+            {
+                rowIndex = row.Index;
+                break;
+            }
+        }
+        
+        _dataGridView.Rows[rowIndex].Cells["colChon"].Value = true;
+        
+        _dataGridView.RefreshEdit();
+        _dataGridView.Refresh();
+    }
+
+    public void ConfigDKHP()
+    {
+        _dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+        _dataGridView.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+    }
+
+    public void DisapleActionColumn()
+    {
+        if (!_action) return;
+        if (!_dataGridView.Columns["Action"].Visible) return;
+        _header.Controls.RemoveAt(_header.Controls.Count - 1);
+        _dataGridView.Columns["Action"].Visible = false;
+        this.OnResize();
+    }
+    public void EnableActionColumn()
+    {
+        if (!_action) return;
+        if (_dataGridView.Columns["Action"].Visible) return;
+        _dataGridView.Columns["Action"].Visible = true;
+        
+        _header.Controls.Add(GetLabel("Hành động"));
+        this.OnResize();
     }
 }

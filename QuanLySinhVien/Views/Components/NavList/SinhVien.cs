@@ -41,13 +41,13 @@ public class SinhVien : NavBase
     
     private List<ChiTietQuyenDto> _listAccess;
     
-    public SinhVien(NhomQuyenDto quyen) : base(quyen)
+    public SinhVien(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
         _cUse = new CUse();
         sinhVienDao = new SinhVienDAO();
-        _controller = new SinhVienController();
+        _controller = SinhVienController.GetInstance();
         Init();
         SetupDataGridView();
         LoadSinhVienData();

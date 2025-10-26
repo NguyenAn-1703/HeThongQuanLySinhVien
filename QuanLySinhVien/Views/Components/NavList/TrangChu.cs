@@ -15,7 +15,7 @@ public class TrangChu : NavBase
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
     private MyTLP _leftPanel;
 
-    public TrangChu(NhomQuyenDto quyen) : base(quyen)
+    public TrangChu(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         Init();
     }

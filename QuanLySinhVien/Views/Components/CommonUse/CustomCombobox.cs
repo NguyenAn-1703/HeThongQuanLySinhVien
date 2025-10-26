@@ -6,6 +6,7 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 public class CustomCombobox : RoundTLP
 {
     public ComboBox combobox;
+    public int cbxWidth { get; set; } = 150;
     private string[] _items;
     public CustomCombobox(string[] items)
     {
@@ -17,12 +18,12 @@ public class CustomCombobox : RoundTLP
     void Init()
     {
         this.Border = true;
-
         this.AutoSize = true;
-        
         
         combobox.DropDownStyle = ComboBoxStyle.DropDownList;
         combobox.AutoSize = true;
+        combobox.Width = cbxWidth;
+        
         combobox.Dock = DockStyle.Fill;
         combobox.Items.AddRange(_items);
         combobox.Margin = new Padding(2);

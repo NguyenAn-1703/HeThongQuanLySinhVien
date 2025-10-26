@@ -41,7 +41,7 @@ public class QuanLiTaiKhoan : NavBase
     private bool xoa = false;
     
 
-    public QuanLiTaiKhoan(NhomQuyenDto quyen) : base(quyen)
+    public QuanLiTaiKhoan(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _rawData = new List<TaiKhoanDto>();
         _displayData = new List<object>();

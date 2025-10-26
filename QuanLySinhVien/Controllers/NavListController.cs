@@ -8,9 +8,11 @@ using System.Collections.Generic;
 public class NavListController
 {
     private NhomQuyenDto _quyen;
-    public NavListController(NhomQuyenDto quyen)
+    private TaiKhoanDto _taiKhoan;
+    public NavListController(NhomQuyenDto quyen, TaiKhoanDto taiKhoan)
     {
         _quyen = quyen;
+        _taiKhoan = taiKhoan;
         setDataButton();
     }
     public Dictionary<string , string> buttonClickTrans = new Dictionary<string, string>();
@@ -54,85 +56,84 @@ public class NavListController
         NavBase ans;
         if (s.Equals("TrangChu"))
         {
-            ans = new TrangChu(_quyen);
+            ans = new TrangChu(_quyen, _taiKhoan);
         }
         else if (s.Equals("SinhVien"))
         {
-            ans = new SinhVien(_quyen);
-            // ans = new ThongTinSinhVien(_quyen);
+            ans = new SinhVien(_quyen, _taiKhoan);
         }
         else if (s.Equals("GiangVien"))
         {
-            ans = new GiangVien(_quyen);
+            ans = new GiangVien(_quyen, _taiKhoan);
         }
         else if (s.Equals("HocPhan"))
         {
-            ans = new HocPhan(_quyen);
+            ans = new HocPhan(_quyen, _taiKhoan);
         }
         else if (s.Equals("MoDangKyHocPhan"))
         {
-            ans = new MoDangKyHocPhan(_quyen);
+            ans = new MoDangKyHocPhan(_quyen, _taiKhoan);
         }
         else if (s.Equals("ToChucThi"))
         {
-            ans = new ToChucThi(_quyen);
+            ans = new ToChucThi(_quyen, _taiKhoan);
         }
         else if (s.Equals("Nganh"))
         {
-            ans = new NganhPanel(_quyen);
+            ans = new NganhPanel(_quyen, _taiKhoan);
         }
         else if (s.Equals("Lop"))
         {
-            ans = new QuanLiLop(_quyen);
+            ans = new QuanLiLop(_quyen, _taiKhoan);
         }
         else if (s.Equals("PhongHoc"))
         {
-            ans = new PhongHoc(_quyen);
+            ans = new PhongHoc(_quyen, _taiKhoan);
         }
         else if (s.Equals("ChuKyDaoTao"))
         {
-            ans = new ChuKyDaoTao(_quyen);
+            ans = new ChuKyDaoTao(_quyen, _taiKhoan);
         }
         else if (s.Equals("KhoaHoc"))
         {
-            ans = new KhoaHoc(_quyen);
+            ans = new KhoaHoc(_quyen, _taiKhoan);
         }
         else if (s.Equals("PhanQuyen"))
         {
-            ans = new PhanQuyen(_quyen);
+            ans = new PhanQuyen(_quyen, _taiKhoan);
         }
         else if (s.Equals("ThongKe"))
         {
-            ans = new ThongKe(_quyen);
+            ans = new ThongKe(_quyen, _taiKhoan);
         }
         else if (s.Equals("ChuongTrinhDaoTao"))
         {
-            ans = new ChuongTrinhDaoTao(_quyen);
+            ans = new ChuongTrinhDaoTao(_quyen, _taiKhoan);
         }
         else if (s.Equals("NhapDiem"))
         {
-            ans = new NhapDiem(_quyen);
+            ans = new NhapDiem(_quyen, _taiKhoan);
         }
         else if (s.Equals("HocPhi"))
         {
-            ans = new HocPhi(_quyen);
+            ans = new HocPhi(_quyen, _taiKhoan);
         }else if (s.Equals("QuanLiTaiKhoan"))
         {
-            ans = new QuanLiTaiKhoan(_quyen);
+            ans = new QuanLiTaiKhoan(_quyen, _taiKhoan);
         }
         //SV
         else if(s.Equals("ThongTinSinhVien"))
         {
-            ans =  new ThongTinSinhVien(_quyen);
+            ans =  new ThongTinSinhVien(_quyen, _taiKhoan);
         }
         else if (s.Equals("DangKyHocPhan"))
         {
-            ans = new DangKyHocPhan(_quyen);
+            ans = new DangKyHocPhan(_quyen, _taiKhoan);
         }
         
         else
         {
-            ans =  new Khoa(_quyen);
+            ans =  new Khoa(_quyen, _taiKhoan);
         }
         return ans;
     }

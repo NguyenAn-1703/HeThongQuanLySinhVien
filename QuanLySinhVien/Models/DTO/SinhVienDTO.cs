@@ -10,7 +10,7 @@ public class SinhVienDTO
     public string TrangThai { get; set; }
     public int MaKhoaHoc { get; set; }
     public int MaLop { get; set; }
-    public string MaTk { get; set; }
+    public int? MaTk { get; set; }
     public string SdtSinhVien { get; set; }
     public string QueQuanSinhVien { get; set; }
     public string Email { get; set; }
@@ -30,7 +30,7 @@ public class SinhVienDTO
     }
 
     public SinhVienDTO(int maSinhVien, string tenSinhVien, string ngaySinh, string gioiTinh, string nganh,
-        string trangThai, int maKhoaHoc, int maLop, string maTk,
+        string trangThai, int maKhoaHoc, int maLop, int maTk,
         string sdtSinhVien, string queQuanSinhVien, string email, string cccd, string anhDaiDienSinhVien)
     {
         MaSinhVien = maSinhVien;

@@ -6,6 +6,44 @@ namespace QuanLySinhVien.Models.DAO;
 
 public class SinhVienDAO
 {
+    
+    public List<SinhVienDTO> GetAll()
+    {
+        List<SinhVienDTO> result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(@"
+        SELECT MaSV, MaTK, MaLop, MaKhoaHoc, TenSV, SoDienThoaiSV, 
+               NgaySinhSV, QueQuanSV, TrangThaiSV, GioiTinhSV, 
+               EmailSV, CCCDSV, AnhDaiDienSV
+        FROM SinhVien
+        WHERE Status = 1", conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new SinhVienDTO
+            {
+                MaSinhVien = reader.GetInt32("MaSV"),
+                MaTk = reader.GetInt32("MaSV"),
+                MaLop = reader.GetInt32("MaLop"),
+                MaKhoaHoc = reader.GetInt32("MaKhoaHoc"),
+                TenSinhVien = reader.GetString("TenSV"),
+                SdtSinhVien = reader.GetString("SoDienThoaiSV"),
+                NgaySinh = reader.GetString("NgaySinhSV"),
+                QueQuanSinhVien = reader.GetString("QueQuanSV"),
+                TrangThai = reader.GetString("TrangThaiSV"),
+                GioiTinh = reader.GetString("GioiTinhSV"),
+                Email = reader.GetString("EmailSV"),
+                CCCD = reader.GetString("CCCDSV"),
+                AnhDaiDienSinhVien = reader.GetString("AnhDaiDienSV"),
+                Nganh = "" // nếu có bảng ngành riêng thì phần này sẽ được gán khi JOIN
+            });
+        }
+
+        return result;
+    }
+
+    
     public List<SinhVienDTO> getTableSinhVien()
     {
         List<SinhVienDTO> result = new();
@@ -97,7 +135,7 @@ public class SinhVienDAO
         cmd.ExecuteNonQuery();
     }
 
-    public void Update(SinhVienDTO sinhVienDto)
+    public void Update(SinhVienDTO SinhVienDTO)
     {
         using var conn = MyConnection.GetConnection();
         const string sql =
@@ -114,19 +152,19 @@ public class SinhVienDAO
                             TrangThaiSV = @TrangThaiSV
                             WHERE MaSV = @MaSV";
         using var cmd = new MySqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@MaSV", sinhVienDto.MaSinhVien);
-        cmd.Parameters.AddWithValue("@TenSV", sinhVienDto.TenSinhVien);
-        cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVienDto.NgaySinh);
-        cmd.Parameters.AddWithValue("@GioiTinhSV", sinhVienDto.GioiTinh);
-        cmd.Parameters.AddWithValue("@MaLop", sinhVienDto.MaLop);
-        cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVienDto.MaKhoaHoc);
-        cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVienDto.SdtSinhVien);
-        cmd.Parameters.AddWithValue("@QueQuanSV", sinhVienDto.QueQuanSinhVien);
-        cmd.Parameters.AddWithValue("@EmailSV", sinhVienDto.Email);
-        cmd.Parameters.AddWithValue("@CCCDSV", sinhVienDto.CCCD);
-        cmd.Parameters.AddWithValue("@TrangThaiSV", sinhVienDto.TrangThai);
-        cmd.Parameters.AddWithValue("@Email", sinhVienDto.Email);
-        cmd.Parameters.AddWithValue("@SdtSinhVien", sinhVienDto.SdtSinhVien);
+        cmd.Parameters.AddWithValue("@MaSV", SinhVienDTO.MaSinhVien);
+        cmd.Parameters.AddWithValue("@TenSV", SinhVienDTO.TenSinhVien);
+        cmd.Parameters.AddWithValue("@NgaySinhSV", SinhVienDTO.NgaySinh);
+        cmd.Parameters.AddWithValue("@GioiTinhSV", SinhVienDTO.GioiTinh);
+        cmd.Parameters.AddWithValue("@MaLop", SinhVienDTO.MaLop);
+        cmd.Parameters.AddWithValue("@MaKhoaHoc", SinhVienDTO.MaKhoaHoc);
+        cmd.Parameters.AddWithValue("@SoDienThoaiSV", SinhVienDTO.SdtSinhVien);
+        cmd.Parameters.AddWithValue("@QueQuanSV", SinhVienDTO.QueQuanSinhVien);
+        cmd.Parameters.AddWithValue("@EmailSV", SinhVienDTO.Email);
+        cmd.Parameters.AddWithValue("@CCCDSV", SinhVienDTO.CCCD);
+        cmd.Parameters.AddWithValue("@TrangThaiSV", SinhVienDTO.TrangThai);
+        cmd.Parameters.AddWithValue("@Email", SinhVienDTO.Email);
+        cmd.Parameters.AddWithValue("@SdtSinhVien", SinhVienDTO.SdtSinhVien);
         cmd.ExecuteNonQuery();
     }
 

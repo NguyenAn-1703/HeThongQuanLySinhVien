@@ -18,7 +18,7 @@ public class ThongKe : NavBase
     private string[] items = new[] { "Tổng quan", "Học lực" };
     private string selectedItem;
     private TableLayoutPanel mainLayout;
-    public ThongKe(NhomQuyenDto quyen) : base(quyen)
+    public ThongKe(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         selectedItem = items[0];
         Init();

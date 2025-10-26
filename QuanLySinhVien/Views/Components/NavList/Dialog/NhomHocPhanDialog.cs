@@ -16,6 +16,7 @@ public class NhomHocPhanDialog : Form
     private GiangVienController _giangVienController;
     private PhongHocController _phongHocController;
     private NhomHocPhanController _nhomHocPhanController;
+    private LopController _lopController;
     
     private CustomButton _exitButton;
     private MyTLP _mainLayout;
@@ -55,6 +56,7 @@ public class NhomHocPhanDialog : Form
         _giangVienController = GiangVienController.GetInstance();
         _phongHocController = PhongHocController.getInstance();
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
+        _lopController = LopController.GetInstance();
         _title = title;
         _dialogType = dialogType;
         _hocKy = hocKy;
@@ -130,6 +132,7 @@ public class NhomHocPhanDialog : Form
         listField.Add(new LabelTextField("Năm", TextFieldType.NormalText));
         listField.Add(new LabelTextField("Học phần", TextFieldType.ListBoxHP));
         listField.Add(new LabelTextField("Giảng viên",  TextFieldType.ListBoxGV));
+        listField.Add(new LabelTextField("Lớp",  TextFieldType.ListBoxLop));
         listField.Add(new LabelTextField("Sĩ số", TextFieldType.Number));
         
         
@@ -437,10 +440,12 @@ public class NhomHocPhanDialog : Form
         NhomHocPhanDto nhomHP = _nhomHocPhanController.GetById(_selectedId);
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(nhomHP.MaHP);
         GiangVienDto giangVien = _giangVienController.GetById(nhomHP.MaGV);
+        LopDto lop = _lopController.GetLopById(nhomHP.MaLop);
 
         listField[2].tb.contentTextBox.Text = hocPhan.TenHP;
         listField[3].tbGV.contentTextBox.Text = giangVien.TenGV;
-        listField[4]._numberField.contentTextBox.Text = nhomHP.SiSo + "";
+        listField[4].tbLop.contentTextBox.Text = lop.TenLop;
+        listField[5]._numberField.contentTextBox.Text = nhomHP.SiSo + "";
 
         SetupListLich();
     }
@@ -450,14 +455,17 @@ public class NhomHocPhanDialog : Form
         NhomHocPhanDto nhomHP = _nhomHocPhanController.GetById(_selectedId);
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(nhomHP.MaHP);
         GiangVienDto giangVien = _giangVienController.GetById(nhomHP.MaGV);
+        LopDto lop = _lopController.GetLopById(nhomHP.MaLop);
 
         listField[2].tb.contentTextBox.Text = hocPhan.TenHP;
         listField[3].tbGV.contentTextBox.Text = giangVien.TenGV;
-        listField[4]._numberField.contentTextBox.Text = nhomHP.SiSo + "";
+        listField[4].tbLop.contentTextBox.Text = lop.TenLop;
+        listField[5]._numberField.contentTextBox.Text = nhomHP.SiSo + "";
         
         listField[2].tb.Enable = false;
         listField[3].tbGV.Enable = false;
-        listField[4]._numberField.Enable = false;
+        listField[4].tbLop.Enable = false;
+        listField[5]._numberField.Enable = false;
 
         SetupListLich();
     }
@@ -497,15 +505,17 @@ public class NhomHocPhanDialog : Form
     {
         string tenHp = listField[2].tb.contentTextBox.Text;
         string tenGv = listField[3].tbGV.contentTextBox.Text;
-        string sisos = listField[4]._numberField.contentTextBox.Text;
+        string tenLop = listField[4].tbLop.contentTextBox.Text;
+        string sisos = listField[5]._numberField.contentTextBox.Text;
         
-        if (!Validate(tenHp,tenGv, sisos))
+        if (!Validate(tenHp,tenGv,tenLop, sisos))
         {
             return;
         }
 
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         GiangVienDto giangVien = _giangVienController.GetByTen(tenGv);
+        LopDto lop = _lopController.GetByTen(tenLop);
         
         int siso = Int16.Parse(sisos);
         int hocKy = int.Parse(_hocKy.Split(" ")[2]);
@@ -515,6 +525,7 @@ public class NhomHocPhanDialog : Form
         {
             MaGV = giangVien.MaGV,
             MaHP = hocPhan.MaHP,
+            MaLop = lop.MaLop,
             HocKy = hocKy,
             Nam = nam,
             SiSo = siso
@@ -560,15 +571,17 @@ public class NhomHocPhanDialog : Form
     {
         string tenHp = listField[2].tb.contentTextBox.Text;
         string tenGv = listField[3].tbGV.contentTextBox.Text;
-        string sisos = listField[4]._numberField.contentTextBox.Text;
+        string tenLop = listField[4].tbLop.contentTextBox.Text;
+        string sisos = listField[5]._numberField.contentTextBox.Text;
         
-        if (!Validate(tenHp,tenGv, sisos))
+        if (!Validate(tenHp,tenGv,tenLop, sisos))
         {
             return;
         }
 
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         GiangVienDto giangVien = _giangVienController.GetByTen(tenGv);
+        LopDto lop = _lopController.GetByTen(tenLop);
         
         int siso = Int16.Parse(sisos);
         int hocKy = int.Parse(_hocKy.Split(" ")[2]);
@@ -579,6 +592,7 @@ public class NhomHocPhanDialog : Form
             MaNHP = _selectedId,
             MaGV = giangVien.MaGV,
             MaHP = hocPhan.MaHP,
+            MaLop = lop.MaLop,
             HocKy = hocKy,
             Nam = nam,
             SiSo = siso
@@ -623,7 +637,7 @@ public class NhomHocPhanDialog : Form
         this.Close();
     }
 
-    bool Validate(string tenHP, string tenGV, string siso)
+    bool Validate(string tenHP, string tenGV, string tenLop, string siso)
     {
         if (tenHP.Equals(""))
         {
@@ -643,6 +657,16 @@ public class NhomHocPhanDialog : Form
         if (!_giangVienController.ExistByTen(tenGV))
         {
             MessageBox.Show("Giảng viên không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+        if (tenLop.Equals(""))
+        {
+            MessageBox.Show("Lớp không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+        if (!_lopController.ExistByTen(tenLop))
+        {
+            MessageBox.Show("Lớp không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
         if (siso.Equals(""))

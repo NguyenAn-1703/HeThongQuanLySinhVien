@@ -11,5 +11,7 @@ public enum TextFieldType
     ListBoxHP,
     ListBoxGV,
     ListBoxPH,
+    ListBoxLop,
+    ListBoxNganh,
     Number
 }

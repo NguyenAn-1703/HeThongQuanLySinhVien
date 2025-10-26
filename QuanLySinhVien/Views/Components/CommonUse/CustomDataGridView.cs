@@ -70,7 +70,7 @@ public class CustomDataGridView : DataGridView
         BorderStyle = BorderStyle.None;
         ReadOnly = true;
         AutoGenerateColumns = false;
-
+        ShowCellToolTips = false;
     }
     
     void SetActionColumn()

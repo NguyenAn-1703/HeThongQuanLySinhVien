@@ -1,4 +1,6 @@
 using QuanLySinhVien.Views.Components.CommonUse.GiangVien;
+using QuanLySinhVien.Views.Components.CommonUse.Lop;
+using QuanLySinhVien.Views.Components.CommonUse.Nganh;
 using QuanLySinhVien.Views.Components.CommonUse.PhongHoc;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
@@ -85,6 +87,12 @@ public class LabelTextField : MyTLP
                 break;
             case  TextFieldType.ListBoxPH:
                 SetListBoxPH();
+                break;
+            case  TextFieldType.ListBoxLop:
+                SetListBoxLop();
+                break;
+            case  TextFieldType.ListBoxNganh:
+                SetListBoxNganh();
                 break;
             case  TextFieldType.Number:
                 SetListBoxNumber();
@@ -201,6 +209,24 @@ public class LabelTextField : MyTLP
         tbPH.Dock  = DockStyle.Top;
         this.Controls.Add(tbPH);
     }
+    
+    public CustomSearchFieldLop tbLop;
+    void SetListBoxLop()
+    {
+        tbLop =  new CustomSearchFieldLop();
+        tbLop.Dock  = DockStyle.Top;
+        this.Controls.Add(tbLop);
+    }
+    
+    public CustomSearchFieldNG tbNganh;
+    void SetListBoxNganh()
+    {
+        tbNganh =  new CustomSearchFieldNG();
+        tbNganh.Dock  = DockStyle.Top;
+        this.Controls.Add(tbNganh);
+    }
+    
+    
 
 
     void SetListBoxNumber()

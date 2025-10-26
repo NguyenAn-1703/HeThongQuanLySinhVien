@@ -37,7 +37,7 @@ public class Khoa : NavBase
     private bool xoa = false;
 
 
-    public Khoa(NhomQuyenDto quyen) : base(quyen)
+    public Khoa(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

@@ -48,7 +48,7 @@ public class NganhPanel : NavBase
     private NganhDialog _nganhDialog;
 
         
-    public NganhPanel(NhomQuyenDto quyen) : base(quyen)
+    public NganhPanel(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _rawData = new List<NganhDto>();
         _displayData = new List<object>();

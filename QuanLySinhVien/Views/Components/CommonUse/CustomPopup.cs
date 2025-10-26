@@ -29,7 +29,7 @@ public class CustomPopup : Panel
 
         _dt.AlternatingRowsDefaultCellStyle = _dt.RowsDefaultCellStyle;
         // _dt.ScrollBars = ScrollBars.None;
-        _dt.ShowCellToolTips = false;
+        
 
         _dt.Dock = DockStyle.None;
         _dt.Height = 105;

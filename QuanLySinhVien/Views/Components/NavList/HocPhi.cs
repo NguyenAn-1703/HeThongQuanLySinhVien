@@ -15,7 +15,7 @@ public class HocPhi : NavBase
     
     
     private List<ChiTietQuyenDto> _listAccess;
-    public HocPhi(NhomQuyenDto quyen) : base(quyen)
+    public HocPhi(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

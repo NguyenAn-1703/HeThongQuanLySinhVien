@@ -27,7 +27,7 @@ public class GiangVien : NavBase
     
     private List<ChiTietQuyenDto> _listAccess;
 
-    public GiangVien(NhomQuyenDto quyen) : base(quyen)
+    public GiangVien(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

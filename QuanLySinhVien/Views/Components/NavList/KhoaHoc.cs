@@ -37,7 +37,7 @@ public class KhoaHoc : NavBase
     private bool sua = false;
     private bool xoa = false;
 
-    public KhoaHoc(NhomQuyenDto quyen) : base(quyen)
+    public KhoaHoc(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();

@@ -66,7 +66,7 @@ public class MoDangKyHocPhan : NavBase
     private bool sua = false;
     private bool xoa = false;
 
-    public MoDangKyHocPhan(NhomQuyenDto quyen) : base(quyen)
+    public MoDangKyHocPhan(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _rawData = new List<NhomHocPhanDto>();
         _displayData = new List<object>();
@@ -291,6 +291,7 @@ public class MoDangKyHocPhan : NavBase
             
             _updateTimeButton.Enabled = true;
             _insertButton.Enabled = true;
+            _table.EnableActionColumn();
             return;
         }
         NhomHocPhanDto nhp1 = _rawDataFilter[0];
@@ -309,6 +310,8 @@ public class MoDangKyHocPhan : NavBase
             endDTField._dTGioField.dateField.Enabled = true;
             _updateTimeButton.Enabled = true;
             _insertButton.Enabled = true;
+            _table.EnableActionColumn();
+
             return;
         }
         
@@ -330,6 +333,8 @@ public class MoDangKyHocPhan : NavBase
             
             _updateTimeButton.Enabled = false;
             _insertButton.Enabled = false;
+            _table.DisapleActionColumn();
+
         }
         
     }

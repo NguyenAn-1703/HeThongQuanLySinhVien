@@ -44,8 +44,27 @@ public class LopController
         return _lopDao.Delete(maLop);
     }
 
-    public LopDto? GetLopById(int maLop)
+    public LopDto GetLopById(int maLop)
     {
         return _lopDao.GetLopById(maLop);
+    }
+    
+    public LopDto GetByTen(string tenLop)
+    {
+        return _lopDao.GetByTen(tenLop);
+    }
+    
+    public bool ExistByTen(string ten)
+    {
+        List<LopDto> listPh = GetAll();
+        foreach (LopDto item in listPh)
+        {
+            if (item.TenLop.Equals(ten))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

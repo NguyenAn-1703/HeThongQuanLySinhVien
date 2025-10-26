@@ -37,7 +37,7 @@ public class PhanQuyen : NavBase
     private bool xoa = false;
 
 
-    public PhanQuyen(NhomQuyenDto quyen) : base(quyen)
+    public PhanQuyen(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
