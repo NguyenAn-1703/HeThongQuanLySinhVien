@@ -115,4 +115,12 @@ public class GiangVienController
 
         return false;
     }
+    
+    public GiangVienDto GetByMaTK(int maTk)
+    {
+        GiangVienDto gv = new  GiangVienDto();
+        List<GiangVienDto> listGV = GiangVienDao.GetAll();
+        gv = listGV.First(x => x.MaTK == maTk);
+        return gv;
+    }
 }

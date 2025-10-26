@@ -19,28 +19,31 @@ static class Program
         
         // Application.Run(new FLogin());
         
-        // NhomQuyenDto nhomQuyen = new NhomQuyenDto*
-        
-        // NhomQuyenDto nhomQuyen = new NhomQuyenDto
-        // {
-        //     MaNQ = 2,
-        //     TenNhomQuyen = "admin", 
-        // };
-        // Application.Run(new MyHome(nhomQuyen));
-        
         NhomQuyenDto nhomQuyen = new NhomQuyenDto
         {
-            MaNQ = 1,
-            TenNhomQuyen = "SinhVien", 
+            MaNQ = 2,
+            TenNhomQuyen = "admin", 
         };
         TaiKhoanDto taiKhoan = new TaiKhoanDto
         {
-            MaTK = 3,
-            TenDangNhap = "sinhvien", 
-            Type = "Sinh viên"
+            MaTK = 1,
+            TenDangNhap = "admin", 
+            Type = "Quản trị viên"
         };
-        
         Application.Run(new MyHome(nhomQuyen, taiKhoan));
+        
+        // NhomQuyenDto nhomQuyen = new NhomQuyenDto
+        // {
+        //     MaNQ = 1,
+        //     TenNhomQuyen = "SinhVien", 
+        // };
+        // TaiKhoanDto taiKhoan = new TaiKhoanDto
+        // {
+        //     MaTK = 3,
+        //     TenDangNhap = "sinhvien", 
+        //     Type = "Sinh viên"
+        // };
+        // Application.Run(new MyHome(nhomQuyen, taiKhoan));
 
     }
 }

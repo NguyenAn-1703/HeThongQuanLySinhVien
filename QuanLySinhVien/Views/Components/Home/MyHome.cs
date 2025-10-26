@@ -40,6 +40,9 @@ public class MyHome : Form
     private MyTLP mainLayout;
     //panel trống cho chức năng không cần đến rightTop
     private MyTLP _emptyForUnTopBar;
+    
+    private SinhVienController _sinhVienController;
+    private GiangVienController _giangVienController;
 
     private NhomQuyenDto _quyen;
     private TaiKhoanDto _taiKhoan;
@@ -52,6 +55,9 @@ public class MyHome : Form
         navBar = new NavBar(_quyen);
         rightBottomChange = new TrangChu(_quyen, taiKhoan);
         navListController = new NavListController(_quyen, taiKhoan);
+        _sinhVienController = SinhVienController.GetInstance();
+        _giangVienController = GiangVienController.GetInstance();
+            
         _taiKhoan = taiKhoan;
         Init();
     }
@@ -340,6 +346,16 @@ public class MyHome : Form
         
         textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        string gmail;
+        if (_taiKhoan.Type.Equals("Quản trị viên"))
+        {
+            gmail = _giangVienController.GetByMaTK(_taiKhoan.MaTK).Email;
+        }
+        else
+        {
+            gmail = _sinhVienController.GetByMaTK(_taiKhoan.MaTK).Email;
+        }
         
         var userTextName = new Label
         {
@@ -348,13 +364,14 @@ public class MyHome : Form
             AutoSize = true
         };
         
-        var userTextGmail = new Label //đổi -> nq
+        var userTextGmail = new Label
         {   
-            Text = _quyen.TenNhomQuyen,
             Font = GetFont.GetFont.GetMainFont(11, FontType.Regular),
             AutoSize = true,
             ForeColor = Color.Gray,
         };
+        userTextGmail.Text = gmail;
+        
         
         textAccount.Controls.Add(userTextName);
         textAccount.Controls.Add(userTextGmail);
