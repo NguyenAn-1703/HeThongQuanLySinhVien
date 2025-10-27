@@ -13,5 +13,7 @@ public enum TextFieldType
     ListBoxPH,
     ListBoxLop,
     ListBoxNganh,
+    ListBoxTK,
+    DiaChi,
     Number
 }

@@ -1,50 +1,54 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 
-namespace QuanLySinhVien.Views.Components.CommonUse.Lop;
+namespace QuanLySinhVien.Views.Components.CommonUse;
 
-public class CustomSearchFieldLop : CustomTextBox
+public class CustomSearchFieldHP : CustomTextBox
 {
     CustomPopup _popup;
 
     private Form _parent;
 
-    private List<LopDto> listHP;
-    private LopController _LopController;
+    private List<HocPhanDto> listHP;
+    private HocPhanController _hocPhanController;
 
     private List<string> _columnNames;
     private List<object> _cellDatas;
     private List<object> displayDatas;
 
-    private LopDto selectedHP;
-
-    public CustomSearchFieldLop()
+    private HocPhanDto selectedHP;
+    
+    public CustomSearchFieldHP()
     {
-        _parent = new Form();
-        _LopController = LopController.GetInstance();
+        _parent = new  Form();
+        _hocPhanController = HocPhanController.GetInstance();
         _popup = new CustomPopup();
-        listHP = _LopController.GetAll();
+        listHP = _hocPhanController.GetAll();
         Init();
     }
 
     void Init()
     {
-        SetData();
+        
 
+        SetData();
+        
         SetAction();
+        
     }
 
     void SetAction()
     {
         this.contentTextBox.TextChanged += (sender, args) => OnTextChanged();
-        this.contentTextBox.KeyDown += (sender, args) => OnKeyDown(args);
+        this.contentTextBox.KeyDown +=  (sender, args) => OnKeyDown(args);
         this._popup.KeyEnter += (index) => OnKeyEnter(index);
     }
 
     void OnKeyEnter(int index)
     {
-        selectedHP = _LopController.GetLopById(index);
-        contentTextBox.Text = selectedHP.TenLop;
+        
+        selectedHP = _hocPhanController.GetHocPhanById(index);
+        contentTextBox.Text = selectedHP.TenHP;
         contentTextBox.Focus();
         contentTextBox.SelectAll();
         _popup.Visible = false;
@@ -53,14 +57,14 @@ public class CustomSearchFieldLop : CustomTextBox
     void OnKeyDown(KeyEventArgs e)
     {
         //chọn trong list
-        if (e.KeyCode == Keys.Down)
+        if (e.KeyCode == Keys.Down && !contentTextBox.Text.Equals(""))
         {
-            if (_popup.Visible == true && !contentTextBox.Text.Equals(""))
+            if (_popup.Visible == true)
             {
                 _popup._dt.Focus();
             }
         }
-
+        
         //chọn trực tiếp
         if (e.KeyCode == Keys.Enter && _popup.Visible == true && !contentTextBox.Text.Equals(""))
         {
@@ -91,14 +95,14 @@ public class CustomSearchFieldLop : CustomTextBox
             }
         
 
-            List<LopDto> searchList = listHP.Where(x =>
-                x.MaLop.ToString().ToLower().Contains(keyword) ||
-                x.TenLop.ToLower().Contains(keyword)
+            List<HocPhanDto> searchList = listHP.Where(x => 
+                x.MaHP.ToString().ToLower().Contains(keyword) ||
+                x.TenHP.ToLower().Contains(keyword)
             ).ToList();
             displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
             {
-                MaLop = x.MaLop,
-                TenLop = x.TenLop
+                MaHP = x.MaHP,
+                TenHP = x.TenHP
             });
             _popup.UpdateData(displayDatas);
 
@@ -111,17 +115,18 @@ public class CustomSearchFieldLop : CustomTextBox
                 _popup.Visible = true;
             }
         }
+            
         
     }
 
     public void SetData()
     {
-        string[] arr = new[] { "MaLop", "TenLop" };
+        string [] arr = new[] { "MaHP", "TenHP"};
         _columnNames = arr.ToList();
         displayDatas = ConvertObject.ConvertToDisplay(listHP, x => new
         {
-            MaLop = x.MaLop,
-            TenLop = x.TenLop
+            MaHP = x.MaHP,
+            TenHP = x.TenHP
         });
         _popup.SetData(_columnNames, displayDatas);
     }
@@ -129,17 +134,16 @@ public class CustomSearchFieldLop : CustomTextBox
     public void SetupLocation()
     {
         _parent = FindForm();
-
+        
         Point screenPoint = this.PointToScreen(new Point(0, this.Height));
         Point location = _parent.PointToClient(screenPoint);
-
+        
         _popup.Location = location;
-
+        
         _popup.Width = this.Width;
-
+        
         _parent.Controls.Add(_popup);
         _popup.BringToFront();
 
-        Console.WriteLine(location);
     }
 }

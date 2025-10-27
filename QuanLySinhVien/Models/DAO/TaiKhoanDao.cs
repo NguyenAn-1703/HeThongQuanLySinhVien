@@ -154,6 +154,40 @@ public class TaiKhoanDao
         return result;
     }
     
+    public List<TaiKhoanDto> GetTaiKhoanNotUsed()
+    {
+        List<TaiKhoanDto> result = new();
+
+        using var conn = MyConnection.GetConnection();
+        string query = @"
+        SELECT tk.MaTK, tk.MaNQ, tk.TenDangNhap, tk.MatKhau, tk.Type
+        FROM TaiKhoan tk
+        LEFT JOIN SinhVien sv ON tk.MaTK = sv.MaTK AND sv.Status = 1
+        LEFT JOIN GiangVien gv ON tk.MaTK = gv.MaTK AND gv.Status = 1
+        WHERE tk.Status = 1
+          AND sv.MaSV IS NULL
+          AND gv.MaGV IS NULL;
+    ";
+
+        using var cmd = new MySqlCommand(query, conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new TaiKhoanDto
+            {
+                MaTK = reader.GetInt32("MaTK"),
+                MaNQ = reader.GetInt32("MaNQ"),
+                TenDangNhap = reader.GetString("TenDangNhap"),
+                MatKhau = reader.GetString("MatKhau"),
+                Type = reader.GetString("Type")
+            });
+        }
+
+        return result;
+    }
+
+    
     // ⚡⚡⚡ HÀM STATIC TEST TOÀN BỘ CRUD ⚡⚡⚡
     public static void Test()
     {

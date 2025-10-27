@@ -2,6 +2,7 @@ using QuanLySinhVien.Views.Components.CommonUse.GiangVien;
 using QuanLySinhVien.Views.Components.CommonUse.Lop;
 using QuanLySinhVien.Views.Components.CommonUse.Nganh;
 using QuanLySinhVien.Views.Components.CommonUse.PhongHoc;
+using QuanLySinhVien.Views.Components.CommonUse.SearchField.TaiKhoan;
 using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
 
@@ -97,24 +98,28 @@ public class LabelTextField : MyTLP
             case  TextFieldType.Number:
                 SetListBoxNumber();
                 break;
-            
+            case   TextFieldType.ListBoxTK:
+                SetListBoxTK();
+                break;
+
+                
             
         }
     }
 
     void SetNormalTextField()
     {
-        _field = new CustomTextBox();
+        _field = new CustomTextBox(){BackColor = MyColor.White};
         _field.Dock = DockStyle.Top;
-        _field.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
+        _field.Font = new Font("Segoe UI", 12F, FontStyle.Regular);
         this.Controls.Add(_field);
     }
 
     void SetPasswordTextField()
     {
-        _password = new CustomTextBox();
+        _password = new CustomTextBox(){BackColor = MyColor.White};
         _password.Dock = DockStyle.Top;
-        _password.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
+        _password.Font = new Font("Segoe UI", 12F, FontStyle.Regular);
         _password.contentTextBox.PasswordChar = '*';
         setEyeButton();
         this.Controls.Add(_password);
@@ -124,7 +129,7 @@ public class LabelTextField : MyTLP
     {
         _combobox = new CustomCombobox(new string[0]);
         _combobox.Dock = DockStyle.Top;
-        _combobox.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
+        _combobox.Font = new Font("Segoe UI", 12F, FontStyle.Regular);
         this.Controls.Add(_combobox);
     }
 
@@ -189,6 +194,7 @@ public class LabelTextField : MyTLP
     void SetListBox()
     {
         tb =  new CustomSearchFieldHP();
+        tb.BackColor = MyColor.White;
         tb.Dock  = DockStyle.Top;
         this.Controls.Add(tb);
         
@@ -198,6 +204,7 @@ public class LabelTextField : MyTLP
     void SetListBoxGV()
     {
         tbGV =  new CustomSearchFieldGV();
+        tbGV.BackColor = MyColor.White;
         tbGV.Dock  = DockStyle.Top;
         this.Controls.Add(tbGV);
     }
@@ -206,6 +213,8 @@ public class LabelTextField : MyTLP
     void SetListBoxPH()
     {
         tbPH =  new CustomSearchFieldPH();
+        tbPH.BackColor = MyColor.White;
+
         tbPH.Dock  = DockStyle.Top;
         this.Controls.Add(tbPH);
     }
@@ -214,6 +223,8 @@ public class LabelTextField : MyTLP
     void SetListBoxLop()
     {
         tbLop =  new CustomSearchFieldLop();
+        tbLop.BackColor = MyColor.White;
+
         tbLop.Dock  = DockStyle.Top;
         this.Controls.Add(tbLop);
     }
@@ -222,18 +233,28 @@ public class LabelTextField : MyTLP
     void SetListBoxNganh()
     {
         tbNganh =  new CustomSearchFieldNG();
+        tbNganh.BackColor = MyColor.White;
+
         tbNganh.Dock  = DockStyle.Top;
         this.Controls.Add(tbNganh);
     }
     
+    public CustomSearchFieldTK tbTK;
+    void SetListBoxTK()
+    {
+        tbTK =  new CustomSearchFieldTK();
+        tbTK.BackColor = MyColor.White;
+
+        tbTK.Dock  = DockStyle.Top;
+        this.Controls.Add(tbTK);
+    }
+
     
-
-
     void SetListBoxNumber()
     {
-        _numberField = new CustomTextBox();
+        _numberField = new CustomTextBox(){BackColor = MyColor.White};
         _numberField.Dock = DockStyle.Top;
-        _numberField.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
+        _numberField.Font = new Font("Segoe UI", 12F, FontStyle.Regular);
         this.Controls.Add(_numberField);
 
         _numberField.contentTextBox.KeyPress += (sender, args) =>

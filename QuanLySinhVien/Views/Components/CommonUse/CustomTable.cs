@@ -59,7 +59,6 @@ public class CustomTable : MyTLP
         this.RowCount = 2;
         this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-
         _dataGridView = new CustomDataGridView(_action, _edit, _delete);
     }
 
@@ -71,7 +70,7 @@ public class CustomTable : MyTLP
         _header.WrapContents = false;
         _header.BackColor = MyColor.MainColor;
         _header.Margin = new Padding(0, 0, 0, 0);
-        _header.Padding = new Padding(5, 0, 5, 0);
+        _header.Padding = new Padding(0, 0, 0, 0);
 
         foreach (String i in _headerContent)
         {
@@ -264,13 +263,30 @@ public class CustomTable : MyTLP
 
     void OnResize()
     {
-        int tableWidth = this.Width - 24;
-        int columnSize = tableWidth / _header.Controls.Count;
-       
-        foreach (Control c in _header.Controls)
+        int tableWidth;
+        int columnSize;
+        Console.WriteLine(_header.Controls.Count);
+
+        if (_dataGridView.DisplayedRowCount(false) < _dataGridView.RowCount)
         {
-            c.Size = new Size(columnSize, c.Height);
+            tableWidth = this.Width - 20;
+            columnSize = tableWidth / _header.Controls.Count;
+            foreach (Control c in _header.Controls)
+            {
+                c.Size = new Size(columnSize, c.Height);
+            }
+            _header.Controls[_header.Controls.Count - 1].Width = columnSize + 20;
         }
+        else
+        {
+            tableWidth = this.Width;
+            columnSize = tableWidth / _header.Controls.Count;
+            foreach (Control c in _header.Controls)
+            {
+                c.Size = new Size(columnSize, c.Height);
+            }
+        }
+
     }
 
     public void UpdateData(List<List<object>> newRows)

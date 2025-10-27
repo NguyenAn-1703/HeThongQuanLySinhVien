@@ -42,6 +42,42 @@ public class SinhVienDAO
 
         return result;
     }
+    
+    public SinhVienDTO GetById(int id)
+    {
+        SinhVienDTO result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(@"
+        SELECT MaSV, MaTK, MaLop, MaKhoaHoc, TenSV, SoDienThoaiSV, 
+               NgaySinhSV, QueQuanSV, TrangThaiSV, GioiTinhSV, 
+               EmailSV, CCCDSV, AnhDaiDienSV
+        FROM SinhVien
+        WHERE Status = 1 AND MaSV = @MaSV", conn);
+        cmd.Parameters.AddWithValue("@MaSV", id);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new SinhVienDTO
+            {
+                MaSinhVien = reader.GetInt32("MaSV"),
+                MaTk = reader.GetInt32("MaSV"),
+                MaLop = reader.GetInt32("MaLop"),
+                MaKhoaHoc = reader.GetInt32("MaKhoaHoc"),
+                TenSinhVien = reader.GetString("TenSV"),
+                SdtSinhVien = reader.GetString("SoDienThoaiSV"),
+                NgaySinh = reader.GetString("NgaySinhSV"),
+                QueQuanSinhVien = reader.GetString("QueQuanSV"),
+                TrangThai = reader.GetString("TrangThaiSV"),
+                GioiTinh = reader.GetString("GioiTinhSV"),
+                Email = reader.GetString("EmailSV"),
+                CCCD = reader.GetString("CCCDSV"),
+                AnhDaiDienSinhVien = reader.GetString("AnhDaiDienSV")
+            };
+        }
+
+        return result;
+    }
 
     
     public List<SinhVienDTO> getTableSinhVien()
@@ -71,6 +107,8 @@ public class SinhVienDAO
 
         return result;
     }
+    
+    
 
     public SinhVienDTO GetSinhVienById(int maSinhVien)
     {
@@ -103,43 +141,48 @@ public class SinhVienDAO
         return result;
     }
 
-    public void Add(SinhVienDTO sinhVien)
-    {
-        using var conn = MyConnection.GetConnection();
-        const string sql = @"INSERT INTO SinhVien (MaTK, MaLop, MaKhoaHoc, TenSV, SoDienThoaiSV, NgaySinhSV, 
-                            QueQuanSV, TrangThaiSV, GioiTinhSV, EmailSV, CCCDSV, AnhDaiDienSV) 
-                            VALUES (@MaTK, @MaLop, @MaKhoaHoc, @TenSV, @SoDienThoaiSV, @NgaySinhSV, 
-                            @QueQuanSV, @TrangThaiSV, @GioiTinhSV, @EmailSV, @CCCDSV, @AnhDaiDienSV)";
-        using var cmd = new MySqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@MaTK", sinhVien.MaTk ?? (object)DBNull.Value);
-        cmd.Parameters.AddWithValue("@MaLop", sinhVien.MaLop);
-        cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVien.MaKhoaHoc);
-        cmd.Parameters.AddWithValue("@TenSV", sinhVien.TenSinhVien);
-        cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVien.SdtSinhVien);
-        cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVien.NgaySinh);
-        cmd.Parameters.AddWithValue("@QueQuanSV", sinhVien.QueQuanSinhVien);
-        cmd.Parameters.AddWithValue("@TrangThaiSV", sinhVien.TrangThai);
-        cmd.Parameters.AddWithValue("@GioiTinhSV", sinhVien.GioiTinh);
-        cmd.Parameters.AddWithValue("@EmailSV", sinhVien.Email);
-        cmd.Parameters.AddWithValue("@CCCDSV", sinhVien.CCCD);
-        cmd.Parameters.AddWithValue("@AnhDaiDienSV", sinhVien.AnhDaiDienSinhVien ?? (object)DBNull.Value);
-        cmd.ExecuteNonQuery();
-    }
+public bool Add(SinhVienDTO sinhVien)
+{
+    using var conn = MyConnection.GetConnection();
+    const string sql = @"INSERT INTO SinhVien 
+                        (MaTK, MaLop, MaKhoaHoc, TenSV, SoDienThoaiSV, NgaySinhSV, 
+                         QueQuanSV, TrangThaiSV, GioiTinhSV, EmailSV, CCCDSV, AnhDaiDienSV) 
+                        VALUES 
+                        (@MaTK, @MaLop, @MaKhoaHoc, @TenSV, @SoDienThoaiSV, @NgaySinhSV, 
+                         @QueQuanSV, @TrangThaiSV, @GioiTinhSV, @EmailSV, @CCCDSV, @AnhDaiDienSV)";
+    using var cmd = new MySqlCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@MaTK", sinhVien.MaTk);
+    cmd.Parameters.AddWithValue("@MaLop", sinhVien.MaLop);
+    cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVien.MaKhoaHoc);
+    cmd.Parameters.AddWithValue("@TenSV", sinhVien.TenSinhVien);
+    cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVien.SdtSinhVien);
+    cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVien.NgaySinh);
+    cmd.Parameters.AddWithValue("@QueQuanSV", sinhVien.QueQuanSinhVien);
+    cmd.Parameters.AddWithValue("@TrangThaiSV", sinhVien.TrangThai);
+    cmd.Parameters.AddWithValue("@GioiTinhSV", sinhVien.GioiTinh);
+    cmd.Parameters.AddWithValue("@EmailSV", sinhVien.Email);
+    cmd.Parameters.AddWithValue("@CCCDSV", sinhVien.CCCD);
+    cmd.Parameters.AddWithValue("@AnhDaiDienSV", sinhVien.AnhDaiDienSinhVien ?? (object)DBNull.Value);
 
-    public void Delete(int maSinhVien)
-    {
-        using var conn = MyConnection.GetConnection();
-        const string sql = "DELETE FROM SinhVien WHERE MaSV = @MaSV";
-        using var cmd = new MySqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@MaSV", maSinhVien);
-        cmd.ExecuteNonQuery();
-    }
+    int rows = cmd.ExecuteNonQuery();
+    return rows > 0;
+}
 
-    public void Update(SinhVienDTO SinhVienDTO)
-    {
-        using var conn = MyConnection.GetConnection();
-        const string sql =
-            @"UPDATE SinhVien SET 
+public bool Delete(int maSinhVien)
+{
+    using var conn = MyConnection.GetConnection();
+    const string sql = "DELETE FROM SinhVien WHERE MaSV = @MaSV";
+    using var cmd = new MySqlCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@MaSV", maSinhVien);
+
+    int rows = cmd.ExecuteNonQuery();
+    return rows > 0;
+}
+
+public bool Update(SinhVienDTO sinhVien)
+{
+    using var conn = MyConnection.GetConnection();
+    const string sql = @"UPDATE SinhVien SET 
                             TenSV = @TenSV,
                             NgaySinhSV = @NgaySinhSV,
                             GioiTinhSV = @GioiTinhSV,
@@ -149,79 +192,83 @@ public class SinhVienDAO
                             QueQuanSV = @QueQuanSV,
                             EmailSV = @EmailSV,
                             CCCDSV = @CCCDSV,
-                            TrangThaiSV = @TrangThaiSV
-                            WHERE MaSV = @MaSV";
-        using var cmd = new MySqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@MaSV", SinhVienDTO.MaSinhVien);
-        cmd.Parameters.AddWithValue("@TenSV", SinhVienDTO.TenSinhVien);
-        cmd.Parameters.AddWithValue("@NgaySinhSV", SinhVienDTO.NgaySinh);
-        cmd.Parameters.AddWithValue("@GioiTinhSV", SinhVienDTO.GioiTinh);
-        cmd.Parameters.AddWithValue("@MaLop", SinhVienDTO.MaLop);
-        cmd.Parameters.AddWithValue("@MaKhoaHoc", SinhVienDTO.MaKhoaHoc);
-        cmd.Parameters.AddWithValue("@SoDienThoaiSV", SinhVienDTO.SdtSinhVien);
-        cmd.Parameters.AddWithValue("@QueQuanSV", SinhVienDTO.QueQuanSinhVien);
-        cmd.Parameters.AddWithValue("@EmailSV", SinhVienDTO.Email);
-        cmd.Parameters.AddWithValue("@CCCDSV", SinhVienDTO.CCCD);
-        cmd.Parameters.AddWithValue("@TrangThaiSV", SinhVienDTO.TrangThai);
-        cmd.Parameters.AddWithValue("@Email", SinhVienDTO.Email);
-        cmd.Parameters.AddWithValue("@SdtSinhVien", SinhVienDTO.SdtSinhVien);
-        cmd.ExecuteNonQuery();
-    }
+                            TrangThaiSV = @TrangThaiSV,
+                            AnhDaiDienSV = @AnhDaiDienSV
+                        WHERE MaSV = @MaSV";
 
-    public List<SinhVienDTO> Search(string searchText, string filter)
-    {
-        List<SinhVienDTO> result = new();
-        using var conn = MyConnection.GetConnection();
+    using var cmd = new MySqlCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@MaSV", sinhVien.MaSinhVien);
+    cmd.Parameters.AddWithValue("@TenSV", sinhVien.TenSinhVien);
+    cmd.Parameters.AddWithValue("@NgaySinhSV", sinhVien.NgaySinh);
+    cmd.Parameters.AddWithValue("@GioiTinhSV", sinhVien.GioiTinh);
+    cmd.Parameters.AddWithValue("@MaLop", sinhVien.MaLop);
+    cmd.Parameters.AddWithValue("@MaKhoaHoc", sinhVien.MaKhoaHoc);
+    cmd.Parameters.AddWithValue("@SoDienThoaiSV", sinhVien.SdtSinhVien);
+    cmd.Parameters.AddWithValue("@QueQuanSV", sinhVien.QueQuanSinhVien);
+    cmd.Parameters.AddWithValue("@EmailSV", sinhVien.Email);
+    cmd.Parameters.AddWithValue("@CCCDSV", sinhVien.CCCD);
+    cmd.Parameters.AddWithValue("@TrangThaiSV", sinhVien.TrangThai);
+    cmd.Parameters.AddWithValue("@AnhDaiDienSV", sinhVien.AnhDaiDienSinhVien ?? (object)DBNull.Value);
 
-        string sql = @"SELECT s.MaSV, s.TenSV, s.NgaySinhSV, s.GioiTinhSV, 
-                       IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh, s.TrangThaiSV AS TrangThai
-                       FROM SinhVien s
-                       LEFT JOIN Lop l ON s.MaLop = l.MaLop
-                       LEFT JOIN Nganh n ON l.MaNganh = n.MaNganh";
+    int rows = cmd.ExecuteNonQuery();
+    return rows > 0;
+}
 
-        if (!string.IsNullOrWhiteSpace(searchText))
-        {
-            sql += " WHERE ";
 
-            if (filter == "Mã sinh viên")
-            {
-                sql += "CAST(s.MaSV AS CHAR) LIKE @SearchText";
-            }
-            else if (filter == "Tên sinh viên")
-            {
-                sql += "s.TenSV LIKE @SearchText";
-            }
-            else
-            {
-                sql += "(CAST(s.MaSV AS CHAR) LIKE @SearchText OR s.TenSV LIKE @SearchText)";
-            }
-        }
-
-        sql += " ORDER BY s.MaSV";
-
-        using var cmd = new MySqlCommand(sql, conn);
-
-        if (!string.IsNullOrWhiteSpace(searchText))
-        {
-            cmd.Parameters.AddWithValue("@SearchText", "%" + searchText + "%");
-        }
-
-        using var reader = cmd.ExecuteReader();
-
-        while (reader.Read())
-        {
-            result.Add(new SinhVienDTO(
-                reader.GetInt32(reader.GetOrdinal("MaSV")),
-                reader.GetString(reader.GetOrdinal("TenSV")),
-                reader.GetString(reader.GetOrdinal("NgaySinhSV")),
-                reader.GetString(reader.GetOrdinal("GioiTinhSV")),
-                reader.GetString(reader.GetOrdinal("Nganh")),
-                reader.GetString(reader.GetOrdinal("TrangThai"))
-            ));
-        }
-
-        return result;
-    }
+    // public List<SinhVienDTO> Search(string searchText, string filter)
+    // {
+    //     List<SinhVienDTO> result = new();
+    //     using var conn = MyConnection.GetConnection();
+    //
+    //     string sql = @"SELECT s.MaSV, s.TenSV, s.NgaySinhSV, s.GioiTinhSV, 
+    //                    IFNULL(n.TenNganh, 'Chưa xác định') AS Nganh, s.TrangThaiSV AS TrangThai
+    //                    FROM SinhVien s
+    //                    LEFT JOIN Lop l ON s.MaLop = l.MaLop
+    //                    LEFT JOIN Nganh n ON l.MaNganh = n.MaNganh";
+    //
+    //     if (!string.IsNullOrWhiteSpace(searchText))
+    //     {
+    //         sql += " WHERE ";
+    //
+    //         if (filter == "Mã sinh viên")
+    //         {
+    //             sql += "CAST(s.MaSV AS CHAR) LIKE @SearchText";
+    //         }
+    //         else if (filter == "Tên sinh viên")
+    //         {
+    //             sql += "s.TenSV LIKE @SearchText";
+    //         }
+    //         else
+    //         {
+    //             sql += "(CAST(s.MaSV AS CHAR) LIKE @SearchText OR s.TenSV LIKE @SearchText)";
+    //         }
+    //     }
+    //
+    //     sql += " ORDER BY s.MaSV";
+    //
+    //     using var cmd = new MySqlCommand(sql, conn);
+    //
+    //     if (!string.IsNullOrWhiteSpace(searchText))
+    //     {
+    //         cmd.Parameters.AddWithValue("@SearchText", "%" + searchText + "%");
+    //     }
+    //
+    //     using var reader = cmd.ExecuteReader();
+    //
+    //     while (reader.Read())
+    //     {
+    //         result.Add(new SinhVienDTO(
+    //             reader.GetInt32(reader.GetOrdinal("MaSV")),
+    //             reader.GetString(reader.GetOrdinal("TenSV")),
+    //             reader.GetString(reader.GetOrdinal("NgaySinhSV")),
+    //             reader.GetString(reader.GetOrdinal("GioiTinhSV")),
+    //             reader.GetString(reader.GetOrdinal("Nganh")),
+    //             reader.GetString(reader.GetOrdinal("TrangThai"))
+    //         ));
+    //     }
+    //
+    //     return result;
+    // }
 
     public int CountSinhVienByStatus(TrangThaiSV status)
     {

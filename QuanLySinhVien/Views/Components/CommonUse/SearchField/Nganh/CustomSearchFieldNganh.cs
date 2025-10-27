@@ -141,6 +141,5 @@ public class CustomSearchFieldNG : CustomTextBox
         _parent.Controls.Add(_popup);
         _popup.BringToFront();
 
-        Console.WriteLine(location);
     }
 }

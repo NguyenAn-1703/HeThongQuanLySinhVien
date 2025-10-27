@@ -1,35 +1,36 @@
-namespace QuanLySinhVien.Views.Components.CommonUse.GiangVien;
-
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 
-public class CustomSearchFieldGV : CustomTextBox
+namespace QuanLySinhVien.Views.Components.CommonUse.Lop;
+
+public class CustomSearchFieldLop : CustomTextBox
 {
     CustomPopup _popup;
 
     private Form _parent;
 
-    private List<GiangVienDto> listHP;
-    private GiangVienController _GiangVienController;
+    private List<LopDto> listHP;
+    private LopController _LopController;
 
     private List<string> _columnNames;
     private List<object> _cellDatas;
     private List<object> displayDatas;
 
-    private GiangVienDto selectedHP;
+    private LopDto selectedHP;
 
-    public CustomSearchFieldGV()
+    public CustomSearchFieldLop()
     {
         _parent = new Form();
-        _GiangVienController = GiangVienController.GetInstance();
+        _LopController = LopController.GetInstance();
         _popup = new CustomPopup();
-        listHP = _GiangVienController.GetAll();
+        listHP = _LopController.GetAll();
         Init();
     }
 
     void Init()
     {
         SetData();
+
         SetAction();
     }
 
@@ -42,8 +43,8 @@ public class CustomSearchFieldGV : CustomTextBox
 
     void OnKeyEnter(int index)
     {
-        selectedHP = _GiangVienController.GetById(index);
-        contentTextBox.Text = selectedHP.TenGV;
+        selectedHP = _LopController.GetLopById(index);
+        contentTextBox.Text = selectedHP.TenLop;
         contentTextBox.Focus();
         contentTextBox.SelectAll();
         _popup.Visible = false;
@@ -52,13 +53,16 @@ public class CustomSearchFieldGV : CustomTextBox
     void OnKeyDown(KeyEventArgs e)
     {
         //chọn trong list
-        if (e.KeyCode == Keys.Down && !contentTextBox.Text.Equals("") && _popup.Visible == true)
+        if (e.KeyCode == Keys.Down)
         {
-            _popup._dt.Focus();
+            if (_popup.Visible == true && !contentTextBox.Text.Equals(""))
+            {
+                _popup._dt.Focus();
+            }
         }
 
         //chọn trực tiếp
-        if (e.KeyCode == Keys.Enter && !contentTextBox.Text.Equals("") && _popup.Visible == true)
+        if (e.KeyCode == Keys.Enter && _popup.Visible == true && !contentTextBox.Text.Equals(""))
         {
             if (_popup._dt.SelectedRows[0].Index == 0)
             {
@@ -85,15 +89,16 @@ public class CustomSearchFieldGV : CustomTextBox
                 _popup.Visible = false;
                 return;
             }
+        
 
-            List<GiangVienDto> searchList = listHP.Where(x =>
-                x.MaGV.ToString().ToLower().Contains(keyword) ||
-                x.TenGV.ToLower().Contains(keyword)
+            List<LopDto> searchList = listHP.Where(x =>
+                x.MaLop.ToString().ToLower().Contains(keyword) ||
+                x.TenLop.ToLower().Contains(keyword)
             ).ToList();
             displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
             {
-                MaGV = x.MaGV,
-                TenGV = x.TenGV
+                MaLop = x.MaLop,
+                TenLop = x.TenLop
             });
             _popup.UpdateData(displayDatas);
 
@@ -106,16 +111,17 @@ public class CustomSearchFieldGV : CustomTextBox
                 _popup.Visible = true;
             }
         }
+        
     }
 
     public void SetData()
     {
-        string[] arr = new[] { "MaGV", "TenGV" };
+        string[] arr = new[] { "MaLop", "TenLop" };
         _columnNames = arr.ToList();
         displayDatas = ConvertObject.ConvertToDisplay(listHP, x => new
         {
-            MaGV = x.MaGV,
-            TenGV = x.TenGV
+            MaLop = x.MaLop,
+            TenLop = x.TenLop
         });
         _popup.SetData(_columnNames, displayDatas);
     }
@@ -134,6 +140,5 @@ public class CustomSearchFieldGV : CustomTextBox
         _parent.Controls.Add(_popup);
         _popup.BringToFront();
 
-        Console.WriteLine(location);
     }
 }

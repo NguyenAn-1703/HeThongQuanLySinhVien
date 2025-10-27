@@ -19,13 +19,13 @@ public class ChuongTrinhDaoTaoDialog : Form
     private int _idChuongTrinhDaoTao;
     public event Action Finish;
     
-    private TableLayoutPanel _mainLayout;
+    private MyTLP _mainLayout;
     private TitleButton _btnLuu;
     
     private string _title;
     private DialogType _dialogType;
 
-    private TableLayoutPanel _contentPanel;
+    private MyTLP _contentPanel;
     
     private HocPhanController _hocPhanController;
 
@@ -90,17 +90,17 @@ public class ChuongTrinhDaoTaoDialog : Form
     void Init()
     {
         Width = 1200;
-        Height = 900;
+        Height = 750;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
         this.FormBorderStyle = FormBorderStyle.None;
         
-        _mainLayout = new  TableLayoutPanel
+        _mainLayout = new  MyTLP
         {
             Dock =  DockStyle.Fill,
             RowCount = 4,
             BorderStyle = BorderStyle.FixedSingle,
-            // CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+            // CellBorderStyle = MyTLPCellBorderStyle.Single
         };
         
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -135,7 +135,7 @@ public class ChuongTrinhDaoTaoDialog : Form
     
     void SetTopBar()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
@@ -171,7 +171,7 @@ public class ChuongTrinhDaoTaoDialog : Form
 
     void SetTitleBar()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -195,7 +195,7 @@ public class ChuongTrinhDaoTaoDialog : Form
 
     void SetContent()
     {
-        _contentPanel = new TableLayoutPanel
+        _contentPanel = new MyTLP
         {
             ColumnCount = 2,
             RowCount = 2,
@@ -206,26 +206,18 @@ public class ChuongTrinhDaoTaoDialog : Form
         _contentPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        // _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _contentPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
         SetTextBoxContainer();
-
-
-        
-
         
         SetTable();
         
         _mainLayout.Controls.Add(_contentPanel);
-        
-        
     }
 
     void SetTextBoxContainer()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -335,7 +327,7 @@ public class ChuongTrinhDaoTaoDialog : Form
     void SetBottom()
     {
         //Thêm có Đặt lại, Lưu, Hủy
-        TableLayoutPanel panel = new TableLayoutPanel
+        MyTLP panel = new MyTLP
         {
             AutoSize = true,
             Dock = DockStyle.Fill,

@@ -15,6 +15,7 @@
       <Compile Update="Components\MyForm.cs">
         <SubType>Form</SubType>
       </Compile>
+      <None Remove="config\diachi.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -166,6 +167,9 @@
   	<Content Include="config\Permission.json">
   	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   	</Content>
+  	<None Remove="config\quan_huyen.json" />
+  	<None Remove="config\tinh_tp.json" />
+  	<None Remove="config\xa_phuong.json" />
     </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ public class SinhVienDTO
     public string TrangThai { get; set; }
     public int MaKhoaHoc { get; set; }
     public int MaLop { get; set; }
-    public int? MaTk { get; set; }
+    public int MaTk { get; set; }
     public string SdtSinhVien { get; set; }
     public string QueQuanSinhVien { get; set; }
     public string Email { get; set; }

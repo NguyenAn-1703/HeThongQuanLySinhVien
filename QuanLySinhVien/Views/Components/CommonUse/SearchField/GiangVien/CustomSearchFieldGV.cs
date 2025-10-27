@@ -1,54 +1,49 @@
+namespace QuanLySinhVien.Views.Components.CommonUse.GiangVien;
+
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 
-namespace QuanLySinhVien.Views.Components.CommonUse;
-
-public class CustomSearchFieldHP : CustomTextBox
+public class CustomSearchFieldGV : CustomTextBox
 {
     CustomPopup _popup;
 
     private Form _parent;
 
-    private List<HocPhanDto> listHP;
-    private HocPhanController _hocPhanController;
+    private List<GiangVienDto> listHP;
+    private GiangVienController _GiangVienController;
 
     private List<string> _columnNames;
     private List<object> _cellDatas;
     private List<object> displayDatas;
 
-    private HocPhanDto selectedHP;
-    
-    public CustomSearchFieldHP()
+    private GiangVienDto selectedHP;
+
+    public CustomSearchFieldGV()
     {
-        _parent = new  Form();
-        _hocPhanController = HocPhanController.GetInstance();
+        _parent = new Form();
+        _GiangVienController = GiangVienController.GetInstance();
         _popup = new CustomPopup();
-        listHP = _hocPhanController.GetAll();
+        listHP = _GiangVienController.GetAll();
         Init();
     }
 
     void Init()
     {
-        
-
         SetData();
-        
         SetAction();
-        
     }
 
     void SetAction()
     {
         this.contentTextBox.TextChanged += (sender, args) => OnTextChanged();
-        this.contentTextBox.KeyDown +=  (sender, args) => OnKeyDown(args);
+        this.contentTextBox.KeyDown += (sender, args) => OnKeyDown(args);
         this._popup.KeyEnter += (index) => OnKeyEnter(index);
     }
 
     void OnKeyEnter(int index)
     {
-        
-        selectedHP = _hocPhanController.GetHocPhanById(index);
-        contentTextBox.Text = selectedHP.TenHP;
+        selectedHP = _GiangVienController.GetById(index);
+        contentTextBox.Text = selectedHP.TenGV;
         contentTextBox.Focus();
         contentTextBox.SelectAll();
         _popup.Visible = false;
@@ -57,16 +52,13 @@ public class CustomSearchFieldHP : CustomTextBox
     void OnKeyDown(KeyEventArgs e)
     {
         //chọn trong list
-        if (e.KeyCode == Keys.Down && !contentTextBox.Text.Equals(""))
+        if (e.KeyCode == Keys.Down && !contentTextBox.Text.Equals("") && _popup.Visible == true)
         {
-            if (_popup.Visible == true)
-            {
-                _popup._dt.Focus();
-            }
+            _popup._dt.Focus();
         }
-        
+
         //chọn trực tiếp
-        if (e.KeyCode == Keys.Enter && _popup.Visible == true && !contentTextBox.Text.Equals(""))
+        if (e.KeyCode == Keys.Enter && !contentTextBox.Text.Equals("") && _popup.Visible == true)
         {
             if (_popup._dt.SelectedRows[0].Index == 0)
             {
@@ -93,16 +85,15 @@ public class CustomSearchFieldHP : CustomTextBox
                 _popup.Visible = false;
                 return;
             }
-        
 
-            List<HocPhanDto> searchList = listHP.Where(x => 
-                x.MaHP.ToString().ToLower().Contains(keyword) ||
-                x.TenHP.ToLower().Contains(keyword)
+            List<GiangVienDto> searchList = listHP.Where(x =>
+                x.MaGV.ToString().ToLower().Contains(keyword) ||
+                x.TenGV.ToLower().Contains(keyword)
             ).ToList();
             displayDatas = ConvertObject.ConvertToDisplay(searchList, x => new
             {
-                MaHP = x.MaHP,
-                TenHP = x.TenHP
+                MaGV = x.MaGV,
+                TenGV = x.TenGV
             });
             _popup.UpdateData(displayDatas);
 
@@ -115,18 +106,16 @@ public class CustomSearchFieldHP : CustomTextBox
                 _popup.Visible = true;
             }
         }
-            
-        
     }
 
     public void SetData()
     {
-        string [] arr = new[] { "MaHP", "TenHP"};
+        string[] arr = new[] { "MaGV", "TenGV" };
         _columnNames = arr.ToList();
         displayDatas = ConvertObject.ConvertToDisplay(listHP, x => new
         {
-            MaHP = x.MaHP,
-            TenHP = x.TenHP
+            MaGV = x.MaGV,
+            TenGV = x.TenGV
         });
         _popup.SetData(_columnNames, displayDatas);
     }
@@ -134,17 +123,16 @@ public class CustomSearchFieldHP : CustomTextBox
     public void SetupLocation()
     {
         _parent = FindForm();
-        
+
         Point screenPoint = this.PointToScreen(new Point(0, this.Height));
         Point location = _parent.PointToClient(screenPoint);
-        
+
         _popup.Location = location;
-        
+
         _popup.Width = this.Width;
-        
+
         _parent.Controls.Add(_popup);
         _popup.BringToFront();
 
-        Console.WriteLine(location);
     }
 }

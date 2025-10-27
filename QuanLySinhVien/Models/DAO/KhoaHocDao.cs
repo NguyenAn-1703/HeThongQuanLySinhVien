@@ -130,4 +130,29 @@ public class KhoaHocDao
 
         return result;
     }
+    
+    public KhoaHocDto GetByTen(string ten)
+    {
+        KhoaHocDto result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaKhoaHoc, MaCKDT, TenKhoaHoc, NienKhoaHoc FROM khoahoc WHERE Status = 1 AND TenKhoaHoc = @TenKhoaHoc", conn);
+        cmd.Parameters.AddWithValue("@TenKhoaHoc", ten);
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            result = new KhoaHocDto
+            {
+                MaKhoaHoc = reader.GetInt32("MaKhoaHoc"),
+                MaCKDT = reader.GetInt32("MaCKDT"),
+                TenKhoaHoc = reader.GetString("TenKhoaHoc"),
+                NienKhoaHoc = reader.GetString("NienKhoaHoc")
+            };
+        }
+
+        return result;
+    }
+    
+    
 }

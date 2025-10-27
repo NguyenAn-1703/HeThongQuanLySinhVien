@@ -56,4 +56,23 @@ public class TaiKhoanController
     {
         return _taiKhoanDao.GetTaiKhoanByUsrName(usrName);
     }
+
+    public List<TaiKhoanDto> GetTaiKhoanNotUsed()
+    {
+        return _taiKhoanDao.GetTaiKhoanNotUsed();
+    }
+    
+    public bool ExistByTen(string ten)
+    {
+        List<TaiKhoanDto> listPh = GetAll();
+        foreach (TaiKhoanDto item in listPh)
+        {
+            if (item.TenDangNhap.Equals(ten))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

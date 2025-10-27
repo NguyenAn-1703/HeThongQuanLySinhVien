@@ -25,14 +25,40 @@ public class Validate
     public static bool IsValidEmail(string input)
     {
         if (string.IsNullOrEmpty(input)) return false;
-        return Regex.IsMatch(input, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+        
+        // cú pháp chuẩn [Tên người dùng]@[Tên miền].[Miền cấp cao], một hoặc nhiều miền cc
+        string pattern = @"^[\w]+@[\w]+(\.[\w]+)+$";
+        
+        return Regex.IsMatch(input, pattern);
     }
+
+    
 
     // Kiểm tra số điện thoại
     public static bool IsValidPhoneNumber(string input)
     {
+        // 0xxxxxxxxx   → 10 chữ số
+        // +84xxxxxxxxx → 9 chữ số sau mã quốc gia
+        
         if (string.IsNullOrEmpty(input)) return false;
-        return Regex.IsMatch(input, @"^(0|\+84)(\d{9})$");
+
+        string pattern = @"^(0|\+84)\d{9}$";
+        
+        return Regex.IsMatch(input, pattern);
+    }
+    
+
+    
+    public static bool IsValidCCCD(string input)
+    {
+        // Mã tỉnh/thành phố hoặc mã quốc gia	3 số đầu	Ví dụ: 001 (Hà Nội), 079 (TP. HCM)
+        // Mã giới tính + năm sinh	3 số tiếp theo	Ví dụ: 2xx (nam 2000–2099), 3xx (nữ 2000–2099)
+        // Số ngẫu nhiên	6 số cuối	Dãy số định danh duy nhất
+        if (string.IsNullOrEmpty(input)) return false;
+
+        string pattern = @"^\d{3}[2-3]\d{8}$";
+        
+        return Regex.IsMatch(input, pattern);
     }
 
     // Kiểm tra số 

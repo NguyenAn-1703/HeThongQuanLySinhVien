@@ -26,35 +26,34 @@ public class SinhVienController
         LopDao = LopDAO.GetInstance();
     }
 
+    public List<SinhVienDTO> GetAll()
+    {
+        return SinhVienDao.GetAll();
+    }
+    
     public List<SinhVienDTO> LayDanhSachSinhVienTable()
     {
         return SinhVienDao.getTableSinhVien();
     }
 
-    public void EditSinhVien(SinhVienDTO sinhVien)
+    public bool EditSinhVien(SinhVienDTO sinhVien)
     {
-        
-        SinhVienDao.Update(sinhVien);
+        return SinhVienDao.Update(sinhVien);
     }
 
-    public void DeleteSinhVien(int id)
+    public bool DeleteSinhVien(int id)
     {
-        SinhVienDao.Delete(id);
+        return SinhVienDao.Delete(id);
     }
 
-    public SinhVienDTO GetSinhVienById(int id)
+    public SinhVienDTO GetById(int id)
     {
-        return SinhVienDao.GetSinhVienById(id);
+        return SinhVienDao.GetById(id);
     }
 
-    public void AddSinhVien(SinhVienDTO sinhVien)
+    public bool AddSinhVien(SinhVienDTO sinhVien)
     {
-        SinhVienDao.Add(sinhVien);
-    }
-
-    public List<SinhVienDTO> Search(string text, string filter)
-    {
-        return SinhVienDao.Search(text, filter);
+        return SinhVienDao.Add(sinhVien);
     }
     
     public List<NganhDto> GetAllNganh()

@@ -49,4 +49,9 @@ public class KhoaHocController
         return _khoaHocDao.GetKhoaHocById(maKhoaHoc);
     }
     
+    public KhoaHocDto GetByTen(string tenKhoaHoc)
+    {
+        return _khoaHocDao.GetByTen(tenKhoaHoc);
+    }
+    
 }
