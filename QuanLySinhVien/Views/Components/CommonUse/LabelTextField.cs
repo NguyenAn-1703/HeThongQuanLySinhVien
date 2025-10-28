@@ -101,6 +101,12 @@ public class LabelTextField : MyTLP
             case   TextFieldType.ListBoxTK:
                 SetListBoxTK();
                 break;
+            case   TextFieldType.Time:
+                SetTimeField();
+                break;
+            case   TextFieldType.Timehhmm:
+                SetTimeFieldHHMM();
+                break;
 
                 
             
@@ -300,6 +306,38 @@ public class LabelTextField : MyTLP
             c.Cursor = Cursors.Hand;
         }
 
+    }
+
+    public CustomDateField _fTime;
+    void SetTimeField()
+    {
+        _fTime = new CustomDateField()
+        {
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+            AutoSize = true,
+            Dock = DockStyle.Top
+        };
+        _fTime.dateField.Format = DateTimePickerFormat.Custom; 
+        _fTime.dateField.CustomFormat = "HH:mm:ss";
+        
+        _fTime.dateField.ShowUpDown = true;
+        this.Controls.Add(_fTime);
+    }
+    
+    public CustomDateField _fTimeHHMM;
+    void SetTimeFieldHHMM()
+    {
+        _fTimeHHMM = new CustomDateField()
+        {
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+            AutoSize = true,
+            Dock = DockStyle.Top
+        };
+        _fTimeHHMM.dateField.Format = DateTimePickerFormat.Custom; 
+        _fTimeHHMM.dateField.CustomFormat = "HH:mm";
+        
+        _fTimeHHMM.dateField.ShowUpDown = true;
+        this.Controls.Add(_fTimeHHMM);
     }
 
     void onClickEyeBtn()

@@ -7,6 +7,8 @@ public enum TextFieldType
     Combobox,
     DateTime,
     Date,
+    Time,
+    Timehhmm,
     Year,
     ListBoxHP,
     ListBoxGV,
