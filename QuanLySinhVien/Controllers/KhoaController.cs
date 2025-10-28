@@ -62,5 +62,11 @@ namespace QuanLySinhVien.Controllers
             KhoaDto tmp = _khoaDao.GetKhoaById(id);
             return tmp;
         }
+        
+        public KhoaDto GetByTen(string ten)
+        {
+            KhoaDto tmp = _khoaDao.GetByTen(ten);
+            return tmp;
+        }
     }
 }

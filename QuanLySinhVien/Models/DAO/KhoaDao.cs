@@ -123,6 +123,30 @@ namespace QuanLySinhVien.Models.DAO
 
             return result;
         }
+        
+        public KhoaDto GetByTen(string tenKhoa)
+        {
+            KhoaDto result = new();
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(
+                "SELECT MaKhoa, TenKhoa, Email, DiaChi, Status FROM Khoa WHERE Status = 1 AND TenKhoa = @TenKhoa",
+                conn);
+            cmd.Parameters.AddWithValue("@TenKhoa", tenKhoa);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                result = new KhoaDto
+                {
+                    MaKhoa = reader.GetInt32("MaKhoa"),
+                    TenKhoa = reader.GetString("TenKhoa"),
+                    Email = reader.GetString("Email"),
+                    DiaChi = reader.GetString("DiaChi"),
+                };
+            }
+
+            return result;
+        }
 
         public static void TestKhoaDAO()
         {

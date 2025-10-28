@@ -26,7 +26,7 @@ public class ThongKeTongQuan : TableLayoutPanel
 
     #region Fields
     private readonly SinhVienDAO _sinhVienDao = new SinhVienDAO();
-    private readonly GiangVienDao _giangVienDao = new GiangVienDao();
+    // private readonly GiangVienDao _giangVienDa;
     private readonly NganhDao _nganhDao = NganhDao.GetInstance();
     #endregion
 
@@ -66,7 +66,7 @@ public class ThongKeTongQuan : TableLayoutPanel
         mainLayout.Controls.Add(new StatisticalBox("Tổng số sinh viên",
             _sinhVienDao.CountSinhVienByStatus(TrangThaiSV.DangHoc), StatisticalIndex.first));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số giảng viên",
-            _giangVienDao.CountGiangVienByStatus(TrangThaiGV.DangCongTac), StatisticalIndex.second));
+            GiangVienDao.GetAll().Count, StatisticalIndex.second));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số ngành", _nganhDao.CountNganhByStatus(ACTIVE_STATUS),
             StatisticalIndex.third));
         mainLayout.Controls.Add(new StatisticalBox("Tổng số học phí đã thu", _sinhVienDao.TongHocPhiDaThu(), StatisticalIndex.fourth));

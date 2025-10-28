@@ -286,21 +286,21 @@ public class SinhVien : NavBase
 
     void Delete(int index)
     {
-        // DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-        // if (select == DialogResult.No)
-        // {
-        //     return;
-        // }
-        // if (_SinhVienController.Delete(index))
-        // {
-        //     MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //     UpdateDataDisplay(_SinhVienController.GetAll());
-        //     this._table.UpdateData(_displayData);
-        // }
-        // else
-        // {
-        //     MessageBox.Show("Xóa tài khoản thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        // }
+        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+        if (select == DialogResult.No)
+        {
+            return;
+        }
+        if (_SinhVienController.DeleteSinhVien(index))
+        {
+            MessageBox.Show("Xóa sinh viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            UpdateDataDisplay(ConvertDtoToDisplay(_SinhVienController.GetAll()));
+            this._table.UpdateData(_displayData);
+        }
+        else
+        {
+            MessageBox.Show("Xóa sinh viên thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 
     List<SinhVienDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)

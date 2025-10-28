@@ -1,3 +1,4 @@
+using QuanLyGiangVien.Views.Components;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components;
 using QuanLySinhVien.Views.Components.NavList;
