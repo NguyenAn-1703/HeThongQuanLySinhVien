@@ -78,7 +78,7 @@ public class CTDTTable : CustomTable
 
             if (_type == TableCTDTType.Plus)
             {
-                DrawRecByPath(g, rectBorder, MyColor.SkyBlue);
+                DrawRecByPath(g, rectBorder, MyColor.BlueButton);
                 DrawIcon(g, plusIcon, rect);
             }
             else

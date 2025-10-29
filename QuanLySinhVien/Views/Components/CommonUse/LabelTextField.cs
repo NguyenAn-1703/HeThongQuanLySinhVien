@@ -163,7 +163,7 @@ public class LabelTextField : MyTLP
             Dock = DockStyle.Top
         };
         _dTGioField.dateField.Format = DateTimePickerFormat.Custom; 
-        _dTGioField.dateField.CustomFormat = " HH:mm:ss";
+        _dTGioField.dateField.CustomFormat = "HH:mm:ss";
         
         _dTGioField.dateField.ShowUpDown = true;
         panel.Controls.Add(_dTNgayField);
@@ -280,6 +280,91 @@ public class LabelTextField : MyTLP
     
     
 
+    
+
+    public CustomDateField _fTime;
+    void SetTimeField()
+    {
+        _fTime = new CustomDateField()
+        {
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+            AutoSize = true,
+            Dock = DockStyle.Top
+        };
+        _fTime.dateField.Format = DateTimePickerFormat.Custom; 
+        _fTime.dateField.CustomFormat = "HH:mm:ss";
+        
+        _fTime.dateField.ShowUpDown = true;
+        this.Controls.Add(_fTime);
+    }
+    
+    public CustomDateField _fTimeHH;
+    public CustomDateField _fTimeMM;
+    void SetTimeFieldHHMM()
+    {
+        MyTLP panel = new  MyTLP
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 4,
+            AutoSize = true,
+        };
+        
+
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+
+
+        Label lblGio = new Label
+        {
+            Text = "giờ",
+            Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
+            AutoSize = true,
+            Margin = new Padding(3, 15, 3 ,3),
+
+        };
+        Label lblPh = new Label
+        {
+            Text = "phút",
+            Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
+            AutoSize = true,
+            Margin = new Padding(3, 15, 3 ,3),
+
+        };
+        
+        _fTimeHH = new CustomDateField()
+        {
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+            AutoSize = true,
+            Dock = DockStyle.Top
+        };
+        _fTimeHH.dateField.Format = DateTimePickerFormat.Custom; 
+        _fTimeHH.dateField.CustomFormat = "HH";
+        _fTimeHH.dateField.ShowUpDown = true;
+        _fTimeHH.dateField.Width = 10;
+        
+        _fTimeMM = new CustomDateField()
+        {
+            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+            AutoSize = true,
+            Dock = DockStyle.Top
+        };
+        _fTimeMM.dateField.Format = DateTimePickerFormat.Custom; 
+        _fTimeMM.dateField.CustomFormat = "mm";
+        _fTimeMM.dateField.ShowUpDown = true;
+        _fTimeMM.dateField.Width = 10;
+        
+        
+        panel.Controls.Add(_fTimeHH);
+        panel.Controls.Add(lblGio);
+        panel.Controls.Add(_fTimeMM);
+        panel.Controls.Add(lblPh);
+        this.Controls.Add(panel);
+    }
+    
+    
     void setEyeButton()
     {
 
@@ -306,38 +391,6 @@ public class LabelTextField : MyTLP
             c.Cursor = Cursors.Hand;
         }
 
-    }
-
-    public CustomDateField _fTime;
-    void SetTimeField()
-    {
-        _fTime = new CustomDateField()
-        {
-            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
-            AutoSize = true,
-            Dock = DockStyle.Top
-        };
-        _fTime.dateField.Format = DateTimePickerFormat.Custom; 
-        _fTime.dateField.CustomFormat = "HH:mm:ss";
-        
-        _fTime.dateField.ShowUpDown = true;
-        this.Controls.Add(_fTime);
-    }
-    
-    public CustomDateField _fTimeHHMM;
-    void SetTimeFieldHHMM()
-    {
-        _fTimeHHMM = new CustomDateField()
-        {
-            Font = new Font("Segoe UI", 12F, FontStyle.Regular),
-            AutoSize = true,
-            Dock = DockStyle.Top
-        };
-        _fTimeHHMM.dateField.Format = DateTimePickerFormat.Custom; 
-        _fTimeHHMM.dateField.CustomFormat = "HH:mm";
-        
-        _fTimeHHMM.dateField.ShowUpDown = true;
-        this.Controls.Add(_fTimeHHMM);
     }
 
     void onClickEyeBtn()

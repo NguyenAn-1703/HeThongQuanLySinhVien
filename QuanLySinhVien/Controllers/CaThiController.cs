@@ -50,4 +50,25 @@ public class CaThiController
     {
         return _caThiDao.GetById(maCT);
     }
+
+    public List<CaThiDto> GetByHocKyNam(int hky, string nam)
+    {
+        return _caThiDao.GetByHocKyNam(hky, nam);
+    }
+
+    public int GetLastId()
+    {
+        _listCaThi = _caThiDao.GetAll();
+        return _listCaThi[_listCaThi.Count -1].MaCT;
+    }
+
+    public bool ExistById(int id)
+    {
+        _listCaThi = _caThiDao.GetAll();
+        foreach (CaThiDto item in _listCaThi)
+        {
+            if (item.MaCT == id) return true;
+        }
+        return false;
+    }
 }

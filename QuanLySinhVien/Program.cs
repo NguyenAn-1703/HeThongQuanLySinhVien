@@ -19,6 +19,8 @@ static class Program
         
         // Application.Run(new FLogin());
         
+        
+        
         NhomQuyenDto nhomQuyen = new NhomQuyenDto
         {
             MaNQ = 2,

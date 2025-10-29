@@ -112,4 +112,19 @@ public class CaThi_SinhVienDao
 
         return result;
     }
+    
+    public bool HardDeleteByMaCT(int maCT)
+    {
+        int rowAffected = 0;
+        using var conn = MyConnection.GetConnection();
+        string query = @"DELETE FROM CaThi_SinhVien
+                     WHERE MaCT = @MaCT";
+        using var cmd = new MySqlCommand(query, conn);
+        cmd.Parameters.AddWithValue("@MaCT", maCT);
+
+        rowAffected = cmd.ExecuteNonQuery();
+        return rowAffected > 0;
+    }
+
+    
 }

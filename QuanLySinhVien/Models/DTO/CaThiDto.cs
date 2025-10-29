@@ -8,4 +8,6 @@ public class CaThiDto
     public string Thu { get; set; }
     public string ThoiGianBatDau { get; set; }
     public string ThoiLuong { get; set; }
+    public string Nam { get; set; }
+    public int HocKy { get; set; }
 }

@@ -20,7 +20,7 @@ public class CustomDateField : RoundTLP
 
         
         dateField.Format = DateTimePickerFormat.Custom;
-        dateField.CustomFormat = " dd/MM/yyyy";
+        dateField.CustomFormat = "dd/MM/yyyy";
         
         
         dateField.AutoSize = true;

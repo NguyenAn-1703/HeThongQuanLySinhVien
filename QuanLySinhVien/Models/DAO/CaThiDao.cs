@@ -21,7 +21,10 @@ public class CaThiDao
     {
         List<CaThiDto> result = new();
         using var conn = MyConnection.GetConnection();
-        string query = "SELECT MaCT, MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong FROM CaThi WHERE Status = 1";
+        string query = @"SELECT MaCT, MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong, HocKy, Nam 
+                         FROM CaThi 
+                         WHERE Status = 1";
+
         using var cmd = new MySqlCommand(query, conn);
         using var reader = cmd.ExecuteReader();
 
@@ -34,7 +37,9 @@ public class CaThiDao
                 MaPH = reader.GetInt32("MaPH"),
                 Thu = reader.GetString("Thu"),
                 ThoiGianBatDau = reader.GetString("ThoiGianBatDau"),
-                ThoiLuong = reader.GetString("ThoiLuong")
+                ThoiLuong = reader.GetString("ThoiLuong"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam")
             });
         }
 
@@ -45,14 +50,19 @@ public class CaThiDao
     {
         int rowAffected = 0;
         using var conn = MyConnection.GetConnection();
-        string query = @"INSERT INTO CaThi (MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong)
-                         VALUES (@MaHP, @MaPH, @Thu, @ThoiGianBatDau, @ThoiLuong)";
+        string query = @"INSERT INTO CaThi 
+                         (MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong, HocKy, Nam) 
+                         VALUES 
+                         (@MaHP, @MaPH, @Thu, @ThoiGianBatDau, @ThoiLuong, @HocKy, @Nam)";
+
         using var cmd = new MySqlCommand(query, conn);
         cmd.Parameters.AddWithValue("@MaHP", caThi.MaHP);
         cmd.Parameters.AddWithValue("@MaPH", caThi.MaPH);
         cmd.Parameters.AddWithValue("@Thu", caThi.Thu);
         cmd.Parameters.AddWithValue("@ThoiGianBatDau", caThi.ThoiGianBatDau);
         cmd.Parameters.AddWithValue("@ThoiLuong", caThi.ThoiLuong);
+        cmd.Parameters.AddWithValue("@HocKy", caThi.HocKy);
+        cmd.Parameters.AddWithValue("@Nam", caThi.Nam);
 
         rowAffected = cmd.ExecuteNonQuery();
         return rowAffected > 0;
@@ -63,12 +73,15 @@ public class CaThiDao
         int rowAffected = 0;
         using var conn = MyConnection.GetConnection();
         string query = @"UPDATE CaThi 
-                         SET MaHP = @MaHP,
-                             MaPH = @MaPH,
-                             Thu = @Thu,
-                             ThoiGianBatDau = @ThoiGianBatDau,
-                             ThoiLuong = @ThoiLuong
+                         SET MaHP = @MaHP, 
+                             MaPH = @MaPH, 
+                             Thu = @Thu, 
+                             ThoiGianBatDau = @ThoiGianBatDau, 
+                             ThoiLuong = @ThoiLuong,
+                             HocKy = @HocKy,
+                             Nam = @Nam
                          WHERE MaCT = @MaCT";
+
         using var cmd = new MySqlCommand(query, conn);
         cmd.Parameters.AddWithValue("@MaCT", caThi.MaCT);
         cmd.Parameters.AddWithValue("@MaHP", caThi.MaHP);
@@ -76,6 +89,8 @@ public class CaThiDao
         cmd.Parameters.AddWithValue("@Thu", caThi.Thu);
         cmd.Parameters.AddWithValue("@ThoiGianBatDau", caThi.ThoiGianBatDau);
         cmd.Parameters.AddWithValue("@ThoiLuong", caThi.ThoiLuong);
+        cmd.Parameters.AddWithValue("@HocKy", caThi.HocKy);
+        cmd.Parameters.AddWithValue("@Nam", caThi.Nam);
 
         rowAffected = cmd.ExecuteNonQuery();
         return rowAffected > 0;
@@ -88,6 +103,7 @@ public class CaThiDao
         string query = @"UPDATE CaThi 
                          SET Status = 0 
                          WHERE MaCT = @MaCT";
+
         using var cmd = new MySqlCommand(query, conn);
         cmd.Parameters.AddWithValue("@MaCT", maCT);
 
@@ -99,8 +115,10 @@ public class CaThiDao
     {
         CaThiDto result = null;
         using var conn = MyConnection.GetConnection();
-        string query = @"SELECT MaCT, MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong 
-                         FROM CaThi WHERE Status = 1 AND MaCT = @MaCT";
+        string query = @"SELECT MaCT, MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong, HocKy, Nam 
+                         FROM CaThi 
+                         WHERE Status = 1 AND MaCT = @MaCT";
+
         using var cmd = new MySqlCommand(query, conn);
         cmd.Parameters.AddWithValue("@MaCT", maCT);
         using var reader = cmd.ExecuteReader();
@@ -114,10 +132,50 @@ public class CaThiDao
                 MaPH = reader.GetInt32("MaPH"),
                 Thu = reader.GetString("Thu"),
                 ThoiGianBatDau = reader.GetString("ThoiGianBatDau"),
-                ThoiLuong = reader.GetString("ThoiLuong")
+                ThoiLuong = reader.GetString("ThoiLuong"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam")
             };
         }
 
         return result;
     }
+    
+    public List<CaThiDto> GetByHocKyNam(int hky, string nami)
+    {
+        string nam = nami.Split(" ")[0];
+        
+        List<CaThiDto> result = new();
+        using var conn = MyConnection.GetConnection();
+        string query = @"SELECT MaCT, MaHP, MaPH, Thu, ThoiGianBatDau, ThoiLuong, HocKy, Nam 
+                         FROM CaThi 
+                         WHERE Status = 1 AND Nam = @Nam AND HocKy = @HocKy";
+
+        using var cmd = new MySqlCommand(query, conn);
+        cmd.Parameters.AddWithValue("@Nam", nam);
+        cmd.Parameters.AddWithValue("@HocKy", hky);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new CaThiDto
+            {
+                MaCT = reader.GetInt32("MaCT"),
+                MaHP = reader.GetInt32("MaHP"),
+                MaPH = reader.GetInt32("MaPH"),
+                Thu = reader.GetString("Thu"),
+                ThoiGianBatDau = reader.GetString("ThoiGianBatDau"),
+                ThoiLuong = reader.GetString("ThoiLuong"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam")
+            });
+        }
+
+        return result;
+    }
+    
 }
+
+    
+ 
+
