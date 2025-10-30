@@ -2,42 +2,86 @@ using System.Data;
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
+using QuanLySinhVien.Views.Components.CommonUse.Search.SearchObject;
 using QuanLySinhVien.Views.Components.NavList;
+using QuanLySinhVien.Views.Components.NavList.Dialog;
+using QuanLySinhVien.Views.Components.ViewComponents;
 using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Views.Structs;
+
 namespace QuanLySinhVien.Views.Components;
 public class NhapDiem : NavBase
 {
     private string ID = "NHAPDIEM";
-    private string[] _listSelectionForComboBox = new []{""};
-    
-    private DataGridView dataGridView1;
-    private DataTable table;
-    private CUse _cUse;
-    private ChiTietQuyenController _chiTietQuyenController;
-    private ChucNangController _chucNangController;
+    private string _title = "Nhập điểm";
+    private List<string> _listSelectionForComboBox;
+    private CustomTable _table;
+    private NhomQuyenController _nhomQuyenController;
+    string[] _headerArray = new string[]
+    {
+        "Mã nhóm HP",
+        "Tên HP",
+        "Sĩ số",
+        "Giảng viên",
+    };
+    List<string> _headerList;
+    // private TitleButton _insertButton;
+
+    List<NhomHocPhanDto> _rawData;
+    List<object> _displayData;
+
+    private NhomHocPhanSearch _NhomHocPhanSearch;
+    private NhomHocPhanController _NhomHocPhanController;
     
     private List<ChiTietQuyenDto> _listAccess;
-    public NhapDiem(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
-    {
-        _chiTietQuyenController = ChiTietQuyenController.getInstance();
-        _chucNangController = ChucNangController.getInstance();
-        _cUse = new CUse();
-        Init();
-        SetupDataGridView();
-    }
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    private HocPhanController _hocPhanController;
+    private PhongHocController _phongHocController;
+    
+    private GiangVienController _giangVienController;
+
+    private bool them = false;
+    private bool sua = false;
+    private bool xoa = false;
     
 
-        
+    public NhapDiem(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
+    {
+        _rawData = new List<NhomHocPhanDto>();
+        _displayData = new List<object>();
+        _NhomHocPhanController = NhomHocPhanController.GetInstance();
+        _nhomQuyenController = NhomQuyenController.GetInstance();
+        _chiTietQuyenController = ChiTietQuyenController.getInstance();
+        _chucNangController = ChucNangController.getInstance();
+        _hocPhanController = HocPhanController.GetInstance();
+        _phongHocController = PhongHocController.getInstance();
+        _giangVienController = GiangVienController.GetInstance();
+        Init();
+    }
+
+    private MyTLP _mainLayout;
     private void Init()
     {
         CheckQuyen();
-        //BackColor = Color.Blue;
+        
         Dock = DockStyle.Fill;
-        Size = new Size(1200, 900);
-        Controls.Add(Bottom());
-        Controls.Add(Top());
+
+        _mainLayout = new MyTLP
+        {
+            RowCount = 2,
+            Dock = DockStyle.Fill,
+        };
+        _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        _mainLayout.Controls.Add(Top());
+        SetBottom();
+        
+
+        Controls.Add(_mainLayout);
     }
-    
+
     void CheckQuyen()
     {
         int maCN = _chucNangController.GetByTen(ID).MaCN;
@@ -46,165 +90,280 @@ public class NhapDiem : NavBase
         {
             Console.WriteLine(x.HanhDong);
         }
+
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
+        {
+            them = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
+        {
+            sua = true;
+        }
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
+        {
+            xoa = true;
+        }
+        
     }
 
+
+    private MyTLP _panelTop;
     private Panel Top()
     {
-        Panel mainTop = new Panel
-        {
-            Dock = DockStyle.Top,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            //BackColor = Color.Red,
-            Height = 120,
-        };
-        var header = new TableLayoutPanel
+        _panelTop = new MyTLP
         {
             Dock = DockStyle.Fill,
+            AutoSize = true,
+            Padding = new Padding(10, 7, 10, 0),
             ColumnCount = 3,
-            RowCount = 1,
-            Padding = new Padding(20, 10, 20, 10),
+            BackColor = MyColor.GrayBackGround
         };
-        header.ColumnStyles.Clear();
-        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        header.RowStyles.Clear();
-        header.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        // Title
-        var textNavList = new Label
-        {
-            Text = "Nhập Điểm",
-            AutoSize = true,
-        };
+        _panelTop.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        _panelTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        _panelTop.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+        _panelTop.Controls.Add(getTitle());
+        SetHKyNamContainer();
         
-        var filters = new FlowLayoutPanel
-        {
-            FlowDirection = FlowDirection.LeftToRight,
-            AutoSize = true,
-            WrapContents = false,
-            Anchor = AnchorStyles.Top | AnchorStyles.Right,
-            Margin = new Padding(0, 8, 12, 0),
-        };
-        Panel MakeLabeledInput(string labelText, int labelWidth, int inputWidth)
-        {
-            var panel = new Panel { Width = labelWidth + inputWidth, Height = 36, Margin = new Padding(8, 30, 8, 0) };
-            var lbl = new Label { Text = labelText, Width = labelWidth, Dock = DockStyle.Left, TextAlign = ContentAlignment.MiddleLeft };
-            var tb  = new TextBox { Width = inputWidth, Dock = DockStyle.Right };
-            panel.Controls.Add(tb);
-            panel.Controls.Add(lbl);
-            return panel;
-        }
-        filters.Controls.Add(MakeLabeledInput("Học phần:", 90, 220));
-        filters.Controls.Add(MakeLabeledInput("Lớp:", 60, 200));
-
-        // Action button
-        var btnAction = new Button
-        {
-            Text = "Tìm",
-            AutoSize = true,
-            Padding = new Padding(16, 10, 16, 10),
-            Margin = new Padding(0),
-            Anchor = AnchorStyles.None,
-        };
-
-        // Add to header
-        header.Controls.Add(textNavList, 0, 0);
-        header.Controls.Add(filters, 1, 0);
-        header.Controls.Add(btnAction, 2, 0);
-        mainTop.Controls.Add(header);
-        return mainTop;
+        return _panelTop;
     }
 
-    private Panel Bottom()
+    private LabelTextField _hocKyField;
+    private LabelTextField _namField;
+    private void SetHKyNamContainer()
     {
-        Panel mainBot = new Panel
+        MyTLP panel = new MyTLP
         {
+            ColumnCount = 2,
+            AutoSize = true,
+        };
+
+        _hocKyField = new LabelTextField("Học kỳ", TextFieldType.Combobox);
+        _hocKyField._combobox.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
+        string[] listHK = new[] { "Học kỳ 1", "Học kỳ 2" };
+        _hocKyField.SetComboboxList(listHK.ToList());
+        _hocKyField.SetComboboxSelection("Học kỳ 1");
+        
+        _namField = new LabelTextField("Năm", TextFieldType.Year);
+        _namField.Font =  GetFont.GetFont.GetMainFont(14, FontType.Regular);
+        _namField._namField.Value = DateTime.Now;
+
+        
+        panel.Controls.Add(_hocKyField);
+        panel.Controls.Add(_namField);
+        
+        _panelTop.Controls.Add(panel);
+    }
+
+    MyTLP _panelBottom;
+    private MyTLP _screen;
+    private void SetBottom()
+    {
+        _screen = new MyTLP { Margin = new Padding(0), Dock = DockStyle.Fill };
+        _panelBottom = new RoundTLP
+        {
+            Border = true,
             Dock = DockStyle.Fill,
-            // BackColor = Color.Green,
-            BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Padding = new Padding(20 , 0 , 20 , 0),
+            AutoSize = true,
+            RowCount = 2,
+            ColumnCount = 2,
+            Padding = new Padding(10),
+            Margin = new Padding(0),
+        };
+
+        _panelBottom.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _panelBottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        Label lblNhomHocPhan = new Label
+        {
+            Margin = new Padding(5),
+            AutoSize = true,
+            Text="Nhóm học phần",
+            Font = GetFont.GetFont.GetMainFont(13, FontType.Black),
         };
         
+        _panelBottom.Controls.Add(lblNhomHocPhan);
+
+
+        SetCombobox();
+
+        SetDataTableFromDb();
+
+        SetSearch();
+
+        SetAction();
         
-        mainBot.Controls.Add(getDataGridView());
-        
-        return mainBot;
+        _panelBottom.Controls.Add(_table);
+        _panelBottom.SetColumnSpan(_table, 2);
+
+        _screen.Controls.Add(_panelBottom);
+        _mainLayout.Controls.Add(_screen);
     }
 
-    private DataGridView getDataGridView()
+    //////////////////////////////SETTOP///////////////////////////////
+    Label getTitle()
     {
-        dataGridView1 = _cUse.getDataView(710 , 1140 , 20 , 20);
-        dataGridView1.ReadOnly = false;
-        dataGridView1.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        Label titlePnl = new Label
+        {
+            Text = _title,
+            Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
+            AutoSize = true,
+            Anchor = AnchorStyles.Left
+        };
+        return titlePnl;
+    }
+
+
+    //////////////////////////////SETTOP///////////////////////////////
+
+
+    /// ///////////////////////////SETBOTTOM////////////////////////////////////
+    void SetCombobox()
+    {
+        _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
+        _listSelectionForComboBox = _headerList;
+    }
+
+
+    void SetDataTableFromDb()
+    {
+        string hkyS = _hocKyField.GetSelectionCombobox();
+        int hky = int.Parse(hkyS.Split(' ')[2]);
+        string nam = DateTime.Now.ToString("yyyy");
         
-        return dataGridView1;
+        // lấy ds nhóm học phần theo học kỳ và năm, theo giảng viên, nếu admin thì lấy toàn bộ giảng viên
+        if (_quyen.TenNhomQuyen.Equals("admin"))
+        {
+            _rawData = _NhomHocPhanController.GetByHkyNam(hky, nam);
+        }
+        else
+        {
+            GiangVienDto GV = _giangVienController.GetByMaTK(_taiKhoan.MaTK);
+            _rawData = _NhomHocPhanController.GetByHkyNamMaGV(hky, nam, GV.MaGV);
+        }
+        
+        SetDisplayData();
+        
+        string[] columnNames = new[] { "MaNHP", "TenHP", "Siso", "TenGiangVien"};
+        List<string> columnNamesList = columnNames.ToList();
+
+        _table = new CustomTable(_headerList, columnNamesList, _displayData, false);
+    }
+
+    void SetDisplayData()
+    {
+        _displayData = ConvertObject.ConvertToDisplay(ConvertDtoToDisplay(_rawData), x => new
+            {
+                MaNHP = x.MaNHP,
+                TenHP = x.TenHP,
+                Siso = x.Siso,
+                TenGiangVien = x.TenGiangVien,
+            }
+        );
+    }
+
+
+    void SetSearch()
+    {
+        _NhomHocPhanSearch = new NhomHocPhanSearch(ConvertDtoToDisplay(_rawData));
+    }
+
+    void SetAction()
+    {
+        _NhomHocPhanSearch.FinishSearch += dtos =>
+        {
+            UpdateDataDisplay(dtos);
+            this._table.UpdateData(_displayData);
+        };
+
+        
+        _table.OnDetail += index => { ChangePanel(index); };
+
+        _hocKyField._combobox.combobox.SelectedIndexChanged += (sender, args) => OnChangeHKNam();
+        _namField._namField.ValueChanged += (sender, args) => OnChangeHKNam();
+    }
+
+    void OnChangeHKNam()
+    {
+        string hkyS = _hocKyField.GetSelectionCombobox();
+        int hky = int.Parse(hkyS.Split(' ')[2]);
+
+        string nam = _namField.GetTextNam();
+        
+        // lấy ds nhóm học phần theo học kỳ và năm, theo giảng viên, nếu admin thì lấy toàn bộ giảng viên
+        if (_quyen.TenNhomQuyen.Equals("admin"))
+        {
+            _rawData = _NhomHocPhanController.GetByHkyNam(hky, nam);
+        }
+        else
+        {
+            GiangVienDto GV = _giangVienController.GetByMaTK(_taiKhoan.MaTK);
+            _rawData = _NhomHocPhanController.GetByHkyNamMaGV(hky, nam, GV.MaGV);
+        }
+        UpdateDataDisplay(ConvertDtoToDisplay(_rawData));
+        _table.UpdateData(_displayData);
+    }
+
+    void UpdateDataDisplay(List<NhomHocPhanDisplay> dtos)
+    {
+        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        {
+            MaNHP = x.MaNHP,
+            TenHP = x.TenHP,
+            Siso = x.Siso,
+            TenGiangVien = x.TenGiangVien,
+        });
     }
     
-    private void SetupDataGridView()
+    void ChangePanel(int id)
     {
-        table = new DataTable();
-        
-        // add row table
-        table.Columns.Add("Mã SV", typeof(string));
-        table.Columns.Add("Họ và tên", typeof(string));
-        table.Columns.Add("Điểm quá trình", typeof(double));
-        table.Columns.Add("Điểm giữa kỳ", typeof(double));
-        table.Columns.Add("Điểm cuối kỳ", typeof(double));
-        table.Columns.Add("Điểm hệ 10", typeof(double));
-        table.Columns.Add("Điểm hệ 4", typeof(double));
+        _screen.SuspendLayout();
+        _screen.Controls.Clear();
+        NhapDiemDialog nhapDiemDialog = new NhapDiemDialog("Nhập điểm", id);
 
-        // add database
-        for (int i = 0; i < 30; i++)
-        {
-            table.Rows.Add("3123410025", "Nguyễn âu gia bảo", "1" , "1" , "1" , "1", "1");
-        }
-        
-        // set Width
-        dataGridView1.AutoGenerateColumns = true;
-        dataGridView1.DataSource = table;
-        dataGridView1.RowTemplate.Height = 37;
-        // delete border
-        dataGridView1.BorderStyle = BorderStyle.None;
-        dataGridView1.CellBorderStyle = DataGridViewCellBorderStyle.None;
-        dataGridView1.RowHeadersVisible = false;
-        
-        // change Width
-        dataGridView1.DataBindingComplete += (s, e) =>
-        {
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        nhapDiemDialog.Back += () => ResetPanel();
+        _screen.Controls.Add(nhapDiemDialog);
+        _screen.ResumeLayout();
 
-            int[] weights = {150, 250, 170, 150, 140, 130, 128};
-            for (int i = 0; i < dataGridView1.Columns.Count && i < weights.Length; i++)
-            {
-                var col = dataGridView1.Columns[i];
-                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                col.FillWeight = weights[i];
-                col.MinimumWidth = 60;
-            }
-        };
-        // change header
-        dataGridView1.EnableHeadersVisualStyles = false;
-        dataGridView1.Dock = DockStyle.Fill;
-        dataGridView1.ColumnHeadersHeight = 45;
-        dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-        dataGridView1.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-        dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-        dataGridView1.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
-        {
-            BackColor = ColorTranslator.FromHtml("#07689F"),
-            ForeColor = ColorTranslator.FromHtml("#f5f5f5"),
-            //ForeColor = Color.White,
-            // Font = new Font("JetBrains Mono", 10f, FontStyle.Bold),
-            Alignment = DataGridViewContentAlignment.MiddleCenter,
-        };
+        _namField.Enabled = false;
+        _hocKyField.Enabled = false;
     }
 
+    void ResetPanel()
+    {
+        _screen.Controls.Clear();
+        _screen.Controls.Add(_panelBottom);
+        _namField.Enabled = true;
+        _hocKyField.Enabled = true;
+    }
+
+    void Delete(int index)
+    {
+        
+    }
+    
+    List<NhomHocPhanDisplay> ConvertDtoToDisplay(List<NhomHocPhanDto> input)
+    {
+        List<NhomHocPhanDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new NhomHocPhanDisplay
+        {
+            MaNHP = x.MaNHP,
+            TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
+            Siso = x.SiSo,
+            TenGiangVien = _giangVienController.GetById(x.MaGV).TenGV,
+        });
+        return rs;
+    }
+    
+
+    /// ///////////////////////////SETBOTTOM////////////////////////////////////
     public override List<string> getComboboxList()
     {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        return this._listSelectionForComboBox;
     }
-    
+
     public override void onSearch(string txtSearch, string filter)
-    { }
+    {
+        this._NhomHocPhanSearch.Search(txtSearch, filter, ConvertDtoToDisplay(_rawData));
+    }
 }

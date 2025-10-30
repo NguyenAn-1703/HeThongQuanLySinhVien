@@ -1,17 +1,9 @@
 using System.ComponentModel;
-using System.Data;
 using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
-#region Cách dùng
-
-//Set bool action trước để set nút xóa, sửa
-//Nếu set action và không set nút, tự động sẽ có nút xóa
-
-#endregion
-
-public class CustomTable : MyTLP
+public class TableNhapDiem : MyTLP
 {
     public CustomDataGridView _dataGridView;
     List<string> _headerContent;
@@ -32,7 +24,7 @@ public class CustomTable : MyTLP
     public event Action<int> OnDetail;
     
 
-    public CustomTable(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false,
+    public TableNhapDiem(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false,
         bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
@@ -51,6 +43,7 @@ public class CustomTable : MyTLP
         SetHeader();
         SetContent();
         SetEventListen();
+        SetCotDiem();
     }
 
     void Configuration()
@@ -67,7 +60,6 @@ public class CustomTable : MyTLP
         _header.Dock = DockStyle.Top;
         _header.AutoSize = true;
         _header.FlowDirection = FlowDirection.LeftToRight;
-        _header.WrapContents = false;
         _header.BackColor = MyColor.MainColor;
         _header.Margin = new Padding(0, 0, 0, 0);
         _header.Padding = new Padding(0, 0, 0, 0);
@@ -116,7 +108,6 @@ public class CustomTable : MyTLP
 
         _dataGridView.Dock = DockStyle.Fill;
         _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
-        Console.WriteLine(_cellDatas.Count);
             
         this.Controls.Add(_dataGridView);
         
@@ -126,7 +117,8 @@ public class CustomTable : MyTLP
     {
         Label lbl = new Label
         {
-            Dock = DockStyle.Top,
+            // Dock = DockStyle.Top,
+            Anchor = AnchorStyles.None,
             Height = 30,
             TextAlign = ContentAlignment.MiddleCenter,
             Text = text,
@@ -254,8 +246,7 @@ public class CustomTable : MyTLP
 
     void detail(int index)
     {
-        // object o = _cellDatas[index];
-        // Console.WriteLine("Chi tiết" + o.ToString());
+
         
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
         
@@ -266,7 +257,6 @@ public class CustomTable : MyTLP
     {
         int tableWidth;
         int columnSize;
-        Console.WriteLine(_header.Controls.Count);
 
         if (_dataGridView.DisplayedRowCount(false) < _dataGridView.RowCount)
         {
@@ -282,12 +272,12 @@ public class CustomTable : MyTLP
         {
             tableWidth = this.Width;
             columnSize = tableWidth / _header.Controls.Count;
+            
             foreach (Control c in _header.Controls)
             {
                 c.Size = new Size(columnSize, c.Height);
             }
         }
-
     }
 
     public void UpdateData(List<List<object>> newRows)
@@ -335,109 +325,280 @@ public class CustomTable : MyTLP
         _displayCellData = new BindingList<object>(_cellDatas);
         _dataGridView.DataSource = _displayCellData;
     }
-
-    public void AddColumn(ColumnType columnType, string title)
+    void SetCotDiem()
     {
-        if (columnType == ColumnType.CheckBox)
-        {
-            AddCbColumn(title);
-        }
-    }
-
-    public event Action<int, bool> ClickCB;
-
-    void AddCbColumn(string title)
-    {
-        DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn();
-        // chkCol.HeaderText = "Chọn";
-        chkCol.Name = "colChon";
-        // chkCol.Width = 50; // Tùy chỉnh độ rộng
-        chkCol.ReadOnly = false;
-        _dataGridView.Columns.Add(chkCol);
         _dataGridView.ReadOnly = false;
-        // _dataGridView.AutoGenerateColumns = false;
-        this._header.Controls.Add(GetLabel(title));
+        AddColumnTongDiem();
         
+        AddColumn();
         
-        _dataGridView.CurrentCellDirtyStateChanged += (sender, e) =>
+        SetActionDgv();
+        SetAction();
+    }
+
+    private CustomButton _addColBtn;
+    void AddColumnTongDiem()
+    {
+        MyTLP pnlCot =  new MyTLP
         {
-            if (_dataGridView.IsCurrentCellDirty)
-            {
-                _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
-            }
+            Height = 70,
+            ColumnCount = 2,
+            Margin = new Padding(0,3, 0, 3),
         };
+        pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        _addColBtn = new CustomButton(15,15,"plus.svg", MyColor.GrayBackGround, false, false, false, false){Anchor = AnchorStyles.None};
+        _addColBtn.HoverColor = MyColor.GrayHoverColor;
+        _addColBtn.SelectColor = MyColor.GraySelectColor;
+
+        Label title = GetLabel("Tổng điểm");
+        title.Margin = new Padding(3, 3,20 ,3);
+
+        pnlCot.Controls.Add(_addColBtn);
+        pnlCot.Controls.Add(title);
+        _header.Controls.Add(pnlCot);
         
-        _dataGridView.CellContentClick += (sender, e) =>
+        
+        DataGridViewTextBoxColumn textColTongDiem = new DataGridViewTextBoxColumn();
+        textColTongDiem.HeaderText = "Tổng điểm";
+        textColTongDiem.Name = "TongDiem";
+        textColTongDiem.ReadOnly = true;
+        textColTongDiem.DefaultCellStyle.NullValue = 0 + "";
+
+        _dataGridView.Columns.Add(textColTongDiem);
+    }
+
+    void SetAction()
+    {
+        _addColBtn._mouseDown += () => AddColumn();
+    }
+
+    private List<TextBox> listTbHeSo = new List<TextBox>();
+    private List<string> listDColumnName = new List<string>();
+    private int index = 0;
+    void AddColumn()
+    {
+        _header.SuspendLayout();
+
+        // tối đa 5 cột điểm
+        if (index >= 5)
         {
-            OnClickCB(e);
+            MessageBox.Show("Chỉ được thêm tối đa 5 cột điểm", "Thông báo", MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+            return;
+        }
+        index++;
+        //thêm header
+        MyTLP pnlCot =  new MyTLP
+        {
+            Height = 70,
+            ColumnCount = 2,
+            RowCount = 2,
+            Margin = new Padding(0,3, 0, 3),
         };
-    }
-    // Cài đặt sk click cb
-    void OnClickCB(DataGridViewCellEventArgs e)
-    {
-        if (_dataGridView.Columns[e.ColumnIndex].Name == "colChon" && e.RowIndex >= 0)
+        pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        
+        Label title = GetLabel("Cột điểm " + index);
+        Label lblhs = GetLabel("H.Số:");
+        lblhs.AutoSize = true;
+
+        
+        TextBox hso = new  TextBox
         {
-            bool isChecked = Convert.ToBoolean(_dataGridView.Rows[e.RowIndex].Cells["colChon"].EditedFormattedValue);
-            int i = Convert.ToInt32(_dataGridView.Rows[e.RowIndex].Cells[0].Value);
-            ClickCB?.Invoke(i, isChecked);
-        }
+            Dock = DockStyle.Fill,
+            Font = GetFont.GetFont.GetMainFont(9, FontType.Regular),
+            TextAlign = HorizontalAlignment.Center,
+            PlaceholderText = "Hệ số",
+            TabIndex = index,
+            Text = "1",
+        };
+        hso.Leave += (sender, args) => OnChangeHeSo(hso);
+        
+        listTbHeSo.Add(hso);
+        
+        pnlCot.Controls.Add(title);
+        pnlCot.SetColumnSpan(title, 2);
+        pnlCot.Controls.Add(lblhs);
+        pnlCot.Controls.Add(hso);
+
+        _header.Controls.Add(pnlCot);
+        
+        int insertIndex = _header.Controls.Count - 2;
+        _header.Controls.SetChildIndex(pnlCot, insertIndex);
+        
+        //thêm cột
+        DataGridViewTextBoxColumn colNhapDiem = new DataGridViewTextBoxColumn();
+        colNhapDiem.HeaderText = "Nhập điểm";
+        colNhapDiem.Name = "colNhapDiem " + index;
+        colNhapDiem.DefaultCellStyle.NullValue = 0 + "";
+
+        listDColumnName.Add(colNhapDiem.Name);
+        
+        _dataGridView.Columns.Insert(insertIndex, colNhapDiem);
+        OnResize();
+        _header.ResumeLayout();
     }
 
-    public void FailCb(int i)
+    void SetActionDgv()
     {
-        int rowIndex = -1;
-        foreach (DataGridViewRow row in _dataGridView.Rows)
+        _dataGridView.EditingControlShowing += (sender, args) => dataGridView1_EditingControlShowing(sender, args);
+        _dataGridView.CellMouseEnter += (sender, args) => dataGridView1_CellMouseEnter(sender, args);
+        _dataGridView.CellPainting += (sender, args) => dataGridView1_CellPainting(sender, args);
+        _dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
+        _dataGridView.CellValueChanged += (sender, args) => dataGridView1_CellValueChanged(sender, args);
+        _dataGridView.CellLeave += (sender, args) => dataGridView1_CellLeave(sender, args);
+    }
+    
+    
+    private void dataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+    {
+        if (e.Control is TextBox tb)
         {
-            if (row.Cells[0].Value != null && Convert.ToInt32(row.Cells[0].Value) == i)
+            tb.BorderStyle = BorderStyle.FixedSingle;
+            tb.BackColor = Color.White;
+            tb.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+            tb.Margin = new Padding(0, 0, 19, 0);
+            tb.AutoSize = false;
+            tb.Dock = DockStyle.Fill;
+        }
+    }
+    
+    private void dataGridView1_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+        {
+            var dgv = sender as DataGridView;
+            var columnName = dgv.Columns[e.ColumnIndex].Name;
+            
+            if (columnName.StartsWith("colNhapDiem"))
             {
-                rowIndex = row.Index;
-                break;
+                dgv.Cursor = Cursors.Hand;
             }
-        }
-        _dataGridView.Rows[rowIndex].Cells["colChon"].Value = false;
-        _dataGridView.RefreshEdit();
-        _dataGridView.Refresh();
-    }
-
-    public void tickCB(int i)
-    {
-        int rowIndex = -1;
-        foreach (DataGridViewRow row in _dataGridView.Rows)
-        {
-            if (row.Cells[0].Value != null && Convert.ToInt32(row.Cells[0].Value) == i)
+            else
             {
-                rowIndex = row.Index;
-                break;
+                dgv.Cursor = Cursors.Default;
             }
+            
         }
-        
-        _dataGridView.Rows[rowIndex].Cells["colChon"].Value = true;
-        
-        _dataGridView.RefreshEdit();
-        _dataGridView.Refresh();
     }
 
-    public void ConfigDKHP()
+    private void dataGridView1_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
     {
-        _dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-        _dataGridView.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+        if (e.RowIndex < 0 || e.ColumnIndex < 0)
+            return;
+
+        var dgv = sender as DataGridView;
+        var columnName = dgv.Columns[e.ColumnIndex].Name;
+
+        if (columnName.StartsWith("colNhapDiem"))
+        {
+            e.PaintBackground(e.ClipBounds, true);
+            e.PaintContent(e.ClipBounds);
+
+            using (Pen p = new Pen(Color.Gray, 1))
+            {
+                Rectangle rect = e.CellBounds;
+                rect.X += 2;
+                rect.Y += 2;
+                rect.Width -= 4; 
+                rect.Height -= 4;
+                e.Graphics.DrawRectangle(p, rect);
+            }
+
+            e.Handled = true;
+        }
     }
 
-    public void DisapleActionColumn()
+    private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
     {
-        if (!_action) return;
-        if (!_dataGridView.Columns["Action"].Visible) return;
-        _header.Controls.RemoveAt(_header.Controls.Count - 1);
-        _dataGridView.Columns["Action"].Visible = false;
-        this.OnResize();
+        var dgv = sender as DataGridView;
+        if (e.RowIndex < 0 || e.ColumnIndex < 0) return; // bỏ header
+
+        var column = dgv.Columns[e.ColumnIndex];
+        if (column.Name.StartsWith("colNhapDiem"))
+        {
+            OnChangeDiem(e.RowIndex, e.ColumnIndex);
+        }
     }
-    public void EnableActionColumn()
+    
+    private void dataGridView1_CellLeave(object sender, DataGridViewCellEventArgs e)
     {
-        if (!_action) return;
-        if (_dataGridView.Columns["Action"].Visible) return;
-        _dataGridView.Columns["Action"].Visible = true;
-        
-        _header.Controls.Add(GetLabel("Hành động"));
-        this.OnResize();
+        if (_dataGridView.IsCurrentCellInEditMode)
+            _dataGridView.EndEdit();
     }
+
+    void OnChangeDiem(int rowIndex, int columnIndex)
+    {
+        DataGridViewCell cell = _dataGridView.Rows[rowIndex].Cells[columnIndex];
+        if (cell == null)
+        {
+            return;
+        }
+        string diem =  cell.Value.ToString();
+        if (!ValidateDiem(diem))
+        {
+            cell.Value = 0;
+            return;
+        }
+        UpdateTongDiem(rowIndex);
+    }
+
+    void OnChangeHeSo(TextBox heso)
+    {
+        if (!ValidateHeSo(heso.Text.Trim()))
+        {
+            heso.Text = "1";
+        }
+    }
+
+    void UpdateTongDiem(int rowIndex)
+    {
+        float tongDiem = 0;
+        float tongHeSo = 0;
+        for (int i = 0; i < listDColumnName.Count; i++)
+        {
+            DataGridViewCell cell = _dataGridView.Rows[rowIndex].Cells[listDColumnName[i]];
+            float diem;
+            int heso;
+            
+            if (cell.Value == null)
+            {
+                diem = 0;
+            }
+            else
+            {
+                diem = float.Parse(cell.Value.ToString());
+            }
+
+            if (listTbHeSo[i].Text.Trim().Equals(""))
+            {
+                heso = 0;
+            }
+            else
+            {
+                heso = int.Parse(listTbHeSo[i].Text.Trim());
+            }
+            
+            tongDiem += diem * heso;
+            tongHeSo += heso;
+        }
+
+        if (tongHeSo != 0)
+        {
+            _dataGridView.Rows[rowIndex].Cells["TongDiem"].Value = tongDiem / tongHeSo;
+        }
+    }
+
+    bool ValidateHeSo(string text)
+    {
+        return Validate.IsNumeric(text);
+    }
+
+    bool ValidateDiem(string diem)
+    {
+        return (Validate.IsValidDiem(diem));
+    }
+    
 }

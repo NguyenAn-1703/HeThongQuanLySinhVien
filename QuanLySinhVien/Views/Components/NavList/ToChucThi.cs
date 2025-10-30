@@ -20,13 +20,7 @@ public class ToChucThi : NavBase
     private CaThiController _CaThiController;
     private NhomQuyenController _nhomQuyenController;
     private CaThi_SinhVienController _caThiSinhVienController;
-    // public int MaCT { get; set; }
-    // public string TenHP { get; set; }
-    // public int TenPhong { get; set; }
-    // public int Thu { get; set; }
-    // public string ThoiGianBatDau { get; set; }
-    // public int ThoiLuong { get; set; }
-    // public int SiSo { get; set; }
+
     string[] _headerArray = new string[] { "Mã ca thi", "Học phần", "Phòng", "Thứ", "Thời gian bắt đầu" , "Thời lượng", "Sĩ số"};
     List<string> _headerList;
 
@@ -369,6 +363,15 @@ public class ToChucThi : NavBase
         }
         if (_CaThiController.Delete(index))
         {
+            List<CaThi_SinhVienDto> listctsv = _caThiSinhVienController.GetByMaCT(index);
+            foreach (CaThi_SinhVienDto ctsv in listctsv)
+            {
+                if (!_caThiSinhVienController.HardDeleteByMaCT(index))
+                {
+                    MessageBox.Show("Xóa ca thi sinh vien thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
             MessageBox.Show("Xóa ca thi thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
             UpdateDataDisplay(ConvertDtoToDisplay(_CaThiController.GetAll()));
             OnChangeHKNam();

@@ -425,16 +425,16 @@ INSERT INTO Lop (MaGV, MaNganh, TenLop, SoLuongSV) VALUES
 -- 3
 INSERT INTO GiangVien
 (MaTK, MaKhoa, TenGV, NgaySinhGV, GioiTinhGV, SoDienThoai, Email, TrangThai, AnhDaiDienGV) VALUES
-                                                                                               (1, 1, 'Nguyễn Văn An', '1980-03-15', 'Nam', '0912345678', 'an.nguyen@univ.edu.vn', 'Đang công tác', 'an.jpg'),
-                                                                                               (2, 1, 'Trần Thị Bình', '1982-07-22', 'Nữ', '0923456789', 'binh.tran@univ.edu.vn', 'Đang công tác', 'binh.jpg'),
-                                                                                               (2, 1, 'Lê Quang Huy', '1985-05-10', 'Nam', '0934567890', 'huy.le@univ.edu.vn', 'Đang công tác', 'huy.jpg'),
-                                                                                               (2, 1, 'Phạm Minh Châu', '1983-09-30', 'Nữ', '0945678901', 'chau.pham@univ.edu.vn', 'Đang nghỉ phép', 'chau.jpg'),
-                                                                                               (2, 1, 'Đỗ Thị Thu Hà', '1987-01-25', 'Nữ', '0956789012', 'ha.do@univ.edu.vn', 'Đang công tác', 'ha.jpg'),
-                                                                                               (2, 2, 'Ngô Văn Dũng', '1979-11-12', 'Nam', '0967890123', 'dung.ngo@univ.edu.vn', 'Đang công tác', 'dung.jpg'),
-                                                                                               (2, 2, 'Vũ Thị Mai', '1986-04-18', 'Nữ', '0978901234', 'mai.vu@univ.edu.vn', 'Đang công tác', 'mai.jpg'),
-                                                                                               (2, 2, 'Bùi Anh Tuấn', '1984-08-05', 'Nam', '0989012345', 'tuan.bui@univ.edu.vn', 'Đang nghỉ phép', 'tuan.jpg'),
-                                                                                               (2, 2, 'Hoàng Lan Phương', '1988-02-14', 'Nữ', '0990123456', 'phuong.hoang@univ.edu.vn', 'Đang công tác', 'phuong.jpg'),
-                                                                                               (2, 2, 'Phan Văn Khánh', '1978-12-20', 'Nam', '0901234567', 'khanh.phan@univ.edu.vn', 'Đang công tác', 'khanh.jpg');
+                                                                                               (1, 1, 'Nguyễn Văn An', '1980-03-15', 'Nam', '0912345678', 'an.nguyen@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (4, 1, 'Ân giảng viên', '1982-07-22', 'Nam', '0923456789', 'an.gv@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (2, 1, 'Lê Quang Huy', '1985-05-10', 'Nam', '0934567890', 'huy.le@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (2, 1, 'Phạm Minh Châu', '1983-09-30', 'Nữ', '0945678901', 'chau.pham@univ.edu.vn', 'Đang nghỉ phép', 'defualt.jpg'),
+                                                                                               (2, 1, 'Đỗ Thị Thu Hà', '1987-01-25', 'Nữ', '0956789012', 'ha.do@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (2, 2, 'Ngô Văn Dũng', '1979-11-12', 'Nam', '0967890123', 'dung.ngo@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (2, 2, 'Vũ Thị Mai', '1986-04-18', 'Nữ', '0978901234', 'mai.vu@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (2, 2, 'Bùi Anh Tuấn', '1984-08-05', 'Nam', '0989012345', 'tuan.bui@univ.edu.vn', 'Đang nghỉ phép', 'defualt.jpg'),
+                                                                                               (2, 2, 'Hoàng Lan Phương', '1988-02-14', 'Nữ', '0990123456', 'phuong.hoang@univ.edu.vn', 'Đang công tác', 'defualt.jpg'),
+                                                                                               (2, 2, 'Phan Văn Khánh', '1978-12-20', 'Nam', '0901234567', 'khanh.phan@univ.edu.vn', 'Đang công tác', 'defualt.jpg');
 
 -- 4
 INSERT INTO Khoa (TenKHoa, Email, DiaChi) VALUES

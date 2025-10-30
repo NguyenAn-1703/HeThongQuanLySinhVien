@@ -273,8 +273,7 @@ public class MyHome : Form
         
         rightBottomChange.Dock = DockStyle.Fill;
         rightBottomHost.Controls.Add(rightBottomChange);
-
-
+        
         // if (rightBottomChange is DangKyHocPhan)
         // {
         //     _searchBar.Visible = false;
@@ -284,7 +283,6 @@ public class MyHome : Form
         //     _searchBar.Visible = true;
         // }
         
-
         if (rightBottomChange is TrangChu || rightBottomChange is DangKyHocPhan)
         {
             rightTop.Visible = false;

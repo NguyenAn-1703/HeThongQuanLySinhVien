@@ -34,6 +34,8 @@ public class RoundTLP : MyTLP
         Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
         
         e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+        
         using (GraphicsPath path = new GraphicsPath())
         {
             if(TopLeft) path.AddArc(rect.X, rect.Y, BorderRadius, BorderRadius, 180, 90);
@@ -50,8 +52,12 @@ public class RoundTLP : MyTLP
             
             path.CloseFigure();
             
-            this.Region = new Region(path);
-
+            using (Brush brush = new SolidBrush(this.BackColor))
+            {
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                e.Graphics.FillPath(brush, path);
+            }
+            
             if (Border)
             {
                 using (Pen pen = new Pen(BorderColor, BorderSize))
@@ -60,10 +66,10 @@ public class RoundTLP : MyTLP
                     e.Graphics.DrawPath(pen, path);
                 }
             }
+            
+            this.Region = new Region(path);
 
         }
         e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-        
-
     }
 }

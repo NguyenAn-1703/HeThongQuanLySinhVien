@@ -205,6 +205,67 @@ public class NhomHocPhanDao
 
         return result;
     }
+    
+    public List<NhomHocPhanDto> GetByHkyNam(int hky, string nam)
+    {
+        List<NhomHocPhanDto> result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaNHP, MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo FROM NhomHocPhan " +
+            "WHERE HocKy = @HocKy AND Nam = @Nam",
+            conn);
+        cmd.Parameters.AddWithValue("@HocKy", hky);
+        cmd.Parameters.AddWithValue("@Nam", nam);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new NhomHocPhanDto
+            {
+                MaNHP = reader.GetInt32("MaNHP"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaHP = reader.GetInt32("MaHP"),
+                MaLichDK = reader.GetInt32("MaLichDK"),
+                MaLop = reader.GetInt32("MaLop"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam"),
+                SiSo = reader.GetInt32("SiSo"),
+            });
+        }
+
+        return result;
+    }
+    
+    public List<NhomHocPhanDto> GetByHkyNamMaGV(int hky, string nam, int maGV)
+    {
+        List<NhomHocPhanDto> result = new();
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT MaNHP, MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo FROM NhomHocPhan " +
+            "WHERE HocKy = @HocKy AND Nam = @Nam AND MaGV = @MaGV",
+            conn);
+        cmd.Parameters.AddWithValue("@HocKy", hky);
+        cmd.Parameters.AddWithValue("@Nam", nam);
+        cmd.Parameters.AddWithValue("@MaGV", maGV);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new NhomHocPhanDto
+            {
+                MaNHP = reader.GetInt32("MaNHP"),
+                MaGV = reader.GetInt32("MaGV"),
+                MaHP = reader.GetInt32("MaHP"),
+                MaLichDK = reader.GetInt32("MaLichDK"),
+                MaLop = reader.GetInt32("MaLop"),
+                HocKy = reader.GetInt32("HocKy"),
+                Nam = reader.GetString("Nam"),
+                SiSo = reader.GetInt32("SiSo"),
+            });
+        }
+
+        return result;
+    }
 }
 
 

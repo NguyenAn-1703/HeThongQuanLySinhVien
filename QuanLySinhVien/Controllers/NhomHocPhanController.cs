@@ -61,4 +61,14 @@ public class NhomHocPhanController
         return _nhomHocPhanDao.GetByHkyNamMaHP(hky, nam,  maHP);
     }
 
+    public List<NhomHocPhanDto> GetByHkyNam(int hky, string nam)
+    {
+        return _nhomHocPhanDao.GetByHkyNam(hky, nam);
+    }
+    
+    public List<NhomHocPhanDto> GetByHkyNamMaGV(int hky, string nam, int maGV)
+    {
+        return _nhomHocPhanDao.GetByHkyNamMaGV(hky, nam, maGV);
+    }
+    
 }

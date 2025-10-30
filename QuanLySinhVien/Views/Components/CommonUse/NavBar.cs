@@ -103,16 +103,22 @@ public class NavBar : Panel
 
         if (_roleType.Equals("admin"))
         {
+            int index = 0;
             for (int i = 0; i < _arrDataNavItem.Length; i++)
             {
                 if (_listAccess.Any(x =>
                         x.TenCN.Equals(_arrDataNavItem[i].ID) || _arrDataNavItem[i].ID.Equals("TRANGCHU")))
                 {
-                    NavItem navItem = new NavItem(i, _arrDataNavItem[i].Svg + ".svg", _arrDataNavItem[i].Name);
+                    NavItem navItem = new NavItem(index, _arrDataNavItem[i].Svg + ".svg", _arrDataNavItem[i].Name);
+                    index++;
                     navItem.OnClickThisItem += this.UpdateStatusNavBar;
                     ButtonArray.Add(navItem);
-                    _mainLayout.Controls.Add(ButtonArray[i]);
                 }
+            }
+
+            foreach (NavItem item in ButtonArray)
+            {
+                _mainLayout.Controls.Add(item);
             }
         }
         else
@@ -122,7 +128,10 @@ public class NavBar : Panel
                 NavItem navItem = new NavItem(i, _listDataNavItemForSV[i].Svg + ".svg", _listDataNavItemForSV[i].Name);
                 navItem.OnClickThisItem += this.UpdateStatusNavBar;
                 ButtonArray.Add(navItem);
-                _mainLayout.Controls.Add(ButtonArray[i]);
+            }
+            foreach (NavItem item in ButtonArray)
+            {
+                _mainLayout.Controls.Add(item);
             }
         }
 

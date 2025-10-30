@@ -109,4 +109,14 @@ public class Validate
 
         return true;
     }
+    
+    public static bool IsValidDiem(string text)
+    {
+        if (double.TryParse(text, out double diem))
+        {
+            return diem >= 0 && diem <= 10;
+        }
+        return false;
+    }
+
 }
