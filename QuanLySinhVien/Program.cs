@@ -47,7 +47,7 @@ static class Program
         //     Type = "Sinh viên"
         // };
         // Application.Run(new MyHome(nhomQuyen, taiKhoan));
-        
+        //
         //GIANGVIEN
         NhomQuyenDto nhomQuyen = new NhomQuyenDto
         {

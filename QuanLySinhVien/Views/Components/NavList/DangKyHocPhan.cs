@@ -42,6 +42,7 @@ public class DangKyHocPhan : NavBase
     private PhongHocController _phongHocController;
     private DangKyController _dangKyController;
     private SinhVienController _sinhVienController;
+    private KetQuaController _ketQuaController;
     private LichDangKyDto _currentLichDangKy;
     private List<NhomHocPhanDto> _currentListNhp;
     
@@ -63,6 +64,7 @@ public class DangKyHocPhan : NavBase
         _phongHocController = PhongHocController.getInstance();
         _dangKyController = DangKyController.GetInstance();
         _sinhVienController = SinhVienController.GetInstance();
+        _ketQuaController = KetQuaController.GetInstance();
         _taiKhoan = taiKhoan;
         _sinhvien = _sinhVienController.GetByMaTK(taiKhoan.MaTK);
         Init();
@@ -510,6 +512,20 @@ public class DangKyHocPhan : NavBase
                 MessageBox.Show("Them dang ky that bai: " + maHpTrung + " !", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            //thêm luôn bảng kết quả
+            KetQuaDto ketQua = new KetQuaDto
+            {
+                MaHP = nhp.MaHP,
+                MaSV = _sinhvien.MaSinhVien,
+                HocKy = _hocKy,
+                Nam = _nam
+            };
+            if (!_ketQuaController.Insert(ketQua))
+            {
+                MessageBox.Show("Them ket qua that bai: !", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
             
             _rawDataDangKy.Add(nhp);
         }

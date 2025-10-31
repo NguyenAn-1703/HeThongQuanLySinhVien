@@ -30,6 +30,9 @@ public class NhapDiemDialog : RoundTLP
     private DangKyController _dangKyController;
     private HocPhanController _hocPhanController;
     private NhomHocPhanController _nhomHocPhanController;
+    private DiemQuaTrinhController _diemQuaTrinhController;
+    private KetQuaController _ketQuaController;
+    private CotDiemController _cotDiemController;
     private CustomButton _backButton;
     public event Action Back;
 
@@ -43,6 +46,9 @@ public class NhapDiemDialog : RoundTLP
         _hocPhanController =  HocPhanController.GetInstance();
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
         _nhomHP = _nhomHocPhanController.GetById(_idNHP);
+        _diemQuaTrinhController =  DiemQuaTrinhController.GetInstance();
+        _ketQuaController =  KetQuaController.GetInstance();
+        _cotDiemController =  CotDiemController.GetInstance();
         Init();
     }
 
@@ -68,7 +74,6 @@ public class NhapDiemDialog : RoundTLP
         this.Controls.Add(_mainLayout);
 
         SetAction();
-
         SetupDetail();
     }
 
@@ -91,7 +96,9 @@ public class NhapDiemDialog : RoundTLP
         string[] headers = new string[] {"Mã sinh viên", "Tên sinh viên", "Giới tính","Ngày sinh" }; 
         string[] columnNames = new string [] {"MaSV","TenSV","GioiTinh","NgaySinh"};
         SetDisplayData();
-        _tableSV = new TableNhapDiem(headers.ToList(),columnNames.ToList(), _displayData);
+        SetupCotDiem();
+        
+        _tableSV = new TableNhapDiem(headers.ToList(),columnNames.ToList(), _displayData, listDiemSV);
         _contentLayout.Controls.Add(_tableSV);
         _mainLayout.Controls.Add(_contentLayout);
     }
@@ -216,5 +223,44 @@ public class NhapDiemDialog : RoundTLP
             NgaySinh = x.NgaySinh
         });
         return rs;
+    }
+
+    private List<DiemSV> listDiemSV = new List<DiemSV>();
+    void SetupCotDiem()
+    {
+        int maHP = _nhomHP.MaHP;
+        List<KetQuaDto> listKq = new List<KetQuaDto>();
+
+        foreach (SinhVienDTO sv in _rawData)
+        {
+            if (_ketQuaController.ExistByMaSVMaHP(sv.MaSinhVien,  maHP))
+            {
+                KetQuaDto kq = _ketQuaController.GetByMaSVMaHP(sv.MaSinhVien, maHP);
+                listKq.Add(kq);
+            }
+        }
+        
+        foreach (KetQuaDto item in listKq)
+        {
+            if (_diemQuaTrinhController.ExistsByMaKQ(item.MaKQ))
+            {
+                DiemQuaTrinhDto diemQt =  _diemQuaTrinhController.GetByMaKQ(item.MaKQ);
+                List<CotDiemDto> listCotDiemSV = _cotDiemController.GetByMaDQT(diemQt.MaDQT);
+                DiemSV diemSv = new DiemSV
+                {
+                    MaSV = item.MaSV,
+                    listCotDiem = listCotDiemSV,
+                };
+                listDiemSV.Add(diemSv);
+            }
+        }
+        // foreach (var diemSV in listDiemSV)
+        // {
+        //     Console.WriteLine($"MaSV: {diemSV.MaSV}");
+        //         foreach (var cot in diemSV.listCotDiem)
+        //         {
+        //             Console.WriteLine($"    - {cot.TenCotDiem}: DiemSo = {cot.DiemSo}, HeSo = {cot.HeSo}");
+        //         }
+        // }
     }
 }

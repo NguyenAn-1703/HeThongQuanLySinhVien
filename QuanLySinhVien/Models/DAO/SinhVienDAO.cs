@@ -24,7 +24,7 @@ public class SinhVienDAO
             result.Add(new SinhVienDTO
             {
                 MaSinhVien = reader.GetInt32("MaSV"),
-                MaTk = reader.GetInt32("MaSV"),
+                MaTk = reader.GetInt32("MaTK"),
                 MaLop = reader.GetInt32("MaLop"),
                 MaKhoaHoc = reader.GetInt32("MaKhoaHoc"),
                 TenSinhVien = reader.GetString("TenSV"),
@@ -61,7 +61,7 @@ public class SinhVienDAO
             result = new SinhVienDTO
             {
                 MaSinhVien = reader.GetInt32("MaSV"),
-                MaTk = reader.GetInt32("MaSV"),
+                MaTk = reader.GetInt32("MaTK"),
                 MaLop = reader.GetInt32("MaLop"),
                 MaKhoaHoc = reader.GetInt32("MaKhoaHoc"),
                 TenSinhVien = reader.GetString("TenSV"),

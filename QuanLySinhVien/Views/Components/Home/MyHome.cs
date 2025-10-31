@@ -352,6 +352,7 @@ public class MyHome : Form
         }
         else
         {
+            Console.WriteLine("sv" + _sinhVienController.GetByMaTK(_taiKhoan.MaTK).MaSinhVien);
             gmail = _sinhVienController.GetByMaTK(_taiKhoan.MaTK).Email;
         }
         

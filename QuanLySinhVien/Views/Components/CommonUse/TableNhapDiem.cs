@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
@@ -22,9 +23,11 @@ public class TableNhapDiem : MyTLP
     public event Action<int> OnEdit;
     public event Action<int> OnDelete;
     public event Action<int> OnDetail;
-    
 
-    public TableNhapDiem(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false,
+    private List<DiemSV> _listDiemSV;
+
+    public TableNhapDiem(List<string> headerContent, List<string> columnNames, List<object> cells,
+        List<DiemSV> listDiemSV, bool action = false,
         bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
@@ -34,6 +37,7 @@ public class TableNhapDiem : MyTLP
         _edit = edit;
         _delete = delete;
         _columnNames = columnNames;
+        _listDiemSV = listDiemSV;
         Init();
     }
 
@@ -108,9 +112,8 @@ public class TableNhapDiem : MyTLP
 
         _dataGridView.Dock = DockStyle.Fill;
         _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
-            
+
         this.Controls.Add(_dataGridView);
-        
     }
 
     Label GetLabel(String text)
@@ -156,7 +159,7 @@ public class TableNhapDiem : MyTLP
         {
             Cursor = Cursors.Hand,
         };
-        
+
         _topForm.Controls.Add(_editBtn);
         _editBtn.BringToFront();
 
@@ -175,9 +178,10 @@ public class TableNhapDiem : MyTLP
         {
             _editBtn.Visible = false;
         }
-        _editBtn.MouseLeave +=  (sender, args) =>_editBtn.Visible = false;
-        
-        
+
+        _editBtn.MouseLeave += (sender, args) => _editBtn.Visible = false;
+
+
         _editBtn.MouseDown += (sender, args) => edit(index);
     }
 
@@ -190,7 +194,7 @@ public class TableNhapDiem : MyTLP
         {
             Cursor = Cursors.Hand,
         };
-        
+
         _topForm.Controls.Add(_deleteBtn);
         _deleteBtn.BringToFront();
 
@@ -209,11 +213,11 @@ public class TableNhapDiem : MyTLP
         {
             _deleteBtn.Visible = false;
         }
-        _deleteBtn.MouseLeave +=  (sender, args) =>_deleteBtn.Visible = false;
+
+        _deleteBtn.MouseLeave += (sender, args) => _deleteBtn.Visible = false;
 
 
         _deleteBtn.MouseDown += (sender, args) => delete(index);
-        
     }
 
     void OnLeaveEditBtn()
@@ -229,27 +233,24 @@ public class TableNhapDiem : MyTLP
     void delete(int index)
     {
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
-        
+
         OnDelete?.Invoke(Id);
         _deleteBtn.Dispose();
     }
 
     void edit(int index)
     {
-        
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
-        
+
         OnEdit?.Invoke(Id);
-        
+
         _editBtn.Dispose();
     }
 
     void detail(int index)
     {
-
-        
         int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
-        
+
         OnDetail?.Invoke(Id);
     }
 
@@ -266,13 +267,14 @@ public class TableNhapDiem : MyTLP
             {
                 c.Size = new Size(columnSize, c.Height);
             }
+
             _header.Controls[_header.Controls.Count - 1].Width = columnSize + 20;
         }
         else
         {
             tableWidth = this.Width;
             columnSize = tableWidth / _header.Controls.Count;
-            
+
             foreach (Control c in _header.Controls)
             {
                 c.Size = new Size(columnSize, c.Height);
@@ -298,6 +300,7 @@ public class TableNhapDiem : MyTLP
                 {
                     values.Add(row[i]);
                 }
+
                 // pad if row has fewer cells than headers
                 while (values.Count < _headerContent.Count)
                 {
@@ -325,41 +328,44 @@ public class TableNhapDiem : MyTLP
         _displayCellData = new BindingList<object>(_cellDatas);
         _dataGridView.DataSource = _displayCellData;
     }
+
     void SetCotDiem()
     {
         _dataGridView.ReadOnly = false;
         AddColumnTongDiem();
-        
+
         AddColumn();
-        
+
         SetActionDgv();
         SetAction();
     }
 
     private CustomButton _addColBtn;
+
     void AddColumnTongDiem()
     {
-        MyTLP pnlCot =  new MyTLP
+        MyTLP pnlCot = new MyTLP
         {
             Height = 70,
             ColumnCount = 2,
-            Margin = new Padding(0,3, 0, 3),
+            Margin = new Padding(0, 3, 0, 3),
         };
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-        _addColBtn = new CustomButton(15,15,"plus.svg", MyColor.GrayBackGround, false, false, false, false){Anchor = AnchorStyles.None};
+        _addColBtn = new CustomButton(15, 15, "plus.svg", MyColor.GrayBackGround, false, false, false, false)
+            { Anchor = AnchorStyles.None };
         _addColBtn.HoverColor = MyColor.GrayHoverColor;
         _addColBtn.SelectColor = MyColor.GraySelectColor;
 
         Label title = GetLabel("Tổng điểm");
-        title.Margin = new Padding(3, 3,20 ,3);
+        title.Margin = new Padding(3, 3, 20, 3);
 
         pnlCot.Controls.Add(_addColBtn);
         pnlCot.Controls.Add(title);
         _header.Controls.Add(pnlCot);
-        
-        
+
+
         DataGridViewTextBoxColumn textColTongDiem = new DataGridViewTextBoxColumn();
         textColTongDiem.HeaderText = "Tổng điểm";
         textColTongDiem.Name = "TongDiem";
@@ -372,11 +378,13 @@ public class TableNhapDiem : MyTLP
     void SetAction()
     {
         _addColBtn._mouseDown += () => AddColumn();
+        _dataGridView.DataBindingComplete += SetupCotDiem;
     }
 
     private List<TextBox> listTbHeSo = new List<TextBox>();
     private List<string> listDColumnName = new List<string>();
     private int index = 0;
+
     void AddColumn()
     {
         _header.SuspendLayout();
@@ -388,24 +396,25 @@ public class TableNhapDiem : MyTLP
                 MessageBoxIcon.Warning);
             return;
         }
+
         index++;
         //thêm header
-        MyTLP pnlCot =  new MyTLP
+        MyTLP pnlCot = new MyTLP
         {
             Height = 70,
             ColumnCount = 2,
             RowCount = 2,
-            Margin = new Padding(0,3, 0, 3),
+            Margin = new Padding(0, 3, 0, 3),
         };
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        
+
         Label title = GetLabel("Cột điểm " + index);
         Label lblhs = GetLabel("H.Số:");
         lblhs.AutoSize = true;
 
-        
-        TextBox hso = new  TextBox
+
+        TextBox hso = new TextBox
         {
             Dock = DockStyle.Fill,
             Font = GetFont.GetFont.GetMainFont(9, FontType.Regular),
@@ -415,19 +424,19 @@ public class TableNhapDiem : MyTLP
             Text = "1",
         };
         hso.Leave += (sender, args) => OnChangeHeSo(hso);
-        
+
         listTbHeSo.Add(hso);
-        
+
         pnlCot.Controls.Add(title);
         pnlCot.SetColumnSpan(title, 2);
         pnlCot.Controls.Add(lblhs);
         pnlCot.Controls.Add(hso);
 
         _header.Controls.Add(pnlCot);
-        
+
         int insertIndex = _header.Controls.Count - 2;
         _header.Controls.SetChildIndex(pnlCot, insertIndex);
-        
+
         //thêm cột
         DataGridViewTextBoxColumn colNhapDiem = new DataGridViewTextBoxColumn();
         colNhapDiem.HeaderText = "Nhập điểm";
@@ -435,7 +444,7 @@ public class TableNhapDiem : MyTLP
         colNhapDiem.DefaultCellStyle.NullValue = 0 + "";
 
         listDColumnName.Add(colNhapDiem.Name);
-        
+
         _dataGridView.Columns.Insert(insertIndex, colNhapDiem);
         OnResize();
         _header.ResumeLayout();
@@ -450,8 +459,8 @@ public class TableNhapDiem : MyTLP
         _dataGridView.CellValueChanged += (sender, args) => dataGridView1_CellValueChanged(sender, args);
         _dataGridView.CellLeave += (sender, args) => dataGridView1_CellLeave(sender, args);
     }
-    
-    
+
+
     private void dataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
     {
         if (e.Control is TextBox tb)
@@ -464,14 +473,14 @@ public class TableNhapDiem : MyTLP
             tb.Dock = DockStyle.Fill;
         }
     }
-    
+
     private void dataGridView1_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
         {
             var dgv = sender as DataGridView;
             var columnName = dgv.Columns[e.ColumnIndex].Name;
-            
+
             if (columnName.StartsWith("colNhapDiem"))
             {
                 dgv.Cursor = Cursors.Hand;
@@ -480,7 +489,6 @@ public class TableNhapDiem : MyTLP
             {
                 dgv.Cursor = Cursors.Default;
             }
-            
         }
     }
 
@@ -502,7 +510,7 @@ public class TableNhapDiem : MyTLP
                 Rectangle rect = e.CellBounds;
                 rect.X += 2;
                 rect.Y += 2;
-                rect.Width -= 4; 
+                rect.Width -= 4;
                 rect.Height -= 4;
                 e.Graphics.DrawRectangle(p, rect);
             }
@@ -522,7 +530,7 @@ public class TableNhapDiem : MyTLP
             OnChangeDiem(e.RowIndex, e.ColumnIndex);
         }
     }
-    
+
     private void dataGridView1_CellLeave(object sender, DataGridViewCellEventArgs e)
     {
         if (_dataGridView.IsCurrentCellInEditMode)
@@ -536,12 +544,14 @@ public class TableNhapDiem : MyTLP
         {
             return;
         }
-        string diem =  cell.Value.ToString();
+
+        string diem = cell.Value.ToString();
         if (!ValidateDiem(diem))
         {
             cell.Value = 0;
             return;
         }
+
         UpdateTongDiem(rowIndex);
     }
 
@@ -562,7 +572,7 @@ public class TableNhapDiem : MyTLP
             DataGridViewCell cell = _dataGridView.Rows[rowIndex].Cells[listDColumnName[i]];
             float diem;
             int heso;
-            
+
             if (cell.Value == null)
             {
                 diem = 0;
@@ -580,7 +590,7 @@ public class TableNhapDiem : MyTLP
             {
                 heso = int.Parse(listTbHeSo[i].Text.Trim());
             }
-            
+
             tongDiem += diem * heso;
             tongHeSo += heso;
         }
@@ -600,5 +610,61 @@ public class TableNhapDiem : MyTLP
     {
         return (Validate.IsValidDiem(diem));
     }
-    
+
+    public void SetupCotDiem(object sender, DataGridViewBindingCompleteEventArgs e)
+    {
+
+        if (_listDiemSV.Count == 0) return;
+        DiemSV fstDiem = _listDiemSV[0];
+        for (int i = 1; i < fstDiem.listCotDiem.Count; i++)
+        {
+            AddColumn();
+        }
+        
+        foreach (DiemSV diemSv in _listDiemSV)
+        {
+            int cell;
+            int row = GetRowIndexByMaSv(diemSv.MaSV);
+            
+            if (diemSv.listCotDiem.Count == 0)
+                return;
+            
+            for (int i = 0; i < diemSv.listCotDiem.Count; i++)
+            {
+                int index = i + 1;
+                cell = GetColumnIndexByName("colNhapDiem " + index);
+                _dataGridView.Rows[row].Cells[cell].Value = diemSv.listCotDiem[i].DiemSo;
+            }
+
+        }
+
+        
+        _dataGridView.DataBindingComplete -= SetupCotDiem;
+    }
+
+    int GetRowIndexByMaSv(int maSV)
+    {
+        foreach (DataGridViewRow x in _dataGridView.Rows)
+        {
+            if (int.Parse(x.Cells["MaSV"].Value.ToString()) == maSV)
+            {
+                return x.Index;
+            }
+        }
+
+        return -1;
+    }
+
+    int GetColumnIndexByName(string name)
+    {
+        foreach (DataGridViewColumn x in _dataGridView.Columns)
+        {
+            if (x.Name.Equals(name))
+            {
+                return x.Index;
+            }
+        }
+
+        return -1;
+    }
 }

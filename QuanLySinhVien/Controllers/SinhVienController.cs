@@ -76,7 +76,13 @@ public class SinhVienController
     {
         SinhVienDTO sv = new  SinhVienDTO();
         List<SinhVienDTO> listSv = SinhVienDao.GetAll();
-        sv = listSv.First(x => x.MaTk == maTK);
+        foreach (SinhVienDTO item in listSv)
+        {
+            if (item.MaTk == maTK)
+            {
+                sv =  item;
+            }
+        }
         return sv;
     }
 }
