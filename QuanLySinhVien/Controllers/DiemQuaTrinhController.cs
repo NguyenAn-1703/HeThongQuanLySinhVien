@@ -78,4 +78,16 @@ public class DiemQuaTrinhController
         }
         return false;
     }
+
+    public bool HardDelete(int maDQT)
+    {
+        return _diemQuaTrinhDao.HardDelete(maDQT);
+    }
+
+    public int GetLastAutoIncrement()
+    {
+        _listDiemQuaTrinh = _diemQuaTrinhDao.GetAll();
+        int lastindex = _listDiemQuaTrinh.Count - 1;
+        return _listDiemQuaTrinh[lastindex].MaDQT;
+    }
 }

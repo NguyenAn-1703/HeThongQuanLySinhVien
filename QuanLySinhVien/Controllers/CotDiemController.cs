@@ -63,4 +63,9 @@ public class CotDiemController
 
         return rs;
     }
+
+    public bool HardDelete(int MaCD)
+    {
+        return _cotDiemDao.HardDelete(MaCD);
+    }
 }

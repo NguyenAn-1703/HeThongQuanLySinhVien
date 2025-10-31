@@ -97,7 +97,6 @@ public class DiemQuaTrinhDao
                 rowAffected = cmd.ExecuteNonQuery();
             }
         }
-
         return rowAffected > 0;
     }
 
@@ -124,4 +123,21 @@ public class DiemQuaTrinhDao
 
         return result;
     }
+    
+    public bool HardDelete(int maDQT)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"DELETE FROM DiemQuaTrinh
+                         WHERE MaDQT = @MaDQT";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaDQT", maDQT);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+        return rowAffected > 0;
+    }
+
 }

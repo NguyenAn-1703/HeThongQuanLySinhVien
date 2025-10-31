@@ -65,7 +65,7 @@ public class CustomButton : RoundTLP
         this.MouseLeave  +=  (sender, args) => OnMouseLeave();
     }
 
-    void OnMouseDown()
+    public virtual void OnMouseDown()
     {
         this.BackColor = this.SelectColor;
         _mouseDown?.Invoke();

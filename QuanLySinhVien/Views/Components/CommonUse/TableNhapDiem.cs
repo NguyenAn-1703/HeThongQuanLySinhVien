@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using QuanLySinhVien.Controllers;
+using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Enums;
 using QuanLySinhVien.Views.Structs;
 
@@ -25,9 +27,14 @@ public class TableNhapDiem : MyTLP
     public event Action<int> OnDetail;
 
     private List<DiemSV> _listDiemSV;
+    private int _maHp;
+
+    private KetQuaController _ketQuaController;
+    private CotDiemController _cotDiemController;
+    private DiemQuaTrinhController _diemQuaTrinhController;
 
     public TableNhapDiem(List<string> headerContent, List<string> columnNames, List<object> cells,
-        List<DiemSV> listDiemSV, bool action = false,
+        List<DiemSV> listDiemSV, int mahp, bool action = false,
         bool edit = false, bool delete = false)
     {
         _headerContent = headerContent;
@@ -38,6 +45,10 @@ public class TableNhapDiem : MyTLP
         _delete = delete;
         _columnNames = columnNames;
         _listDiemSV = listDiemSV;
+        _maHp = mahp;
+        _diemQuaTrinhController = DiemQuaTrinhController.GetInstance();
+        _cotDiemController = CotDiemController.GetInstance();
+        _ketQuaController = KetQuaController.GetInstance();
         Init();
     }
 
@@ -354,7 +365,7 @@ public class TableNhapDiem : MyTLP
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         _addColBtn = new CustomButton(15, 15, "plus.svg", MyColor.GrayBackGround, false, false, false, false)
-            { Anchor = AnchorStyles.None };
+            { Anchor = AnchorStyles.None, Margin = new Padding(7, 3, 3, 3) };
         _addColBtn.HoverColor = MyColor.GrayHoverColor;
         _addColBtn.SelectColor = MyColor.GraySelectColor;
 
@@ -370,7 +381,7 @@ public class TableNhapDiem : MyTLP
         textColTongDiem.HeaderText = "Tổng điểm";
         textColTongDiem.Name = "TongDiem";
         textColTongDiem.ReadOnly = true;
-        textColTongDiem.DefaultCellStyle.NullValue = 0 + "";
+        // textColTongDiem.DefaultCellStyle.NullValue = 0 + "";
 
         _dataGridView.Columns.Add(textColTongDiem);
     }
@@ -378,11 +389,10 @@ public class TableNhapDiem : MyTLP
     void SetAction()
     {
         _addColBtn._mouseDown += () => AddColumn();
-        _dataGridView.DataBindingComplete += SetupCotDiem;
+        _dataGridView.DataBindingComplete += SetupData;
     }
 
     private List<TextBox> listTbHeSo = new List<TextBox>();
-    private List<string> listDColumnName = new List<string>();
     private int index = 0;
 
     void AddColumn()
@@ -409,11 +419,33 @@ public class TableNhapDiem : MyTLP
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         pnlCot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
+
+        MyTLP panelTitle = new MyTLP
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            ColumnCount = 2
+        };
+        panelTitle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panelTitle.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
         Label title = GetLabel("Cột điểm " + index);
+        //nút xóa cột
+        IndexButton btnRemove = new IndexButton(15, 15, "minus.svg", MyColor.GrayBackGround, false, false, false, false)
+        {
+            Anchor = AnchorStyles.None,
+            index = index
+        };
+        btnRemove.HoverColor = MyColor.GrayHoverColor;
+        btnRemove.SelectColor = MyColor.GraySelectColor;
+        btnRemove.MouseDownIndex += (i) => RemoveColumn(i);
+
+        panelTitle.Controls.Add(title);
+        panelTitle.Controls.Add(btnRemove);
+
+
         Label lblhs = GetLabel("H.Số:");
         lblhs.AutoSize = true;
-
-
         TextBox hso = new TextBox
         {
             Dock = DockStyle.Fill,
@@ -427,8 +459,8 @@ public class TableNhapDiem : MyTLP
 
         listTbHeSo.Add(hso);
 
-        pnlCot.Controls.Add(title);
-        pnlCot.SetColumnSpan(title, 2);
+        pnlCot.Controls.Add(panelTitle);
+        pnlCot.SetColumnSpan(panelTitle, 2);
         pnlCot.Controls.Add(lblhs);
         pnlCot.Controls.Add(hso);
 
@@ -441,13 +473,42 @@ public class TableNhapDiem : MyTLP
         DataGridViewTextBoxColumn colNhapDiem = new DataGridViewTextBoxColumn();
         colNhapDiem.HeaderText = "Nhập điểm";
         colNhapDiem.Name = "colNhapDiem " + index;
-        colNhapDiem.DefaultCellStyle.NullValue = 0 + "";
-
-        listDColumnName.Add(colNhapDiem.Name);
-
+        // colNhapDiem.DefaultCellStyle.NullValue = 0 + "";
+        
         _dataGridView.Columns.Insert(insertIndex, colNhapDiem);
         OnResize();
         _header.ResumeLayout();
+        SetupDefault();
+    }
+
+    void RemoveColumn(int i)
+    {
+        DialogResult rs = MessageBox.Show("Xóa cột sẽ xóa hết các dữ liệu trên cột \n Bạn có chắc muốn xóa ?",
+            "Cảnh báo", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        if (rs == DialogResult.No)
+        {
+            return;
+        }
+
+        _header.SuspendLayout();
+        // Xóa header, xóa cột, resetindex
+        int numCol = _header.Controls.Count;
+        int pos = numCol - (index + 1) + i - 1;
+        _header.Controls.RemoveAt(pos);
+
+        string colName = "colNhapDiem " + i;
+        _dataGridView.Columns.Remove(colName);
+        UpdateListTbHso(i);
+        index--;
+
+        OnResize();
+        _header.ResumeLayout();
+    }
+
+    void UpdateListTbHso(int i)
+    {
+        int pos = i - 1;
+        listTbHeSo.RemoveAt(pos);
     }
 
     void SetActionDgv()
@@ -458,6 +519,8 @@ public class TableNhapDiem : MyTLP
         _dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
         _dataGridView.CellValueChanged += (sender, args) => dataGridView1_CellValueChanged(sender, args);
         _dataGridView.CellLeave += (sender, args) => dataGridView1_CellLeave(sender, args);
+   
+
     }
 
 
@@ -567,9 +630,10 @@ public class TableNhapDiem : MyTLP
     {
         float tongDiem = 0;
         float tongHeSo = 0;
-        for (int i = 0; i < listDColumnName.Count; i++)
+        for (int i = 0; i < listTbHeSo.Count; i++)
         {
-            DataGridViewCell cell = _dataGridView.Rows[rowIndex].Cells[listDColumnName[i]];
+            int index = i + 1;
+            DataGridViewCell cell = _dataGridView.Rows[rowIndex].Cells["colNhapDiem " + index];
             float diem;
             int heso;
 
@@ -611,35 +675,57 @@ public class TableNhapDiem : MyTLP
         return (Validate.IsValidDiem(diem));
     }
 
-    public void SetupCotDiem(object sender, DataGridViewBindingCompleteEventArgs e)
+    public void SetupData(object sender, DataGridViewBindingCompleteEventArgs e)
     {
+        SetupDefault();
+        SetupCotDiem();
+        _dataGridView.DataBindingComplete -= SetupData;
+    }
 
+    public void SetupDefault()
+    {
+        foreach (DataGridViewRow row in _dataGridView.Rows)
+        {
+            foreach (DataGridViewCell cell in row.Cells)
+            {
+                if (cell.Value == null)
+                    cell.Value = 0;
+            }
+        }
+
+    }
+
+    public void SetupCotDiem()
+    {
         if (_listDiemSV.Count == 0) return;
         DiemSV fstDiem = _listDiemSV[0];
         for (int i = 1; i < fstDiem.listCotDiem.Count; i++)
         {
             AddColumn();
         }
-        
+
+        for (int i = 0; i < listTbHeSo.Count; i++)
+        {
+            listTbHeSo[i].Text = fstDiem.listCotDiem[i].HeSo.ToString();
+        }
+
         foreach (DiemSV diemSv in _listDiemSV)
         {
             int cell;
             int row = GetRowIndexByMaSv(diemSv.MaSV);
-            
+
             if (diemSv.listCotDiem.Count == 0)
                 return;
-            
+
             for (int i = 0; i < diemSv.listCotDiem.Count; i++)
             {
                 int index = i + 1;
                 cell = GetColumnIndexByName("colNhapDiem " + index);
                 _dataGridView.Rows[row].Cells[cell].Value = diemSv.listCotDiem[i].DiemSo;
             }
-
         }
 
-        
-        _dataGridView.DataBindingComplete -= SetupCotDiem;
+
     }
 
     int GetRowIndexByMaSv(int maSV)
@@ -666,5 +752,128 @@ public class TableNhapDiem : MyTLP
         }
 
         return -1;
+    }
+
+    public void UpdateDiem()
+    {
+        List<DiemSV> listDiemSV = GetListDiemSV();
+        //xóa cũ
+        foreach (DiemSV diemSV in listDiemSV)
+        {
+            KetQuaDto kq = _ketQuaController.GetByMaSVMaHP(diemSV.MaSV, _maHp);
+            
+            //Xóa nếu có diemquatrinh cũ
+            if (_diemQuaTrinhController.ExistsByMaKQ(kq.MaKQ))
+            {
+                DiemQuaTrinhDto dqt = _diemQuaTrinhController.GetByMaKQ(kq.MaKQ);
+                List<CotDiemDto> listCotDiem = _cotDiemController.GetByMaDQT(dqt.MaDQT);
+
+                foreach (CotDiemDto cd in listCotDiem)
+                {
+                    if (!_cotDiemController.HardDelete(cd.MaCD))
+                    {
+                        MessageBox.Show("Xóa cột điểm thất bại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                
+                if (!_diemQuaTrinhController.HardDelete(dqt.MaDQT))
+                {
+                    MessageBox.Show("Xóa điểm quá trình thất bại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+        }
+        
+        //thêm mới
+        foreach (DiemSV diemSV in listDiemSV)
+        {
+            KetQuaDto kq = _ketQuaController.GetByMaSVMaHP(diemSV.MaSV, _maHp);
+
+            float tongDiem = GetTongDiemDQT(diemSV);
+            DiemQuaTrinhDto dqt = new DiemQuaTrinhDto
+            {
+                MaKQ = kq.MaKQ,
+                DiemSo = tongDiem,
+            };
+
+            if (!_diemQuaTrinhController.Insert(dqt))
+            {
+                MessageBox.Show("Them điểm quá trình thất bại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            int maDQT = _diemQuaTrinhController.GetLastAutoIncrement();
+
+            foreach (CotDiemDto cd in diemSV.listCotDiem)
+            {
+                CotDiemDto cotDiem = new CotDiemDto
+                {
+                    DiemSo = cd.DiemSo,
+                    HeSo = cd.HeSo,
+                    TenCotDiem = cd.TenCotDiem,
+                    MaDQT = maDQT
+                };
+                if (!_cotDiemController.Insert(cotDiem))
+                {
+                    MessageBox.Show("Them cột điểm thất bại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+
+        }
+        
+    }
+
+    public float GetTongDiemDQT(DiemSV diemSV)
+    {
+        float tongDiem = 0;
+        float tongHeSo = 0;
+            
+        foreach (CotDiemDto cd in diemSV.listCotDiem)
+        {
+            tongDiem += cd.DiemSo * cd.HeSo;
+            tongHeSo += cd.HeSo;
+        }
+
+        if (tongHeSo == 0)
+        {
+            return 0;
+        }
+        Console.WriteLine("he " + tongDiem / tongHeSo);
+        return tongDiem / tongHeSo;
+    }
+    
+    public List<DiemSV> GetListDiemSV()
+    {
+        List<DiemSV> rs = new List<DiemSV>();
+        int numCol = _header.Controls.Count;
+        int startPos = numCol - (index + 1);
+        int endPos = _header.Controls.Count - 2; //index -1, cot tong diem -11
+        
+        foreach (DataGridViewRow row in _dataGridView.Rows)
+        {
+            List<CotDiemDto> listCotDiem = new List<CotDiemDto>();
+            DiemSV diemSV = new DiemSV();
+            diemSV.MaSV = int.Parse(row.Cells["MaSV"].Value.ToString());
+            
+            int colIndex = 1;
+            for (int i = startPos; i <= endPos; i++)
+            {
+                CotDiemDto cotDiem = new CotDiemDto
+                {
+                    TenCotDiem = "Cột điểm " + colIndex,
+                    DiemSo = float.Parse(row.Cells[i].Value.ToString()),
+                    HeSo = int.Parse(listTbHeSo[colIndex - 1].Text)
+                };
+                listCotDiem.Add(cotDiem);
+                colIndex++;
+                // Console.WriteLine(cotDiem.TenCotDiem + " " + cotDiem.DiemSo + " " + cotDiem.HeSo);
+            }
+            diemSV.listCotDiem = listCotDiem;
+            rs.Add(diemSV);
+        }
+        return rs;
     }
 }

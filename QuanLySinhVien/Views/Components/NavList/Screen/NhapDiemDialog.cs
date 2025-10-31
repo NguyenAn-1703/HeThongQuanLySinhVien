@@ -84,12 +84,14 @@ public class NhapDiemDialog : RoundTLP
         _contentLayout = new MyTLP
         {
             Dock = DockStyle.Fill,
-            RowCount = 2,
+            RowCount = 3,
             ColumnCount = 1,
+            CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
         };
         
         _contentLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _contentLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        _contentLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         SetTitleBar();
         
@@ -98,8 +100,12 @@ public class NhapDiemDialog : RoundTLP
         SetDisplayData();
         SetupCotDiem();
         
-        _tableSV = new TableNhapDiem(headers.ToList(),columnNames.ToList(), _displayData, listDiemSV);
+        _tableSV = new TableNhapDiem(headers.ToList(),columnNames.ToList(), _displayData, listDiemSV, _nhomHP.MaHP);
         _contentLayout.Controls.Add(_tableSV);
+
+        _btnLuu = new TitleButton("Lưu thay đổi"){Dock = DockStyle.Right};
+        _contentLayout.Controls.Add(_btnLuu);
+        
         _mainLayout.Controls.Add(_contentLayout);
     }
 
@@ -197,6 +203,18 @@ public class NhapDiemDialog : RoundTLP
     {
         _backButton._mouseDown += () => Back?.Invoke();
         _searchBar.KeyDown += (s) => OnSearch(s);
+        _btnLuu._mouseDown += () => UpdateDiem();
+    }
+
+    void UpdateDiem()
+    {
+        DialogResult rs = MessageBox.Show("Xác nhận lưu thay đổi ?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        if (rs == DialogResult.No)
+        {
+            return;
+        }
+
+        _tableSV.UpdateDiem();
     }
     
     void OnSearch(string input)
@@ -254,13 +272,6 @@ public class NhapDiemDialog : RoundTLP
                 listDiemSV.Add(diemSv);
             }
         }
-        // foreach (var diemSV in listDiemSV)
-        // {
-        //     Console.WriteLine($"MaSV: {diemSV.MaSV}");
-        //         foreach (var cot in diemSV.listCotDiem)
-        //         {
-        //             Console.WriteLine($"    - {cot.TenCotDiem}: DiemSo = {cot.DiemSo}, HeSo = {cot.HeSo}");
-        //         }
-        // }
+
     }
 }

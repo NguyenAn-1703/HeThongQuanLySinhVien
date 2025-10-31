@@ -134,4 +134,21 @@ public class CotDiemDao
 
         return result;
     }
+    public bool HardDelete(int maCD)
+    {
+        int rowAffected = 0;
+        using (MySqlConnection conn = MyConnection.GetConnection())
+        {
+            string query = @"DELETE FROM CotDiem
+                         WHERE MaCD = @MaCD";
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@MaCD", maCD);
+                rowAffected = cmd.ExecuteNonQuery();
+            }
+        }
+
+        return rowAffected > 0;
+    }
+
 }
