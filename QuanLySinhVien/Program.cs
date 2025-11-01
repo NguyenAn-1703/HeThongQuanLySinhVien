@@ -21,18 +21,18 @@ static class Program
         
         
         //ADMIN
-        // NhomQuyenDto nhomQuyen = new NhomQuyenDto
-        // {
-        //     MaNQ = 2,
-        //     TenNhomQuyen = "admin", 
-        // };
-        // TaiKhoanDto taiKhoan = new TaiKhoanDto
-        // {
-        //     MaTK = 1,
-        //     TenDangNhap = "admin", 
-        //     Type = "Quản trị viên"
-        // };
-        // Application.Run(new MyHome(nhomQuyen, taiKhoan));
+        NhomQuyenDto nhomQuyen = new NhomQuyenDto
+        {
+            MaNQ = 2,
+            TenNhomQuyen = "admin", 
+        };
+        TaiKhoanDto taiKhoan = new TaiKhoanDto
+        {
+            MaTK = 1,
+            TenDangNhap = "admin", 
+            Type = "Quản trị viên"
+        };
+        Application.Run(new MyHome(nhomQuyen, taiKhoan));
         
         //SINHVIEN
         // NhomQuyenDto nhomQuyen = new NhomQuyenDto
@@ -49,18 +49,18 @@ static class Program
         // Application.Run(new MyHome(nhomQuyen, taiKhoan));
         //
         //GIANGVIEN
-        NhomQuyenDto nhomQuyen = new NhomQuyenDto
-        {
-            MaNQ = 4,
-            TenNhomQuyen = "GiangVien", 
-        };
-        TaiKhoanDto taiKhoan = new TaiKhoanDto
-        {
-            MaTK = 4,
-            TenDangNhap = "giangvien", 
-            Type = "Quản trị viên"
-        };
-        Application.Run(new MyHome(nhomQuyen, taiKhoan));
+        // NhomQuyenDto nhomQuyen = new NhomQuyenDto
+        // {
+        //     MaNQ = 4,
+        //     TenNhomQuyen = "GiangVien", 
+        // };
+        // TaiKhoanDto taiKhoan = new TaiKhoanDto
+        // {
+        //     MaTK = 4,
+        //     TenDangNhap = "giangvien", 
+        //     Type = "Quản trị viên"
+        // };
+        // Application.Run(new MyHome(nhomQuyen, taiKhoan));
 
     }
 }

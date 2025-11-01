@@ -61,6 +61,11 @@
       "Actions": ["Xem", "Them"]
     },
     {
+      "Name": "Nhập điểm thi",
+      "ID": "NHAPDIEMTHI",
+      "Actions": ["Xem", "Them"]
+    },
+    {
       "Name": "Học phí",
       "ID": "HOCPHI",
       "Actions": ["Xem", "Them"]

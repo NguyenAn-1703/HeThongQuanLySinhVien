@@ -34,6 +34,7 @@ public class NavListController
         buttonClickTrans["Mở đăng ký học phần"] = "MoDangKyHocPhan";
         buttonClickTrans["Tổ chức thi"] = "ToChucThi";
         buttonClickTrans["Nhập điểm"] = "NhapDiem";
+        buttonClickTrans["Nhập điểm thi"] = "NhapDiemThi";
         buttonClickTrans["Quản lí tài khoản"] = "QuanLiTaiKhoan";
         buttonClickTrans["Phân quyền"] = "PhanQuyen";
         buttonClickTrans["Thống kê"] = "ThongKe";
@@ -114,6 +115,10 @@ public class NavListController
         else if (s.Equals("NhapDiem"))
         {
             ans = new NhapDiem(_quyen, _taiKhoan);
+        }
+        else if (s.Equals("NhapDiemThi"))
+        {
+            ans = new NhapDiemThi(_quyen, _taiKhoan);
         }
         else if (s.Equals("HocPhi"))
         {

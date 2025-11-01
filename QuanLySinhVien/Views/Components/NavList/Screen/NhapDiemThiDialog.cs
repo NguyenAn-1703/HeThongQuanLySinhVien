@@ -1,7 +1,6 @@
 using QuanLySinhVien.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Views.Components.CommonUse;
-using QuanLySinhVien.Views.Components.CommonUse.AddImg;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.CommonUse.Search.SearchObject;
 using QuanLySinhVien.Views.Components.ViewComponents;
@@ -10,24 +9,25 @@ using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
-public class NhapDiemDialog : RoundTLP
+public class NhapDiemThiDialog : RoundTLP
 {
     private string _title;
     private MyTLP _mainLayout;
     private CustomButton _exitButton;
     private List<LabelTextField> _listTextBox;
-    private int _idNHP;
-    private NhomHocPhanDto _nhomHP;
+    private int _idCaThi;
+    private HocPhanDto _hocPhan;
     private TitleButton _btnLuu;
     public event Action Finish;
     private string imgPath = "";
-    private TableNhapDiem _tableSV;
+    private TableNhapDiemThi _tableSV;
 
     private List<SinhVienDTO> _rawData;
     private List<object> _displayData;
 
     private SinhVienController _sinhVienController;
-    private DangKyController _dangKyController;
+    private CaThi_SinhVienController _caThiSinhVienController;
+    private CaThiController _caThiController;
     private HocPhanController _hocPhanController;
     private NhomHocPhanController _nhomHocPhanController;
     private DiemQuaTrinhController _diemQuaTrinhController;
@@ -36,19 +36,19 @@ public class NhapDiemDialog : RoundTLP
     private CustomButton _backButton;
     public event Action Back;
 
-    public NhapDiemDialog(string title, int idNHP = -1)
+    public NhapDiemThiDialog(string title, int idCaThi = -1)
     {
         _listTextBox = new List<LabelTextField>();
-        _idNHP = idNHP;
+        _idCaThi = idCaThi;
         _title = title;
         _sinhVienController = SinhVienController.GetInstance();
-        _dangKyController = DangKyController.GetInstance();
+        _caThiSinhVienController = CaThi_SinhVienController.GetInstance();
         _hocPhanController =  HocPhanController.GetInstance();
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
-        _nhomHP = _nhomHocPhanController.GetById(_idNHP);
         _diemQuaTrinhController =  DiemQuaTrinhController.GetInstance();
         _ketQuaController =  KetQuaController.GetInstance();
         _cotDiemController =  CotDiemController.GetInstance();
+        _caThiController = CaThiController.GetInstance();
         Init();
     }
 
@@ -68,11 +68,12 @@ public class NhapDiemDialog : RoundTLP
 
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        
+        _hocPhan = _hocPhanController.GetHocPhanById(_caThiController.GetById(_idCaThi).MaHP);
+        
         SetContent();
         SetBottom();
-
         this.Controls.Add(_mainLayout);
-
         SetAction();
         SetupDetail();
     }
@@ -99,7 +100,7 @@ public class NhapDiemDialog : RoundTLP
         SetDisplayData();
         SetupCotDiem();
         
-        _tableSV = new TableNhapDiem(headers.ToList(),columnNames.ToList(), _displayData, listDiemSV, _nhomHP.MaHP);
+        _tableSV = new TableNhapDiemThi(headers.ToList(),columnNames.ToList(), _displayData, listDiemThiSV, _hocPhan.MaHP);
         _contentLayout.Controls.Add(_tableSV);
 
         _btnLuu = new TitleButton("Lưu thay đổi"){Dock = DockStyle.Right};
@@ -126,7 +127,7 @@ public class NhapDiemDialog : RoundTLP
         
         Label lblTitle = new Label
         {
-            Text = "DS sinh viên học nhóm: " + _idNHP + " , Học phần: " + _hocPhanController.GetHocPhanById(_nhomHP.MaHP).TenHP,
+            Text = "DS sinh viên thi ca thi mã : " + _idCaThi + " , Học phần: " + _hocPhanController.GetHocPhanById(_hocPhan.MaHP).TenHP,
             Dock = DockStyle.Bottom,
             AutoSize = true,
             Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
@@ -141,8 +142,10 @@ public class NhapDiemDialog : RoundTLP
     void SetDisplayData()
     {
         _rawData = new List<SinhVienDTO>();
-        List<DangKyDto> listDK =  _dangKyController.GetByMaNHP(_idNHP);
-        foreach (DangKyDto item in listDK)
+        
+        // Sinh Vien trong ca thi
+        List<CaThi_SinhVienDto> listCTSV = _caThiSinhVienController.GetByMaCT(_idCaThi);
+        foreach (CaThi_SinhVienDto item in listCTSV)
         {
             _rawData.Add(_sinhVienController.GetById(item.MaSV));
         }
@@ -208,8 +211,7 @@ public class NhapDiemDialog : RoundTLP
         {
             return;
         }
-        _tableSV.UpdateDiem(); 
-
+        _tableSV.UpdateDiem();
     }
     
     List<SVNhapDiemDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)
@@ -224,35 +226,19 @@ public class NhapDiemDialog : RoundTLP
         return rs;
     }
 
-    private List<DiemSV> listDiemSV = new List<DiemSV>();
+    private List<DiemThiSV> listDiemThiSV = new List<DiemThiSV>();
     void SetupCotDiem()
     {
-        int maHP = _nhomHP.MaHP;
-        List<KetQuaDto> listKq = new List<KetQuaDto>();
-
+        int maHP = _hocPhan.MaHP;
         foreach (SinhVienDTO sv in _rawData)
         {
-            if (_ketQuaController.ExistByMaSVMaHP(sv.MaSinhVien,  maHP))
+            KetQuaDto kq = _ketQuaController.GetByMaSVMaHP(sv.MaSinhVien, maHP);
+            DiemThiSV diemThi = new DiemThiSV
             {
-                KetQuaDto kq = _ketQuaController.GetByMaSVMaHP(sv.MaSinhVien, maHP);
-                listKq.Add(kq);
-            }
+                MaSV = sv.MaSinhVien,
+                diemThi = kq.DiemThi,
+            };
+            listDiemThiSV.Add(diemThi);
         }
-        
-        foreach (KetQuaDto item in listKq)
-        {
-            if (_diemQuaTrinhController.ExistsByMaKQ(item.MaKQ))
-            {
-                DiemQuaTrinhDto diemQt =  _diemQuaTrinhController.GetByMaKQ(item.MaKQ);
-                List<CotDiemDto> listCotDiemSV = _cotDiemController.GetByMaDQT(diemQt.MaDQT);
-                DiemSV diemSv = new DiemSV
-                {
-                    MaSV = item.MaSV,
-                    listCotDiem = listCotDiemSV,
-                };
-                listDiemSV.Add(diemSv);
-            }
-        }
-
     }
 }

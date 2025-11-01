@@ -63,6 +63,7 @@ public class NavBar : Panel
             new NavItemValue { ID = "KHOAHOC", Svg = "khoahoc", Name = "Khóa học" },
             new NavItemValue { ID = "TOCHUCTHI", Svg = "tochucthi", Name = "Tổ chức thi" },
             new NavItemValue { ID = "NHAPDIEM", Svg = "nhapdiem", Name = "Nhập điểm" },
+            new NavItemValue { ID = "NHAPDIEMTHI", Svg = "nhapdiemthi", Name = "Nhập điểm thi" },
             new NavItemValue { ID = "HOCPHI", Svg = "hocphi", Name = "Học phí" },
             new NavItemValue { ID = "MODANGKYHOCPHAN", Svg = "modangkyhocphan", Name = "Mở đăng ký học phần" },
             new NavItemValue { ID = "TAIKHOAN", Svg = "taikhoan", Name = "Quản lí tài khoản" },
