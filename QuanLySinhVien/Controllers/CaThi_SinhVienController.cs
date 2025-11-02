@@ -35,27 +35,39 @@ public class CaThi_SinhVienController
 
     public bool Insert(CaThi_SinhVienDto caThiSv)
     {
-        return _caThiSinhVienDao.Insert(caThiSv);
+        bool result = _caThiSinhVienDao.Insert(caThiSv);
+        if (result)
+            _listCaThiSinhVien = _caThiSinhVienDao.GetAll();
+        return result;
     }
 
     public bool Delete(int maCT, int maSV)
     {
-        return _caThiSinhVienDao.Delete(maCT, maSV);
+        bool result = _caThiSinhVienDao.Delete(maCT, maSV);
+        if (result)
+            _listCaThiSinhVien = _caThiSinhVienDao.GetAll();
+        return result;
     }
 
     public CaThi_SinhVienDto GetById(int maCT, int maSV)
     {
-        return _caThiSinhVienDao.GetById(maCT, maSV);
+        return _listCaThiSinhVien
+            .First(x => x.MaCT == maCT && x.MaSV == maSV);
     }
 
     public List<CaThi_SinhVienDto> GetByMaCT(int maCT)
     {
-        return _caThiSinhVienDao.GetByMaCT(maCT);
+        return _listCaThiSinhVien
+            .Where(x => x.MaCT == maCT)
+            .ToList();
     }
     
     public bool HardDeleteByMaCT(int maCT)
     {
-        return _caThiSinhVienDao.HardDeleteByMaCT(maCT);
+        bool result = _caThiSinhVienDao.HardDeleteByMaCT(maCT);
+        if (result)
+            _listCaThiSinhVien = _caThiSinhVienDao.GetAll();
+        return result;
     }
 
     public bool ExistSVThiHp(int maHP, int maSV)

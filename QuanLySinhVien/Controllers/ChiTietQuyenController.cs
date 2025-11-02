@@ -31,8 +31,6 @@ public class ChiTietQuyenController
 
     public bool Insert(ChiTietQuyenDto ChiTietQuyenDto)
     {
-        //Validate
-        
         return (_ChiTietQuyenDao.Insert(ChiTietQuyenDto));
     }
 

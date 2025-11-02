@@ -32,22 +32,31 @@ public class NhomQuyenController
 
     public bool Insert(NhomQuyenDto nhomQuyenDto)
     {
-        return _nhomQuyenDao.Insert(nhomQuyenDto);
+        bool result = _nhomQuyenDao.Insert(nhomQuyenDto);
+        if (result)
+            listNhomQuyen = _nhomQuyenDao.GetAll();
+        return result;
     }
 
     public bool Update(NhomQuyenDto nhomQuyenDto)
     {
-        return _nhomQuyenDao.Update(nhomQuyenDto);
+        bool result = _nhomQuyenDao.Update(nhomQuyenDto);
+        if (result)
+            listNhomQuyen = _nhomQuyenDao.GetAll();
+        return result;
     }
 
     public bool Delete(int idNhomQuyen)
     {
-        return _nhomQuyenDao.Delete(idNhomQuyen);
+        bool result = _nhomQuyenDao.Delete(idNhomQuyen);
+        if (result)
+            listNhomQuyen = _nhomQuyenDao.GetAll();
+        return result;
     }
 
     public NhomQuyenDto GetById(int id)
     {
-        return _nhomQuyenDao.GetById(id);
+        return listNhomQuyen.First(nq => nq.MaNQ == id);
     }
 
     public string GetTenQuyenByID(int id)

@@ -483,6 +483,14 @@ public class TableNhapDiem : MyTLP
 
     void RemoveColumn(int i)
     {
+        // tối thiểu 1 cột điểm
+        if (index <= 1)
+        {
+            MessageBox.Show("Có ít nhất 1 cột điểm", "Thông báo", MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+            return;
+        }
+        
         DialogResult rs = MessageBox.Show("Xóa cột sẽ xóa hết các dữ liệu trên cột \n Bạn có chắc muốn xóa ?",
             "Cảnh báo", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
         if (rs == DialogResult.No)
@@ -503,6 +511,7 @@ public class TableNhapDiem : MyTLP
 
         OnResize();
         _header.ResumeLayout();
+        OnResize();
     }
 
     void UpdateListTbHso(int i)

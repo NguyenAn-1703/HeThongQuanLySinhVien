@@ -27,28 +27,39 @@ public class HocPhanController
 
     public List<HocPhanDto> GetAll()
     {
-        return _hocPhanDao.GetAll();
+        _listHocPhan = _hocPhanDao.GetAll();
+        return _listHocPhan;
     }
 
     public bool Insert(HocPhanDto hocPhanDto)
     {
-        return _hocPhanDao.Insert(hocPhanDto);
+        bool result = _hocPhanDao.Insert(hocPhanDto);
+        if (result)
+            _listHocPhan = _hocPhanDao.GetAll();
+        return result;
     }
 
     public bool Update(HocPhanDto hocPhanDto)
     {
-        return _hocPhanDao.Update(hocPhanDto);
+        bool result = _hocPhanDao.Update(hocPhanDto);
+        if (result)
+            _listHocPhan = _hocPhanDao.GetAll();
+        return result;
     }
 
     public bool Delete(int idHocPhan)
     {
-        return _hocPhanDao.Delete(idHocPhan);
+        bool result = _hocPhanDao.Delete(idHocPhan);
+        if (result)
+            _listHocPhan = _hocPhanDao.GetAll();
+        return result;
     }
 
     public HocPhanDto GetHocPhanById(int id)
     {
-        return _hocPhanDao.GetHocPhanById(id);
+        return _listHocPhan.First(hp => hp.MaHP == id);
     }
+
     
     public bool ExistByTen(string ten)
     {

@@ -43,6 +43,8 @@ public class DangKyHocPhan : NavBase
     private DangKyController _dangKyController;
     private SinhVienController _sinhVienController;
     private KetQuaController _ketQuaController;
+    private HocPhiHocPhanController _hocPhiHocPhanController;
+    private HocPhiTinChiController _hocPhiTinChiController;
     private LichDangKyDto _currentLichDangKy;
     private List<NhomHocPhanDto> _currentListNhp;
     
@@ -65,6 +67,8 @@ public class DangKyHocPhan : NavBase
         _dangKyController = DangKyController.GetInstance();
         _sinhVienController = SinhVienController.GetInstance();
         _ketQuaController = KetQuaController.GetInstance();
+        _hocPhiHocPhanController = HocPhiHocPhanController.GetInstance();
+        _hocPhiTinChiController = HocPhiTinChiController.GetInstance();
         _taiKhoan = taiKhoan;
         _sinhvien = _sinhVienController.GetByMaTK(taiKhoan.MaTK);
         Init();
@@ -88,6 +92,7 @@ public class DangKyHocPhan : NavBase
         SetLich();
         SetTop();
         SetBottom();
+        SetupHocPhi();
         // SetBtnExport();
         
 
@@ -433,7 +438,7 @@ public class DangKyHocPhan : NavBase
 
         foreach (DangKyDto dk in listDkHocKy)
         {
-            Console.WriteLine(dk.MaNHP);
+            Console.WriteLine("sv " + _sinhvien.MaSinhVien + " nhoms: " + dk.MaNHP);
         }
         
         if (listDkHocKy.Count == 0) return;
@@ -490,6 +495,15 @@ public class DangKyHocPhan : NavBase
         _tableMoDangKy._dataGridView.DataSource = _displayDataMoDangKy;
     }
 
+    private double hocPhiTrenTinChi;
+    void SetupHocPhi()
+    {
+        LopDto lop = _lopController.GetLopById(_sinhvien.MaLop);
+        NganhDto nganh = _nganhController.GetNganhById(lop.MaNganh);
+        HocPhiTinChiDto hocPhi = _hocPhiTinChiController.GetNewestHocPhiTinChiByMaNganh(nganh.MaNganh);
+        hocPhiTrenTinChi = hocPhi.SoTienMotTinChi;
+    }
+
     void OnClickCB(int index, bool b)
     {
         NhomHocPhanDto nhp = _rawDataMoDangKy.First(x => x.MaNHP == index);
@@ -512,7 +526,10 @@ public class DangKyHocPhan : NavBase
                 MessageBox.Show("Them dang ky that bai: " + maHpTrung + " !", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            //thêm luôn bảng kết quả
+            
+            _rawDataDangKy.Add(nhp);
+            
+            //thêm luôn bảng kết quả, học phí học phần
             KetQuaDto ketQua = new KetQuaDto
             {
                 MaHP = nhp.MaHP,
@@ -526,8 +543,19 @@ public class DangKyHocPhan : NavBase
                 return;
             }
             
-            
-            _rawDataDangKy.Add(nhp);
+            HocPhiHocPhanDto hocPhiHocPhan = new HocPhiHocPhanDto
+            {
+                MaHP = nhp.MaHP,
+                MaSV = _sinhvien.MaSinhVien,
+                HocKy = _hocKy,
+                Nam = _nam,
+                TongTien = TinhTongTien(nhp),
+            };
+            if (!_hocPhiHocPhanController.Insert(hocPhiHocPhan))
+            {
+                MessageBox.Show("Them hoc phi hoc phan that bai: !", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
         }
         else
         {
@@ -543,11 +571,35 @@ public class DangKyHocPhan : NavBase
             }
             
             _rawDataDangKy.RemoveAll(x => x.MaNHP == index);
+            
+            
+            //xóa bảng kết quả, học phí học phần
+            KetQuaDto ketQua = _ketQuaController.GetByMaSVMaHP(_sinhvien.MaSinhVien, nhp.MaHP);
+            if (!_ketQuaController.Delete(ketQua.MaKQ))
+            {
+                MessageBox.Show("Xoa ket qua that bai: !", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            if (!_hocPhiHocPhanController.DeleteByMaSVMaHP(_sinhvien.MaSinhVien, nhp.MaHP))
+            {
+                MessageBox.Show("xoa hoc phi hoc phan that bai: !", "Lỗi",  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
         }
         UpdateSoTC();
         UpdateDataDisplayDangKy(_rawDataDangKy);
         _tableDangKy._dataGridView.DataSource = _displayDataDangKy;
     }
+
+    double TinhTongTien(NhomHocPhanDto nhomHp)
+    {
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(nhomHp.MaHP);
+        double tongTien = hocPhiTrenTinChi * hocPhan.SoTinChi;
+        return tongTien;
+    }
+    
+   
 
     //chỉ xét trùng lịch, không xét tới phòng
     int DuplicateLichHp(NhomHocPhanDto nhp)

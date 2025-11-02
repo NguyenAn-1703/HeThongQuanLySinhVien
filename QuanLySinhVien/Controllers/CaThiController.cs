@@ -33,22 +33,31 @@ public class CaThiController
 
     public bool Insert(CaThiDto caThiDto)
     {
-        return _caThiDao.Insert(caThiDto);
+        bool result = _caThiDao.Insert(caThiDto);
+        if (result)
+            _listCaThi = _caThiDao.GetAll();
+        return result;
     }
 
     public bool Update(CaThiDto caThiDto)
     {
-        return _caThiDao.Update(caThiDto);
+        bool result = _caThiDao.Update(caThiDto);
+        if (result)
+            _listCaThi = _caThiDao.GetAll();
+        return result;
     }
 
     public bool Delete(int maCT)
     {
-        return _caThiDao.Delete(maCT);
+        bool result = _caThiDao.Delete(maCT);
+        if (result)
+            _listCaThi = _caThiDao.GetAll();
+        return result;
     }
 
     public CaThiDto GetById(int maCT)
     {
-        return _caThiDao.GetById(maCT);
+        return _listCaThi.First(ct => ct.MaCT == maCT);
     }
 
     public List<CaThiDto> GetByHocKyNam(int hky, string nam)

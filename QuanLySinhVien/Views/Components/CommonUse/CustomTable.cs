@@ -147,6 +147,26 @@ public class CustomTable : MyTLP
 
         this._dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
         this._dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
+        
+        
+        // fix lỗi hiện scrollbar sớm
+         _dataGridView.ScrollBars = ScrollBars.None;
+         _dataGridView.DataBindingComplete += (s, e) =>
+         {
+             if (_dataGridView.IsHandleCreated)
+             {
+                 // đợi vòng UI tiếp theo để layout xong hoàn toàn
+                 _dataGridView.BeginInvoke(new Action(() =>
+                 {
+                     _dataGridView.ScrollBars = ScrollBars.Both;
+                 }));
+             }
+             else
+             {
+                 _dataGridView.ScrollBars = ScrollBars.Both;
+             }
+         };
+        
     }
 
     void OnDoubleClickRow(DataGridViewCellEventArgs e)
@@ -266,17 +286,16 @@ public class CustomTable : MyTLP
     {
         int tableWidth;
         int columnSize;
-        Console.WriteLine(_header.Controls.Count);
 
         if (_dataGridView.DisplayedRowCount(false) < _dataGridView.RowCount)
         {
-            tableWidth = this.Width - 20;
+            tableWidth = this.Width - 25;
             columnSize = tableWidth / _header.Controls.Count;
             foreach (Control c in _header.Controls)
             {
                 c.Size = new Size(columnSize, c.Height);
             }
-            _header.Controls[_header.Controls.Count - 1].Width = columnSize + 20;
+            _header.Controls[_header.Controls.Count - 1].Width = columnSize + 25;
         }
         else
         {
@@ -341,6 +360,10 @@ public class CustomTable : MyTLP
         if (columnType == ColumnType.CheckBox)
         {
             AddCbColumn(title);
+        }
+        else if (columnType == ColumnType.Button)
+        {
+            AddBtnColumn(title);
         }
     }
 
@@ -440,4 +463,35 @@ public class CustomTable : MyTLP
         _header.Controls.Add(GetLabel("Hành động"));
         this.OnResize();
     }
+
+    void AddBtnColumn(string title)
+    {
+        this._header.Controls.Add(GetLabel(title));
+        
+        DataGridViewButtonColumn btnCol = new DataGridViewButtonColumn();
+        btnCol.HeaderText = title; 
+        btnCol.Name = "colButton";      
+        btnCol.Text = "Cập nhật";      
+        btnCol.UseColumnTextForButtonValue = true;
+
+        _dataGridView.Columns.Add(btnCol);
+        _dataGridView.CellContentClick += dgvHocPhi_CellContentClick;
+    }
+    
+    private void dgvHocPhi_CellContentClick(object sender, DataGridViewCellEventArgs e)
+    {
+        if (_dataGridView.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
+        {
+            int maSV = int.Parse(_dataGridView.Rows[e.RowIndex].Cells["MaSV"].Value.ToString());
+            OnClickBtn(maSV);
+        }
+    }
+
+    public event Action<int> MouseClickBtnCapNhat;
+    void OnClickBtn(int maSV)
+    {
+        MouseClickBtnCapNhat?.Invoke(maSV);
+    }
+
+    
 }

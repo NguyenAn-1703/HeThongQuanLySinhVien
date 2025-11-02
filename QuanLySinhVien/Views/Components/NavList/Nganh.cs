@@ -232,7 +232,7 @@ public class NganhPanel : NavBase
 
     void Update(int id)
     {
-        var nganh = _rawData.FirstOrDefault(n => n.MaNganh == id);
+        var nganh = _nganhController.GetNganhById(id);
         _nganhDialog = new NganhDialog(DialogType.Sua, nganh, NganhDao.GetInstance());
         
         _nganhDialog.Finish += () =>
@@ -245,7 +245,7 @@ public class NganhPanel : NavBase
     
     void Detail(int id)
     {
-        var nganh = _rawData.FirstOrDefault(n => n.MaNganh == id);
+        var nganh = _nganhController.GetNganhById(id);
         _nganhDialog = new NganhDialog(DialogType.ChiTiet, nganh, NganhDao.GetInstance());
         
         _nganhDialog.ShowDialog();

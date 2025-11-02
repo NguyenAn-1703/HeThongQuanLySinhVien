@@ -63,4 +63,11 @@ public class NganhController
     {
         return _nganhDao.GetByTen(ten);
     }
+
+    public int GetLastAutoIncrement()
+    {
+        _listNganh = _nganhDao.GetAll();
+        int lastIndex = _listNganh.Count - 1;
+        return _listNganh[lastIndex].MaNganh;
+    }
 }
