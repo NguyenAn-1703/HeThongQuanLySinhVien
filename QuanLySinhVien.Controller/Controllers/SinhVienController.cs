@@ -1,5 +1,7 @@
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.SearchObject;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -8,10 +10,13 @@ public class SinhVienController
     private static SinhVienController _instance;
     private readonly HocPhiSVController _HocPhiSVController;
     private readonly KhoaController _khoaController;
-
     private readonly LopController _lopController;
     private readonly NganhController _nganhController;
-    private NhomHocPhanController _nhomHocPhanController;
+
+    private Dictionary<int, string> _lopDic;
+    private Dictionary<int, string> _nganhDic;
+    
+    
     public LopDAO LopDao;
     public NganhDao NganhDao;
     public SinhVienDAO SinhVienDao;
@@ -25,7 +30,16 @@ public class SinhVienController
         _nganhController = NganhController.GetInstance();
         _khoaController = KhoaController.GetInstance();
         _HocPhiSVController = HocPhiSVController.GetInstance();
-        _nhomHocPhanController = NhomHocPhanController.GetInstance();
+
+        InitLookupData();
+    }
+
+    void InitLookupData()
+    {
+        var listLop = _lopController.GetAll();
+        var listNganh = _nganhController.GetAll();
+        _lopDic = listLop.ToDictionary(x => x.MaLop, x => x.TenLop);
+        _nganhDic = listNganh.ToDictionary(x => x.MaNganh, x => x.TenNganh);
     }
 
     public static SinhVienController GetInstance()
@@ -116,5 +130,20 @@ public class SinhVienController
                 return hpsv.TrangThai;
 
         return "Chưa đóng";
+    }
+    
+    public List<SinhVienDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)
+    {
+        List<SinhVienDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new SinhVienDisplay
+        {
+            MaSinhVien = x.MaSinhVien,
+            TenSinhVien = x.TenSinhVien,
+            NgaySinh = x.NgaySinh,
+            GioiTinh = x.GioiTinh,
+            TenLop = _lopDic.TryGetValue(x.MaLop, out var tenLop) ? tenLop : "",
+            TenNganh = _nganhDic.TryGetValue(x.MaLop, out var tenNganh) ? tenNganh : "",
+            TrangThai = x.TrangThai
+        });
+        return rs;
     }
 }

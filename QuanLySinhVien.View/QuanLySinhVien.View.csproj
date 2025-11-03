@@ -1,0 +1,113 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Update="MyComponent\MyForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <Compile Update="Components\MyForm.cs">
+            <SubType>Form</SubType>
+        </Compile>
+        <None Remove="config\diachi.json"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Fonts\Montserrat-Black.ttf"/>
+        <None Remove="Fonts\Montserrat-BlackItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-BoldItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-Bold.ttf"/>
+        <None Remove="Fonts\Montserrat-ExtraBold.ttf"/>
+        <None Remove="Fonts\Montserrat-ExtraBoldItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-ExtraLight.ttf"/>
+        <None Remove="Fonts\Montserrat-ExtraLightItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-Italic.ttf"/>
+        <None Remove="Fonts\Montserrat-Light.ttf"/>
+        <None Remove="Fonts\Montserrat-LightItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-Medium.ttf"/>
+        <None Remove="Fonts\Montserrat-MediumItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-Regular.ttf"/>
+        <None Remove="Fonts\Montserrat-SemiBold.ttf"/>
+        <None Remove="Fonts\Montserrat-SemiBoldItalic.ttf"/>
+        <None Remove="Fonts\Montserrat-Thin.ttf"/>
+        <None Remove="Fonts\Montserrat-ThinItalic.ttf"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
+        <PackageReference Include="LiveCharts" Version="0.9.7"/>
+        <PackageReference Include="LiveCharts.WinForms" Version="0.9.7.1"/>
+        <PackageReference Include="LiveChartsCore" Version="2.0.0-rc5.4"/>
+        <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc5.4"/>
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.WinForms" Version="2.0.0-rc5.4"/>
+        <PackageReference Include="MySql.Data" Version="9.4.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="MySqlConnector" Version="2.4.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0"/>
+        <PackageReference Include="Svg" Version="3.4.7"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <None Remove="img\trangchu.svg"/>
+        <None Remove="img\chuongtrinhdaotao.svg"/>
+        <None Remove="img\giangvien.svg"/>
+        <None Remove="img\hocphan.svg"/>
+        <None Remove="img\hocphi.svg"/>
+        <None Remove="img\khoa.svg"/>
+        <None Remove="img\modangkyhocphan.svg"/>
+        <None Remove="img\nganh.svg"/>
+        <None Remove="img\nhapdiem.svg"/>
+        <None Remove="img\phanquyen.svg"/>
+        <None Remove="img\phonghoc.svg"/>
+        <None Remove="img\sinhvien.svg"/>
+        <None Remove="img\taikhoan.svg"/>
+        <None Remove="img\thongke.svg"/>
+        <None Remove="img\tochucthi.svg"/>
+        <None Remove="img\Png\Logo-DH-Sai-Gon-SGU.png"/>
+        <None Remove="img\png\Logo ĐH Sài Gòn - SGU.png"/>
+        <None Remove="img\dangxuat.svg"/>
+        <None Remove="img\search.svg"/>
+        <None Remove="img\user.svg"/>
+        <None Remove="img\plus.svg"/>
+        <None Remove="img\plus_circle.svg"/>
+        <None Remove="img\fix.svg"/>
+        <None Remove="img\trashbin.svg"/>
+        <Content Include="Views\img\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="Views\font\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="img\upload.svg"/>
+        <None Remove="config\Permission.json"/>
+        <None Remove="config\quan_huyen.json"/>
+        <None Remove="config\tinh_tp.json"/>
+        <None Remove="config\xa_phuong.json"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <EditorConfigFiles Include="C:\Program Files\dotnet\sdk\8.0.415\Sdks\Microsoft.NET.Sdk\analyzers\build\config\analysislevel_8_default.globalconfig">
+            <Link>Controllers\config\analysislevel_8_default.globalconfig</Link>
+        </EditorConfigFiles>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\QuanLySinhVien.Controller\QuanLySinhVien.Controller.csproj"/>
+        <ProjectReference Include="..\QuanLySinhVien.Shared\QuanLySinhVien.Shared.csproj"/>
+    </ItemGroup>
+
+</Project>

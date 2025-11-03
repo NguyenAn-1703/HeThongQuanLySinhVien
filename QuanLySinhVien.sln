@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanLySinhVien", "QuanLySinhVien\QuanLySinhVien.csproj", "{1945E7B8-6397-4885-AAAF-9C141C88CDA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanLySinhVien.View", "QuanLySinhVien.View\QuanLySinhVien.View.csproj", "{1945E7B8-6397-4885-AAAF-9C141C88CDA8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanLySinhVien.Model", "QuanLySinhVien.Model\QuanLySinhVien.Model.csproj", "{1E22FF95-DADC-4B31-8D38-0AA3E7BEF245}"
 EndProject
