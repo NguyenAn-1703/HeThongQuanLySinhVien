@@ -1,54 +1,53 @@
-using System.Data;
-using System.Runtime.InteropServices.JavaScript;
-using QuanLyGiangVien.Views.Components.CommonUse;
 using QuanLyGiangVien.Views.Components.CommonUse.Search;
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.Views.Components;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search.SearchObject;
 using QuanLySinhVien.Views.Components.GetFont;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
-using QuanLySinhVien.Views.Enums;
-using QuanLySinhVien.Views.Structs;
-using Svg;
 
 namespace QuanLyGiangVien.Views.Components;
 
 public class GiangVien : NavBase
 {
-    private string ID = "GiangVien";
-    private string _title = "Giảng viên";
-    private List<string> _listSelectionForComboBox;
-    private CustomTable _table;
+    private readonly string[] _headerArray = new[]
+        { "Mã giảng viên", "Tên giảng viên", "Khoa", "Ngày sinh", "Giới tính", "Số điện thoại", "Email" };
+
+    private readonly string _title = "Giảng viên";
+    private readonly string ID = "GiangVien";
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    private List<object> _displayData;
     private GiangVienController _GiangVienController;
-    private NhomQuyenController _nhomQuyenController;
-    private KhoaController _khoaController;
-    string[] _headerArray = new string[] { "Mã giảng viên", "Tên giảng viên", "Khoa", "Ngày sinh", "Giới tính", "Số điện thoại", "Email" };
-    List<string> _headerList;
-
-    private TitleButton _insertButton;
-
-    List<GiangVienDto> _rawData;
-    List<object> _displayData;
-
-    private GiangVienSearch _GiangVienSearch;
 
     private GiangVienDialog _GiangVienDialog;
 
-    private List<InputFormItem> _listIFI;
+    private GiangVienSearch _GiangVienSearch;
+    private List<string> _headerList;
+
+    private TitleButton _insertButton;
+    private KhoaController _khoaController;
 
     private List<ChiTietQuyenDto> _listAccess;
-    private ChiTietQuyenController _chiTietQuyenController;
-    private ChucNangController _chucNangController;
+
+    private List<InputFormItem> _listIFI;
+    private List<string> _listSelectionForComboBox;
     private LopController _lopController;
     private NganhController _nganhController;
+    private NhomQuyenController _nhomQuyenController;
 
-    private bool them = false;
-    private bool sua = false;
-    private bool xoa = false;
-    
+    private List<GiangVienDto> _rawData;
+    private CustomTable _table;
+    private bool sua;
+
+    private bool them;
+    private bool xoa;
+
 
     public GiangVien(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
@@ -67,13 +66,13 @@ public class GiangVien : NavBase
     private void Init()
     {
         CheckQuyen();
-        
+
         Dock = DockStyle.Fill;
 
-        MyTLP mainLayout = new MyTLP
+        var mainLayout = new MyTLP
         {
             RowCount = 2,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -84,34 +83,21 @@ public class GiangVien : NavBase
         Controls.Add(mainLayout);
     }
 
-    void CheckQuyen()
+    private void CheckQuyen()
     {
         int maCN = _chucNangController.GetByTen(ID).MaCN;
         _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
-        foreach (ChiTietQuyenDto x in _listAccess)
-        {
-            Console.WriteLine(x.HanhDong);
-        }
+        foreach (var x in _listAccess) Console.WriteLine(x.HanhDong);
 
-        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
-        {
-            them = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
-        {
-            sua = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
-        {
-            xoa = true;
-        }
-        
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them"))) them = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua"))) sua = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
-    
+
 
     private Panel Top()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -126,25 +112,22 @@ public class GiangVien : NavBase
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         panel.Controls.Add(getTitle());
-        
+
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        if (them)
-        {
-            panel.Controls.Add(_insertButton);
-        }
-        
+        if (them) panel.Controls.Add(_insertButton);
+
 
         return panel;
     }
 
     private Panel Bottom()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
 
         SetCombobox();
@@ -161,13 +144,13 @@ public class GiangVien : NavBase
     }
 
     //////////////////////////////SETTOP///////////////////////////////
-    Label getTitle()
+    private Label getTitle()
     {
-        Label titlePnl = new Label
+        var titlePnl = new Label
         {
             Text = _title,
             Font = GetFont.GetMainFont(17, FontType.ExtraBold),
-            AutoSize = true,
+            AutoSize = true
         };
         return titlePnl;
     }
@@ -177,51 +160,51 @@ public class GiangVien : NavBase
 
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
-    void SetCombobox()
+    private void SetCombobox()
     {
         _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _listSelectionForComboBox = _headerList;
     }
 
 
-    void SetDataTableFromDb()
+    private void SetDataTableFromDb()
     {
         _rawData = _GiangVienController.GetAll();
         SetDisplayData();
 
-        string[] columnNames = new[] { "MaGV", "TenGV", "TenKhoa", "NgaySinhGV","GioiTinhGV", "SoDienThoai", "Email" };
-        List<string> columnNamesList = columnNames.ToList();
+        var columnNames = new[] { "MaGV", "TenGV", "TenKhoa", "NgaySinhGV", "GioiTinhGV", "SoDienThoai", "Email" };
+        var columnNamesList = columnNames.ToList();
 
         _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
 
-    void SetDisplayData()
+    private void SetDisplayData()
     {
         _displayData = ConvertObject.ConvertToDisplay(ConvertDtoToDisplay(_rawData), x => new
             {
-                MaGV = x.MaGV,
-                TenGV = x.TenGV,
-                TenKhoa = x.TenKhoa,
-                NgaySinhGV = x.NgaySinhGV,
-                GioiTinhGV = x.GioiTinhGV,
-                SoDienThoai = x.SoDienThoai,
-                Email = x.Email,
+                x.MaGV,
+                x.TenGV,
+                x.TenKhoa,
+                x.NgaySinhGV,
+                x.GioiTinhGV,
+                x.SoDienThoai,
+                x.Email
             }
         );
     }
 
 
-    void SetSearch()
+    private void SetSearch()
     {
         _GiangVienSearch = new GiangVienSearch(ConvertDtoToDisplay(_rawData));
     }
 
-    void SetAction()
+    private void SetAction()
     {
         _GiangVienSearch.FinishSearch += dtos =>
         {
             UpdateDataDisplay(dtos);
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
 
         _insertButton._mouseDown += () => { Insert(); };
@@ -230,66 +213,64 @@ public class GiangVien : NavBase
         _table.OnDelete += index => { Delete(index); };
     }
 
-    void UpdateDataDisplay(List<GiangVienDisplay> input)
+    private void UpdateDataDisplay(List<GiangVienDisplay> input)
     {
-        this._displayData = ConvertObject.ConvertToDisplay(input, x => new
+        _displayData = ConvertObject.ConvertToDisplay(input, x => new
         {
-            MaGV = x.MaGV,
-            TenGV = x.TenGV,
-            TenKhoa = x.TenKhoa,
-            NgaySinhGV = x.NgaySinhGV,
-            GioiTinhGV = x.GioiTinhGV,
-            SoDienThoai = x.SoDienThoai,
-            Email = x.Email,
+            x.MaGV,
+            x.TenGV,
+            x.TenKhoa,
+            x.NgaySinhGV,
+            x.GioiTinhGV,
+            x.SoDienThoai,
+            x.Email
         });
     }
 
-    void Insert()
-    { 
+    private void Insert()
+    {
         _GiangVienDialog = new GiangVienDialog("Thêm giảng viên", DialogType.Them);
-        
+
         _GiangVienDialog.Finish += () =>
         {
-            List<GiangVienDisplay> listSv = ConvertDtoToDisplay(_GiangVienController.GetAll());
+            var listSv = ConvertDtoToDisplay(_GiangVienController.GetAll());
             UpdateDataDisplay(listSv);
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
-        this._GiangVienDialog.ShowDialog();
+        _GiangVienDialog.ShowDialog();
     }
 
-    void Update(int id)
+    private void Update(int id)
     {
         _GiangVienDialog = new GiangVienDialog("Sửa giảng viên", DialogType.Sua, id);
         _GiangVienDialog.Finish += () =>
         {
-            List<GiangVienDisplay> listSv = ConvertDtoToDisplay(_GiangVienController.GetAll());
+            var listSv = ConvertDtoToDisplay(_GiangVienController.GetAll());
             UpdateDataDisplay(listSv);
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
-        this._GiangVienDialog.ShowDialog();
+        _GiangVienDialog.ShowDialog();
     }
 
-    void Detail(int id)
+    private void Detail(int id)
     {
         _GiangVienDialog = new GiangVienDialog("Chi tiết giảng viên", DialogType.ChiTiet, id);
-        this._GiangVienDialog.ShowDialog();
+        _GiangVienDialog.ShowDialog();
     }
 
-    void Delete(int index)
+    private void Delete(int index)
     {
-        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-        if (select == DialogResult.No)
-        {
-            return;
-        }
+        var select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo,
+            MessageBoxIcon.Information);
+        if (select == DialogResult.No) return;
 
         _GiangVienController.SoftDeleteById(index);
-            MessageBox.Show("Xóa giảng viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            UpdateDataDisplay(ConvertDtoToDisplay(_GiangVienController.GetAll()));
-            this._table.UpdateData(_displayData);
+        MessageBox.Show("Xóa giảng viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        UpdateDataDisplay(ConvertDtoToDisplay(_GiangVienController.GetAll()));
+        _table.UpdateData(_displayData);
     }
 
-    List<GiangVienDisplay> ConvertDtoToDisplay(List<GiangVienDto> input)
+    private List<GiangVienDisplay> ConvertDtoToDisplay(List<GiangVienDto> input)
     {
         List<GiangVienDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new GiangVienDisplay
         {
@@ -299,20 +280,20 @@ public class GiangVien : NavBase
             NgaySinhGV = x.NgaySinhGV,
             GioiTinhGV = x.GioiTinhGV,
             SoDienThoai = x.SoDienThoai,
-            Email = x.Email,
+            Email = x.Email
         });
         return rs;
     }
-    
+
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
     public override List<string> getComboboxList()
     {
-        return this._listSelectionForComboBox;
+        return _listSelectionForComboBox;
     }
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._GiangVienSearch.Search(txtSearch, filter);
+        _GiangVienSearch.Search(txtSearch, filter);
     }
 }

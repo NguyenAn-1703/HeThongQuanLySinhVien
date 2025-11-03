@@ -1,17 +1,18 @@
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class TrangChu : NavBase
 {
-    private string[] _listSelectionForComboBox = new[] { "" };
+    private readonly int _imgHeight = 626;
+    private readonly int _imgWidth = 364;
+    private readonly string[] _listSelectionForComboBox = new[] { "" };
     private BackgroundPic _image;
-    private int _imgWidth = 364;
-    private int _imgHeight = 626;
     private Label _lbl1, _lbl2, _lbl3, _lbl4;
     private MyTLP _leftPanel;
 
@@ -22,12 +23,12 @@ public class TrangChu : NavBase
 
     private void Init()
     {
-        this.SuspendLayout();
+        SuspendLayout();
         BackColor = MyColor.GrayBackGround;
         Dock = DockStyle.Fill;
         Margin = new Padding(0);
 
-        MyTLP mainLayout = new MyTLP();
+        var mainLayout = new MyTLP();
         mainLayout.SuspendLayout();
         mainLayout.Margin = new Padding(0);
         mainLayout.Dock = DockStyle.Fill;
@@ -45,47 +46,47 @@ public class TrangChu : NavBase
         mainLayout.Controls.Add(_image);
         mainLayout.ResumeLayout();
 
-        this.Controls.Add(mainLayout);
+        Controls.Add(mainLayout);
 
         SetContentInFrontOfImg();
 
-        this.Resize += (sender, args) => { updateSize(); };
+        Resize += (sender, args) => { updateSize(); };
 
-        this.ResumeLayout();
+        ResumeLayout();
     }
 
-    void updateSize()
+    private void updateSize()
     {
         _image.SuspendLayout();
-        _image.Height = this.Height;
-        _image.Width = this.Height * _imgWidth / _imgHeight;
+        _image.Height = Height;
+        _image.Width = Height * _imgWidth / _imgHeight;
         _lbl2.Location = new Point(50, _image.Bottom - 250);
         _lbl3.Location = new Point(50, _image.Bottom - 130);
         _lbl4.Location = new Point(50, _image.Bottom - 100);
     }
 
-    void SetImage()
+    private void SetImage()
     {
         _image = new BackgroundPic
         {
             Margin = new Padding(0),
             BackgroundImage = GetPng.GetImage("img/jpg/homeimg.jpg"),
             Dock = DockStyle.Right,
-            BackgroundImageLayout = ImageLayout.Zoom,
+            BackgroundImageLayout = ImageLayout.Zoom
         };
         _image.Paint += (sender, args) => Overlay(args);
     }
 
     private void Overlay(PaintEventArgs e)
     {
-        Color overlayColor = Color.FromArgb(100, 0, 0, 0);
-        using (SolidBrush brush = new SolidBrush(overlayColor))
+        var overlayColor = Color.FromArgb(100, 0, 0, 0);
+        using (var brush = new SolidBrush(overlayColor))
         {
             e.Graphics.FillRectangle(brush, _image.ClientRectangle);
         }
     }
 
-    void SetContentInFrontOfImg()
+    private void SetContentInFrontOfImg()
     {
         _image.SuspendLayout();
         _lbl1 = new Label();
@@ -130,9 +131,9 @@ public class TrangChu : NavBase
         _image.ResumeLayout();
     }
 
-    PictureBox GetStar()
+    private PictureBox GetStar()
     {
-        PictureBox pb = new PictureBox
+        var pb = new PictureBox
         {
             Location = new Point(_image.Location.X + 10, _image.Location.Y + 10),
             BackColor = Color.Transparent,
@@ -143,9 +144,9 @@ public class TrangChu : NavBase
         return pb;
     }
 
-    MyTLP GetLeftPanel()
+    private MyTLP GetLeftPanel()
     {
-        MyTLP panel = new MyTLP();
+        var panel = new MyTLP();
         panel.SuspendLayout();
         panel.Margin = new Padding(0);
         panel.Padding = new Padding(40);
@@ -157,16 +158,16 @@ public class TrangChu : NavBase
         panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
         panel.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
 
-        Label name = new Label();
+        var name = new Label();
         name.Text = "Hệ thống quản lý sinh viên \nSGU";
         name.AutoSize = true;
         name.Font = GetFont.GetFont.GetPlayFairFont(25, FontType.Regular);
         name.ForeColor = MyColor.MainColor;
 
-        BoxHome box1 = new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn.");
-        BoxHome box2 = new BoxHome("Bảo mật", "Hệ thống bảo mật an toàn.");
-        BoxHome box3 = new BoxHome("Nhanh chóng", "Lưu trữ và tải dữ liệu nhanh chóng.");
-        BoxHome box4 = new BoxHome("Thân thiện", "Thao tác dễ dàng.");
+        var box1 = new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn.");
+        var box2 = new BoxHome("Bảo mật", "Hệ thống bảo mật an toàn.");
+        var box3 = new BoxHome("Nhanh chóng", "Lưu trữ và tải dữ liệu nhanh chóng.");
+        var box4 = new BoxHome("Thân thiện", "Thao tác dễ dàng.");
 
         box1.Anchor = AnchorStyles.Left;
         box3.Anchor = AnchorStyles.Left;
@@ -185,8 +186,10 @@ public class TrangChu : NavBase
 
     public override List<string> getComboboxList()
     {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        return ConvertArray_ListString.ConvertArrayToListString(_listSelectionForComboBox);
     }
+
     public override void onSearch(string txtSearch, string filter)
-    { }
+    {
+    }
 }

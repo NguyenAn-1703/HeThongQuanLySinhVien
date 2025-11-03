@@ -1,6 +1,5 @@
 using System.ComponentModel;
-using System.Data;
-using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Shared.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
@@ -13,24 +12,20 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CustomTable : MyTLP
 {
-    public CustomDataGridView _dataGridView;
-    List<string> _headerContent;
-    protected MyFLP _header;
+    private readonly bool _action;
+    private readonly List<string> _columnNames; //để truy suất
+    private readonly bool _delete;
+    private readonly bool _edit;
+    private readonly List<string> _headerContent;
     private List<object> _cellDatas;
-    private List<string> _columnNames; //để truy suất
+    public CustomDataGridView _dataGridView;
+    private CustomButton _deleteBtn;
     private BindingList<object> _displayCellData;
-    private bool _action;
-    private bool _edit;
-    private bool _delete;
-    private Form _topForm;
 
     private CustomButton _editBtn;
-    private CustomButton _deleteBtn;
+    protected MyFLP _header;
+    private Form _topForm;
 
-    public event Action<int> OnEdit;
-    public event Action<int> OnDelete;
-    public event Action<int> OnDetail;
-    
 
     public CustomTable(List<string> headerContent, List<string> columnNames, List<object> cells, bool action = false,
         bool edit = false, bool delete = false)
@@ -45,7 +40,11 @@ public class CustomTable : MyTLP
         Init();
     }
 
-    void Init()
+    public event Action<int> OnEdit;
+    public event Action<int> OnDelete;
+    public event Action<int> OnDetail;
+
+    private void Init()
     {
         Configuration();
         SetHeader();
@@ -53,16 +52,16 @@ public class CustomTable : MyTLP
         SetEventListen();
     }
 
-    void Configuration()
+    private void Configuration()
     {
-        this.Dock = DockStyle.Fill;
-        this.RowCount = 2;
-        this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        Dock = DockStyle.Fill;
+        RowCount = 2;
+        RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         _dataGridView = new CustomDataGridView(_action, _edit, _delete);
     }
 
-    void SetHeader()
+    private void SetHeader()
     {
         _header.Dock = DockStyle.Top;
         _header.AutoSize = true;
@@ -72,22 +71,16 @@ public class CustomTable : MyTLP
         _header.Margin = new Padding(0, 0, 0, 0);
         _header.Padding = new Padding(0, 0, 0, 0);
 
-        foreach (String i in _headerContent)
-        {
-            this._header.Controls.Add(GetLabel(i));
-        }
+        foreach (var i in _headerContent) _header.Controls.Add(GetLabel(i));
 
-        if (_action)
-        {
-            _header.Controls.Add(GetLabel("Hành động"));
-        }
+        if (_action) _header.Controls.Add(GetLabel("Hành động"));
 
-        this.Controls.Add(_header);
+        Controls.Add(_header);
     }
 
-    void SetContent()
+    private void SetContent()
     {
-        for (int i = 0; i < _headerContent.Count; i++)
+        for (var i = 0; i < _headerContent.Count; i++)
         {
             var column = new DataGridViewTextBoxColumn
             {
@@ -117,14 +110,13 @@ public class CustomTable : MyTLP
         _dataGridView.Dock = DockStyle.Fill;
         _dataGridView.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
         Console.WriteLine(_cellDatas.Count);
-            
-        this.Controls.Add(_dataGridView);
-        
+
+        Controls.Add(_dataGridView);
     }
 
-    Label GetLabel(String text)
+    private Label GetLabel(string text)
     {
-        Label lbl = new Label
+        var lbl = new Label
         {
             Dock = DockStyle.Top,
             Height = 30,
@@ -132,181 +124,156 @@ public class CustomTable : MyTLP
             Text = text,
             Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold),
             ForeColor = MyColor.White,
-            Margin = new Padding(0, 3, 0, 3),
+            Margin = new Padding(0, 3, 0, 3)
         };
         return lbl;
     }
 
-    void SetEventListen()
+    private void SetEventListen()
     {
-        this.Resize += (sender, args) => OnResize();
-        this._dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
+        Resize += (sender, args) => OnResize();
+        _dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
 
-        this._dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
-        this._dataGridView.BtnHoverDelete += (rec, index) => OnHoverDeleteBtn(rec, index);
+        _dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
+        _dataGridView.BtnHoverDelete += (rec, index) => OnHoverDeleteBtn(rec, index);
 
-        this._dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
-        this._dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
-        
-        
+        _dataGridView.BtnEditLeave += () => OnLeaveEditBtn();
+        _dataGridView.BtnDeleteLeave += () => OnLeaveDeleteBtn();
+
+
         // fix lỗi hiện scrollbar sớm
-         _dataGridView.ScrollBars = ScrollBars.None;
-         _dataGridView.DataBindingComplete += (s, e) =>
-         {
-             if (_dataGridView.IsHandleCreated)
-             {
-                 // đợi vòng UI tiếp theo để layout xong hoàn toàn
-                 _dataGridView.BeginInvoke(new Action(() =>
-                 {
-                     _dataGridView.ScrollBars = ScrollBars.Both;
-                 }));
-             }
-             else
-             {
-                 _dataGridView.ScrollBars = ScrollBars.Both;
-             }
-         };
-        
+        _dataGridView.ScrollBars = ScrollBars.None;
+        _dataGridView.DataBindingComplete += (s, e) =>
+        {
+            if (_dataGridView.IsHandleCreated)
+                // đợi vòng UI tiếp theo để layout xong hoàn toàn
+                _dataGridView.BeginInvoke(() => { _dataGridView.ScrollBars = ScrollBars.Both; });
+            else
+                _dataGridView.ScrollBars = ScrollBars.Both;
+        };
     }
 
-    void OnDoubleClickRow(DataGridViewCellEventArgs e)
+    private void OnDoubleClickRow(DataGridViewCellEventArgs e)
     {
-        int index = e.RowIndex;
+        var index = e.RowIndex;
         detail(index);
     }
 
-    void OnHoverEditBtn(Point rec, int index)
+    private void OnHoverEditBtn(Point rec, int index)
     {
-        int rowIndex = index;
+        var rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
-        _topForm = this.FindForm();
+        _topForm = FindForm();
         _editBtn = new CustomButton(20, 20, "fix.svg", MyColor.MainColor)
         {
-            Cursor = Cursors.Hand,
+            Cursor = Cursors.Hand
         };
-        
+
         _topForm.Controls.Add(_editBtn);
         _editBtn.BringToFront();
 
-        Point myPoint = _topForm.PointToClient(rec);
+        var myPoint = _topForm.PointToClient(rec);
         _editBtn.Location = myPoint;
 
-        Point cursorPos = Cursor.Position;
-        Point cursorOnForm = _topForm.PointToClient(cursorPos);
+        var cursorPos = Cursor.Position;
+        var cursorOnForm = _topForm.PointToClient(cursorPos);
 
         // Nếu chuột đang nằm trong vùng nút thì hiển thị, nếu không thì ẩn
         if (_editBtn.Bounds.Contains(cursorOnForm))
-        {
             _editBtn.Visible = true;
-        }
         else
-        {
             _editBtn.Visible = false;
-        }
-        _editBtn.MouseLeave +=  (sender, args) =>_editBtn.Visible = false;
-        
-        
+        _editBtn.MouseLeave += (sender, args) => _editBtn.Visible = false;
+
+
         _editBtn.MouseDown += (sender, args) => edit(index);
     }
 
-    void OnHoverDeleteBtn(Point rec, int index)
+    private void OnHoverDeleteBtn(Point rec, int index)
     {
-        int rowIndex = index;
+        var rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
-        _topForm = this.FindForm();
+        _topForm = FindForm();
         _deleteBtn = new CustomButton(20, 20, "trashbin.svg", MyColor.RedHover)
         {
-            Cursor = Cursors.Hand,
+            Cursor = Cursors.Hand
         };
-        
+
         _topForm.Controls.Add(_deleteBtn);
         _deleteBtn.BringToFront();
 
-        Point myPoint = _topForm.PointToClient(rec);
+        var myPoint = _topForm.PointToClient(rec);
         _deleteBtn.Location = myPoint;
 
-        Point cursorPos = Cursor.Position;
-        Point cursorOnForm = _topForm.PointToClient(cursorPos);
+        var cursorPos = Cursor.Position;
+        var cursorOnForm = _topForm.PointToClient(cursorPos);
 
         // Nếu chuột đang nằm trong vùng nút thì hiển thị, nếu không thì ẩn
         if (_deleteBtn.Bounds.Contains(cursorOnForm))
-        {
             _deleteBtn.Visible = true;
-        }
         else
-        {
             _deleteBtn.Visible = false;
-        }
-        _deleteBtn.MouseLeave +=  (sender, args) =>_deleteBtn.Visible = false;
+        _deleteBtn.MouseLeave += (sender, args) => _deleteBtn.Visible = false;
 
 
         _deleteBtn.MouseDown += (sender, args) => delete(index);
-        
     }
 
-    void OnLeaveEditBtn()
+    private void OnLeaveEditBtn()
     {
         _editBtn.Dispose();
     }
 
-    void OnLeaveDeleteBtn()
+    private void OnLeaveDeleteBtn()
     {
         _deleteBtn.Dispose();
     }
 
-    void delete(int index)
+    private void delete(int index)
     {
-        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
-        
+        var Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+
         OnDelete?.Invoke(Id);
         _deleteBtn.Dispose();
     }
 
-    void edit(int index)
+    private void edit(int index)
     {
-        
-        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
-        
+        var Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+
         OnEdit?.Invoke(Id);
-        
+
         _editBtn.Dispose();
     }
 
-    void detail(int index)
+    private void detail(int index)
     {
         // object o = _cellDatas[index];
         // Console.WriteLine("Chi tiết" + o.ToString());
-        
-        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
-        
+
+        var Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+
         OnDetail?.Invoke(Id);
     }
 
-    void OnResize()
+    private void OnResize()
     {
         int tableWidth;
         int columnSize;
 
         if (_dataGridView.DisplayedRowCount(false) < _dataGridView.RowCount)
         {
-            tableWidth = this.Width - 25;
+            tableWidth = Width - 25;
             columnSize = tableWidth / _header.Controls.Count;
-            foreach (Control c in _header.Controls)
-            {
-                c.Size = new Size(columnSize, c.Height);
-            }
+            foreach (Control c in _header.Controls) c.Size = new Size(columnSize, c.Height);
             _header.Controls[_header.Controls.Count - 1].Width = columnSize + 25;
         }
         else
         {
-            tableWidth = this.Width;
+            tableWidth = Width;
             columnSize = tableWidth / _header.Controls.Count;
-            foreach (Control c in _header.Controls)
-            {
-                c.Size = new Size(columnSize, c.Height);
-            }
+            foreach (Control c in _header.Controls) c.Size = new Size(columnSize, c.Height);
         }
-
     }
 
     public void UpdateData(List<List<object>> newRows)
@@ -323,26 +290,17 @@ public class CustomTable : MyTLP
             if (row != null)
             {
                 // take only as many values as header columns define
-                for (int i = 0; i < _headerContent.Count && i < row.Count; i++)
-                {
-                    values.Add(row[i]);
-                }
+                for (var i = 0; i < _headerContent.Count && i < row.Count; i++) values.Add(row[i]);
                 // pad if row has fewer cells than headers
-                while (values.Count < _headerContent.Count)
-                {
-                    values.Add(string.Empty);
-                }
+                while (values.Count < _headerContent.Count) values.Add(string.Empty);
             }
             else
             {
-                for (int i = 0; i < _headerContent.Count; i++) values.Add(string.Empty);
+                for (var i = 0; i < _headerContent.Count; i++) values.Add(string.Empty);
             }
 
             // add placeholder for action column if enabled
-            if (_action)
-            {
-                values.Add(string.Empty);
-            }
+            if (_action) values.Add(string.Empty);
 
             _dataGridView.Rows.Add(values.ToArray());
         }
@@ -358,20 +316,15 @@ public class CustomTable : MyTLP
     public void AddColumn(ColumnType columnType, string title)
     {
         if (columnType == ColumnType.CheckBox)
-        {
             AddCbColumn(title);
-        }
-        else if (columnType == ColumnType.Button)
-        {
-            AddBtnColumn(title);
-        }
+        else if (columnType == ColumnType.Button) AddBtnColumn(title);
     }
 
     public event Action<int, bool> ClickCB;
 
-    void AddCbColumn(string title)
+    private void AddCbColumn(string title)
     {
-        DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn();
+        var chkCol = new DataGridViewCheckBoxColumn();
         // chkCol.HeaderText = "Chọn";
         chkCol.Name = "colChon";
         // chkCol.Width = 50; // Tùy chỉnh độ rộng
@@ -379,44 +332,38 @@ public class CustomTable : MyTLP
         _dataGridView.Columns.Add(chkCol);
         _dataGridView.ReadOnly = false;
         // _dataGridView.AutoGenerateColumns = false;
-        this._header.Controls.Add(GetLabel(title));
-        
-        
+        _header.Controls.Add(GetLabel(title));
+
+
         _dataGridView.CurrentCellDirtyStateChanged += (sender, e) =>
         {
-            if (_dataGridView.IsCurrentCellDirty)
-            {
-                _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
-            }
+            if (_dataGridView.IsCurrentCellDirty) _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
         };
-        
-        _dataGridView.CellContentClick += (sender, e) =>
-        {
-            OnClickCB(e);
-        };
+
+        _dataGridView.CellContentClick += (sender, e) => { OnClickCB(e); };
     }
+
     // Cài đặt sk click cb
-    void OnClickCB(DataGridViewCellEventArgs e)
+    private void OnClickCB(DataGridViewCellEventArgs e)
     {
         if (_dataGridView.Columns[e.ColumnIndex].Name == "colChon" && e.RowIndex >= 0)
         {
-            bool isChecked = Convert.ToBoolean(_dataGridView.Rows[e.RowIndex].Cells["colChon"].EditedFormattedValue);
-            int i = Convert.ToInt32(_dataGridView.Rows[e.RowIndex].Cells[0].Value);
+            var isChecked = Convert.ToBoolean(_dataGridView.Rows[e.RowIndex].Cells["colChon"].EditedFormattedValue);
+            var i = Convert.ToInt32(_dataGridView.Rows[e.RowIndex].Cells[0].Value);
             ClickCB?.Invoke(i, isChecked);
         }
     }
 
     public void FailCb(int i)
     {
-        int rowIndex = -1;
+        var rowIndex = -1;
         foreach (DataGridViewRow row in _dataGridView.Rows)
-        {
             if (row.Cells[0].Value != null && Convert.ToInt32(row.Cells[0].Value) == i)
             {
                 rowIndex = row.Index;
                 break;
             }
-        }
+
         _dataGridView.Rows[rowIndex].Cells["colChon"].Value = false;
         _dataGridView.RefreshEdit();
         _dataGridView.Refresh();
@@ -424,18 +371,16 @@ public class CustomTable : MyTLP
 
     public void tickCB(int i)
     {
-        int rowIndex = -1;
+        var rowIndex = -1;
         foreach (DataGridViewRow row in _dataGridView.Rows)
-        {
             if (row.Cells[0].Value != null && Convert.ToInt32(row.Cells[0].Value) == i)
             {
                 rowIndex = row.Index;
                 break;
             }
-        }
-        
+
         _dataGridView.Rows[rowIndex].Cells["colChon"].Value = true;
-        
+
         _dataGridView.RefreshEdit();
         _dataGridView.Refresh();
     }
@@ -452,46 +397,46 @@ public class CustomTable : MyTLP
         if (!_dataGridView.Columns["Action"].Visible) return;
         _header.Controls.RemoveAt(_header.Controls.Count - 1);
         _dataGridView.Columns["Action"].Visible = false;
-        this.OnResize();
+        OnResize();
     }
+
     public void EnableActionColumn()
     {
         if (!_action) return;
         if (_dataGridView.Columns["Action"].Visible) return;
         _dataGridView.Columns["Action"].Visible = true;
-        
+
         _header.Controls.Add(GetLabel("Hành động"));
-        this.OnResize();
+        OnResize();
     }
 
-    void AddBtnColumn(string title)
+    private void AddBtnColumn(string title)
     {
-        this._header.Controls.Add(GetLabel(title));
-        
-        DataGridViewButtonColumn btnCol = new DataGridViewButtonColumn();
-        btnCol.HeaderText = title; 
-        btnCol.Name = "colButton";      
-        btnCol.Text = "Cập nhật";      
+        _header.Controls.Add(GetLabel(title));
+
+        var btnCol = new DataGridViewButtonColumn();
+        btnCol.HeaderText = title;
+        btnCol.Name = "colButton";
+        btnCol.Text = "Cập nhật";
         btnCol.UseColumnTextForButtonValue = true;
 
         _dataGridView.Columns.Add(btnCol);
         _dataGridView.CellContentClick += dgvHocPhi_CellContentClick;
     }
-    
+
     private void dgvHocPhi_CellContentClick(object sender, DataGridViewCellEventArgs e)
     {
         if (_dataGridView.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
         {
-            int maSV = int.Parse(_dataGridView.Rows[e.RowIndex].Cells["MaSV"].Value.ToString());
+            var maSV = int.Parse(_dataGridView.Rows[e.RowIndex].Cells["MaSV"].Value.ToString());
             OnClickBtn(maSV);
         }
     }
 
     public event Action<int> MouseClickBtnCapNhat;
-    void OnClickBtn(int maSV)
+
+    private void OnClickBtn(int maSV)
     {
         MouseClickBtnCapNhat?.Invoke(maSV);
     }
-
-    
 }

@@ -1,66 +1,66 @@
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
-using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class ChuongTrinhDaoTaoDialog : Form
 {
+    private readonly string[] _arrLHDT = new[] { "Chính quy", "Văn bằng 2", "Vừa học vừa làm" };
+    private readonly string[] _arrTDDT = new[] { "Cử nhân", "Thạc sĩ", "Tiến sĩ" };
+    private readonly DialogType _dialogType;
+    private readonly List<string> _header;
 
-    private CustomButton _exitButton;
-    private List<InputFormItem> _listIFI;
-    private List<LabelTextField> _listTextBox;
-    private ChuongTrinhDaoTaoController _chuongTrinhDaoTaoController;
-    private int _idChuongTrinhDaoTao;
-    public event Action Finish;
-    
-    private MyTLP _mainLayout;
+    private readonly string[] _headerArray = new[] { "Mã học phần", "Tên học phần", "Hành động" };
+
+    private readonly string[] _headerDetailArray = new[] { "Mã học phần", "Tên học phần" };
+    private readonly int _idChuongTrinhDaoTao;
+    private readonly List<InputFormItem> _listIFI;
+    private readonly List<string> _listLHDT;
+    private readonly List<string> _listTDDT;
+    private readonly List<LabelTextField> _listTextBox;
+
+    private readonly string _title;
     private TitleButton _btnLuu;
-    
-    private string _title;
-    private DialogType _dialogType;
+    private ChuKyDaoTaoController _chuKyDaoTaoController;
+    private ChuongTrinhDaoTao_HocPhanController _chuongTrinhDaoTao_HocPhanController;
+    private ChuongTrinhDaoTaoController _chuongTrinhDaoTaoController;
 
     private MyTLP _contentPanel;
-    
+
+    private CustomButton _exitButton;
+    private List<string> _headerDetail;
+
     private HocPhanController _hocPhanController;
+    private List<object> _leftDisplayData;
+    private List<HocPhanDto> _leftRawData;
+
+    private CtdtSearchBar _leftSearchBar;
 
 
     private CTDTTable _leftTable;
-    private List<HocPhanDto> _leftRawData;
-    private List<object> _leftDisplayData;
-    
-    private CTDTTable _rightTable;
-    private List<HocPhanDto> _rightRawData;
-    private List<object> _rightDisplayData;
 
-    private CtdtSearchBar _leftSearchBar;
-    private CtdtSearchBar _rightSearchBar;
+    private MyTLP _mainLayout;
+    private List<HocPhanDto> _newListUpdate;
 
-    private string[] _headerArray = new[] { "Mã học phần", "Tên học phần", "Hành động" };
-    private List<string> _header;
-    
-    private string[] _headerDetailArray = new[] { "Mã học phần", "Tên học phần"};
-    private List<string> _headerDetail;
-    
     private NganhController _nganhController;
-    private ChuKyDaoTaoController _chuKyDaoTaoController;
-    private ChuongTrinhDaoTao_HocPhanController _chuongTrinhDaoTao_HocPhanController;
-    
-    private string[] _arrLHDT = new []{"Chính quy","Văn bằng 2","Vừa học vừa làm"};
-    private List<string> _listLHDT;
-    private string[] _arrTDDT = new []{"Cử nhân","Thạc sĩ","Tiến sĩ"};
-    private List<string> _listTDDT;
 
     private List<HocPhanDto> _oldListUpdate;
-    private List<HocPhanDto> _newListUpdate;
-    
+    private List<object> _rightDisplayData;
+    private List<HocPhanDto> _rightRawData;
+    private CtdtSearchBar _rightSearchBar;
 
-    public ChuongTrinhDaoTaoDialog(string title, DialogType dialogType, List<InputFormItem> listIFI, ChuongTrinhDaoTaoController chuongTrinhDaoTaoController, int idChuongTrinhDaoTao = -1)
+    private CTDTTable _rightTable;
+
+
+    public ChuongTrinhDaoTaoDialog(string title, DialogType dialogType, List<InputFormItem> listIFI,
+        ChuongTrinhDaoTaoController chuongTrinhDaoTaoController, int idChuongTrinhDaoTao = -1)
     {
         _listTextBox = new List<LabelTextField>();
         _listIFI = listIFI;
@@ -68,132 +68,127 @@ public class ChuongTrinhDaoTaoDialog : Form
         _idChuongTrinhDaoTao = idChuongTrinhDaoTao;
         _title = title;
         _hocPhanController = HocPhanController.GetInstance();
-        
+
         _leftRawData = new List<HocPhanDto>();
         _leftDisplayData = new List<object>();
         _rightRawData = new List<HocPhanDto>();
         _rightDisplayData = new List<object>();
         _dialogType = dialogType;
-        
+
         _header = _headerArray.ToList();
         _headerDetail = _headerDetailArray.ToList();
         _listLHDT = _arrLHDT.ToList();
         _listTDDT = _arrTDDT.ToList();
-        
+
         _nganhController = NganhController.GetInstance();
         _chuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
-        
+
         _chuongTrinhDaoTao_HocPhanController = ChuongTrinhDaoTao_HocPhanController.GetInstance();
         Init();
     }
 
-    void Init()
+    public event Action Finish;
+
+    private void Init()
     {
         Width = 1200;
         Height = 750;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
-        this.FormBorderStyle = FormBorderStyle.None;
-        
-        _mainLayout = new  MyTLP
+        FormBorderStyle = FormBorderStyle.None;
+
+        _mainLayout = new MyTLP
         {
-            Dock =  DockStyle.Fill,
+            Dock = DockStyle.Fill,
             RowCount = 4,
-            BorderStyle = BorderStyle.FixedSingle,
+            BorderStyle = BorderStyle.FixedSingle
             // CellBorderStyle = MyTLPCellBorderStyle.Single
         };
-        
+
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        
+
         SetTopBar();
         SetTitleBar();
         SetContent();
         SetBottom();
-        
-        this.Controls.Add(_mainLayout);
+
+        Controls.Add(_mainLayout);
 
         SetAction();
 
-        
-        if (_dialogType == DialogType.Them)
-        {
-            SetupInsert();
-        }
-        else if (_dialogType == DialogType.Sua)
-        {
-            SetupUpdate();
-        }
-        else
-        {
-            SetupDetail();
-        }
 
+        if (_dialogType == DialogType.Them)
+            SetupInsert();
+        else if (_dialogType == DialogType.Sua)
+            SetupUpdate();
+        else
+            SetupDetail();
     }
-    
-    void SetTopBar()
+
+    private void SetTopBar()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
-        
+
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
 
-        Label topTitle = new Label
+        var topTitle = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.Left,
             BackColor = MyColor.GrayBackGround,
             Dock = DockStyle.Fill,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
         panel.Controls.Add(topTitle);
-        
+
         _exitButton = new CustomButton(25, 25, "exitbutton.svg", MyColor.GrayBackGround, false, false, false, false);
         _exitButton.HoverColor = MyColor.GrayHoverColor;
         _exitButton.SelectColor = MyColor.GraySelectColor;
         _exitButton.Margin = new Padding(0);
         _exitButton.Anchor = AnchorStyles.Right;
-        
-        _exitButton.MouseDown +=  (sender, args) => this.Close(); 
+
+        _exitButton.MouseDown += (sender, args) => Close();
         panel.Controls.Add(_exitButton);
-        
-        this._mainLayout.Controls.Add(panel);
+
+        _mainLayout.Controls.Add(panel);
     }
 
-    void SetTitleBar()
+    private void SetTitleBar()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.MainColor,
             Margin = new Padding(0),
-            Padding = new Padding(0, 10, 0, 10),
+            Padding = new Padding(0, 10, 0, 10)
         };
 
-        Label title = new Label
+        var title = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.None,
             AutoSize = true,
             ForeColor = MyColor.White,
-            Font = GetFont.GetFont.GetMainFont(16, FontType.Black),
+            Font = GetFont.GetFont.GetMainFont(16, FontType.Black)
         };
-        
+
         panel.Controls.Add(title);
         _mainLayout.Controls.Add(panel);
     }
 
-    void SetContent()
+    private void SetContent()
     {
         _contentPanel = new MyTLP
         {
@@ -209,75 +204,76 @@ public class ChuongTrinhDaoTaoDialog : Form
         _contentPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
         SetTextBoxContainer();
-        
+
         SetTable();
-        
+
         _mainLayout.Controls.Add(_contentPanel);
     }
 
-    void SetTextBoxContainer()
+    private void SetTextBoxContainer()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             Margin = new Padding(0),
             BackColor = MyColor.LightGray,
             ColumnCount = 2,
-            RowCount = 2,
+            RowCount = 2
             // Padding = new Padding(100, 10, 100, 10),
         };
-        
+
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-        
-        for (int i = 0; i < _listIFI.Count; i++)
+
+        for (var i = 0; i < _listIFI.Count; i++)
         {
-            LabelTextField textField = new LabelTextField(_listIFI[i].content, _listIFI[i].type)
+            var textField = new LabelTextField(_listIFI[i].content, _listIFI[i].type)
             {
-                Margin = new Padding(100, 5, 100, 5),
+                Margin = new Padding(100, 5, 100, 5)
             };
             _listTextBox.Add(textField);
             panel.Controls.Add(_listTextBox[i]);
         }
+
         _contentPanel.Controls.Add(panel);
-        _contentPanel.SetColumnSpan (panel, 2);
+        _contentPanel.SetColumnSpan(panel, 2);
     }
 
-    Label GetLabel(string text)
+    private Label GetLabel(string text)
     {
-        Label lbl = new Label
+        var lbl = new Label
         {
             Text = text,
             Font = GetFont.GetFont.GetMainFont(11, FontType.SemiBold),
-            AutoSize = true,
+            AutoSize = true
         };
         return lbl;
     }
 
-    void SetTable()
+    private void SetTable()
     {
         //mahp, tenhp, hành động
         //mahp, tenhp, hành động
 
-        RoundTLP leftPnl = new RoundTLP
+        var leftPnl = new RoundTLP
         {
             Dock = DockStyle.Fill,
             RowCount = 3,
-            Padding = new  Padding(15, 0, 15, 15),
+            Padding = new Padding(15, 0, 15, 15),
             Border = true,
             BorderColor = MyColor.GraySelectColor,
-            Margin = new Padding(15),
+            Margin = new Padding(15)
         };
-        RoundTLP rightPnl = new RoundTLP
+        var rightPnl = new RoundTLP
         {
             Dock = DockStyle.Fill,
             RowCount = 3,
-            Padding = new  Padding(15, 0, 15, 15),
+            Padding = new Padding(15, 0, 15, 15),
             Border = true,
             BorderColor = MyColor.GraySelectColor,
-            Margin = new Padding(15),
+            Margin = new Padding(15)
         };
         leftPnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         leftPnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -285,85 +281,82 @@ public class ChuongTrinhDaoTaoDialog : Form
         rightPnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         rightPnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         rightPnl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        
-        Label lblhp = GetLabel("Học phần: ");
-        Label lblhpct = GetLabel("Học phần thuộc chương trình đào tạo: ");
+
+        var lblhp = GetLabel("Học phần: ");
+        var lblhpct = GetLabel("Học phần thuộc chương trình đào tạo: ");
         lblhp.Margin = new Padding(0, 20, 0, 0);
         lblhpct.Margin = new Padding(0, 20, 0, 0);
         lblhp.Anchor = AnchorStyles.None;
         lblhpct.Anchor = AnchorStyles.None;
-        
-        _leftSearchBar = new CtdtSearchBar(){Dock = DockStyle.Right};
-        _rightSearchBar = new CtdtSearchBar(){Dock = DockStyle.Right};
-        
 
-        
+        _leftSearchBar = new CtdtSearchBar { Dock = DockStyle.Right };
+        _rightSearchBar = new CtdtSearchBar { Dock = DockStyle.Right };
+
 
         _leftRawData = _hocPhanController.GetAll();
-        
+
         SetLeftDisplayData();
-        string[] leftColumnNameArr = new[] { "MaHP", "TenHP", "ActionPlus" };
+        var leftColumnNameArr = new[] { "MaHP", "TenHP", "ActionPlus" };
         _leftTable = new CTDTTable(_header, leftColumnNameArr.ToList(), _leftDisplayData, TableCTDTType.Plus);
         // _contentPanel.Controls.Add(_leftTable);
 
         SetRightDisplayData();
-        string[] rightColumnNameArr = new[] { "MaHP", "TenHP", "ActionMinus" };
+        var rightColumnNameArr = new[] { "MaHP", "TenHP", "ActionMinus" };
         _rightTable = new CTDTTable(_header, rightColumnNameArr.ToList(), _rightDisplayData, TableCTDTType.Minus);
 
-        
-        
+
         leftPnl.Controls.Add(lblhp);
         leftPnl.Controls.Add(_leftSearchBar);
         leftPnl.Controls.Add(_leftTable);
-        
+
         rightPnl.Controls.Add(lblhpct);
         rightPnl.Controls.Add(_rightSearchBar);
         rightPnl.Controls.Add(_rightTable);
-        
+
         _contentPanel.Controls.Add(leftPnl);
         _contentPanel.Controls.Add(rightPnl);
     }
-    
-    void SetBottom()
+
+    private void SetBottom()
     {
         //Thêm có Đặt lại, Lưu, Hủy
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             AutoSize = true,
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
+            ColumnCount = 3
         };
-        
+
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
         {
-            panel.Controls.Add(new Panel{Height = 0});
-        
+            panel.Controls.Add(new Panel { Height = 0 });
+
             _btnLuu = new TitleButton("Lưu");
             panel.Controls.Add(_btnLuu);
-        
-            TitleButton btnHuy = new TitleButton("Hủy");
-            btnHuy._mouseDown += () => this.Close();
-            
+
+            var btnHuy = new TitleButton("Hủy");
+            btnHuy._mouseDown += () => Close();
+
             panel.Controls.Add(btnHuy);
         }
         else
         {
-            panel.Controls.Add(new Panel{Height = 0});
-        
-            TitleButton btnThoat = new TitleButton("Thoát");
-            btnThoat._mouseDown += () => this.Close();
+            panel.Controls.Add(new Panel { Height = 0 });
+
+            var btnThoat = new TitleButton("Thoát");
+            btnThoat._mouseDown += () => Close();
             panel.Controls.Add(btnThoat, 2, 0);
         }
 
-        
-        this._mainLayout.Controls.Add(panel, 0, 3);
+
+        _mainLayout.Controls.Add(panel, 0, 3);
     }
-    
-    void SetAction()
+
+    private void SetAction()
     {
         _leftSearchBar.KeyDown += s => OnLeftSearch(s);
         _rightSearchBar.KeyDown += s => OnRightSearch(s);
@@ -373,97 +366,89 @@ public class ChuongTrinhDaoTaoDialog : Form
 
         _leftTable.OnDetail += i =>
         {
-            new HocPhanDialog(DialogType.ChiTiet, _hocPhanController.GetHocPhanById(i), HocPhanDao.GetInstance()).ShowDialog();
+            new HocPhanDialog(DialogType.ChiTiet, _hocPhanController.GetHocPhanById(i), HocPhanDao.GetInstance())
+                .ShowDialog();
         };
-        
+
         _rightTable.OnDetail += i =>
         {
-            new HocPhanDialog(DialogType.ChiTiet, _hocPhanController.GetHocPhanById(i), HocPhanDao.GetInstance()).ShowDialog();
+            new HocPhanDialog(DialogType.ChiTiet, _hocPhanController.GetHocPhanById(i), HocPhanDao.GetInstance())
+                .ShowDialog();
         };
 
-        if (_dialogType == DialogType.Them)
-        {
-            _btnLuu._mouseDown += () => Insert();
-        }
+        if (_dialogType == DialogType.Them) _btnLuu._mouseDown += () => Insert();
 
-        if (_dialogType == DialogType.Sua)
-        {
-            _btnLuu._mouseDown += () => Update();
-        }
+        if (_dialogType == DialogType.Sua) _btnLuu._mouseDown += () => Update();
     }
 
-    void SetLeftDisplayData()
+    private void SetLeftDisplayData()
     {
         _leftDisplayData = ConvertObject.ConvertToDisplay(_leftRawData, x => new
-        {                          
-            MaHP = x.MaHP,
-            TenHP = x.TenHP,
-        }); 
+        {
+            x.MaHP, x.TenHP
+        });
     }
 
-    void SetupInsert()
+    private void SetupInsert()
     {
         SetupCombobox();
     }
 
-    void SetupUpdate()
+    private void SetupUpdate()
     {
         SetupCombobox();
-        
+
         ChuongTrinhDaoTaoDto chuongTrinh = _chuongTrinhDaoTaoController.GetById(_idChuongTrinhDaoTao);
-        
+
         NganhDto nganh = _nganhController.GetNganhById(chuongTrinh.MaNganh);
         ChuKyDaoTaoDto chuKy = _chuKyDaoTaoController.GetById(chuongTrinh.MaCKDT);
-        
+
         _listTextBox[0].SetComboboxSelection(nganh.TenNganh);
         _listTextBox[1].SetComboboxSelection(chuKy.NamBatDau + " - " + chuKy.NamKetThuc);
         _listTextBox[2].SetComboboxSelection(chuongTrinh.LoaiHinhDT);
         _listTextBox[3].SetComboboxSelection(chuongTrinh.TrinhDo);
-        
 
-        List<ChuongTrinhDaoTao_HocPhanDto> listCTDT_HP = _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(_idChuongTrinhDaoTao);
-        
-        List<HocPhanDto> listHocPhan = new List<HocPhanDto>();
-        foreach (ChuongTrinhDaoTao_HocPhanDto item in listCTDT_HP)
-        {
-            listHocPhan.Add(_hocPhanController.GetHocPhanById(item.MaHP));
-        }
+
+        List<ChuongTrinhDaoTao_HocPhanDto> listCTDT_HP =
+            _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(_idChuongTrinhDaoTao);
+
+        var listHocPhan = new List<HocPhanDto>();
+        foreach (var item in listCTDT_HP) listHocPhan.Add(_hocPhanController.GetHocPhanById(item.MaHP));
         _rightRawData = listHocPhan;
         _leftRawData.RemoveAll(a => listHocPhan.Any(b => a.MaHP == b.MaHP));
         UpdateTableWNewRawData();
-        
+
         //chỉ cần lấy mã để so sánh
         _oldListUpdate = _rightRawData
             .Select(x => new HocPhanDto
             {
-                MaHP = x.MaHP,
+                MaHP = x.MaHP
             })
-            .ToList();;
+            .ToList();
+        ;
     }
 
-    void SetupDetail()
+    private void SetupDetail()
     {
         SetupCombobox();
         ChuongTrinhDaoTaoDto chuongTrinh = _chuongTrinhDaoTaoController.GetById(_idChuongTrinhDaoTao);
         NganhDto nganh = _nganhController.GetNganhById(chuongTrinh.MaNganh);
         ChuKyDaoTaoDto chuKy = _chuKyDaoTaoController.GetById(chuongTrinh.MaCKDT);
-        
+
         _listTextBox[0].SetComboboxSelection(nganh.TenNganh);
         _listTextBox[1].SetComboboxSelection(chuKy.NamBatDau + " - " + chuKy.NamKetThuc);
         _listTextBox[2].SetComboboxSelection(chuongTrinh.LoaiHinhDT);
         _listTextBox[3].SetComboboxSelection(chuongTrinh.TrinhDo);
 
-        List<ChuongTrinhDaoTao_HocPhanDto> listCTDT_HP = _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(_idChuongTrinhDaoTao);
-        
-        List<HocPhanDto> listHocPhan = new List<HocPhanDto>();
-        foreach (ChuongTrinhDaoTao_HocPhanDto item in listCTDT_HP)
-        {
-            listHocPhan.Add(_hocPhanController.GetHocPhanById(item.MaHP));
-        }
+        List<ChuongTrinhDaoTao_HocPhanDto> listCTDT_HP =
+            _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(_idChuongTrinhDaoTao);
+
+        var listHocPhan = new List<HocPhanDto>();
+        foreach (var item in listCTDT_HP) listHocPhan.Add(_hocPhanController.GetHocPhanById(item.MaHP));
         _rightRawData = listHocPhan;
         _leftRawData.RemoveAll(a => listHocPhan.Any(b => a.MaHP == b.MaHP));
-        
-        
+
+
         UpdateTableWNewRawData();
 
         _leftTable.EnableActionColumn();
@@ -472,46 +457,44 @@ public class ChuongTrinhDaoTaoDialog : Form
         _listTextBox[1].GetComboboxField().Enabled = false;
         _listTextBox[2].GetComboboxField().Enabled = false;
         _listTextBox[3].GetComboboxField().Enabled = false;
-
     }
 
-    void SetupCombobox()
+    private void SetupCombobox()
     {
         List<NganhDto> listNganh = _nganhController.GetAll();
-        List<string> listTenNganh = listNganh.Select(x => x.TenNganh).ToList();
+        var listTenNganh = listNganh.Select(x => x.TenNganh).ToList();
         _listTextBox[0].SetComboboxList(listTenNganh);
         _listTextBox[0].SetComboboxSelection(listTenNganh[0]);
-        
+
         List<ChuKyDaoTaoDto> listChuKy = _chuKyDaoTaoController.GetAll();
-        List<string> listTenChuKy = listChuKy.Select(x => (x.NamBatDau + " - " + x.NamKetThuc)).ToList();
+        var listTenChuKy = listChuKy.Select(x => x.NamBatDau + " - " + x.NamKetThuc).ToList();
         _listTextBox[1].SetComboboxList(listTenChuKy);
         _listTextBox[1].SetComboboxSelection(listTenChuKy[0]);
-        
+
         _listTextBox[2].SetComboboxList(_listLHDT);
         _listTextBox[2].SetComboboxSelection(_listLHDT[0]);
-        
+
         _listTextBox[3].SetComboboxList(_listTDDT);
         _listTextBox[3].SetComboboxSelection(_listTDDT[0]);
     }
-    
-    void SetRightDisplayData()
+
+    private void SetRightDisplayData()
     {
         _rightDisplayData = ConvertObject.ConvertToDisplay(_rightRawData, x => new
-        {                          
-            MaHP = x.MaHP,
-            TenHP = x.TenHP,
-        }); 
+        {
+            x.MaHP, x.TenHP
+        });
     }
 
-    void InsertHP(int maHP)
+    private void InsertHP(int maHP)
     {
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(maHP);
         _rightRawData.Add(hocPhan);
         _leftRawData.RemoveAll(a => a.MaHP == maHP);
         UpdateTableWNewRawData();
     }
-    
-    void DeleteHP(int maHP)
+
+    private void DeleteHP(int maHP)
     {
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(maHP);
         _leftRawData.Add(hocPhan);
@@ -519,55 +502,52 @@ public class ChuongTrinhDaoTaoDialog : Form
         UpdateTableWNewRawData();
     }
 
-    void UpdateTableWNewRawData()
+    private void UpdateTableWNewRawData()
     {
         _leftRawData = _leftRawData.OrderBy(x => x.MaHP).ToList();
         _rightRawData = _rightRawData.OrderBy(x => x.MaHP).ToList();
         SetRightDisplayData();
         SetLeftDisplayData();
-        
-        _leftTable._dataGridView.DataSource=_leftDisplayData;
-        _rightTable._dataGridView.DataSource=_rightDisplayData;
-        
+
+        _leftTable._dataGridView.DataSource = _leftDisplayData;
+        _rightTable._dataGridView.DataSource = _rightDisplayData;
     }
 
-    void UpdateLeftDisplayData(List<HocPhanDto> dtos)
+    private void UpdateLeftDisplayData(List<HocPhanDto> dtos)
     {
-        this._leftDisplayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _leftDisplayData = ConvertObject.ConvertToDisplay(dtos, x => new
         {
-            MaHP = x.MaHP,
-            TenHP = x.TenHP,
+            x.MaHP, x.TenHP
         });
     }
-    
-    void UpdateRightDisplayData(List<HocPhanDto> dtos)
+
+    private void UpdateRightDisplayData(List<HocPhanDto> dtos)
     {
-        this._rightDisplayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _rightDisplayData = ConvertObject.ConvertToDisplay(dtos, x => new
         {
-            MaHP = x.MaHP,
-            TenHP = x.TenHP,
+            x.MaHP, x.TenHP
         });
     }
 
 
-    void OnLeftSearch(string input)
+    private void OnLeftSearch(string input)
     {
-        string keyword = input.ToLower().Trim();
-        List<HocPhanDto> result = _leftRawData
-            .Where(x => x.MaHP.ToString().ToLower().Contains(keyword) || 
+        var keyword = input.ToLower().Trim();
+        var result = _leftRawData
+            .Where(x => x.MaHP.ToString().ToLower().Contains(keyword) ||
                         x.TenHP.ToString().ToLower().Contains(keyword)
             )
             .ToList();
- 
+
         UpdateLeftDisplayData(result);
         _leftTable._dataGridView.DataSource = _leftDisplayData;
     }
-    
-    void OnRightSearch(string input)
+
+    private void OnRightSearch(string input)
     {
-        string keyword = input.ToLower().Trim();
-        List<HocPhanDto> result = _rightRawData
-            .Where(x => x.MaHP.ToString().ToLower().Contains(keyword) || 
+        var keyword = input.ToLower().Trim();
+        var result = _rightRawData
+            .Where(x => x.MaHP.ToString().ToLower().Contains(keyword) ||
                         x.TenHP.ToString().ToLower().Contains(keyword)
             )
             .ToList();
@@ -575,26 +555,27 @@ public class ChuongTrinhDaoTaoDialog : Form
         UpdateRightDisplayData(result);
         _rightTable._dataGridView.DataSource = _rightDisplayData;
     }
-    
 
-    void Insert()
+
+    private void Insert()
     {
-        string startendYear = _listTextBox[1].GetSelectionCombobox();
+        var startendYear = _listTextBox[1].GetSelectionCombobox();
         ChuKyDaoTaoDto chuky = _chuKyDaoTaoController.GetByStartYearEndYear(startendYear);
-        
-        string tenNganh = _listTextBox[0].GetSelectionCombobox();
+
+        var tenNganh = _listTextBox[0].GetSelectionCombobox();
         NganhDto nganh = _nganhController.GetByTen(tenNganh);
-        
-        string loaiHinhDaoTao = _listTextBox[2].GetSelectionCombobox();
-        string trinhDoDaoTao = _listTextBox[2].GetSelectionCombobox();
+
+        var loaiHinhDaoTao = _listTextBox[2].GetSelectionCombobox();
+        var trinhDoDaoTao = _listTextBox[2].GetSelectionCombobox();
 
         if (!_chuongTrinhDaoTaoController.ValidateNganhChuKy(nganh.MaNganh, chuky.MaCKDT))
         {
-            MessageBox.Show("Đã tồn tại chương trình đào tạo của ngành này thuộc chu kỳ này!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Đã tồn tại chương trình đào tạo của ngành này thuộc chu kỳ này!", "Lỗi",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
-        List<HocPhanDto> listSelected = _rightRawData;
+        var listSelected = _rightRawData;
         if (listSelected.Count == 0)
         {
             MessageBox.Show("Chưa có học phần nào được chọn!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -606,7 +587,7 @@ public class ChuongTrinhDaoTaoDialog : Form
                 MaCKDT = chuky.MaCKDT,
                 MaNganh = nganh.MaNganh,
                 LoaiHinhDT = loaiHinhDaoTao,
-                TrinhDo = trinhDoDaoTao,
+                TrinhDo = trinhDoDaoTao
             }))
         {
             MessageBox.Show("Lỗi thêm chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -615,92 +596,85 @@ public class ChuongTrinhDaoTaoDialog : Form
 
         int MaCTDT = _chuongTrinhDaoTaoController.GetLastAutoIncrement();
 
-        foreach (HocPhanDto dto in listSelected)
-        {
+        foreach (var dto in listSelected)
             if (
                 !_chuongTrinhDaoTao_HocPhanController.Insert(new ChuongTrinhDaoTao_HocPhanDto
                 {
                     MaHP = dto.MaHP,
-                    MaCTDT = MaCTDT,
+                    MaCTDT = MaCTDT
                 }))
             {
-                MessageBox.Show("Lỗi thêm chi tiết chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Lỗi thêm chi tiết chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
-        }
-        
-        MessageBox.Show("Thêm chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        
-        this.Close();
+
+        MessageBox.Show("Thêm chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK,
+            MessageBoxIcon.Information);
+
+        Close();
         Finish?.Invoke();
     }
-    
-    void Update()
+
+    private void Update()
     {
         _newListUpdate = _rightRawData;
-        
-        string startendYear = _listTextBox[1].GetSelectionCombobox();
-        ChuKyDaoTaoDto chuky = _chuKyDaoTaoController.GetByStartYearEndYear(startendYear);
-        
-        string tenNganh = _listTextBox[0].GetSelectionCombobox();
-        NganhDto nganh = _nganhController.GetByTen(tenNganh);
-        
-        string loaiHinhDaoTao = _listTextBox[2].GetSelectionCombobox();
-        string trinhDoDaoTao = _listTextBox[2].GetSelectionCombobox();
 
-        if (!_chuongTrinhDaoTaoController.ValidateNganhChuKy(_idChuongTrinhDaoTao,nganh.MaNganh, chuky.MaCKDT))
+        var startendYear = _listTextBox[1].GetSelectionCombobox();
+        ChuKyDaoTaoDto chuky = _chuKyDaoTaoController.GetByStartYearEndYear(startendYear);
+
+        var tenNganh = _listTextBox[0].GetSelectionCombobox();
+        NganhDto nganh = _nganhController.GetByTen(tenNganh);
+
+        var loaiHinhDaoTao = _listTextBox[2].GetSelectionCombobox();
+        var trinhDoDaoTao = _listTextBox[2].GetSelectionCombobox();
+
+        if (!_chuongTrinhDaoTaoController.ValidateNganhChuKy(_idChuongTrinhDaoTao, nganh.MaNganh, chuky.MaCKDT))
         {
-            MessageBox.Show("Đã tồn tại chương trình đào tạo của ngành này thuộc chu kỳ này!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Đã tồn tại chương trình đào tạo của ngành này thuộc chu kỳ này!", "Lỗi",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
-        List<HocPhanDto> listSelected = _rightRawData;
+        var listSelected = _rightRawData;
         if (listSelected.Count == 0)
         {
             MessageBox.Show("Chưa có học phần nào được chọn!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
-        
+
         if (!_chuongTrinhDaoTaoController.Update(new ChuongTrinhDaoTaoDto
             {
                 MaCTDT = _idChuongTrinhDaoTao,
                 MaCKDT = chuky.MaCKDT,
                 MaNganh = nganh.MaNganh,
                 LoaiHinhDT = loaiHinhDaoTao,
-                TrinhDo = trinhDoDaoTao,
+                TrinhDo = trinhDoDaoTao
             }))
         {
             MessageBox.Show("Lỗi thêm chương trình đào tạo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
-        
+
 
         //List cũ có, mới không có -> xóa
-        foreach (HocPhanDto dto in _oldListUpdate)
-        {
+        foreach (var dto in _oldListUpdate)
             if (!_newListUpdate.Any(x => x.MaHP == dto.MaHP))
-            {
                 _chuongTrinhDaoTao_HocPhanController.HardDelete(_idChuongTrinhDaoTao, dto.MaHP);
-            }
-        }
+
         //List cũ không có, mới có -> thêm
-        foreach (HocPhanDto dto in _newListUpdate)
-        {
+        foreach (var dto in _newListUpdate)
             if (!_oldListUpdate.Any(x => x.MaHP == dto.MaHP))
-            {
-                _chuongTrinhDaoTao_HocPhanController.Insert(new ChuongTrinhDaoTao_HocPhanDto()
+                _chuongTrinhDaoTao_HocPhanController.Insert(new ChuongTrinhDaoTao_HocPhanDto
                 {
                     MaCTDT = _idChuongTrinhDaoTao,
-                    MaHP = dto.MaHP,
+                    MaHP = dto.MaHP
                 });
-            }
-        }
-        
-        MessageBox.Show("Sửa chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        
-        this.Close();
+
+        MessageBox.Show("Sửa chương trình đào tạo thành công!", "Thành công", MessageBoxButtons.OK,
+            MessageBoxIcon.Information);
+
+        Close();
         Finish?.Invoke();
     }
-    
-    
 }

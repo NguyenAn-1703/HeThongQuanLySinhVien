@@ -1,53 +1,47 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Models.DAO;
-using QuanLySinhVien.Views.Components.NavList;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
+using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
-using QuanLySinhVien.Views.Enums;
-using Svg;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class NganhPanel : NavBase
 {
-    private string _title = "Ngành";
-    
-    private string ID = "NGANH";
-  
+    private readonly string[] _headerArray = new[] { "Mã ngành", "Tên ngành", "Tên khoa" };
 
-    private CustomTable _table;
+    private readonly string ID = "NGANH";
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    private List<object> _displayData;
+    private List<string> _headerList;
+
+    private TitleButton _insertButton;
+    private KhoaController _khoaController;
+
+    private List<ChiTietQuyenDto> _listAccess;
     private List<string> _listSelectionForComboBox;
 
     private NganhController _nganhController;
-    private KhoaController _khoaController;
-    string[] _headerArray = new[] { "Mã ngành", "Tên ngành", "Tên khoa" };
-    List<string> _headerList;
-
-    private TitleButton _insertButton;
-    private ChiTietQuyenController _chiTietQuyenController;
-    private ChucNangController _chucNangController;
-    
-    private List<ChiTietQuyenDto> _listAccess;
-    private bool them = false;
-    private bool sua = false;
-    private bool xoa = false;
-
-    List<NganhDto> _rawData;
-    List<object> _displayData;
-
-    private NganhSearch _nganhSearch;
 
     private NganhDialog _nganhDialog;
 
-        
+    private NganhSearch _nganhSearch;
+
+    private List<NganhDto> _rawData;
+
+
+    private CustomTable _table;
+    private string _title = "Ngành";
+    private bool sua;
+    private bool them;
+    private bool xoa;
+
+
     public NganhPanel(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
         _rawData = new List<NganhDto>();
@@ -58,7 +52,6 @@ public class NganhPanel : NavBase
         _chucNangController = ChucNangController.getInstance();
         Init();
     }
-    
 
 
     private void Init()
@@ -66,10 +59,10 @@ public class NganhPanel : NavBase
         CheckQuyen();
         Dock = DockStyle.Fill;
 
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        var mainLayout = new TableLayoutPanel
         {
             RowCount = 2,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -79,32 +72,20 @@ public class NganhPanel : NavBase
 
         Controls.Add(mainLayout);
     }
-    
-    void CheckQuyen()
+
+    private void CheckQuyen()
     {
         int maCN = _chucNangController.GetByTen(ID).MaCN;
         _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
-        foreach (ChiTietQuyenDto x in _listAccess)
-        {
-            Console.WriteLine(x.HanhDong);
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
-        {
-            them = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
-        {
-            sua = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
-        {
-            xoa = true;
-        }
+        foreach (var x in _listAccess) Console.WriteLine(x.HanhDong);
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them"))) them = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua"))) sua = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
     private Panel Top()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -121,24 +102,21 @@ public class NganhPanel : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        if (them)
-        {
-            panel.Controls.Add(_insertButton);
-        }
-        
+        if (them) panel.Controls.Add(_insertButton);
+
 
         return panel;
     }
 
     private Panel Bottom()
     {
-        Panel panel = new Panel
+        var panel = new Panel
         {
             Dock = DockStyle.Fill,
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
             Padding = new Padding(20)
         };
-        
+
         SetCombobox();
 
         SetDataTableFromDb();
@@ -152,132 +130,131 @@ public class NganhPanel : NavBase
         return panel;
     }
 
-    Label getTitle()
+    private Label getTitle()
     {
-        Label titlePnl = new Label
+        var titlePnl = new Label
         {
             Text = "Ngành",
             Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
-            AutoSize = true,
+            AutoSize = true
         };
         return titlePnl;
     }
 
-    void SetCombobox()
+    private void SetCombobox()
     {
         _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _listSelectionForComboBox = _headerList;
     }
 
-    void SetDataTableFromDb()
+    private void SetDataTableFromDb()
     {
         _rawData = _nganhController.GetAll();
         SetDisplayData();
 
-        string[] columnNames = new[] { "MaNganh", "TenNganh", "TenKhoa" };
-        List<string> columnNamesList = columnNames.ToList();
+        var columnNames = new[] { "MaNganh", "TenNganh", "TenKhoa" };
+        var columnNamesList = columnNames.ToList();
 
         _table = new CustomTable(_headerList, columnNamesList, _displayData, true, true, true);
     }
 
-    void SetDisplayData()
+    private void SetDisplayData()
     {
         _displayData = ConvertObject.ConvertToDisplay(_rawData, dto => new
         {
-            MaNganh = dto.MaNganh,
-            TenNganh = dto.TenNganh,
-            TenKhoa = _khoaController.GetKhoaById(dto.MaKhoa).TenKhoa
+            dto.MaNganh,
+            dto.TenNganh,
+            _khoaController.GetKhoaById(dto.MaKhoa).TenKhoa
         });
     }
 
-    void SetSearch()
+    private void SetSearch()
     {
         _nganhSearch = new NganhSearch(_rawData);
     }
 
-    void SetAction()
+    private void SetAction()
     {
         _nganhSearch.FinishSearch += dtos =>
         {
             UpdateDataDisplay(dtos);
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
-        
+
         _insertButton._mouseDown += () => { Insert(); };
         _table.OnEdit += index => { Update(index); };
         _table.OnDetail += index => { Detail(index); };
         _table.OnDelete += index => { Delete(index); };
     }
-    
-    void UpdateDataDisplay(List<NganhDto> dtos)
+
+    private void UpdateDataDisplay(List<NganhDto> dtos)
     {
-        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new
         {
-            MaNganh = x.MaNganh,
-            TenNganh = x.TenNganh,
-            TenKhoa = _khoaController.GetKhoaById(x.MaKhoa).TenKhoa
+            x.MaNganh,
+            x.TenNganh,
+            _khoaController.GetKhoaById(x.MaKhoa).TenKhoa
         });
     }
 
-    void Insert()
+    private void Insert()
     {
         _nganhDialog = new NganhDialog(DialogType.Them, new NganhDto(), NganhDao.GetInstance());
         _nganhDialog.Finish += () =>
         {
             UpdateDataDisplay(_nganhController.GetAll());
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
         _nganhDialog.ShowDialog();
     }
 
-    void Update(int id)
+    private void Update(int id)
     {
         var nganh = _nganhController.GetNganhById(id);
         _nganhDialog = new NganhDialog(DialogType.Sua, nganh, NganhDao.GetInstance());
-        
+
         _nganhDialog.Finish += () =>
         {
             UpdateDataDisplay(_nganhController.GetAll());
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
         _nganhDialog.ShowDialog();
     }
-    
-    void Detail(int id)
+
+    private void Detail(int id)
     {
         var nganh = _nganhController.GetNganhById(id);
         _nganhDialog = new NganhDialog(DialogType.ChiTiet, nganh, NganhDao.GetInstance());
-        
+
         _nganhDialog.ShowDialog();
     }
 
-    void Delete(int id)
+    private void Delete(int id)
     {
-        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-        if (select == DialogResult.No)
-        {
-            return;
-        }
+        var select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo,
+            MessageBoxIcon.Information);
+        if (select == DialogResult.No) return;
         if (_nganhController.Delete(id))
         {
-            MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
             UpdateDataDisplay(_nganhController.GetAll());
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         }
         else
         {
             MessageBox.Show("Xóa tài khoản thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-    
+
 
     public override List<string> getComboboxList()
     {
-        return this._listSelectionForComboBox;
+        return _listSelectionForComboBox;
     }
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._nganhSearch.Search(txtSearch, filter);
+        _nganhSearch.Search(txtSearch, filter);
     }
 }

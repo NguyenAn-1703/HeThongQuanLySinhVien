@@ -1,13 +1,11 @@
 using System.Drawing.Drawing2D;
-using QuanLySinhVien.Views.Enums;
 using Svg;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CUse
 {
-    public CUse(){}
-    public DataGridView getDataView(int height, int width , int x , int y)
+    public DataGridView getDataView(int height, int width, int x, int y)
     {
         return new DataGridView
         {
@@ -26,13 +24,13 @@ public class CUse
                 BackColor = ColorTranslator.FromHtml("#f5f5f5")
             },
             AllowUserToResizeColumns = false,
-            AllowUserToResizeRows = false,
+            AllowUserToResizeRows = false
         };
     }
 
-    public DataGridView GetTable(String[] columns)
+    public DataGridView GetTable(string[] columns)
     {
-        DataGridView dgv = new DataGridView
+        var dgv = new DataGridView
         {
             AllowUserToAddRows = false,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -46,16 +44,17 @@ public class CUse
                 BackColor = ColorTranslator.FromHtml("#f5f5f5")
             },
             AllowUserToResizeColumns = false,
-            AllowUserToResizeRows = false,
+            AllowUserToResizeRows = false
         };
         SetDefaultsDgvProperty(dgv);
-        
+
         dgv.Dock = DockStyle.Fill;
         dgv.AutoSize = true;
-        
+
         return dgv;
     }
-    void SetDefaultsDgvProperty(DataGridView dgv)
+
+    private void SetDefaultsDgvProperty(DataGridView dgv)
     {
         dgv.AllowUserToAddRows = false;
         dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -82,7 +81,7 @@ public class CUse
             v.Stroke = new SvgColourServer(iconColor);
         }
 
-        int inner = canvas - padding * 2;
+        var inner = canvas - padding * 2;
         var iconBmp = svg.Draw(inner, inner);
 
         var bmp = new Bitmap(canvas, canvas);
@@ -93,7 +92,7 @@ public class CUse
             using (var brush = new SolidBrush(bgColor))
             using (var path = new GraphicsPath())
             {
-                float r = cornerRadius * 2f;
+                var r = cornerRadius * 2f;
                 path.AddArc(0, 0, r, r, 180, 90);
                 path.AddArc(canvas - r, 0, r, r, 270, 90);
                 path.AddArc(canvas - r, canvas - r, r, r, 0, 90);

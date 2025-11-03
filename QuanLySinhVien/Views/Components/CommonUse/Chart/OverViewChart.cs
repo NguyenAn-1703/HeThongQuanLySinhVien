@@ -1,15 +1,8 @@
-using System.Windows.Forms;
 using LiveChartsCore;
-using LiveChartsCore.Drawing;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.WinForms;
-using LiveChartsCore.SkiaSharpView.Painting;
-using LiveChartsCore.SkiaSharpView.VisualElements;
-using LiveChartsCore.VisualElements;
-using OpenTK.Graphics.OpenGL4;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
-using SkiaSharp;
 using Padding = System.Windows.Forms.Padding;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Chart;
@@ -18,9 +11,9 @@ public class OverviewChart : RoundTLP
 {
     public OverviewChart(string[] labels, double[] values)
     {
-        Size = new System.Drawing.Size(50, 50);
+        Size = new Size(50, 50);
         Margin = new Padding(10);
-        
+
         var values2 = new double[] { 3, 11, 5, 3, 7, 3, 8 };
 
         var series = new ISeries[]
@@ -43,19 +36,19 @@ public class OverviewChart : RoundTLP
         {
             // Labels = new string[] { "2018", "2019", "2020", "2021", "2022", "2023", "2024" },
             Labels = labels,
-            LabelsRotation = 0, 
+            LabelsRotation = 0
         };
-        
+
         var cartesianChart = new CartesianChart
         {
             Series = series,
             YAxes = [yAxis],
             XAxes = [xAxis],
-            Location = new System.Drawing.Point(0, 0),
-            Size = new System.Drawing.Size(50, 50),
+            Location = new Point(0, 0),
+            Size = new Size(50, 50),
             Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom
         };
-        
+
         var titleLabel = new Label
         {
             Text = "Tổng số sinh viên nhập học 7 năm gần nhất",

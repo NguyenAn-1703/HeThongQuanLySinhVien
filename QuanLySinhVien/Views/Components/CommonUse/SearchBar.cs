@@ -1,48 +1,48 @@
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
-public class SearchBar: MyTLP
+public class SearchBar : MyTLP
 {
+    private TextBox _field;
+
+    private RoundTLP _searchFieldPanel;
+
     // private TextBox _searchBox;
     private CustomCombobox Filter;
 
     private List<string> listSelection;
 
-    private RoundTLP _searchFieldPanel;
-    private TextBox _field;
-    
-    public event Action<string, string> KeyDown;
-    
     public SearchBar()
     {
         listSelection = new List<string>();
         Init();
     }
 
-    void Init()
+    public event Action<string, string> KeyDown;
+
+    private void Init()
     {
-        this.ColumnCount = 2;
-        this.Dock = DockStyle.Fill;
+        ColumnCount = 2;
+        Dock = DockStyle.Fill;
         // Giới hạn chiều rộng tối đa 700px, chiều cao không giới hạn
-        this.MaximumSize = new Size(700, 0);
-        
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        
+        MaximumSize = new Size(700, 0);
+
+        ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
         // this.CellBorderStyle = MyTLPCellBorderStyle.Single;
         SetSearchField();
 
-        this.Filter = getFilter();
+        Filter = getFilter();
 
-        this.Controls.Add(_searchFieldPanel);
-        
-        this.Controls.Add(Filter);
-        
+        Controls.Add(_searchFieldPanel);
+
+        Controls.Add(Filter);
     }
 
-    void SetSearchField()
+    private void SetSearchField()
     {
         _searchFieldPanel = new RoundTLP
         {
@@ -56,26 +56,26 @@ public class SearchBar: MyTLP
         };
         _searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         _searchFieldPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        
-        // _searchFieldPanel.CellBorderStyle = MyTLPCellBorderStyle.Single;
-        
 
-        PictureBox iconGlass = new PictureBox
+        // _searchFieldPanel.CellBorderStyle = MyTLPCellBorderStyle.Single;
+
+
+        var iconGlass = new PictureBox
         {
             Image = GetSvgBitmap.GetBitmap("search.svg"),
             Size = new Size(30, 30),
             SizeMode = PictureBoxSizeMode.Zoom,
-            Margin = new Padding(20, 5, 20, 5),
+            Margin = new Padding(20, 5, 20, 5)
         };
 
         _field = new TextBox();
         _field.PlaceholderText = "Tìm kiếm ...";
         _field.Dock = DockStyle.Fill;
-        _field.Font = GetFont.GetFont.GetMainFont(12,  FontType.Regular);
+        _field.Font = GetFont.GetFont.GetMainFont(12, FontType.Regular);
         _field.BorderStyle = BorderStyle.None;
         _field.Margin = new Padding(3, 5, 7, 3);
-        
-        
+
+
         _searchFieldPanel.Controls.Add(iconGlass);
         _searchFieldPanel.Controls.Add(_field);
 
@@ -85,9 +85,9 @@ public class SearchBar: MyTLP
         _field.TextChanged += (sender, args) => OnTextChanged();
     }
 
-    CustomCombobox getFilter()
+    private CustomCombobox getFilter()
     {
-        CustomCombobox filter = new CustomCombobox(new string[]{});
+        var filter = new CustomCombobox(new string[] { });
         filter.combobox.Font = GetFont.GetFont.GetMainFont(9, FontType.Regular);
         filter.Anchor = AnchorStyles.None;
         return filter;
@@ -95,44 +95,38 @@ public class SearchBar: MyTLP
 
     public void UpdateListCombobox(List<string> list)
     {
-        this.listSelection = list;
-        this.listSelection.Insert(0, "Tất cả");
-        this.Filter.combobox.Items.Clear();
-        
-        foreach (string i in  listSelection)
-        {
-            this.Filter.combobox.Items.Add(i);
-        }
-        this.Filter.combobox.SelectedIndex = 0;
+        listSelection = list;
+        listSelection.Insert(0, "Tất cả");
+        Filter.combobox.Items.Clear();
+
+        foreach (var i in listSelection) Filter.combobox.Items.Add(i);
+        Filter.combobox.SelectedIndex = 0;
         Filter.combobox.SelectedIndexChanged += (sender, args) => OnChangeItem();
     }
 
-    void onEnter()
+    private void onEnter()
     {
-        this._searchFieldPanel.BorderColor = MyColor.MainColor;
-        this._searchFieldPanel.Invalidate();
+        _searchFieldPanel.BorderColor = MyColor.MainColor;
+        _searchFieldPanel.Invalidate();
     }
 
-    void onLeave()
+    private void onLeave()
     {
-        this._searchFieldPanel.BorderColor = MyColor.GraySelectColor;
-        this._searchFieldPanel.Invalidate();
+        _searchFieldPanel.BorderColor = MyColor.GraySelectColor;
+        _searchFieldPanel.Invalidate();
     }
 
-    void OnKeyDown(KeyEventArgs k)
+    private void OnKeyDown(KeyEventArgs k)
     {
-        if (k.KeyCode == Keys.Enter)
-        {
-            KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
-        }
+        if (k.KeyCode == Keys.Enter) KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
     }
 
-    void OnChangeItem()
+    private void OnChangeItem()
     {
         KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
     }
 
-    void OnTextChanged()
+    private void OnTextChanged()
     {
         KeyDown.Invoke(_field.Text, Filter.combobox.SelectedItem + " ");
     }

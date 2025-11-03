@@ -1,18 +1,15 @@
-using ExCSS;
-using LiveCharts.Wpf;
 using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.WinForms;
 using PieChart = LiveChartsCore.SkiaSharpView.WinForms.PieChart;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Chart;
 
 public class CustomPieChart : TableLayoutPanel
 {
+    private readonly string[] _content;
+    private readonly float[] _percent;
     private PieChart pieChart;
-    private string[] _content;
-    private float[] _percent;
 
     public CustomPieChart(string[] content, float[] percent)
     {
@@ -21,29 +18,31 @@ public class CustomPieChart : TableLayoutPanel
         Init();
     }
 
-    void Init()
+    private void Init()
     {
-        this.Anchor = AnchorStyles.None;
-        this.AutoSize = true;
+        Anchor = AnchorStyles.None;
+        AutoSize = true;
         pieChart = new PieChart
         {
-            Size = new Size(300, 300),
+            Size = new Size(300, 300)
         };
 
         pieChart.Series = GetListISeries();
         pieChart.LegendPosition = LegendPosition.Bottom;
-        
+
         pieChart.Anchor = AnchorStyles.None;
         Controls.Add(pieChart);
     }
 
-    List<ISeries> GetListISeries()
+    private List<ISeries> GetListISeries()
     {
-        List<ISeries> list = new List<ISeries>();
-        for (int i = 0; i < _content.Length; i++)
-        {
-            list.Add(new PieSeries<float> {Values = new float[]{_percent[i]}, Name = _content[i], ToolTipLabelFormatter = (point) => $"{point.Label}: {Math.Round(point.Model, 2)}%",});
-        }
+        var list = new List<ISeries>();
+        for (var i = 0; i < _content.Length; i++)
+            list.Add(new PieSeries<float>
+            {
+                Values = new[] { _percent[i] }, Name = _content[i],
+                ToolTipLabelFormatter = point => $"{point.Label}: {Math.Round(point.Model, 2)}%"
+            });
         return list;
     }
 }

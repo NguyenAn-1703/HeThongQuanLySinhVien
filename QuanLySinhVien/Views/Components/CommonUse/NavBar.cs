@@ -1,37 +1,34 @@
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.Views.Components.CommonUse;
-using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.ViewComponents;
 
 public class NavBar : Panel
 {
+    private readonly NavItemValue[] _arrDataNavItem;
+    private readonly NavItemValue[] _arrDataNavItemForSV;
+    private readonly List<ChucNangDto> _listAccess = new();
+    private readonly List<NavItemValue> _listDataNavItemForSV;
+
+    private readonly NhomQuyenDto _nhomQuyen;
+
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+
+    private LichDangKyController _lichDangKyController;
+
+    public MyTLP _mainLayout;
+
+    private string _roleType = "admin";
     // private String[] _labels;
     // private String[] _imgText;
 
     public List<NavItem> ButtonArray;
 
-    private NavItemValue[] _arrDataNavItem;
-    private NavItemValue[] _arrDataNavItemForSV;
-
     //item đang được chọn
     public NavItem SelectedItem;
-
-    public MyTLP _mainLayout;
-
-    public event Action<String> OnSelect1Item;
-
-    private ChiTietQuyenController _chiTietQuyenController;
-    private ChucNangController _chucNangController;
-
-    private NhomQuyenDto _nhomQuyen;
-    private List<ChucNangDto> _listAccess = new List<ChucNangDto>();
-
-    private string _roleType = "admin";
-
-    private LichDangKyController _lichDangKyController;
-    private List<NavItemValue> _listDataNavItemForSV;
 
     public NavBar(NhomQuyenDto nhomQuyen)
     {
@@ -74,19 +71,20 @@ public class NavBar : Panel
         _arrDataNavItemForSV = new[]
         {
             new NavItemValue { ID = "TRANGCHU", Svg = "trangchu", Name = "Trang chủ" },
-            new NavItemValue { ID = "THONGTINSINHVIEN", Svg = "sinhvien", Name = "Thông tin cá nhân" },
+            new NavItemValue { ID = "THONGTINSINHVIEN", Svg = "sinhvien", Name = "Thông tin cá nhân" }
         };
         _listDataNavItemForSV = _arrDataNavItemForSV.ToList();
         if (ValidateDangKyHP())
-        {
-            _listDataNavItemForSV.Add(new NavItemValue { ID = "DANGKYHOCPHAN", Svg = "dangkyhocphan", Name = "Đăng ký học phần" });
-        }
-        
+            _listDataNavItemForSV.Add(new NavItemValue
+                { ID = "DANGKYHOCPHAN", Svg = "dangkyhocphan", Name = "Đăng ký học phần" });
+
         ButtonArray = new List<NavItem>();
-        this.Init();
+        Init();
     }
 
-    void Init()
+    public event Action<string> OnSelect1Item;
+
+    private void Init()
     {
         Dock = DockStyle.Fill;
         AutoScroll = true;
@@ -97,47 +95,40 @@ public class NavBar : Panel
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
             ColumnCount = 1,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
 
         CheckRole();
 
         if (_roleType.Equals("admin"))
         {
-            int index = 0;
-            for (int i = 0; i < _arrDataNavItem.Length; i++)
-            {
+            var index = 0;
+            for (var i = 0; i < _arrDataNavItem.Length; i++)
                 if (_listAccess.Any(x =>
                         x.TenCN.Equals(_arrDataNavItem[i].ID) || _arrDataNavItem[i].ID.Equals("TRANGCHU")))
                 {
-                    NavItem navItem = new NavItem(index, _arrDataNavItem[i].Svg + ".svg", _arrDataNavItem[i].Name);
+                    var navItem = new NavItem(index, _arrDataNavItem[i].Svg + ".svg", _arrDataNavItem[i].Name);
                     index++;
-                    navItem.OnClickThisItem += this.UpdateStatusNavBar;
+                    navItem.OnClickThisItem += UpdateStatusNavBar;
                     ButtonArray.Add(navItem);
                 }
-            }
 
-            foreach (NavItem item in ButtonArray)
-            {
-                _mainLayout.Controls.Add(item);
-            }
+            foreach (var item in ButtonArray) _mainLayout.Controls.Add(item);
         }
         else
         {
-            for (int i = 0; i < _listDataNavItemForSV.Count; i++)
+            for (var i = 0; i < _listDataNavItemForSV.Count; i++)
             {
-                NavItem navItem = new NavItem(i, _listDataNavItemForSV[i].Svg + ".svg", _listDataNavItemForSV[i].Name);
-                navItem.OnClickThisItem += this.UpdateStatusNavBar;
+                var navItem = new NavItem(i, _listDataNavItemForSV[i].Svg + ".svg", _listDataNavItemForSV[i].Name);
+                navItem.OnClickThisItem += UpdateStatusNavBar;
                 ButtonArray.Add(navItem);
             }
-            foreach (NavItem item in ButtonArray)
-            {
-                _mainLayout.Controls.Add(item);
-            }
+
+            foreach (var item in ButtonArray) _mainLayout.Controls.Add(item);
         }
 
 
-        this.Controls.Add(_mainLayout);
+        Controls.Add(_mainLayout);
 
         UpdateSize();
 
@@ -146,7 +137,7 @@ public class NavBar : Panel
         SelectedItem.ChangeToSelectStatus();
     }
 
-    void CheckRole()
+    private void CheckRole()
     {
         if (_nhomQuyen.TenNhomQuyen.Equals("SinhVien"))
         {
@@ -155,14 +146,11 @@ public class NavBar : Panel
         }
 
         List<ChiTietQuyenDto> listCTQ = _chiTietQuyenController.GetByMaNQ(_nhomQuyen.MaNQ);
-        foreach (ChiTietQuyenDto ct in listCTQ)
-        {
-            _listAccess.Add(_chucNangController.GetById(ct.MaCN));
-        }
+        foreach (var ct in listCTQ) _listAccess.Add(_chucNangController.GetById(ct.MaCN));
     }
 
     //Hàm được gọi call back để caapj nhật lại item được chonj mỗi khi 1 item đươc click
-    void UpdateStatusNavBar(int index)
+    private void UpdateStatusNavBar(int index)
     {
         if (SelectedItem.Index != index)
         {
@@ -176,23 +164,22 @@ public class NavBar : Panel
 
     public void UpdateSize()
     {
-        int w = _mainLayout.Width + 6;
-        this.Width = w;
+        var w = _mainLayout.Width + 6;
+        Width = w;
     }
 
-    bool ValidateDangKyHP()
+    private bool ValidateDangKyHP()
     {
         List<LichDangKyDto> listLichDk = _lichDangKyController.GetAll();
-        DateTime now = DateTime.Now;
-        foreach (LichDangKyDto lich in listLichDk)
-        {
+        var now = DateTime.Now;
+        foreach (var lich in listLichDk)
             if (now >= lich.ThoiGianBatDau && now <= lich.ThoiGianKetThuc)
             {
-                Console.WriteLine(lich.MaLichDK + " " +lich.ThoiGianBatDau + " " +lich.ThoiGianKetThuc);
+                Console.WriteLine(lich.MaLichDK + " " + lich.ThoiGianBatDau + " " + lich.ThoiGianKetThuc);
                 Console.WriteLine(now);
                 return true;
             }
-        }
+
         return false;
     }
 }

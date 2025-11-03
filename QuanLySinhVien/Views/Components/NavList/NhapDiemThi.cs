@@ -1,50 +1,65 @@
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.CommonUse.Search.SearchObject;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class NhapDiemThi : NavBase
 {
-    private string ID = "NhapDiemThi";
-    private string _title = "Nhập điểm thi";
-    private List<string> _listSelectionForComboBox;
-    private CustomTable _table;
-    private NhomQuyenController _nhomQuyenController;
-    string[] _headerArray = new string[]
+    private readonly string[] _headerArray = new[]
     {
         "Mã ca thi",
         "Tên HP",
         "Ngày thi",
-        "Phòng",
+        "Phòng"
     };
-    List<string> _headerList;
-    // private TitleButton _insertButton;
 
-    List<CaThiDto> _rawData;
-    List<object> _displayData;
+    private readonly string _title = "Nhập điểm thi";
+    private readonly string ID = "NhapDiemThi";
+    private CaThiController _caThiController;
 
-    
-    private List<ChiTietQuyenDto> _listAccess;
+    private CaThiNhapDiemSearch _caThiNhapDiemSearch;
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
-    private HocPhanController _hocPhanController;
-    private PhongHocController _phongHocController;
-    
-    private GiangVienController _giangVienController;
-    private CaThiController _caThiController;
-    
-    private CaThiNhapDiemSearch _caThiNhapDiemSearch;
+    private List<object> _displayData;
 
-    private bool them = false;
-    private bool sua = false;
-    private bool xoa = false;
-    
+    private GiangVienController _giangVienController;
+
+    private List<string> _headerList;
+
+    private LabelTextField _hocKyField;
+    private HocPhanController _hocPhanController;
+
+
+    private List<ChiTietQuyenDto> _listAccess;
+    private List<string> _listSelectionForComboBox;
+
+    private MyTLP _mainLayout;
+    private LabelTextField _namField;
+    private NhomQuyenController _nhomQuyenController;
+
+    private MyTLP _panelBottom;
+
+
+    private MyTLP _panelTop;
+
+    private PhongHocController _phongHocController;
+    // private TitleButton _insertButton;
+
+    private List<CaThiDto> _rawData;
+    private MyTLP _screen;
+    private CustomTable _table;
+    private bool sua;
+
+    private bool them;
+    private bool xoa;
+
 
     public NhapDiemThi(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
@@ -56,58 +71,42 @@ public class NhapDiemThi : NavBase
         _hocPhanController = HocPhanController.GetInstance();
         _phongHocController = PhongHocController.getInstance();
         _giangVienController = GiangVienController.GetInstance();
-        _caThiController =  CaThiController.GetInstance();
+        _caThiController = CaThiController.GetInstance();
         Init();
     }
 
-    private MyTLP _mainLayout;
     private void Init()
     {
         CheckQuyen();
-        
+
         Dock = DockStyle.Fill;
 
         _mainLayout = new MyTLP
         {
             RowCount = 2,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         _mainLayout.Controls.Add(Top());
         SetBottom();
-        
+
 
         Controls.Add(_mainLayout);
     }
 
-    void CheckQuyen()
+    private void CheckQuyen()
     {
         int maCN = _chucNangController.GetByTen(ID).MaCN;
         _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
-        foreach (ChiTietQuyenDto x in _listAccess)
-        {
-            Console.WriteLine(x.HanhDong);
-        }
+        foreach (var x in _listAccess) Console.WriteLine(x.HanhDong);
 
-        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
-        {
-            them = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
-        {
-            sua = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
-        {
-            xoa = true;
-        }
-        
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them"))) them = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua"))) sua = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
-
-    private MyTLP _panelTop;
     private Panel Top()
     {
         _panelTop = new MyTLP
@@ -125,39 +124,35 @@ public class NhapDiemThi : NavBase
 
         _panelTop.Controls.Add(getTitle());
         SetHKyNamContainer();
-        
+
         return _panelTop;
     }
 
-    private LabelTextField _hocKyField;
-    private LabelTextField _namField;
     private void SetHKyNamContainer()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             ColumnCount = 2,
-            AutoSize = true,
+            AutoSize = true
         };
 
         _hocKyField = new LabelTextField("Học kỳ", TextFieldType.Combobox);
         _hocKyField._combobox.Font = GetFont.GetFont.GetMainFont(10, FontType.Regular);
-        string[] listHK = new[] { "Học kỳ 1", "Học kỳ 2" };
+        var listHK = new[] { "Học kỳ 1", "Học kỳ 2" };
         _hocKyField.SetComboboxList(listHK.ToList());
         _hocKyField.SetComboboxSelection("Học kỳ 1");
-        
+
         _namField = new LabelTextField("Năm", TextFieldType.Year);
-        _namField.Font =  GetFont.GetFont.GetMainFont(14, FontType.Regular);
+        _namField.Font = GetFont.GetFont.GetMainFont(14, FontType.Regular);
         _namField._namField.Value = DateTime.Now;
 
-        
+
         panel.Controls.Add(_hocKyField);
         panel.Controls.Add(_namField);
-        
+
         _panelTop.Controls.Add(panel);
     }
 
-    MyTLP _panelBottom;
-    private MyTLP _screen;
     private void SetBottom()
     {
         _screen = new MyTLP { Margin = new Padding(0), Dock = DockStyle.Fill };
@@ -169,20 +164,20 @@ public class NhapDiemThi : NavBase
             RowCount = 2,
             ColumnCount = 2,
             Padding = new Padding(10),
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
 
         _panelBottom.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _panelBottom.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-        Label lblNhomHocPhan = new Label
+        var lblNhomHocPhan = new Label
         {
             Margin = new Padding(5),
             AutoSize = true,
-            Text="Ca thi",
-            Font = GetFont.GetFont.GetMainFont(13, FontType.Black),
+            Text = "Ca thi",
+            Font = GetFont.GetFont.GetMainFont(13, FontType.Black)
         };
-        
+
         _panelBottom.Controls.Add(lblNhomHocPhan);
 
 
@@ -193,7 +188,7 @@ public class NhapDiemThi : NavBase
         SetSearch();
 
         SetAction();
-        
+
         _panelBottom.Controls.Add(_table);
         _panelBottom.SetColumnSpan(_table, 2);
 
@@ -202,9 +197,9 @@ public class NhapDiemThi : NavBase
     }
 
     //////////////////////////////SETTOP///////////////////////////////
-    Label getTitle()
+    private Label getTitle()
     {
-        Label titlePnl = new Label
+        var titlePnl = new Label
         {
             Text = _title,
             Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
@@ -219,72 +214,72 @@ public class NhapDiemThi : NavBase
 
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
-    void SetCombobox()
+    private void SetCombobox()
     {
         _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _listSelectionForComboBox = _headerList;
     }
 
 
-    void SetDataTableFromDb()
+    private void SetDataTableFromDb()
     {
-        string hkyS = _hocKyField.GetSelectionCombobox();
-        int hky = int.Parse(hkyS.Split(' ')[2]);
-        string nam = DateTime.Now.ToString("yyyy");
-        
+        var hkyS = _hocKyField.GetSelectionCombobox();
+        var hky = int.Parse(hkyS.Split(' ')[2]);
+        var nam = DateTime.Now.ToString("yyyy");
+
         // Lấy ca thi theo hky nam
         List<CaThiDto> listCaThi = _caThiController.GetByHocKyNam(hky, nam);
         _rawData = listCaThi;
-        
-        
-        SetDisplayData();
-        
-        string[] columnNames = new[] { "MaCT", "TenHP", "NgayThi", "TenPhong"};
-        List<string> columnNamesList = columnNames.ToList();
 
-        _table = new CustomTable(_headerList, columnNamesList, _displayData, false);
+
+        SetDisplayData();
+
+        var columnNames = new[] { "MaCT", "TenHP", "NgayThi", "TenPhong" };
+        var columnNamesList = columnNames.ToList();
+
+        _table = new CustomTable(_headerList, columnNamesList, _displayData);
     }
 
-    void SetDisplayData()
+    private void SetDisplayData()
     {
         _displayData = ConvertObject.ConvertToDisplay(ConvertDtoToDisplay(_rawData), x => new
             {
-                MaCT = x.MaCT,
-                TenHP = x.TenHP,
-                NgayThi = x.NgayThi,
-                TenPhong = x.TenPhong,
+                x.MaCT,
+                x.TenHP,
+                x.NgayThi,
+                x.TenPhong
             }
         );
     }
 
 
-    void SetSearch()
+    private void SetSearch()
     {
         _caThiNhapDiemSearch = new CaThiNhapDiemSearch(ConvertDtoToDisplay(_rawData));
     }
 
-    void SetAction()
+    private void SetAction()
     {
         _caThiNhapDiemSearch.FinishSearch += dtos =>
         {
             UpdateDataDisplay(dtos);
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
 
-        
+
         _table.OnDetail += index => { ChangePanel(index); };
 
         _hocKyField._combobox.combobox.SelectedIndexChanged += (sender, args) => OnChangeHKNam();
         _namField._namField.ValueChanged += (sender, args) => OnChangeHKNam();
     }
 
-    void OnChangeHKNam()
+    private void OnChangeHKNam()
     {
-        string hkyS = _hocKyField.GetSelectionCombobox();
-        int hky = int.Parse(hkyS.Split(' ')[2]);
+        var hkyS = _hocKyField.GetSelectionCombobox();
+        var hky = int.Parse(hkyS.Split(' ')[2]);
 
-        string nam = _namField.GetTextNam();
-        
+        var nam = _namField.GetTextNam();
+
         List<CaThiDto> listCaThi = _caThiController.GetByHocKyNam(hky, nam);
         _rawData = listCaThi;
 
@@ -292,23 +287,23 @@ public class NhapDiemThi : NavBase
         _table.UpdateData(_displayData);
     }
 
-    void UpdateDataDisplay(List<CaThiNhapDiemDisplay> dtos)
+    private void UpdateDataDisplay(List<CaThiNhapDiemDisplay> dtos)
     {
-        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new
         {
-            MaCT = x.MaCT,
-            TenHP = x.TenHP,
-            NgayThi = x.NgayThi,
-            TenPhong = x.TenPhong,
+            x.MaCT,
+            x.TenHP,
+            x.NgayThi,
+            x.TenPhong
         });
     }
-    
-    void ChangePanel(int id)
+
+    private void ChangePanel(int id)
     {
         _screen.SuspendLayout();
         _screen.Controls.Clear();
-        NhapDiemThiDialog NhapDiemThiDialog = new NhapDiemThiDialog("Nhập điểm", id);
-        
+        var NhapDiemThiDialog = new NhapDiemThiDialog("Nhập điểm", id);
+
         NhapDiemThiDialog.Back += () => ResetPanel();
         _screen.Controls.Add(NhapDiemThiDialog);
         _screen.ResumeLayout();
@@ -317,7 +312,7 @@ public class NhapDiemThi : NavBase
         _hocKyField.Enabled = false;
     }
 
-    void ResetPanel()
+    private void ResetPanel()
     {
         _screen.Controls.Clear();
         _screen.Controls.Add(_panelBottom);
@@ -325,32 +320,31 @@ public class NhapDiemThi : NavBase
         _hocKyField.Enabled = true;
     }
 
-    void Delete(int index)
+    private void Delete(int index)
     {
-        
     }
-    
-    List<CaThiNhapDiemDisplay> ConvertDtoToDisplay(List<CaThiDto> input)
+
+    private List<CaThiNhapDiemDisplay> ConvertDtoToDisplay(List<CaThiDto> input)
     {
         List<CaThiNhapDiemDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new CaThiNhapDiemDisplay
         {
             MaCT = x.MaCT,
             TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
             NgayThi = x.ThoiGianBatDau,
-            TenPhong = _phongHocController.GetPhongHocById(x.MaPH).TenPH,
+            TenPhong = _phongHocController.GetPhongHocById(x.MaPH).TenPH
         });
         return rs;
     }
-    
+
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
     public override List<string> getComboboxList()
     {
-        return this._listSelectionForComboBox;
+        return _listSelectionForComboBox;
     }
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._caThiNhapDiemSearch.Search(txtSearch, filter, ConvertDtoToDisplay(_rawData));
+        _caThiNhapDiemSearch.Search(txtSearch, filter, ConvertDtoToDisplay(_rawData));
     }
 }

@@ -1,17 +1,16 @@
-using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class HocPhanDialog : CustomDialog
 {
-    private List<LabelTextField> _listLabelTextField;
-    private HocPhanDao _hocPhanDao;
-    private HocPhanDto _hocPhanDto;
-    private int _hocPhanId;
-    public event Action Finish;
+    private readonly HocPhanDao _hocPhanDao;
+    private readonly HocPhanDto _hocPhanDto;
+    private readonly int _hocPhanId;
+    private readonly List<LabelTextField> _listLabelTextField;
 
     public HocPhanDialog(DialogType dialogType, HocPhanDto hocPhanDto, HocPhanDao hocPhanDao)
         : base(GetTitle(dialogType), dialogType, 500, 700)
@@ -23,15 +22,20 @@ public class HocPhanDialog : CustomDialog
         Init();
     }
 
-    private static string GetTitle(DialogType type) => type switch
-    {
-        DialogType.Them => "Thêm học phần",
-        DialogType.Sua => "Cập nhật học phần",
-        DialogType.ChiTiet => "Chi tiết học phần",
-        _ => "Học phần"
-    };
+    public event Action Finish;
 
-    void Init()
+    private static string GetTitle(DialogType type)
+    {
+        return type switch
+        {
+            DialogType.Them => "Thêm học phần",
+            DialogType.Sua => "Cập nhật học phần",
+            DialogType.ChiTiet => "Chi tiết học phần",
+            _ => "Học phần"
+        };
+    }
+
+    private void Init()
     {
         if (_dialogType == DialogType.ChiTiet)
         {
@@ -66,70 +70,59 @@ public class HocPhanDialog : CustomDialog
 
         var hocPhanComboList = _hocPhanDao.GetAllForCombobox();
         hocPhanComboList.Insert(0, "(Không có)");
-        int maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
+        var maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
         _listLabelTextField[maHPTruocIndex]._combobox.UpdateSelection(hocPhanComboList.ToArray());
 
         if (_dialogType == DialogType.Them)
-        {
             SetupInsert();
-        }
         else if (_dialogType == DialogType.Sua)
-        {
             SetupUpdate();
-        }
         else
-        {
             SetupDetail();
-        }
     }
 
-    void SetupInsert()
+    private void SetupInsert()
     {
         _btnLuu._mouseDown += () => { Insert(); };
     }
 
-    void SetupUpdate()
+    private void SetupUpdate()
     {
-        if (_hocPhanId == -1)
-        {
-            throw new Exception("Lỗi chưa cài đặt index");
-        }
+        if (_hocPhanId == -1) throw new Exception("Lỗi chưa cài đặt index");
 
 
         if (_hocPhanDto != null)
         {
-            int tenHPIndex = _dialogType == DialogType.ChiTiet ? 1 : 0;
+            var tenHPIndex = _dialogType == DialogType.ChiTiet ? 1 : 0;
             _listLabelTextField[tenHPIndex].GetTextField().Text = _hocPhanDto.TenHP;
 
 
-            int soTinChiIndex = _dialogType == DialogType.ChiTiet ? 3 : 2;
+            var soTinChiIndex = _dialogType == DialogType.ChiTiet ? 3 : 2;
             _listLabelTextField[soTinChiIndex].GetTextField().Text = _hocPhanDto.SoTinChi.ToString();
 
 
-            int heSoHPIndex = _dialogType == DialogType.ChiTiet ? 4 : 3;
+            var heSoHPIndex = _dialogType == DialogType.ChiTiet ? 4 : 3;
             _listLabelTextField[heSoHPIndex].GetTextField().Text = _hocPhanDto.HeSoHocPhan.ToString();
 
 
-            int soTietLTIndex = _dialogType == DialogType.ChiTiet ? 5 : 4;
+            var soTietLTIndex = _dialogType == DialogType.ChiTiet ? 5 : 4;
             _listLabelTextField[soTietLTIndex].GetTextField().Text = _hocPhanDto.SoTietLyThuyet.ToString();
 
 
-            int soTietTHIndex = _dialogType == DialogType.ChiTiet ? 6 : 5;
+            var soTietTHIndex = _dialogType == DialogType.ChiTiet ? 6 : 5;
             _listLabelTextField[soTietTHIndex].GetTextField().Text = _hocPhanDto.SoTietThucHanh.ToString();
 
 
-            int maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
+            var maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
             if (_hocPhanDto.MaHPTruoc.HasValue)
             {
-                string targetValue = $"{_hocPhanDto.MaHPTruoc.Value} - ";
+                var targetValue = $"{_hocPhanDto.MaHPTruoc.Value} - ";
                 foreach (string item in _listLabelTextField[maHPTruocIndex]._combobox.combobox.Items)
-                {
                     if (item.StartsWith(targetValue))
                     {
                         _listLabelTextField[maHPTruocIndex]._combobox.combobox.SelectedItem = item;
                         break;
                     }
-                }
             }
             else
             {
@@ -140,12 +133,9 @@ public class HocPhanDialog : CustomDialog
         _btnLuu._mouseDown += () => { UpdateHocPhan(); };
     }
 
-    void SetupDetail()
+    private void SetupDetail()
     {
-        if (_hocPhanId == -1)
-        {
-            throw new Exception("Lỗi chưa cài đặt index");
-        }
+        if (_hocPhanId == -1) throw new Exception("Lỗi chưa cài đặt index");
 
 
         if (_hocPhanDto != null)
@@ -176,15 +166,13 @@ public class HocPhanDialog : CustomDialog
 
             if (_hocPhanDto.MaHPTruoc.HasValue)
             {
-                string targetValue = $"{_hocPhanDto.MaHPTruoc.Value} - ";
+                var targetValue = $"{_hocPhanDto.MaHPTruoc.Value} - ";
                 foreach (string item in _listLabelTextField[2]._combobox.combobox.Items)
-                {
                     if (item.StartsWith(targetValue))
                     {
                         _listLabelTextField[2]._combobox.combobox.SelectedItem = item;
                         break;
                     }
-                }
             }
             else
             {
@@ -195,31 +183,29 @@ public class HocPhanDialog : CustomDialog
         }
     }
 
-    void Insert()
+    private void Insert()
     {
-        int tenHPIndex = _dialogType == DialogType.ChiTiet ? 1 : 0;
-        int maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
-        int soTinChiIndex = _dialogType == DialogType.ChiTiet ? 3 : 2;
-        int heSoHPIndex = _dialogType == DialogType.ChiTiet ? 4 : 3;
-        int soTietLTIndex = _dialogType == DialogType.ChiTiet ? 5 : 4;
-        int soTietTHIndex = _dialogType == DialogType.ChiTiet ? 6 : 5;
+        var tenHPIndex = _dialogType == DialogType.ChiTiet ? 1 : 0;
+        var maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
+        var soTinChiIndex = _dialogType == DialogType.ChiTiet ? 3 : 2;
+        var heSoHPIndex = _dialogType == DialogType.ChiTiet ? 4 : 3;
+        var soTietLTIndex = _dialogType == DialogType.ChiTiet ? 5 : 4;
+        var soTietTHIndex = _dialogType == DialogType.ChiTiet ? 6 : 5;
 
-        string tenHP = _listLabelTextField[tenHPIndex].GetTextTextField();
-        string selectedHPTruoc = _listLabelTextField[maHPTruocIndex]._combobox.combobox.SelectedItem?.ToString();
-        string soTinChiText = _listLabelTextField[soTinChiIndex].GetTextTextField();
-        string heSoHPText = _listLabelTextField[heSoHPIndex].GetTextTextField();
-        string soTietLTText = _listLabelTextField[soTietLTIndex].GetTextTextField();
-        string soTietTHText = _listLabelTextField[soTietTHIndex].GetTextTextField();
+        var tenHP = _listLabelTextField[tenHPIndex].GetTextTextField();
+        var selectedHPTruoc = _listLabelTextField[maHPTruocIndex]._combobox.combobox.SelectedItem?.ToString();
+        var soTinChiText = _listLabelTextField[soTinChiIndex].GetTextTextField();
+        var heSoHPText = _listLabelTextField[heSoHPIndex].GetTextTextField();
+        var soTietLTText = _listLabelTextField[soTietLTIndex].GetTextTextField();
+        var soTietTHText = _listLabelTextField[soTietTHIndex].GetTextTextField();
 
         if (ValidateInsert(tenHP, selectedHPTruoc, soTinChiText, heSoHPText, soTietLTText, soTietTHText))
         {
             int? maHPTruoc = null;
             if (selectedHPTruoc != "(Không có)" && !string.IsNullOrEmpty(selectedHPTruoc))
-            {
                 maHPTruoc = int.Parse(selectedHPTruoc.Split('-')[0].Trim());
-            }
 
-            HocPhanDto hocPhan = new HocPhanDto
+            var hocPhan = new HocPhanDto
             {
                 MaHPTruoc = maHPTruoc,
                 TenHP = tenHP,
@@ -234,7 +220,7 @@ public class HocPhanDialog : CustomDialog
                 MessageBox.Show("Thêm học phần thành công!", "Thành công", MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
                 Finish?.Invoke();
-                this.Close();
+                Close();
             }
             else
             {
@@ -243,31 +229,29 @@ public class HocPhanDialog : CustomDialog
         }
     }
 
-    void UpdateHocPhan()
+    private void UpdateHocPhan()
     {
-        int tenHPIndex = _dialogType == DialogType.ChiTiet ? 1 : 0;
-        int maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
-        int soTinChiIndex = _dialogType == DialogType.ChiTiet ? 3 : 2;
-        int heSoHPIndex = _dialogType == DialogType.ChiTiet ? 4 : 3;
-        int soTietLTIndex = _dialogType == DialogType.ChiTiet ? 5 : 4;
-        int soTietTHIndex = _dialogType == DialogType.ChiTiet ? 6 : 5;
+        var tenHPIndex = _dialogType == DialogType.ChiTiet ? 1 : 0;
+        var maHPTruocIndex = _dialogType == DialogType.ChiTiet ? 2 : 1;
+        var soTinChiIndex = _dialogType == DialogType.ChiTiet ? 3 : 2;
+        var heSoHPIndex = _dialogType == DialogType.ChiTiet ? 4 : 3;
+        var soTietLTIndex = _dialogType == DialogType.ChiTiet ? 5 : 4;
+        var soTietTHIndex = _dialogType == DialogType.ChiTiet ? 6 : 5;
 
-        string tenHP = _listLabelTextField[tenHPIndex].GetTextTextField();
-        string selectedHPTruoc = _listLabelTextField[maHPTruocIndex]._combobox.combobox.SelectedItem?.ToString();
-        string soTinChiText = _listLabelTextField[soTinChiIndex].GetTextTextField();
-        string heSoHPText = _listLabelTextField[heSoHPIndex].GetTextTextField();
-        string soTietLTText = _listLabelTextField[soTietLTIndex].GetTextTextField();
-        string soTietTHText = _listLabelTextField[soTietTHIndex].GetTextTextField();
+        var tenHP = _listLabelTextField[tenHPIndex].GetTextTextField();
+        var selectedHPTruoc = _listLabelTextField[maHPTruocIndex]._combobox.combobox.SelectedItem?.ToString();
+        var soTinChiText = _listLabelTextField[soTinChiIndex].GetTextTextField();
+        var heSoHPText = _listLabelTextField[heSoHPIndex].GetTextTextField();
+        var soTietLTText = _listLabelTextField[soTietLTIndex].GetTextTextField();
+        var soTietTHText = _listLabelTextField[soTietTHIndex].GetTextTextField();
 
         if (ValidateUpdate(tenHP, selectedHPTruoc, soTinChiText, heSoHPText, soTietLTText, soTietTHText))
         {
             int? maHPTruoc = null;
             if (selectedHPTruoc != "(Không có)" && !string.IsNullOrEmpty(selectedHPTruoc))
-            {
                 maHPTruoc = int.Parse(selectedHPTruoc.Split('-')[0].Trim());
-            }
 
-            HocPhanDto hocPhan = new HocPhanDto
+            var hocPhan = new HocPhanDto
             {
                 MaHP = _hocPhanDto.MaHP,
                 MaHPTruoc = maHPTruoc,
@@ -283,7 +267,7 @@ public class HocPhanDialog : CustomDialog
                 MessageBox.Show("Cập nhật học phần thành công!", "Thành công", MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
                 Finish?.Invoke();
-                this.Close();
+                Close();
             }
             else
             {
@@ -292,7 +276,7 @@ public class HocPhanDialog : CustomDialog
         }
     }
 
-    bool ValidateInsert(string tenHP, string selectedHPTruoc, string soTinChiText, string heSoHPText,
+    private bool ValidateInsert(string tenHP, string selectedHPTruoc, string soTinChiText, string heSoHPText,
         string soTietLTText, string soTietTHText)
     {
         if (CommonUse.Validate.IsEmpty(tenHP))
@@ -334,7 +318,7 @@ public class HocPhanDialog : CustomDialog
         return true;
     }
 
-    bool ValidateUpdate(string tenHP, string selectedHPTruoc, string soTinChiText, string heSoHPText,
+    private bool ValidateUpdate(string tenHP, string selectedHPTruoc, string soTinChiText, string heSoHPText,
         string soTietLTText, string soTietTHText)
     {
         if (CommonUse.Validate.IsEmpty(tenHP))

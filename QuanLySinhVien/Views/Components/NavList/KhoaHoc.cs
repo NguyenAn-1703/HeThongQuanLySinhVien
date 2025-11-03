@@ -1,41 +1,42 @@
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Search;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
-using QuanLySinhVien.Views.Enums;
-using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class KhoaHoc : NavBase
 {
-    private string ID = "KHOAHOC";
-    private string _title = "Khóa học";
-    private List<string> _listSelectionForComboBox;
-    private CustomTable _table;
-    private KhoaHocController _KhoaHocController;
-    private ChuKyDaoTaoController _chuKyDaoTaoController;
-    string[] _headerArray = new string[] { "Mã khóa học", "Tên khóa học", "Niên khóa học" };
-    List<string> _headerList;
+    private readonly ChuKyDaoTaoController _chuKyDaoTaoController;
+    private readonly string[] _headerArray = new[] { "Mã khóa học", "Tên khóa học", "Niên khóa học" };
+    private readonly string _title = "Khóa học";
+    private readonly string ID = "KHOAHOC";
+    private ChiTietQuyenController _chiTietQuyenController;
+    private ChucNangController _chucNangController;
+    private List<object> _displayData;
+    private List<string> _headerList;
 
     private TitleButton _insertButton;
-
-    List<KhoaHocDto> _rawData;
-    List<object> _displayData;
-
-    private KhoaHocSearch _KhoaHocSearch;
+    private KhoaHocController _KhoaHocController;
 
     private KhoaHocDialog _KhoaHocDialog;
 
-    private List<InputFormItem> _listIFI;
-    private ChiTietQuyenController _chiTietQuyenController;
-    private ChucNangController _chucNangController;
-    
+    private KhoaHocSearch _KhoaHocSearch;
+
     private List<ChiTietQuyenDto> _listAccess;
-    private bool them = false;
-    private bool sua = false;
-    private bool xoa = false;
+
+    private List<InputFormItem> _listIFI;
+    private List<string> _listSelectionForComboBox;
+
+    private List<KhoaHocDto> _rawData;
+    private CustomTable _table;
+    private bool sua;
+    private bool them;
+    private bool xoa;
 
     public KhoaHoc(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
@@ -47,7 +48,6 @@ public class KhoaHoc : NavBase
         _chuKyDaoTaoController = ChuKyDaoTaoController.GetInstance();
         Init();
     }
-    
 
 
     private void Init()
@@ -55,10 +55,10 @@ public class KhoaHoc : NavBase
         CheckQuyen();
         Dock = DockStyle.Fill;
 
-        TableLayoutPanel mainLayout = new TableLayoutPanel
+        var mainLayout = new TableLayoutPanel
         {
             RowCount = 2,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
         mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -68,32 +68,20 @@ public class KhoaHoc : NavBase
 
         Controls.Add(mainLayout);
     }
-    
-    void CheckQuyen()
+
+    private void CheckQuyen()
     {
         int maCN = _chucNangController.GetByTen(ID).MaCN;
         _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
-        foreach (ChiTietQuyenDto x in _listAccess)
-        {
-            Console.WriteLine(x.HanhDong);
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
-        {
-            them = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
-        {
-            sua = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
-        {
-            xoa = true;
-        }
+        foreach (var x in _listAccess) Console.WriteLine(x.HanhDong);
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them"))) them = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua"))) sua = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
     private Panel Top()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -112,20 +100,17 @@ public class KhoaHoc : NavBase
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        if (them)
-        {
-            panel.Controls.Add(_insertButton);
-        }
-        
+        if (them) panel.Controls.Add(_insertButton);
+
 
         return panel;
     }
 
     private Panel Bottom()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
 
         SetCombobox();
@@ -142,13 +127,13 @@ public class KhoaHoc : NavBase
     }
 
     //////////////////////////////SETTOP///////////////////////////////
-    Label getTitle()
+    private Label getTitle()
     {
-        Label titlePnl = new Label
+        var titlePnl = new Label
         {
             Text = _title,
             Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
-            AutoSize = true,
+            AutoSize = true
         };
         return titlePnl;
     }
@@ -158,47 +143,47 @@ public class KhoaHoc : NavBase
 
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
-    void SetCombobox()
+    private void SetCombobox()
     {
         _headerList = ConvertArray_ListString.ConvertArrayToListString(_headerArray);
         _listSelectionForComboBox = _headerList;
     }
 
 
-    void SetDataTableFromDb()
+    private void SetDataTableFromDb()
     {
         _rawData = _KhoaHocController.GetAll();
         SetDisplayData();
 
-        string[] columnNames = new[] { "MaKhoaHoc", "TenKhoaHoc", "NienKhoaHoc" };
-        List<string> columnNamesList = columnNames.ToList();
+        var columnNames = new[] { "MaKhoaHoc", "TenKhoaHoc", "NienKhoaHoc" };
+        var columnNamesList = columnNames.ToList();
 
         _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
 
-    void SetDisplayData()
+    private void SetDisplayData()
     {
         _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new
             {
-                MaKhoaHoc = x.MaKhoaHoc,
-                TenKhoaHoc = x.TenKhoaHoc,
-                NienKhoaHoc = x.NienKhoaHoc
+                x.MaKhoaHoc,
+                x.TenKhoaHoc,
+                x.NienKhoaHoc
             }
         );
     }
 
 
-    void SetSearch()
+    private void SetSearch()
     {
         _KhoaHocSearch = new KhoaHocSearch(_rawData);
     }
 
-    void SetAction()
+    private void SetAction()
     {
         _KhoaHocSearch.FinishSearch += dtos =>
         {
             UpdateDataDisplay(dtos);
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
 
         _insertButton._mouseDown += () => { Insert(); };
@@ -207,98 +192,97 @@ public class KhoaHoc : NavBase
         _table.OnDelete += index => { Delete(index); };
     }
 
-    void UpdateDataDisplay(List<KhoaHocDto> dtos)
+    private void UpdateDataDisplay(List<KhoaHocDto> dtos)
     {
-        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new
         {
-            MaKhoaHoc = x.MaKhoaHoc,
-            TenKhoaHoc = x.TenKhoaHoc,
-            NienKhoaHoc = x.NienKhoaHoc
+            x.MaKhoaHoc,
+            x.TenKhoaHoc,
+            x.NienKhoaHoc
         });
     }
 
-    void Insert()
+    private void Insert()
     {
-        InputFormItem[] arr = new InputFormItem[]
+        InputFormItem[] arr = new[]
         {
             new InputFormItem("Tên khóa học", TextFieldType.NormalText),
-            new InputFormItem("Niên khóa học", TextFieldType.NormalText),
+            new InputFormItem("Niên khóa học", TextFieldType.NormalText)
         };
-        
-        List<InputFormItem> list = new List<InputFormItem>();
+
+        List<InputFormItem> list = new();
         list.AddRange(arr);
 
-        _KhoaHocDialog = new KhoaHocDialog("Thêm khóa học", DialogType.Them, list, _KhoaHocController, _chuKyDaoTaoController);
+        _KhoaHocDialog = new KhoaHocDialog("Thêm khóa học", DialogType.Them, list, _KhoaHocController,
+            _chuKyDaoTaoController);
 
         _KhoaHocDialog.Finish += () =>
         {
             UpdateDataDisplay(_KhoaHocController.GetAll());
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
-        this._KhoaHocDialog.ShowDialog();
+        _KhoaHocDialog.ShowDialog();
     }
 
-    void Update(int id)
+    private void Update(int id)
     {
-        InputFormItem[] arr = new InputFormItem[]
+        InputFormItem[] arr = new[]
         {
             new InputFormItem("Tên khóa học", TextFieldType.NormalText),
-            new InputFormItem("Niên khóa học", TextFieldType.NormalText),
+            new InputFormItem("Niên khóa học", TextFieldType.NormalText)
         };
-        List<InputFormItem> list = new List<InputFormItem>();
+        List<InputFormItem> list = new();
         list.AddRange(arr);
-        _KhoaHocDialog = new KhoaHocDialog("Sửa khóa học", DialogType.Sua, list, _KhoaHocController,_chuKyDaoTaoController, id);
+        _KhoaHocDialog = new KhoaHocDialog("Sửa khóa học", DialogType.Sua, list, _KhoaHocController,
+            _chuKyDaoTaoController, id);
         _KhoaHocDialog.Finish += () =>
         {
             UpdateDataDisplay(_KhoaHocController.GetAll());
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         };
-        this._KhoaHocDialog.ShowDialog();
+        _KhoaHocDialog.ShowDialog();
     }
 
-    void Detail(int id)
+    private void Detail(int id)
     {
-        InputFormItem[] arr = new InputFormItem[]
+        InputFormItem[] arr = new[]
         {
             new InputFormItem("Tên khóa học", TextFieldType.NormalText),
-            new InputFormItem("Niên khóa học", TextFieldType.NormalText),
+            new InputFormItem("Niên khóa học", TextFieldType.NormalText)
         };
-        List<InputFormItem> list = new List<InputFormItem>();
+        List<InputFormItem> list = new();
         list.AddRange(arr);
         _KhoaHocDialog = new KhoaHocDialog("Chi tiết khóa học", DialogType.ChiTiet, list,
             _KhoaHocController, _chuKyDaoTaoController, id);
-        this._KhoaHocDialog.ShowDialog();
+        _KhoaHocDialog.ShowDialog();
     }
 
-    void Delete(int index)
+    private void Delete(int index)
     {
-        DialogResult select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo,
+        var select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo,
             MessageBoxIcon.Information);
-        if (select == DialogResult.No)
-        {
-            return;
-        }
+        if (select == DialogResult.No) return;
 
         if (_KhoaHocController.Delete(index))
         {
             MessageBox.Show("Xóa khóa học thành công!", "Thành công", MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
             UpdateDataDisplay(_KhoaHocController.GetAll());
-            this._table.UpdateData(_displayData);
+            _table.UpdateData(_displayData);
         }
         else
         {
             MessageBox.Show("Xóa khóa học thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-    
+
     public override List<string> getComboboxList()
     {
-        return this._listSelectionForComboBox;
+        return _listSelectionForComboBox;
     }
 
     public override void onSearch(string txtSearch, string filter)
     {
-        this._KhoaHocSearch.Search(txtSearch, filter);
+        _KhoaHocSearch.Search(txtSearch, filter);
     }
 }

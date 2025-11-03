@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EditorConfigFiles Include="C:\Program Files\dotnet\sdk\8.0.415\Sdks\Microsoft.NET.Sdk\analyzers\build\config\analysislevel_8_default.globalconfig">
+            <Link>Controllers\config\analysislevel_8_default.globalconfig</Link>
+        </EditorConfigFiles>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\QuanLySinhVien.Model\QuanLySinhVien.Model.csproj"/>
+        <ProjectReference Include="..\QuanLySinhVien.Shared\QuanLySinhVien.Shared.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+    </ItemGroup>
+
+</Project>

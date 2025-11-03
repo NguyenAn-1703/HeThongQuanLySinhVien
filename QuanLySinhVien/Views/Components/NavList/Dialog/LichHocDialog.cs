@@ -1,74 +1,81 @@
-using System.Runtime.InteropServices.JavaScript;
-using ExCSS;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
-using Mysqlx.Crud;
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
-using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class LichHocDialog : Form
 {
-    private string _title;
-    private DialogType _dialogType;
+    private readonly List<NhomHocPhanDto> _currentListNhp;
+    private readonly DialogType _dialogType;
 
-    private TableLayoutPanel _mainLayout;
-    private CustomButton _exitButton;
+    private readonly List<LichHocDto> _listTam;
+    private readonly string _title;
+
+    private readonly LichHocDto selectedItem;
+
+    private readonly string[] tempa = new[]
+        { "Tiết 1", "Tiết 2", "Tiết 3", "Tiết 4", "Tiết 5", "Tiết 6", "Tiết 7", "Tiết 8", "Tiết 9", "Tiết 10" };
+
+    private readonly string[] tempc = new[] { "Tiết 6", "Tiết 7", "Tiết 8", "Tiết 9", "Tiết 10" };
+
+    private readonly string[] temps = new[] { "Tiết 1", "Tiết 2", "Tiết 3", "Tiết 4", "Tiết 5" };
     private TitleButton _btnLuu;
-    private List<LabelTextField> _listTextBox;
 
-    private LabelTextField fieldPhong;
-    LabelTextField fieldCa;
-    LabelTextField fieldThu;
-    LabelTextField fieldTietBd;
-    LabelTextField fieldTietKt;
-    LabelTextField fieldTuNgay;
-    LabelTextField fieldDenNgay;
-    LabelTextField fieldSoTuan;
-
-
-    public event Action<LichHocDto> Finish;
-
-    private PhongHocController _phongController;
+    private TableLayoutPanel _contentPanel;
+    private CustomButton _exitButton;
     private LichHocController _lichController;
 
-    private LichHocDto selectedItem;
+    private List<string> _listAll;
+    private List<string> _listChieu;
+    private List<string> _listSang;
+    private List<LabelTextField> _listTextBox;
 
-    private List<LichHocDto> _listTam;
+    private TableLayoutPanel _mainLayout;
 
-    private List<NhomHocPhanDto> _currentListNhp;
+    private PhongHocController _phongController;
+    private LabelTextField fieldCa;
+    private LabelTextField fieldDenNgay;
+
+    private LabelTextField fieldPhong;
+    private LabelTextField fieldSoTuan;
+    private LabelTextField fieldThu;
+    private LabelTextField fieldTietBd;
+    private LabelTextField fieldTietKt;
+    private LabelTextField fieldTuNgay;
 
 
-    public LichHocDialog(string title, DialogType dialogType,List<LichHocDto> listTam , List<NhomHocPhanDto> currentLisNhp,  LichHocDto lich = null)
+    public LichHocDialog(string title, DialogType dialogType, List<LichHocDto> listTam,
+        List<NhomHocPhanDto> currentLisNhp, LichHocDto lich = null)
     {
         _title = title;
         _dialogType = dialogType;
         _phongController = PhongHocController.getInstance();
         selectedItem = lich;
         _listTam = listTam;
-        _currentListNhp =  currentLisNhp;
+        _currentListNhp = currentLisNhp;
         _lichController = LichHocController.GetInstance();
         Init();
     }
 
-    void Init()
+
+    public event Action<LichHocDto> Finish;
+
+    private void Init()
     {
         Width = 800;
         Height = 600;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
-        this.FormBorderStyle = FormBorderStyle.None;
+        FormBorderStyle = FormBorderStyle.None;
 
         _mainLayout = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             RowCount = 4,
-            BorderStyle = BorderStyle.FixedSingle,
+            BorderStyle = BorderStyle.FixedSingle
         };
 
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -83,39 +90,34 @@ public class LichHocDialog : Form
 
         SetAction();
 
-        this.Controls.Add(_mainLayout);
+        Controls.Add(_mainLayout);
 
         if (_dialogType == DialogType.ChiTiet)
-        {
             SetupDetail();
-        }
-        else if (_dialogType == DialogType.Sua)
-        {
-            SetupUpdate();
-        }
+        else if (_dialogType == DialogType.Sua) SetupUpdate();
     }
 
-    void SetTopBar()
+    private void SetTopBar()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
 
-        Label topTitle = new Label
+        var topTitle = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.Left,
             BackColor = MyColor.GrayBackGround,
             Dock = DockStyle.Fill,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
         panel.Controls.Add(topTitle);
 
@@ -126,46 +128,44 @@ public class LichHocDialog : Form
         _exitButton.Margin = new Padding(0);
         _exitButton.Anchor = AnchorStyles.Right;
 
-        _exitButton.MouseDown += (sender, args) => this.Close();
+        _exitButton.MouseDown += (sender, args) => Close();
         panel.Controls.Add(_exitButton);
 
         _mainLayout.Controls.Add(panel);
     }
 
-    void SetTitleBar()
+    private void SetTitleBar()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.MainColor,
             Margin = new Padding(0),
-            Padding = new Padding(0, 10, 0, 10),
+            Padding = new Padding(0, 10, 0, 10)
         };
 
-        Label title = new Label
+        var title = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.None,
             AutoSize = true,
             ForeColor = MyColor.White,
-            Font = GetFont.GetFont.GetMainFont(16, FontType.Black),
+            Font = GetFont.GetFont.GetMainFont(16, FontType.Black)
         };
 
         panel.Controls.Add(title);
         _mainLayout.Controls.Add(panel);
     }
 
-    private TableLayoutPanel _contentPanel;
-
-    void SetContent()
+    private void SetContent()
     {
         _contentPanel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             ColumnCount = 2,
             RowCount = 2,
-            Padding = new Padding(7),
+            Padding = new Padding(7)
         };
 
         _contentPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60));
@@ -175,10 +175,10 @@ public class LichHocDialog : Form
         _contentPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
 
-        RoundTLP pnl1 = new RoundTLP { Dock = DockStyle.Fill, AutoSize = true };
-        RoundTLP pnl2 = new RoundTLP
+        var pnl1 = new RoundTLP { Dock = DockStyle.Fill, AutoSize = true };
+        var pnl2 = new RoundTLP
             { Dock = DockStyle.Fill, Border = true, Padding = new Padding(7), Margin = new Padding(3, 20, 6, 3) };
-        RoundTLP pnl3 = new RoundTLP
+        var pnl3 = new RoundTLP
             { Dock = DockStyle.Fill, Border = true, Padding = new Padding(7), Margin = new Padding(3, 20, 3, 3) };
 
         _listTextBox = new List<LabelTextField>();
@@ -216,18 +216,7 @@ public class LichHocDialog : Form
         ConfigCombobox();
     }
 
-    string[] temps = new[] { "Tiết 1", "Tiết 2", "Tiết 3", "Tiết 4", "Tiết 5" };
-    private List<string> _listSang;
-
-    string[] tempc = new[] { "Tiết 6", "Tiết 7", "Tiết 8", "Tiết 9", "Tiết 10" };
-    private List<string> _listChieu;
-
-    string[] tempa = new[]
-        { "Tiết 1", "Tiết 2", "Tiết 3", "Tiết 4", "Tiết 5", "Tiết 6", "Tiết 7", "Tiết 8", "Tiết 9", "Tiết 10" };
-
-    private List<string> _listAll;
-
-    void ConfigCombobox()
+    private void ConfigCombobox()
     {
         _listSang = temps.ToList();
         _listChieu = tempc.ToList();
@@ -242,11 +231,11 @@ public class LichHocDialog : Form
         fieldDenNgay = _listTextBox[6];
         fieldSoTuan = _listTextBox[7];
 
-        string[] ca = new[] { "Lý thuyết", "Thực hành" };
+        var ca = new[] { "Lý thuyết", "Thực hành" };
         fieldCa.SetComboboxList(ca.ToList());
         fieldCa.SetComboboxSelection(ca[0]);
 
-        string[] thu = new[] { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7" };
+        var thu = new[] { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7" };
         fieldThu.SetComboboxList(thu.ToList());
         fieldThu.SetComboboxSelection(thu[0]);
 
@@ -260,30 +249,24 @@ public class LichHocDialog : Form
         SetActionNgay();
     }
 
-    void SetActionTiet()
+    private void SetActionTiet()
     {
         fieldTietBd._combobox.combobox.SelectedIndexChanged += (sender, args) =>
         {
-            int bd = GetTietInt(fieldTietBd.GetSelectionCombobox());
+            var bd = GetTietInt(fieldTietBd.GetSelectionCombobox());
 
             if (bd <= 5)
             {
-                List<string> kt = _listSang.ToList();
-                for (int i = 0; i < bd - 1; i++)
-                {
-                    kt.RemoveAt(0);
-                }
+                var kt = _listSang.ToList();
+                for (var i = 0; i < bd - 1; i++) kt.RemoveAt(0);
 
                 fieldTietKt.SetComboboxList(kt);
                 fieldTietKt.SetComboboxSelection(kt[0]);
             }
             else
             {
-                List<string> kt = _listChieu.ToList();
-                for (int i = 0; i < bd - 6; i++)
-                {
-                    kt.RemoveAt(0);
-                }
+                var kt = _listChieu.ToList();
+                for (var i = 0; i < bd - 6; i++) kt.RemoveAt(0);
 
                 fieldTietKt.SetComboboxList(kt);
                 fieldTietKt.SetComboboxSelection(kt[0]);
@@ -291,12 +274,12 @@ public class LichHocDialog : Form
         };
     }
 
-    void SetActionNgay()
+    private void SetActionNgay()
     {
         fieldTuNgay.GetDField().TextChanged += (sender, args) =>
         {
-            DateTime startDate = fieldTuNgay.GetDField().Value;
-            DateTime endDate = fieldDenNgay.GetDField().Value;
+            var startDate = fieldTuNgay.GetDField().Value;
+            var endDate = fieldDenNgay.GetDField().Value;
 
             if (startDate > endDate)
             {
@@ -304,17 +287,17 @@ public class LichHocDialog : Form
                 endDate = startDate;
             }
 
-            TimeSpan timeSpan = endDate - startDate;
-            int days = timeSpan.Days;
-            int week = days / 7;
+            var timeSpan = endDate - startDate;
+            var days = timeSpan.Days;
+            var week = days / 7;
 
             fieldSoTuan._numberField.contentTextBox.Text = week + "";
         };
 
         fieldDenNgay.GetDField().TextChanged += (sender, args) =>
         {
-            DateTime startDate = fieldTuNgay.GetDField().Value;
-            DateTime endDate = fieldDenNgay.GetDField().Value;
+            var startDate = fieldTuNgay.GetDField().Value;
+            var endDate = fieldDenNgay.GetDField().Value;
 
             if (startDate > endDate)
             {
@@ -322,29 +305,29 @@ public class LichHocDialog : Form
                 endDate = startDate;
             }
 
-            TimeSpan timeSpan = endDate - startDate;
-            int days = timeSpan.Days;
-            int week = days / 7;
+            var timeSpan = endDate - startDate;
+            var days = timeSpan.Days;
+            var week = days / 7;
 
             fieldSoTuan._numberField.contentTextBox.Text = week + "";
         };
 
         fieldSoTuan._numberField.contentTextBox.TextChanged += (sender, args) =>
         {
-            DateTime startDate = fieldTuNgay.GetDField().Value;
-            if (fieldSoTuan._numberField.contentTextBox.Focused == true)
+            var startDate = fieldTuNgay.GetDField().Value;
+            if (fieldSoTuan._numberField.contentTextBox.Focused)
             {
-                string ngayS = fieldSoTuan._numberField.contentTextBox.Text;
+                var ngayS = fieldSoTuan._numberField.contentTextBox.Text;
                 if (!ngayS.Equals(""))
                 {
-                    int days = int.Parse(ngayS) * 7;
+                    var days = int.Parse(ngayS) * 7;
                     fieldDenNgay.GetDField().Value = startDate.AddDays(days);
                 }
             }
         };
     }
 
-    void SetupDetail()
+    private void SetupDetail()
     {
         // public int MaLH { get; set; }
         // public int MaPH { get; set; }
@@ -365,9 +348,9 @@ public class LichHocDialog : Form
         fieldTuNgay.GetDField().Value = selectedItem.TuNgay;
         fieldDenNgay.GetDField().Value = selectedItem.DenNgay;
 
-        TimeSpan timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
-        int days = timeSpan.Days;
-        int week = days / 7;
+        var timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
+        var days = timeSpan.Days;
+        var week = days / 7;
 
         fieldSoTuan._numberField.contentTextBox.Text = week + "";
 
@@ -380,7 +363,8 @@ public class LichHocDialog : Form
         fieldDenNgay._dField.Enabled = false;
         fieldSoTuan._numberField.Enable = false;
     }
-    void SetupUpdate()
+
+    private void SetupUpdate()
     {
         fieldPhong.tbPH.contentTextBox.Text = _phongController.GetPhongHocById(selectedItem.MaPH).TenPH;
         fieldCa.SetComboboxSelection(selectedItem.Type);
@@ -391,34 +375,27 @@ public class LichHocDialog : Form
         fieldTuNgay.GetDField().Value = selectedItem.TuNgay;
         fieldDenNgay.GetDField().Value = selectedItem.DenNgay;
 
-        TimeSpan timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
-        int days = timeSpan.Days;
-        int week = days / 7;
+        var timeSpan = selectedItem.DenNgay - selectedItem.TuNgay;
+        var days = timeSpan.Days;
+        var week = days / 7;
 
         fieldSoTuan._numberField.contentTextBox.Text = week + "";
     }
 
-    void SetAction()
+    private void SetAction()
     {
         if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
-        {
             _btnLuu._mouseDown += () => { OnMouseDown(); };
-        }
     }
 
-    void OnMouseDown()
+    private void OnMouseDown()
     {
         if (_dialogType == DialogType.Them)
-        {
             Insert();
-        }   
-        else if (_dialogType == DialogType.Sua)
-        {
-            Update();
-        }
+        else if (_dialogType == DialogType.Sua) Update();
     }
 
-    void Insert()
+    private void Insert()
     {
         // public int MaLH { get; set; }
         // public int MaPH { get; set; }
@@ -431,19 +408,16 @@ public class LichHocDialog : Form
         // public int SoTiet { get; set; }
         // public string Type { get; set; }
 
-        string tenPhong = fieldPhong.tbPH.contentTextBox.Text;
+        var tenPhong = fieldPhong.tbPH.contentTextBox.Text;
 
-        if (!Validate(tenPhong))
-        {
-            return;
-        }
-        
+        if (!Validate(tenPhong)) return;
+
         PhongHocDto phong = _phongController.GetByTen(tenPhong);
 
-        int tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
-        int tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
+        var tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
+        var tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
 
-        LichHocDto lich = new LichHocDto
+        var lich = new LichHocDto
         {
             MaPH = phong.MaPH,
             Thu = fieldThu.GetSelectionCombobox(),
@@ -452,28 +426,25 @@ public class LichHocDialog : Form
             TuNgay = fieldTuNgay.GetDField().Value,
             DenNgay = fieldDenNgay.GetDField().Value,
             SoTiet = tietKt - tietBd,
-            Type = fieldCa.GetSelectionCombobox(),
+            Type = fieldCa.GetSelectionCombobox()
         };
 
         Finish?.Invoke(lich);
-        this.Close();
+        Close();
     }
-    
-    void Update()
-    {
-        string tenPhong = fieldPhong.tbPH.contentTextBox.Text;
 
-        if (!Validate(tenPhong))
-        {
-            return;
-        }
-        
+    private void Update()
+    {
+        var tenPhong = fieldPhong.tbPH.contentTextBox.Text;
+
+        if (!Validate(tenPhong)) return;
+
         PhongHocDto phong = _phongController.GetByTen(tenPhong);
 
-        int tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
-        int tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
+        var tietBd = int.Parse(fieldTietBd.GetSelectionCombobox().Split(" ")[1]);
+        var tietKt = int.Parse(fieldTietKt.GetSelectionCombobox().Split(" ")[1]);
 
-        LichHocDto lich = new LichHocDto
+        var lich = new LichHocDto
         {
             MaPH = phong.MaPH,
             Thu = fieldThu.GetSelectionCombobox(),
@@ -482,27 +453,27 @@ public class LichHocDialog : Form
             TuNgay = fieldTuNgay.GetDField().Value,
             DenNgay = fieldDenNgay.GetDField().Value,
             SoTiet = tietKt - tietBd,
-            Type = fieldCa.GetSelectionCombobox(),
+            Type = fieldCa.GetSelectionCombobox()
         };
 
         Finish?.Invoke(lich);
-        this.Close();
+        Close();
     }
 
-    int GetTietInt(string tiet)
+    private int GetTietInt(string tiet)
     {
-        string[] temp = tiet.Split(' ');
+        var temp = tiet.Split(' ');
         return int.Parse(temp[1]);
     }
 
-    void SetBottom()
+    private void SetBottom()
     {
         //Thêm có Đặt lại, Lưu, Hủy
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
             AutoSize = true,
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
+            ColumnCount = 3
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -516,8 +487,8 @@ public class LichHocDialog : Form
             _btnLuu = new TitleButton("Lưu");
             panel.Controls.Add(_btnLuu);
 
-            TitleButton btnHuy = new TitleButton("Hủy");
-            btnHuy._mouseDown += () => this.Close();
+            var btnHuy = new TitleButton("Hủy");
+            btnHuy._mouseDown += () => Close();
 
             panel.Controls.Add(btnHuy);
         }
@@ -525,15 +496,15 @@ public class LichHocDialog : Form
         {
             panel.Controls.Add(new Panel { Height = 0 });
 
-            TitleButton btnThoat = new TitleButton("Thoát");
-            btnThoat._mouseDown += () => this.Close();
+            var btnThoat = new TitleButton("Thoát");
+            btnThoat._mouseDown += () => Close();
             panel.Controls.Add(btnThoat, 2, 0);
         }
 
-        this._mainLayout.Controls.Add(panel, 0, 3);
+        _mainLayout.Controls.Add(panel, 0, 3);
     }
 
-    bool Validate(string tenPhong)
+    private bool Validate(string tenPhong)
     {
         if (tenPhong.Equals(""))
         {
@@ -541,77 +512,72 @@ public class LichHocDialog : Form
             fieldPhong.tbPH.contentTextBox.Focus();
             return false;
         }
+
         if (!_phongController.ExistByTen(tenPhong))
         {
             MessageBox.Show("Phòng không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             fieldPhong.tbPH.contentTextBox.Focus();
             return false;
         }
-        if (DuplicateLichHoc(fieldPhong.tbPH.contentTextBox.Text, fieldThu.GetSelectionCombobox(), fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox()))
+
+        if (DuplicateLichHoc(fieldPhong.tbPH.contentTextBox.Text, fieldThu.GetSelectionCombobox(),
+                fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox()))
         {
             MessageBox.Show("Lịch học bị trùng!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
 
-        int maNhpTrung = DuplicateLichHocNhp(fieldPhong.tbPH.contentTextBox.Text, fieldThu.GetSelectionCombobox(),
+        var maNhpTrung = DuplicateLichHocNhp(fieldPhong.tbPH.contentTextBox.Text, fieldThu.GetSelectionCombobox(),
             fieldTietBd.GetSelectionCombobox(), fieldTietKt.GetSelectionCombobox());
         if (maNhpTrung != -1)
         {
-            MessageBox.Show("Lịch học bị trùng với lịch của nhóm học phần: " + maNhpTrung + " !", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Lịch học bị trùng với lịch của nhóm học phần: " + maNhpTrung + " !", "Lỗi",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
 
         return true;
     }
 
-    bool DuplicateLichHoc(string tenPhong, string thu, string tietBatDau, string tietKetThuc)
+    private bool DuplicateLichHoc(string tenPhong, string thu, string tietBatDau, string tietKetThuc)
     {
         // int maPhong = _phongController.GetByTen(tenPhong).MaPH;
-        int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
-        int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
+        var tietBd = int.Parse(tietBatDau.Split(" ")[1]);
+        var tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
         //trùng ở nhóm học phần hiện tại
-        foreach (LichHocDto item in _listTam)
-        {
+        foreach (var item in _listTam)
             if (item.Thu.Equals(thu))
-            {
                 if (item.TietBatDau <= tietKt && tietBd <= item.TietKetThuc)
-                {
                     return true;
-                }
-            }
-        }
-        
+
         return false;
     }
-    
-    int DuplicateLichHocNhp(string tenPhong,string thu, string tietBatDau, string tietKetThuc)
+
+    private int DuplicateLichHocNhp(string tenPhong, string thu, string tietBatDau, string tietKetThuc)
     {
-        int rs = -1;
+        var rs = -1;
         int maPhong = _phongController.GetByTen(tenPhong).MaPH;
-        int tietBd = int.Parse(tietBatDau.Split(" ")[1]);
-        int tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
-        
+        var tietBd = int.Parse(tietBatDau.Split(" ")[1]);
+        var tietKt = int.Parse(tietKetThuc.Split(" ")[1]);
+
         //trùng ở các nhóm học phần khác cùng đợt đăng ký
-        foreach (NhomHocPhanDto item in _currentListNhp)
+        foreach (var item in _currentListNhp)
         {
             List<LichHocDto> listLichOfNhp = _lichController.GetByMaNhp(item.MaNHP);
-            
-            foreach (LichHocDto lich in listLichOfNhp)
-            {
+
+            foreach (var lich in listLichOfNhp)
                 //(a1, a2) //(b1, b2) //dk: a1 < b2 && b1 < a2
                 if (maPhong == lich.MaPH && thu.Equals(lich.Thu))
-                {
                     if (lich.TietBatDau <= tietKt && tietBd <= lich.TietKetThuc)
                     {
-                        Console.WriteLine("lich cua nhp : " + lich.MaPH + " " + lich.Thu + " " + lich.TietBatDau + " " + lich.TietKetThuc);
+                        Console.WriteLine("lich cua nhp : " + lich.MaPH + " " + lich.Thu + " " + lich.TietBatDau + " " +
+                                          lich.TietKetThuc);
                         Console.WriteLine("lich chen : " + maPhong + " " + thu + " " + tietBd + " " + tietKt);
                         rs = item.MaNHP;
                         return rs;
                     }
-                }
-            }
         }
-        
+
         return rs;
     }
 }

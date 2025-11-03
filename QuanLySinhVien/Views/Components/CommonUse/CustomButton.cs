@@ -4,22 +4,8 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CustomButton : RoundTLP
 {
-    public int PicWidth {get; set;}
-    public int PicHeight {get; set;}
-    public string Svg {get; set;}
-    public int Pad { get; set; } = 3;
-
-    public event Action LeaveActionTable;
-    
-
-    public event Action _mouseDown;
-    
-    public Color BackgroundColor {get; set;}
-    public Color HoverColor { get; set; }
-    public Color SelectColor { get; set; }
-
-
-    public CustomButton(int width, int height, string svg, Color backColor, bool radius1 = true, bool radius2 = true, bool radius3 = true, bool radius4 = true, bool border = false)
+    public CustomButton(int width, int height, string svg, Color backColor, bool radius1 = true, bool radius2 = true,
+        bool radius3 = true, bool radius4 = true, bool border = false)
     {
         PicWidth = width;
         PicHeight = height;
@@ -35,18 +21,32 @@ public class CustomButton : RoundTLP
         Init();
     }
 
-    void Init()
+    public int PicWidth { get; set; }
+    public int PicHeight { get; set; }
+    public string Svg { get; set; }
+    public int Pad { get; set; } = 3;
+
+    public Color BackgroundColor { get; set; }
+    public Color HoverColor { get; set; }
+    public Color SelectColor { get; set; }
+
+    public event Action LeaveActionTable;
+
+
+    public event Action _mouseDown;
+
+    private void Init()
     {
         BackColor = BackgroundColor;
-        this.Margin = new Padding(0);
-        this.Size = new Size(PicWidth + Pad * 2, PicHeight + Pad * 2);
+        Margin = new Padding(0);
+        Size = new Size(PicWidth + Pad * 2, PicHeight + Pad * 2);
         SetPictureBox();
         SetAction();
     }
 
-    void SetPictureBox()
+    private void SetPictureBox()
     {
-        PictureBox pB = new PictureBox
+        var pB = new PictureBox
         {
             Anchor = AnchorStyles.None,
             Size = new Size(PicWidth, PicHeight),
@@ -54,41 +54,40 @@ public class CustomButton : RoundTLP
             SizeMode = PictureBoxSizeMode.Zoom,
             Enabled = false
         };
-        this.Controls.Add(pB);
+        Controls.Add(pB);
     }
 
-    void SetAction()
+    private void SetAction()
     {
-        this.MouseDown += (sender, args) => OnMouseDown();
-        this.MouseUp += (sender, args) => OnMouseUp();
-        this.MouseEnter +=  (sender, args) => OnMouseEnter();
-        this.MouseLeave  +=  (sender, args) => OnMouseLeave();
+        MouseDown += (sender, args) => OnMouseDown();
+        MouseUp += (sender, args) => OnMouseUp();
+        MouseEnter += (sender, args) => OnMouseEnter();
+        MouseLeave += (sender, args) => OnMouseLeave();
     }
 
     public virtual void OnMouseDown()
     {
-        this.BackColor = this.SelectColor;
+        BackColor = SelectColor;
         _mouseDown?.Invoke();
     }
 
-    void OnMouseUp()
+    private void OnMouseUp()
     {
-        this.BackColor = this.BackgroundColor;
+        BackColor = BackgroundColor;
     }
 
-    void OnMouseEnter()
+    private void OnMouseEnter()
     {
-        this.BackColor = this.HoverColor;
+        BackColor = HoverColor;
     }
 
-    void OnMouseLeave()
+    private void OnMouseLeave()
     {
-        this.BackColor = this.BackgroundColor;
+        BackColor = BackgroundColor;
         LeaveActionTable?.Invoke();
     }
 
     public void SetBorder()
     {
-        
     }
 }

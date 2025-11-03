@@ -1,19 +1,20 @@
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
-using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.NavList;
 
 public class ThongKeHocLuc : TableLayoutPanel
 {
-    List<NganhDto> _rawData;
-    List<object> _displayData;
-    TableLayoutPanel _content;
+    private TableLayoutPanel _content;
+    private List<object> _displayData;
     private NganhController _nganhController;
+    private List<NganhDto> _rawData;
+
     public ThongKeHocLuc()
     {
         _rawData = new List<NganhDto>();
@@ -22,61 +23,61 @@ public class ThongKeHocLuc : TableLayoutPanel
         Init();
     }
 
-    void Init()
+    private void Init()
     {
         Configuration();
         SetTitle();
         SetContent();
     }
 
-    void Configuration()
+    private void Configuration()
     {
         Dock = DockStyle.Fill;
         BackColor = MyColor.GrayBackGround;
         Margin = new Padding(0);
         RowCount = 2;
-        
-        this.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        this.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+        RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        RowStyles.Add(new RowStyle(SizeType.Percent, 100));
     }
 
-    void SetTitle()
+    private void SetTitle()
     {
-        TableLayoutPanel panel = new TableLayoutPanel
+        var panel = new TableLayoutPanel
         {
             ColumnCount = 2,
-            AutoSize = true,
+            AutoSize = true
         };
-        Label title = GetLabel("Học lực");
+        var title = GetLabel("Học lực");
 
-        CustomCombobox combobox = new CustomCombobox(new string[] {"Ngành", "Khóa"});
+        var combobox = new CustomCombobox(new[] { "Ngành", "Khóa" });
         combobox.Anchor = AnchorStyles.None;
         combobox.SetSelectionCombobox("Ngành");
-        
+
         panel.Controls.Add(title);
         panel.Controls.Add(combobox);
-        this.Controls.Add(panel);
+        Controls.Add(panel);
     }
 
-    Label GetLabel(string i)
+    private Label GetLabel(string i)
     {
-        Label lbl = new Label
+        var lbl = new Label
         {
             Text = i,
             Font = GetFont.GetFont.GetMainFont(14, FontType.Black),
             AutoSize = true,
-            Margin = new Padding(30, 10, 10, 10),
+            Margin = new Padding(30, 10, 10, 10)
         };
 
         return lbl;
     }
 
-    void SetContent()
+    private void SetContent()
     {
         _content = new TableLayoutPanel
         {
             ColumnCount = 2,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Fill
         };
         _content.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         _content.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -87,51 +88,51 @@ public class ThongKeHocLuc : TableLayoutPanel
 
         SetTable();
         SetPieChart();
-        
+
         // panel.Controls.Add(box1);
         // _content.Controls.Add(box2);
 
-        this.Controls.Add(_content);
+        Controls.Add(_content);
     }
 
-    void SetTable()
+    private void SetTable()
     {
-        string[] header = new[] { "Mã ngành", "Tên ngành", "Số sinh viên giỏi, xuất sắc"};
-        string[] ColumnName = new[] { "MaNganh", "TenNganh", "SoSV"};
+        var header = new[] { "Mã ngành", "Tên ngành", "Số sinh viên giỏi, xuất sắc" };
+        var ColumnName = new[] { "MaNganh", "TenNganh", "SoSV" };
         _rawData = _nganhController.GetAll();
         SetDisplayData();
-        CustomTable table = new CustomTable(header.ToList(), ColumnName.ToList(), _displayData.ToList(), false, false, false);
+        var table = new CustomTable(header.ToList(), ColumnName.ToList(), _displayData.ToList());
         table.Margin = new Padding(6);
         _content.Controls.Add(table);
     }
 
-    void SetDisplayData()
+    private void SetDisplayData()
     {
         _displayData = ConvertObject.ConvertToDisplay(_rawData, x => new
             {
-                MaNganh = x.MaNganh,
-                TenNganh = x.TenNganh,
+                x.MaNganh,
+                x.TenNganh,
                 SoSV = 100
             }
         );
     }
 
-    void SetPieChart()
+    private void SetPieChart()
     {
-        RoundTLP container = new RoundTLP
+        var container = new RoundTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.White,
-            Margin = new Padding(6),
+            Margin = new Padding(6)
         };
-        string[] dsKhoaHoc = new[] { "Xuất sắc","Giỏi","Khá","Trung bình","Yếu" };
-        float[] percent = new[] { 20f, 20f, 25f, 25f, 10f };
-        CustomPieChart chart = new CustomPieChart(dsKhoaHoc,  percent);
+        var dsKhoaHoc = new[] { "Xuất sắc", "Giỏi", "Khá", "Trung bình", "Yếu" };
+        var percent = new[] { 20f, 20f, 25f, 25f, 10f };
+        var chart = new CustomPieChart(dsKhoaHoc, percent);
         chart.Dock = DockStyle.Top;
         container.Controls.Add(chart);
 
-        
+
         _content.Controls.Add(container);
     }
 }

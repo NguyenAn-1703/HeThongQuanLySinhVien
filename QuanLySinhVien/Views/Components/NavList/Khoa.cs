@@ -1,40 +1,39 @@
-using System.Data;
-using System.Diagnostics;
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.NavList;
 using QuanLySinhVien.Views.Components.NavList.Dialog;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class Khoa : NavBase
 {
-    
-    private string ID = "KHOA";
     // variable
-    private string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
+    private readonly string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
 
-    private KhoaController _kcontroller;
-    private SearchBar _searchBar;
-    
-    private CustomTable _table;
-    private List<KhoaDto> listKhoa;
-    private Panel _mainBot;
+    private readonly string ID = "KHOA";
 
-    //button
-    private Button btnThem;
-    private Button btnSua;
-    private Button btnXoa;
-    
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
 
+    private KhoaController _kcontroller;
+
     private List<ChiTietQuyenDto> _listAccess;
-    private bool them = false;
-    private bool sua = false;
-    private bool xoa = false;
+    private Panel _mainBot;
+    private SearchBar _searchBar;
+
+    private CustomTable _table;
+    private Button btnSua;
+
+    //button
+    private Button btnThem;
+    private Button btnXoa;
+    private List<KhoaDto> listKhoa;
+    private bool sua;
+    private bool them;
+    private bool xoa;
 
 
     public Khoa(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
@@ -47,10 +46,10 @@ public class Khoa : NavBase
         setActionListener();
         try
         {
-            if (this._searchBar != null)
+            if (_searchBar != null)
             {
-                this._searchBar.UpdateListCombobox(_listSelectionForComboBox.ToList());
-                this._searchBar.KeyDown += (txt, filter) => onSearch(txt, filter);
+                _searchBar.UpdateListCombobox(_listSelectionForComboBox.ToList());
+                _searchBar.KeyDown += (txt, filter) => onSearch(txt, filter);
             }
         }
         catch
@@ -68,32 +67,20 @@ public class Khoa : NavBase
         Controls.Add(_mainBot);
         Controls.Add(Top());
     }
-    
-    void CheckQuyen()
+
+    private void CheckQuyen()
     {
         int maCN = _chucNangController.GetByTen(ID).MaCN;
         _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
-        foreach (ChiTietQuyenDto x in _listAccess)
-        {
-            Console.WriteLine(x.HanhDong);
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Them")))
-        {
-            them = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Sua")))
-        {
-            sua = true;
-        }
-        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa")))
-        {
-            xoa = true;
-        }
+        foreach (var x in _listAccess) Console.WriteLine(x.HanhDong);
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them"))) them = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua"))) sua = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
     private new Panel Top()
     {
-        Panel mainTop = new Panel
+        var mainTop = new Panel
         {
             Dock = DockStyle.Top,
             BackColor = MyColor.GrayBackGround,
@@ -109,43 +96,43 @@ public class Khoa : NavBase
         };
         btnThem.Click += BtnThem_Click;
         mainTop.Controls.Add(btnThem);
-        
+
         return mainTop;
     }
 
-    void setActionListener()
+    private void setActionListener()
     {
         if (_table != null)
         {
-            this._table.OnEdit += maKhoa => BtnSua_Click(maKhoa);
-            this._table.OnDelete += maKhoa => BtnXoa_Click(maKhoa);
-            this._table.OnDetail += maKhoa => BtnChiTiet_Click(maKhoa);
+            _table.OnEdit += maKhoa => BtnSua_Click(maKhoa);
+            _table.OnDelete += maKhoa => BtnXoa_Click(maKhoa);
+            _table.OnDetail += maKhoa => BtnChiTiet_Click(maKhoa);
         }
     }
 
     private new Panel Bottom()
     {
-        Panel mainBot = new Panel
+        var mainBot = new Panel
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
             Padding = new Padding(20, 0, 20, 0)
         };
-        
+
         return mainBot;
     }
 
     public void loadData()
     {
         listKhoa = _kcontroller.GetDanhSachKhoa();
-        
+
         //  == null -> create new table else ...
         if (_table == null)
         {
-            string[] headerArray = new string[] { "Mã khoa", "Tên khoa", "email", "Địa chỉ" };
+            var headerArray = new[] { "Mã khoa", "Tên khoa", "email", "Địa chỉ" };
             List<string> headerList = ConvertArray_ListString.ConvertArrayToListString(headerArray);
             var columnNames = new List<string> { "MaKhoa", "TenKhoa", "Email", "DiaChi" };
-            
+
             var cells = listKhoa.Cast<object>().ToList();
             _table = new CustomTable(headerList, columnNames, cells, true, true, true);
             _mainBot.Controls.Add(_table);
@@ -166,8 +153,8 @@ public class Khoa : NavBase
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     _kcontroller.ThemKhoa(
-                        dialog.TxtTenKhoa.Text.Trim(), 
-                        dialog.TxtEmail.Text.Trim(), 
+                        dialog.TxtTenKhoa.Text.Trim(),
+                        dialog.TxtEmail.Text.Trim(),
                         dialog.TxtDiaChi.Text.Trim()
                     );
                     MessageBox.Show("Thêm thành công!", "Thông báo");
@@ -187,23 +174,23 @@ public class Khoa : NavBase
         try
         {
             // Tìm khoa theo MaKhoa
-            KhoaDto khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
+            var khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
             if (khoa == null)
             {
                 MessageBox.Show("Không tìm thấy khoa!", "Thông báo");
                 return;
             }
-    
+
             using (var dialog = new KhoaDialog("Sửa thông tin Khoa", DialogType.Sua))
             {
                 dialog.LoadData(khoa);
-                
+
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     _kcontroller.SuaKhoa(
-                        maKhoa, 
-                        dialog.TxtTenKhoa.Text.Trim(), 
-                        dialog.TxtEmail.Text.Trim(), 
+                        maKhoa,
+                        dialog.TxtTenKhoa.Text.Trim(),
+                        dialog.TxtEmail.Text.Trim(),
                         dialog.TxtDiaChi.Text.Trim()
                     );
                     MessageBox.Show("Cập nhật thành công!", "Thông báo");
@@ -223,20 +210,20 @@ public class Khoa : NavBase
         try
         {
             // Tìm khoa theo MaKhoa
-            KhoaDto khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
+            var khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
             if (khoa == null)
             {
                 MessageBox.Show("Không tìm thấy khoa!", "Thông báo");
                 return;
             }
-    
+
             // Button y/n
-            DialogResult rs = MessageBox.Show(
+            var rs = MessageBox.Show(
                 $"Bạn chắc chắn muốn xóa khoa {khoa.TenKhoa}?",
                 "Cảnh báo",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
-                
+
             if (rs == DialogResult.Yes)
             {
                 _kcontroller.XoaKhoa(maKhoa);
@@ -259,7 +246,7 @@ public class Khoa : NavBase
         try
         {
             // Tìm khoa theo MaKhoa
-            KhoaDto khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
+            var khoa = listKhoa.FirstOrDefault(k => k.MaKhoa == maKhoa);
             if (khoa == null)
             {
                 MessageBox.Show("Không tìm thấy khoa!", "Thông báo");
@@ -291,7 +278,7 @@ public class Khoa : NavBase
 
     public override List<string> getComboboxList()
     {
-        return ConvertArray_ListString.ConvertArrayToListString(this._listSelectionForComboBox);
+        return ConvertArray_ListString.ConvertArrayToListString(_listSelectionForComboBox);
     }
 
     public override void onSearch(string txtSearch, string filter)
@@ -306,22 +293,22 @@ public class Khoa : NavBase
                 _table.UpdateData(listKhoa.Cast<object>().ToList());
             return;
         }
-        
+
         var searchTerm = txt.ToLowerInvariant();
         var filteredList = new List<KhoaDto>();
 
         if (string.Equals(f, "Tất cả", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(f))
-        {
             // Tìm trong tất cả cột
             filteredList = listKhoa.Where(k =>
                 k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
-                || (!string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (!string.IsNullOrEmpty(k.Email) && k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (!string.IsNullOrEmpty(k.DiaChi) && k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.TenKhoa) &&
+                    k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.Email) &&
+                    k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                || (!string.IsNullOrEmpty(k.DiaChi) &&
+                    k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
             ).ToList();
-        }
         else
-        {
             // Lọc theo combobox đã chọn
             filteredList = listKhoa.Where(k =>
             {
@@ -330,15 +317,18 @@ public class Khoa : NavBase
                     case "Mã khoa":
                         return k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
                     case "Tên khoa":
-                        return !string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
+                        return !string.IsNullOrEmpty(k.TenKhoa) &&
+                               k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0;
                     default:
                         return k.MaKhoa.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
-                            || (!string.IsNullOrEmpty(k.TenKhoa) && k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
-                            || (!string.IsNullOrEmpty(k.Email) && k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
-                            || (!string.IsNullOrEmpty(k.DiaChi) && k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
+                               || (!string.IsNullOrEmpty(k.TenKhoa) &&
+                                   k.TenKhoa.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                               || (!string.IsNullOrEmpty(k.Email) &&
+                                   k.Email.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                               || (!string.IsNullOrEmpty(k.DiaChi) &&
+                                   k.DiaChi.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
                 }
             }).ToList();
-        }
         // reaload
         if (_table != null)
             _table.UpdateData(filteredList.Cast<object>().ToList());

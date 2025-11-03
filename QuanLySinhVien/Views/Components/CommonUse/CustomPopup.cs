@@ -1,18 +1,14 @@
 using System.ComponentModel;
-using System.Data;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using QuanLySinhVien.Views.Components.CommonUse;
 
 namespace QuanLySinhVien.Views.Components;
 
 public class CustomPopup : Panel
 {
-    public CustomDataGridView _dt;
     private List<object> _cellDatas;
     private List<string> _columnNames;
     private BindingList<object> _displayData;
-
-    public event Action<int> KeyEnter;
+    public CustomDataGridView _dt;
 
     public CustomPopup()
     {
@@ -23,17 +19,19 @@ public class CustomPopup : Panel
         Init();
     }
 
-    void Init()
+    public event Action<int> KeyEnter;
+
+    private void Init()
     {
-        this.BorderStyle = BorderStyle.FixedSingle;
+        BorderStyle = BorderStyle.FixedSingle;
 
         _dt.AlternatingRowsDefaultCellStyle = _dt.RowsDefaultCellStyle;
         // _dt.ScrollBars = ScrollBars.None;
-        
+
 
         _dt.Dock = DockStyle.None;
         _dt.Height = 105;
-        this.Controls.Add(_dt);
+        Controls.Add(_dt);
         SetAction();
     }
 
@@ -42,7 +40,7 @@ public class CustomPopup : Panel
         _columnNames = columnNames;
         _cellDatas = cellDatas;
 
-        foreach (string i in _columnNames)
+        foreach (var i in _columnNames)
         {
             var column = new DataGridViewTextBoxColumn
             {
@@ -64,22 +62,22 @@ public class CustomPopup : Panel
         _dt.DataSource = _displayData;
     }
 
-    void SetAction()
+    private void SetAction()
     {
-        this.Resize += (sender, args) => { _dt.Width = this.Width + 15;};
-        
+        Resize += (sender, args) => { _dt.Width = Width + 15; };
+
         _dt.KeyDown += (sender, args) =>
         {
             if (args.KeyCode == Keys.Enter)
             {
-                int id = (int)_dt.SelectedRows[0].Cells[0].Value;
+                var id = (int)_dt.SelectedRows[0].Cells[0].Value;
                 KeyEnter?.Invoke(id);
             }
         };
 
         _dt.CellClick += (sender, args) =>
         {
-            int id = (int)_dt.SelectedRows[0].Cells[0].Value;
+            var id = (int)_dt.SelectedRows[0].Cells[0].Value;
             KeyEnter?.Invoke(id);
         };
     }

@@ -1,45 +1,55 @@
-using Microsoft.EntityFrameworkCore;
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.CommonUse;
-using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class HocPhiDialog : Form
 {
-    private string _title;
-    private MyTLP _mainLayout;
+    private readonly DialogType _dialogType;
+
+    private readonly int _hky;
+
+    private readonly int _idSinhVien;
+    private readonly string _nam;
+    private readonly string _title;
+    private readonly SinhVienDTO SelectedSv;
+    private TitleButton _btnLuu;
+
+
+    private MyTLP _contentLayout;
+    private List<object> _displayData;
     private CustomButton _exitButton;
+    private HocPhanController _hocPhanController;
+
+    private HocPhiHocPhanController _hocPhiHocPhanController;
+    private HocPhiSVController _hocPhiSVController;
+    private HocPhiTinChiController _hocPhiTinChiController;
     private List<LabelTextField> _listTextBox;
-    private DialogType _dialogType;
+    private LopController _lopController;
+    private MyTLP _mainLayout;
+    private NganhController _nganhController;
+    private List<HocPhiHocPhanDto> _rawData;
 
     private SinhVienController _sinhVienController;
 
-    private int _idSinhVien;
-    private SinhVienDTO SelectedSv;
-    private TitleButton _btnLuu;
+    private CustomTable _tableHp;
 
-    private int _hky;
-    private string _nam;
-    public event Action Finish;
-    
-    private HocPhiHocPhanController _hocPhiHocPhanController;
-    private HocPhanController _hocPhanController;
-    private LopController _lopController;
-    private NganhController _nganhController;
-    private HocPhiTinChiController _hocPhiTinChiController;
-    private HocPhiSVController _hocPhiSVController;
+    private CustomTextBox fieldDaThu;
 
     private double hocPhiTrenTinChi;
+
+    //Tổng tiền tất cả học phần
+    private double tongCong;
 
     public HocPhiDialog(string title, DialogType dialogType, int hky, string nam, int idSinhVien)
     {
         _listTextBox = new List<LabelTextField>();
         _sinhVienController = SinhVienController.GetInstance();
         _hocPhiHocPhanController = HocPhiHocPhanController.GetInstance();
-        _hocPhanController =  HocPhanController.GetInstance();
+        _hocPhanController = HocPhanController.GetInstance();
         _lopController = LopController.GetInstance();
         _nganhController = NganhController.GetInstance();
         _hocPhiTinChiController = HocPhiTinChiController.GetInstance();
@@ -50,23 +60,25 @@ public class HocPhiDialog : Form
         _hky = hky;
         _nam = nam;
         SelectedSv = _sinhVienController.GetById(_idSinhVien);
-        
+
         Init();
     }
 
-    void Init()
+    public event Action Finish;
+
+    private void Init()
     {
         Width = 700;
         Height = 500;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
-        this.FormBorderStyle = FormBorderStyle.None;
+        FormBorderStyle = FormBorderStyle.None;
 
-        _mainLayout = new MyTLP()
+        _mainLayout = new MyTLP
         {
             Dock = DockStyle.Fill,
             RowCount = 4,
-            BorderStyle = BorderStyle.FixedSingle,
+            BorderStyle = BorderStyle.FixedSingle
         };
 
         _mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -85,49 +97,45 @@ public class HocPhiDialog : Form
         SetPanelDatThu();
         SetBottom();
 
-        this.Controls.Add(_mainLayout);
+        Controls.Add(_mainLayout);
 
         SetAction();
-        
+
         if (_dialogType == DialogType.Sua)
-        {
             SetupUpdate();
-        }
         else
-        {
             SetupDetail();
-        }
     }
 
-    void SetHocPhiTinChi()
+    private void SetHocPhiTinChi()
     {
         LopDto lop = _lopController.GetLopById(SelectedSv.MaLop);
         NganhDto nganh = _nganhController.GetNganhById(lop.MaNganh);
         hocPhiTrenTinChi = _hocPhiTinChiController.GetNewestHocPhiTinChiByMaNganh(nganh.MaNganh).SoTienMotTinChi;
     }
-    
 
-    void SetTopBar()
+
+    private void SetTopBar()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
 
-        Label topTitle = new Label
+        var topTitle = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.Left,
             BackColor = MyColor.GrayBackGround,
             Dock = DockStyle.Fill,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
         panel.Controls.Add(topTitle);
 
@@ -137,108 +145,102 @@ public class HocPhiDialog : Form
         _exitButton.Margin = new Padding(0);
         _exitButton.Anchor = AnchorStyles.Right;
 
-        _exitButton.MouseDown += (sender, args) => this.Close();
+        _exitButton.MouseDown += (sender, args) => Close();
         panel.Controls.Add(_exitButton);
 
-        this._mainLayout.Controls.Add(panel);
+        _mainLayout.Controls.Add(panel);
     }
 
-    void SetTitleBar()
+    private void SetTitleBar()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.MainColor,
             Margin = new Padding(0),
-            Padding = new Padding(0, 10, 0, 10),
+            Padding = new Padding(0, 10, 0, 10)
         };
 
-        Label title = new Label
+        var title = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.None,
             AutoSize = true,
             ForeColor = MyColor.White,
-            Font = GetFont.GetFont.GetMainFont(16, FontType.Black),
+            Font = GetFont.GetFont.GetMainFont(16, FontType.Black)
         };
 
         panel.Controls.Add(title);
         _mainLayout.Controls.Add(panel);
     }
-    
 
-    private MyTLP _contentLayout;
-
-    void SetContent()
+    private void SetContent()
     {
         _contentLayout = new MyTLP
         {
             Dock = DockStyle.Fill,
             RowCount = 3,
-            Padding = new Padding(10),
+            Padding = new Padding(10)
         };
-        
+
         _contentLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _contentLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _contentLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-        Label lblNam = new Label
+        var lblNam = new Label
         {
             Text = "Năm: " + _nam,
-            Font = GetFont.GetFont.GetMainFont(9,  FontType.Bold),
-            AutoSize = true,
+            Font = GetFont.GetFont.GetMainFont(9, FontType.Bold),
+            AutoSize = true
         };
-        
-        Label lblHocKy = new Label
+
+        var lblHocKy = new Label
         {
             Text = "Học kỳ: " + _hky,
-            Font = GetFont.GetFont.GetMainFont(9,  FontType.Bold),
-            AutoSize = true,
+            Font = GetFont.GetFont.GetMainFont(9, FontType.Bold),
+            AutoSize = true
         };
-        
+
         _contentLayout.Controls.Add(lblNam);
         _contentLayout.Controls.Add(lblHocKy);
         SetTableHP();
-        
-        this._mainLayout.Controls.Add(_contentLayout);
+
+        _mainLayout.Controls.Add(_contentLayout);
     }
 
-    private CustomTable _tableHp;
-    private List<HocPhiHocPhanDto> _rawData;
-    private List<object> _displayData;
-    void SetTableHP()
+    private void SetTableHP()
     {
-        string[] headers = new[] {"Mã học phần", "Học phần", "Tín chỉ", "Tổng tiền" };
-        string[] columnNames = new[] {"MaHP", "TenHP","SoTinChi","TongTien" };
-            
+        var headers = new[] { "Mã học phần", "Học phần", "Tín chỉ", "Tổng tiền" };
+        var columnNames = new[] { "MaHP", "TenHP", "SoTinChi", "TongTien" };
+
         _rawData = _hocPhiHocPhanController.GetByMaSVHocKyNam(_idSinhVien, _hky, _nam);
         UpdateDataDisplay(_rawData);
-        
+
         _tableHp = new CustomTable(headers.ToList(), columnNames.ToList(), _displayData);
         _contentLayout.Controls.Add(_tableHp);
     }
 
-    void UpdateDataDisplay(List<HocPhiHocPhanDto> dtos)
+    private void UpdateDataDisplay(List<HocPhiHocPhanDto> dtos)
     {
-        this._displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new
         {
-            MaHP = _hocPhanController.GetHocPhanById(x.MaHP).MaHP,
-            TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
-            SoTinChi = _hocPhanController.GetHocPhanById(x.MaHP).SoTinChi,
-            TongTien = x.TongTien,
+            _hocPhanController.GetHocPhanById(x.MaHP).MaHP,
+            _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
+            _hocPhanController.GetHocPhanById(x.MaHP).SoTinChi,
+            x.TongTien
         });
     }
 
 
-    void SetBottom()
+    private void SetBottom()
     {
         //Thêm có Đặt lại, Lưu, Hủy
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             AutoSize = true,
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
+            ColumnCount = 3
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -252,8 +254,8 @@ public class HocPhiDialog : Form
             _btnLuu = new TitleButton("Lưu");
             panel.Controls.Add(_btnLuu);
 
-            TitleButton btnHuy = new TitleButton("Hủy");
-            btnHuy._mouseDown += () => this.Close();
+            var btnHuy = new TitleButton("Hủy");
+            btnHuy._mouseDown += () => Close();
 
             panel.Controls.Add(btnHuy);
         }
@@ -261,112 +263,91 @@ public class HocPhiDialog : Form
         {
             panel.Controls.Add(new Panel { Height = 0 });
 
-            TitleButton btnThoat = new TitleButton("Thoát");
-            btnThoat._mouseDown += () => this.Close();
+            var btnThoat = new TitleButton("Thoát");
+            btnThoat._mouseDown += () => Close();
             panel.Controls.Add(btnThoat, 2, 0);
         }
 
-        this._mainLayout.Controls.Add(panel);
+        _mainLayout.Controls.Add(panel);
     }
 
-    //Tổng tiền tất cả học phần
-    private double tongCong = 0;
-    void SetTongTienLbl()
+    private void SetTongTienLbl()
     {
-        foreach (HocPhiHocPhanDto hphp in _rawData)
-        {
-            tongCong += hphp.TongTien;
-        }
+        foreach (var hphp in _rawData) tongCong += hphp.TongTien;
 
-        Label lblTongTien = new Label
+        var lblTongTien = new Label
         {
             Text = "Tổng cộng: " + FormatMoney.formatVN(tongCong),
             Font = GetFont.GetFont.GetMainFont(10, FontType.Bold),
             Dock = DockStyle.Right,
-            AutoSize = true,
+            AutoSize = true
         };
-        
+
         _mainLayout.Controls.Add(lblTongTien);
     }
 
-    private CustomTextBox fieldDaThu;
-    void SetPanelDatThu()
+    private void SetPanelDatThu()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             AutoSize = true,
             Dock = DockStyle.Right,
-            ColumnCount = 2,
+            ColumnCount = 2
         };
         fieldDaThu = new CustomTextBox();
         fieldDaThu.contentTextBox.Width = 200;
         fieldDaThu.contentTextBox.KeyPress += (sender, args) =>
         {
-            if (!char.IsControl(args.KeyChar) && !char.IsDigit(args.KeyChar))
-            {
-                args.Handled = true;
-            }
+            if (!char.IsControl(args.KeyChar) && !char.IsDigit(args.KeyChar)) args.Handled = true;
         };
-        Label lblDaThu = new Label
+        var lblDaThu = new Label
         {
             Text = "Đã thu: ",
             Font = GetFont.GetFont.GetMainFont(10, FontType.Bold),
             Anchor = AnchorStyles.None,
-            AutoSize = true,
+            AutoSize = true
         };
         panel.Controls.Add(lblDaThu);
         panel.Controls.Add(fieldDaThu);
-        
-        
+
+
         _mainLayout.Controls.Add(panel);
     }
 
-    void SetupUpdate()
+    private void SetupUpdate()
     {
-        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam))
-        {
-            return;
-        }
+        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam)) return;
 
         double daThu = _hocPhiSVController.GetByMaSVHKyNam(_idSinhVien, _hky, _nam).DaThu;
         fieldDaThu.contentTextBox.Text = daThu.ToString();
     }
 
-    void SetupDetail()
+    private void SetupDetail()
     {
-        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam))
-        {
-            return;
-        }
+        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam)) return;
 
         double daThu = _hocPhiSVController.GetByMaSVHKyNam(_idSinhVien, _hky, _nam).DaThu;
         fieldDaThu.contentTextBox.Text = daThu.ToString();
         fieldDaThu.Enable = false;
     }
 
-    void SetAction()
+    private void SetAction()
     {
-        if (_dialogType == DialogType.Sua)
-        {
-            _btnLuu._mouseDown += () => Update();
-        }
+        if (_dialogType == DialogType.Sua) _btnLuu._mouseDown += () => Update();
     }
 
-    
-    void Update()
+
+    private void Update()
     {
-        string daThuS = fieldDaThu.contentTextBox.Text;
-        
-        if (!Validate(daThuS))
-        {
-            return;
-        }
-        
-        double daThu = double.Parse(daThuS);
+        var daThuS = fieldDaThu.contentTextBox.Text;
+
+        if (!Validate(daThuS)) return;
+
+        var daThu = double.Parse(daThuS);
         //chưa có -> tạo mới, có -> update
-        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien,  _hky, _nam))
+        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam))
         {
-            HocPhiSVDto hocPhiSV = new HocPhiSVDto
+            var hocPhiSV = new HocPhiSVDto
             {
                 MaSV = _idSinhVien,
                 HocKy = _hky,
@@ -376,7 +357,7 @@ public class HocPhiDialog : Form
             };
 
             if (!_hocPhiSVController.Insert(hocPhiSV))
-            {   
+            {
                 MessageBox.Show("Thêm hpsv that bai!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -392,14 +373,14 @@ public class HocPhiDialog : Form
                 return;
             }
         }
-        
+
         MessageBox.Show("Cập nhật thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        this.Close();
+        Close();
     }
 
-    string GetTrangThai(double daThu)
+    private string GetTrangThai(double daThu)
     {
-        Console.WriteLine(tongCong + " " +  daThu);
+        Console.WriteLine(tongCong + " " + daThu);
         return tongCong > daThu ? "Còn nợ" : "Đã đóng";
     }
 
@@ -410,6 +391,7 @@ public class HocPhiDialog : Form
             MessageBox.Show("Số tiền thu không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
+
         return true;
     }
 }

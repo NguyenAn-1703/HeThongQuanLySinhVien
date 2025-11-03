@@ -1,28 +1,33 @@
-using QuanLySinhVien.Controllers;
-using QuanLySinhVien.Models;
+using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
+using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.Views.Components.CommonUse;
 using QuanLySinhVien.Views.Components.CommonUse.AddImg;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
-using QuanLySinhVien.Views.Structs;
 
 namespace QuanLySinhVien.Views.Components.NavList.Dialog;
 
 public class GiangVienDialog : Form
 {
-    private string _title;
-    private DialogType _dialogType;
-    private MyTLP _mainLayout;
+    private readonly DialogType _dialogType;
+    private readonly int _idGiangVien;
+    private readonly List<LabelTextField> _listTextBox;
+    private readonly string _title;
+    private TitleButton _btnLuu;
+
+    private BtnThemAnh _btnUpimg;
+
+    private MyTLP _contentLayout;
     private CustomButton _exitButton;
-    private List<InputFormItem> _listIFI;
-    private List<LabelTextField> _listTextBox;
     private GiangVienController _GiangVienController;
     private KhoaController _KhoaController;
+    private List<InputFormItem> _listIFI;
     private LopController _lopController;
+    private MyTLP _mainLayout;
+    private PictureBox _pb;
     private TaiKhoanController _taiKhoanController;
-    private int _idGiangVien;
-    private TitleButton _btnLuu;
-    public event Action Finish;
     private string imgPath = "";
 
     public GiangVienDialog(string title, DialogType dialogType, int idGiangVien = -1)
@@ -38,20 +43,22 @@ public class GiangVienDialog : Form
         Init();
     }
 
-    void Init()
+    public event Action Finish;
+
+    private void Init()
     {
         Width = 900;
         Height = 600;
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
-        this.FormBorderStyle = FormBorderStyle.None;
+        FormBorderStyle = FormBorderStyle.None;
 
-        _mainLayout = new MyTLP()
+        _mainLayout = new MyTLP
         {
             Dock = DockStyle.Fill,
             RowCount = 4,
             BorderStyle = BorderStyle.FixedSingle,
-            BackColor = MyColor.LightGray,
+            BackColor = MyColor.LightGray
             // CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
         };
 
@@ -65,46 +72,40 @@ public class GiangVienDialog : Form
         SetContent();
         SetBottom();
 
-        this.Controls.Add(_mainLayout);
+        Controls.Add(_mainLayout);
 
         SetAction();
 
 
         if (_dialogType == DialogType.Them)
-        {
             SetupInsert();
-        }
         else if (_dialogType == DialogType.Sua)
-        {
             SetupUpdate();
-        }
         else
-        {
             SetupDetail();
-        }
     }
 
-    void SetTopBar()
+    private void SetTopBar()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             ColumnCount = 2,
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
 
-        Label topTitle = new Label
+        var topTitle = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.Left,
             BackColor = MyColor.GrayBackGround,
             Dock = DockStyle.Fill,
-            Margin = new Padding(0),
+            Margin = new Padding(0)
         };
         panel.Controls.Add(topTitle);
 
@@ -114,39 +115,37 @@ public class GiangVienDialog : Form
         _exitButton.Margin = new Padding(0);
         _exitButton.Anchor = AnchorStyles.Right;
 
-        _exitButton.MouseDown += (sender, args) => this.Close();
+        _exitButton.MouseDown += (sender, args) => Close();
         panel.Controls.Add(_exitButton);
 
-        this._mainLayout.Controls.Add(panel);
+        _mainLayout.Controls.Add(panel);
     }
 
-    void SetTitleBar()
+    private void SetTitleBar()
     {
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.MainColor,
             Margin = new Padding(0),
-            Padding = new Padding(0, 10, 0, 10),
+            Padding = new Padding(0, 10, 0, 10)
         };
 
-        Label title = new Label
+        var title = new Label
         {
             Text = _title,
             Anchor = AnchorStyles.None,
             AutoSize = true,
             ForeColor = MyColor.White,
-            Font = GetFont.GetFont.GetMainFont(16, FontType.Black),
+            Font = GetFont.GetFont.GetMainFont(16, FontType.Black)
         };
 
         panel.Controls.Add(title);
         _mainLayout.Controls.Add(panel);
     }
 
-    private MyTLP _contentLayout;
-
-    void SetContent()
+    private void SetContent()
     {
         _contentLayout = new MyTLP
         {
@@ -155,7 +154,7 @@ public class GiangVienDialog : Form
             RowCount = 3,
             // CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
             Padding = new Padding(10),
-            Margin = new Padding(3, 50, 3, 3),
+            Margin = new Padding(3, 50, 3, 3)
         };
 
         _contentLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -172,9 +171,9 @@ public class GiangVienDialog : Form
         _mainLayout.Controls.Add(_contentLayout);
     }
 
-    void SetListField()
+    private void SetListField()
     {
-        InputFormItem[] arr = new InputFormItem[]
+        InputFormItem[] arr = new[]
         {
             new InputFormItem("Tên giảng viên", TextFieldType.NormalText), //0
             new InputFormItem("Ngày sinh", TextFieldType.Date), //1
@@ -182,14 +181,14 @@ public class GiangVienDialog : Form
             new InputFormItem("Số điện thoại", TextFieldType.NormalText), //3
             new InputFormItem("Email", TextFieldType.NormalText), //4
             new InputFormItem("Tài khoản", TextFieldType.ListBoxTK), //5
-            new InputFormItem("Khoa", TextFieldType.Combobox), //6
+            new InputFormItem("Khoa", TextFieldType.Combobox) //6
         };
 
         _listIFI = arr.ToList();
 
         foreach (InputFormItem item in _listIFI)
         {
-            LabelTextField field = new LabelTextField(item.content, item.type);
+            var field = new LabelTextField(item.content, item.type);
             _listTextBox.Add(field);
             _contentLayout.Controls.Add(field);
         }
@@ -197,9 +196,9 @@ public class GiangVienDialog : Form
         SetSelectionCbx();
     }
 
-    void SetSelectionCbx()
+    private void SetSelectionCbx()
     {
-        string[] gioiTinh = new[] { "Nữ", "Nam" };
+        var gioiTinh = new[] { "Nữ", "Nam" };
         _listTextBox[2].SetComboboxList(gioiTinh.ToList());
         _listTextBox[2].SetComboboxSelection(gioiTinh[0]);
 
@@ -208,22 +207,19 @@ public class GiangVienDialog : Form
         _listTextBox[6].SetComboboxSelection(listKh[0]);
     }
 
-    private BtnThemAnh _btnUpimg;
-    private PictureBox _pb;
-
-    void SetContainerPictureBox()
+    private void SetContainerPictureBox()
     {
         _btnUpimg = new BtnThemAnh("Tải lên") { Anchor = AnchorStyles.None };
 
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             Anchor = AnchorStyles.Top,
             AutoSize = true,
             Margin = new Padding(3, 20, 3, 3),
-            RowCount = 3,
+            RowCount = 3
         };
 
-        Label title = new Label
+        var title = new Label
         {
             Text = "Ảnh giảng viên",
             AutoSize = true,
@@ -231,7 +227,7 @@ public class GiangVienDialog : Form
             Anchor = AnchorStyles.None
         };
 
-        RoundTLP pbContainer = new RoundTLP { Border = true, AutoSize = true };
+        var pbContainer = new RoundTLP { Border = true, AutoSize = true };
         _pb = new PictureBox
         {
             Anchor = AnchorStyles.None,
@@ -239,7 +235,7 @@ public class GiangVienDialog : Form
             Image = GetSvgBitmap.GetBitmap("upload.svg"),
             SizeMode = PictureBoxSizeMode.Zoom,
             BackColor = MyColor.White,
-            Margin = new Padding(2),
+            Margin = new Padding(2)
         };
 
 
@@ -253,14 +249,14 @@ public class GiangVienDialog : Form
         _contentLayout.SetRowSpan(panel, 5);
     }
 
-    void SetBottom()
+    private void SetBottom()
     {
         //Thêm có Đặt lại, Lưu, Hủy
-        MyTLP panel = new MyTLP
+        var panel = new MyTLP
         {
             AutoSize = true,
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
+            ColumnCount = 3
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -274,8 +270,8 @@ public class GiangVienDialog : Form
             _btnLuu = new TitleButton("Lưu");
             panel.Controls.Add(_btnLuu);
 
-            TitleButton btnHuy = new TitleButton("Hủy");
-            btnHuy._mouseDown += () => this.Close();
+            var btnHuy = new TitleButton("Hủy");
+            btnHuy._mouseDown += () => Close();
 
             panel.Controls.Add(btnHuy);
         }
@@ -283,33 +279,20 @@ public class GiangVienDialog : Form
         {
             panel.Controls.Add(new Panel { Height = 0 });
 
-            TitleButton btnThoat = new TitleButton("Thoát");
-            btnThoat._mouseDown += () => this.Close();
+            var btnThoat = new TitleButton("Thoát");
+            btnThoat._mouseDown += () => Close();
             panel.Controls.Add(btnThoat, 2, 0);
         }
 
-        this._mainLayout.Controls.Add(panel, 0, 3);
+        _mainLayout.Controls.Add(panel, 0, 3);
     }
 
 
-    void SetupInsert()
+    private void SetupInsert()
     {
     }
 
-    void SetupUpdate()
-    {
-        GiangVienDto giangVien = _GiangVienController.GetById(_idGiangVien);
-        _listTextBox[0].SetText(giangVien.TenGV);
-        _listTextBox[1]._dField.dateField.Value = ConvertDate.ConvertStringToDate(giangVien.NgaySinhGV);
-        _listTextBox[2].SetComboboxSelection(giangVien.GioiTinhGV);
-        _listTextBox[3].SetText(giangVien.SoDienThoai);
-        _listTextBox[4].SetText(giangVien.Email);
-        _listTextBox[5].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(giangVien.MaTK).TenDangNhap;
-        _listTextBox[6].SetComboboxSelection(_KhoaController.GetKhoaById(giangVien.MaKhoa).TenKhoa);
-        LoadImage(giangVien.AnhDaiDien);
-    }
-
-    void SetupDetail()
+    private void SetupUpdate()
     {
         GiangVienDto giangVien = _GiangVienController.GetById(_idGiangVien);
         _listTextBox[0].SetText(giangVien.TenGV);
@@ -320,7 +303,20 @@ public class GiangVienDialog : Form
         _listTextBox[5].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(giangVien.MaTK).TenDangNhap;
         _listTextBox[6].SetComboboxSelection(_KhoaController.GetKhoaById(giangVien.MaKhoa).TenKhoa);
         LoadImage(giangVien.AnhDaiDien);
-        
+    }
+
+    private void SetupDetail()
+    {
+        GiangVienDto giangVien = _GiangVienController.GetById(_idGiangVien);
+        _listTextBox[0].SetText(giangVien.TenGV);
+        _listTextBox[1]._dField.dateField.Value = ConvertDate.ConvertStringToDate(giangVien.NgaySinhGV);
+        _listTextBox[2].SetComboboxSelection(giangVien.GioiTinhGV);
+        _listTextBox[3].SetText(giangVien.SoDienThoai);
+        _listTextBox[4].SetText(giangVien.Email);
+        _listTextBox[5].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(giangVien.MaTK).TenDangNhap;
+        _listTextBox[6].SetComboboxSelection(_KhoaController.GetKhoaById(giangVien.MaKhoa).TenKhoa);
+        LoadImage(giangVien.AnhDaiDien);
+
         _listTextBox[0]._field.Enable = false;
         _listTextBox[1]._dField.Enabled = false;
         _listTextBox[2]._combobox.Enabled = false;
@@ -332,48 +328,41 @@ public class GiangVienDialog : Form
         _btnUpimg.Visible = false;
     }
 
-    void SetAction()
+    private void SetAction()
     {
-        if (_dialogType == DialogType.Them)
-        {
-            _btnLuu._mouseDown += () => Insert();
-        }
+        if (_dialogType == DialogType.Them) _btnLuu._mouseDown += () => Insert();
 
-        if (_dialogType == DialogType.Sua)
-        {
-            _btnLuu._mouseDown += () => Update();
-        }
+        if (_dialogType == DialogType.Sua) _btnLuu._mouseDown += () => Update();
 
         _btnUpimg.OnClickAddImg += s => LoadImage(s);
     }
 
-    void LoadImage(string s)
+    private void LoadImage(string s)
     {
         imgPath = s;
         _pb.Image = Image.FromFile(changeToAbsolutePath(imgPath));
     }
 
-    string changeToAbsolutePath(string path)
+    private string changeToAbsolutePath(string path)
     {
         return Path.Combine(Application.StartupPath, path.Replace("/", "\\"));
     }
 
-    void Insert()
+    private void Insert()
     {
+        var tbTenGV = _listTextBox[0]._field.contentTextBox;
+        var tbNgaySinh = _listTextBox[1]._dField.dateField;
+        var tbSoDienThoai = _listTextBox[3]._field.contentTextBox;
+        var tbEmail = _listTextBox[4]._field.contentTextBox;
+        var tbTK = _listTextBox[5].tbTK.contentTextBox;
 
-        TextBox tbTenGV = _listTextBox[0]._field.contentTextBox;
-        DateTimePicker tbNgaySinh = _listTextBox[1]._dField.dateField;
-        TextBox tbSoDienThoai = _listTextBox[3]._field.contentTextBox;
-        TextBox tbEmail = _listTextBox[4]._field.contentTextBox;
-        TextBox tbTK = _listTextBox[5].tbTK.contentTextBox;
+        var tenGV = tbTenGV.Text;
+        var ngaySinh = tbNgaySinh.Text;
+        var soDienThoai = tbSoDienThoai.Text;
+        var email = tbEmail.Text;
+        var taiKhoan = tbTK.Text;
 
-        string tenGV = tbTenGV.Text;
-        string ngaySinh = tbNgaySinh.Text;
-        string soDienThoai = tbSoDienThoai.Text;
-        string email = tbEmail.Text;
-        string taiKhoan = tbTK.Text;
-        
-        string gioiTinh = _listTextBox[2].GetSelectionCombobox();
+        var gioiTinh = _listTextBox[2].GetSelectionCombobox();
         int maKhoa = _KhoaController.GetByTen(_listTextBox[6].GetSelectionCombobox()).MaKhoa;
 
         if (Validate(imgPath,
@@ -384,8 +373,8 @@ public class GiangVienDialog : Form
             ))
         {
             int maTK = _taiKhoanController.GetTaiKhoanByUsrName(taiKhoan).MaTK;
-            
-            GiangVienDto giangVien = new GiangVienDto
+
+            var giangVien = new GiangVienDto
             {
                 TenGV = tenGV,
                 NgaySinhGV = ngaySinh,
@@ -394,33 +383,33 @@ public class GiangVienDialog : Form
                 Email = email,
                 MaTK = maTK,
                 MaKhoa = maKhoa,
-                AnhDaiDien = imgPath,
+                AnhDaiDien = imgPath
             };
             _GiangVienController.Insert(giangVien);
-            MessageBox.Show("Thêm giảng viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            this.Close();
+            MessageBox.Show("Thêm giảng viên thành công!", "Thành công", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            Close();
             Finish.Invoke();
         }
     }
 
-    void Update()
+    private void Update()
     {
+        var tbTenGV = _listTextBox[0]._field.contentTextBox;
+        var tbNgaySinh = _listTextBox[1]._dField.dateField;
+        var tbSoDienThoai = _listTextBox[3]._field.contentTextBox;
+        var tbEmail = _listTextBox[4]._field.contentTextBox;
+        var tbTK = _listTextBox[5].tbTK.contentTextBox;
 
-        TextBox tbTenGV = _listTextBox[0]._field.contentTextBox;
-        DateTimePicker tbNgaySinh = _listTextBox[1]._dField.dateField;
-        TextBox tbSoDienThoai = _listTextBox[3]._field.contentTextBox;
-        TextBox tbEmail = _listTextBox[4]._field.contentTextBox;
-        TextBox tbTK = _listTextBox[5].tbTK.contentTextBox;
+        var tenGV = tbTenGV.Text;
+        var ngaySinh = tbNgaySinh.Text;
+        var soDienThoai = tbSoDienThoai.Text;
+        var email = tbEmail.Text;
+        var taiKhoan = tbTK.Text;
 
-        string tenGV = tbTenGV.Text;
-        string ngaySinh = tbNgaySinh.Text;
-        string soDienThoai = tbSoDienThoai.Text;
-        string email = tbEmail.Text;
-        string taiKhoan = tbTK.Text;
-
-        string gioiTinh = _listTextBox[2].GetSelectionCombobox();
+        var gioiTinh = _listTextBox[2].GetSelectionCombobox();
         int maKhoa = _KhoaController.GetByTen(_listTextBox[6].GetSelectionCombobox()).MaKhoa;
-        
+
 
         if (Validate(imgPath,
                 tenGV, ngaySinh, soDienThoai,
@@ -429,10 +418,9 @@ public class GiangVienDialog : Form
                 tbSoDienThoai, tbEmail, tbTK
             ))
         {
-            
             int maTK = _taiKhoanController.GetTaiKhoanByUsrName(taiKhoan)!.MaTK;
-            
-            GiangVienDto giangVien = new GiangVienDto
+
+            var giangVien = new GiangVienDto
             {
                 MaGV = _idGiangVien,
                 TenGV = tenGV,
@@ -442,11 +430,12 @@ public class GiangVienDialog : Form
                 Email = email,
                 MaTK = maTK,
                 MaKhoa = maKhoa,
-                AnhDaiDien = imgPath,
+                AnhDaiDien = imgPath
             };
             _GiangVienController.Update(giangVien);
-            MessageBox.Show("Sửa giảng viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            this.Close();
+            MessageBox.Show("Sửa giảng viên thành công!", "Thành công", MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            Close();
             Finish.Invoke();
         }
     }
@@ -487,13 +476,11 @@ public class GiangVienDialog : Form
         ngaySinhDate = ConvertDate.ConvertStringToDate(ngaySinh);
 
         // 4. Kiểm tra tuổi giảng viên (tối thiểu 22 tuổi)
-        DateTime homNay = DateTime.Now;
-        int tuoi = homNay.Year - ngaySinhDate.Year;
+        var homNay = DateTime.Now;
+        var tuoi = homNay.Year - ngaySinhDate.Year;
         if (homNay.Month < ngaySinhDate.Month ||
             (homNay.Month == ngaySinhDate.Month && homNay.Day < ngaySinhDate.Day))
-        {
             tuoi--;
-        }
 
         if (tuoi < 22)
         {

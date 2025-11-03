@@ -1,47 +1,59 @@
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CustomCombobox : RoundTLP
 {
-    public ComboBox combobox;
-    public int cbxWidth { get; set; } = 150;
     private string[] _items;
+    public ComboBox combobox;
+
     public CustomCombobox(string[] items)
     {
-        combobox  = new ComboBox();
+        combobox = new ComboBox();
         _items = items;
         Init();
     }
 
-    void Init()
+    public int cbxWidth { get; set; } = 150;
+
+    public bool Enable
     {
-        this.Border = true;
-        this.AutoSize = true;
-        
+        get => combobox.Enabled;
+        set
+        {
+            combobox.Enabled = value;
+            combobox.BackColor = MyColor.White;
+        }
+    }
+
+    private void Init()
+    {
+        Border = true;
+        AutoSize = true;
+
         combobox.DropDownStyle = ComboBoxStyle.DropDownList;
         combobox.AutoSize = true;
         combobox.Width = cbxWidth;
-        
+
         combobox.Dock = DockStyle.Fill;
         combobox.Items.AddRange(_items);
         combobox.Margin = new Padding(2);
-        
-        this.Controls.Add(combobox);
-        this.combobox.Enter += (sender, args) => OnClick();
-        this.combobox.Leave += (sender, args) => OnLeave();
+
+        Controls.Add(combobox);
+        combobox.Enter += (sender, args) => OnClick();
+        combobox.Leave += (sender, args) => OnLeave();
     }
-    void OnClick()
+
+    private void OnClick()
     {
-        this.BorderColor = MyColor.MainColor;
-        this.Invalidate();
+        BorderColor = MyColor.MainColor;
+        Invalidate();
     }
-    
-    void OnLeave()
+
+    private void OnLeave()
     {
-        this.BorderColor = MyColor.GraySelectColor;
-        this.Invalidate();
+        BorderColor = MyColor.GraySelectColor;
+        Invalidate();
     }
 
     public void UpdateSelection(string[] newlist)
@@ -52,25 +64,13 @@ public class CustomCombobox : RoundTLP
         combobox.SelectedIndex = 0;
     }
 
-    public bool Enable
-    {
-        get =>  combobox.Enabled;
-        set
-        {
-            combobox.Enabled = value;
-            combobox.BackColor = MyColor.White;
-        }
-    }
-
     public void SetSelectionCombobox(string text)
     {
         foreach (var i in combobox.Items)
-        {
             if (i.ToString().Trim().Equals(text))
             {
                 combobox.SelectedItem = i;
                 return;
             }
-        }
     }
 }

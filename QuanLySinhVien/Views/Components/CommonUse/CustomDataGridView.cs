@@ -1,33 +1,29 @@
 using System.Drawing.Drawing2D;
-using System.Windows.Forms.VisualStyles;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using Svg;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CustomDataGridView : DataGridView
 {
-    private bool _action;
-    private bool _edit;
-    private bool _delete;
-    int ButtonHeight = 20;
-    int ButtonWidth = 20;
-    int _margin = 10;
-    int _padding = 3;
-    private int actionRadius = 10;
-    public event Action<Point, int> BtnHoverEdit;
-    public event Action<Point, int> BtnHoverDelete; 
-    public event Action BtnEditLeave;
-    public event Action BtnDeleteLeave;
-    
-    private Bitmap editIcon = GetSvgBitmap.GetBitmap("fix.svg");
-    private Bitmap deleteIcon = GetSvgBitmap.GetBitmap("trashbin.svg");
-    
+    private readonly bool _action;
+    private readonly bool _delete;
+    private readonly bool _edit;
+    private readonly int _margin = 10;
+    private readonly int _padding = 3;
+    private readonly int actionRadius = 10;
+    private readonly int ButtonHeight = 20;
+    private readonly int ButtonWidth = 20;
+    private readonly Bitmap deleteIcon = GetSvgBitmap.GetBitmap("trashbin.svg");
+
+    private readonly Bitmap editIcon = GetSvgBitmap.GetBitmap("fix.svg");
+    private bool flagDelete;
+
     //flag cho mousemove
-    private bool flagEdit = false;
-    private bool flagDelete = false;
-    
-    
+    private bool flagEdit;
+
+    private int i = 0;
+
+
     public CustomDataGridView(bool action = false, bool edit = false, bool delete = false)
     {
         _action = action;
@@ -36,16 +32,18 @@ public class CustomDataGridView : DataGridView
         Init();
     }
 
-    void Init()
+    public event Action<Point, int> BtnHoverEdit;
+    public event Action<Point, int> BtnHoverDelete;
+    public event Action BtnEditLeave;
+    public event Action BtnDeleteLeave;
+
+    private void Init()
     {
         Configuration();
-        if (_action)
-        {
-            SetActionColumn();
-        }
+        if (_action) SetActionColumn();
     }
 
-    void Configuration()
+    private void Configuration()
     {
         Margin = new Padding(0);
         DoubleBuffered = true;
@@ -62,26 +60,26 @@ public class CustomDataGridView : DataGridView
         {
             BackColor = ColorTranslator.FromHtml("#f5f5f5")
         };
-        this.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         CellBorderStyle = DataGridViewCellBorderStyle.None;
         RowTemplate.Height = 35;
         DefaultCellStyle.SelectionBackColor = MyColor.GraySelectColor;
-        DefaultCellStyle.SelectionForeColor = Color.Black; 
+        DefaultCellStyle.SelectionForeColor = Color.Black;
         BorderStyle = BorderStyle.None;
         ReadOnly = true;
         AutoGenerateColumns = false;
         ShowCellToolTips = false;
     }
-    
-    void SetActionColumn()
+
+    private void SetActionColumn()
     {
         CellPainting += (sender, args) => DrawBtn(sender, args);
-        CellMouseMove +=  (sender, args) => OnHoverCell(sender, args);
+        CellMouseMove += (sender, args) => OnHoverCell(sender, args);
         CellMouseLeave += (sender, args) => OnLeaveCell(args.RowIndex, args.ColumnIndex);
         MouseLeave += (sender, args) => OnLeaveDgv();
     }
-    
-    void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
+
+    private void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
     {
         if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Action"].Index)
         {
@@ -89,7 +87,7 @@ public class CustomDataGridView : DataGridView
             e.PaintBackground(e.CellBounds, true);
             e.PaintContent(e.CellBounds);
 
-            Rectangle CellBox = e.CellBounds;
+            var CellBox = e.CellBounds;
 
             Rectangle rectEditBorder;
             Rectangle rectDeleteBorder;
@@ -97,71 +95,71 @@ public class CustomDataGridView : DataGridView
             Rectangle rectEdit;
             Rectangle rectDelete;
 
-            SetRectLoactionAndSize(out rectEditBorder, out rectDeleteBorder, out rectEdit,out rectDelete, CellBox);
-            
-            Graphics g = e.Graphics;
+            SetRectLoactionAndSize(out rectEditBorder, out rectDeleteBorder, out rectEdit, out rectDelete, CellBox);
+
+            var g = e.Graphics;
 
             if (_edit && _delete)
             {
-                DrawRecByPath(g,  rectEditBorder, MyColor.BlueButton);
-                DrawRecByPath(g,  rectDeleteBorder, MyColor.Red);
-            
+                DrawRecByPath(g, rectEditBorder, MyColor.BlueButton);
+                DrawRecByPath(g, rectDeleteBorder, MyColor.Red);
+
                 DrawIcon(g, editIcon, rectEdit);
                 DrawIcon(g, deleteIcon, rectDelete);
             }
             else if (_edit && !_delete)
             {
-                DrawRecByPath(g,  rectEditBorder, MyColor.BlueButton);
-            
+                DrawRecByPath(g, rectEditBorder, MyColor.BlueButton);
+
                 DrawIcon(g, editIcon, rectEdit);
             }
             else
             {
-                DrawRecByPath(g,  rectDeleteBorder, MyColor.Red);
-            
+                DrawRecByPath(g, rectDeleteBorder, MyColor.Red);
+
                 DrawIcon(g, deleteIcon, rectDelete);
             }
-            
+
             // e.Graphics.DrawImage(editIcon,rectEdit);
             // e.Graphics.DrawImage(deleteIcon,rectDelete);
-            
+
             e.Handled = true;
         }
     }
 
-    void SetRectLoactionAndSize(
-        out Rectangle rectEditBorder, 
+    private void SetRectLoactionAndSize(
+        out Rectangle rectEditBorder,
         out Rectangle rectDeleteBorder,
         out Rectangle rectEdit,
         out Rectangle rectDelete,
         Rectangle CellBox
-        )
+    )
     {
         if (_edit && _delete)
         {
             rectEditBorder = new Rectangle(
-                CellBox.Left + (CellBox.Width - 2 * (ButtonWidth + 2*_padding) - _margin) / 2,
-                CellBox.Top + (CellBox.Height - (ButtonHeight + 2*_padding)) / 2,
-                ButtonWidth +  _padding * 2, 
-                ButtonHeight + _padding * 2
-            ); 
-            rectDeleteBorder = new Rectangle( 
-                rectEditBorder.Right + _margin,
-                rectEditBorder.Top,
-                ButtonWidth +  _padding * 2, 
+                CellBox.Left + (CellBox.Width - 2 * (ButtonWidth + 2 * _padding) - _margin) / 2,
+                CellBox.Top + (CellBox.Height - (ButtonHeight + 2 * _padding)) / 2,
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
             );
-            
+            rectDeleteBorder = new Rectangle(
+                rectEditBorder.Right + _margin,
+                rectEditBorder.Top,
+                ButtonWidth + _padding * 2,
+                ButtonHeight + _padding * 2
+            );
+
             rectEdit = new Rectangle(
-                rectEditBorder.Left + _padding, 
-                rectEditBorder.Top + _padding, 
-                ButtonWidth, 
+                rectEditBorder.Left + _padding,
+                rectEditBorder.Top + _padding,
+                ButtonWidth,
                 ButtonHeight
-            ); 
-            rectDelete = new Rectangle( 
-                rectDeleteBorder.Left + _padding, 
-                rectDeleteBorder.Top + _padding, 
-                ButtonWidth, 
+            );
+            rectDelete = new Rectangle(
+                rectDeleteBorder.Left + _padding,
+                rectDeleteBorder.Top + _padding,
+                ButtonWidth,
                 ButtonHeight
             );
         }
@@ -170,100 +168,99 @@ public class CustomDataGridView : DataGridView
             rectDeleteBorder = new Rectangle();
             rectDelete = new Rectangle();
             rectEditBorder = new Rectangle(
-                CellBox.Left + (CellBox.Width - (ButtonWidth + 2*_padding)) / 2,
-                CellBox.Top + (CellBox.Height - (ButtonHeight + 2*_padding)) / 2,
-                ButtonWidth +  _padding * 2, 
+                CellBox.Left + (CellBox.Width - (ButtonWidth + 2 * _padding)) / 2,
+                CellBox.Top + (CellBox.Height - (ButtonHeight + 2 * _padding)) / 2,
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
             );
             rectEdit = new Rectangle(
-                rectEditBorder.Left + _padding, 
-                rectEditBorder.Top + _padding, 
-                ButtonWidth, 
+                rectEditBorder.Left + _padding,
+                rectEditBorder.Top + _padding,
+                ButtonWidth,
                 ButtonHeight
-            ); 
+            );
         }
         else
         {
             rectEditBorder = new Rectangle();
             rectEdit = new Rectangle();
-            rectDeleteBorder = new Rectangle( 
-                CellBox.Left + (CellBox.Width - (ButtonWidth + 2*_padding)) / 2,
-                CellBox.Top + (CellBox.Height - (ButtonHeight + 2*_padding)) / 2,
-                ButtonWidth +  _padding * 2, 
+            rectDeleteBorder = new Rectangle(
+                CellBox.Left + (CellBox.Width - (ButtonWidth + 2 * _padding)) / 2,
+                CellBox.Top + (CellBox.Height - (ButtonHeight + 2 * _padding)) / 2,
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
             );
-            rectDelete = new Rectangle( 
-                rectDeleteBorder.Left + _padding, 
-                rectDeleteBorder.Top + _padding, 
-                ButtonWidth, 
+            rectDelete = new Rectangle(
+                rectDeleteBorder.Left + _padding,
+                rectDeleteBorder.Top + _padding,
+                ButtonWidth,
                 ButtonHeight
             );
         }
-        
     }
 
-    void DrawRecByPath(Graphics g, Rectangle rect, Color color)
+    private void DrawRecByPath(Graphics g, Rectangle rect, Color color)
     {
-        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            
-        using (GraphicsPath path = GetRoundedRec(rect, actionRadius))
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+
+        using (var path = GetRoundedRec(rect, actionRadius))
         using (Brush backBrush = new SolidBrush(color))
         {
             g.FillPath(backBrush, path);
         }
-            
-        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+
+        g.SmoothingMode = SmoothingMode.None;
     }
 
-    void DrawIcon(Graphics g, Bitmap svg, Rectangle rect)
+    private void DrawIcon(Graphics g, Bitmap svg, Rectangle rect)
     {
-        g.DrawImage(svg,rect);
+        g.DrawImage(svg, rect);
     }
 
-    void OnHoverCell(object o,  DataGridViewCellMouseEventArgs e)
+    private void OnHoverCell(object o, DataGridViewCellMouseEventArgs e)
     {
         if (e.RowIndex >= 0 && e.ColumnIndex == Columns["Action"].Index)
         {
-            int rowIndex = e.RowIndex;
-            int columnIndex = e.ColumnIndex;
-            
-            DataGridView dgv = o as DataGridView;
-            
+            var rowIndex = e.RowIndex;
+            var columnIndex = e.ColumnIndex;
+
+            var dgv = o as DataGridView;
+
             //Lấy display vì e kiểu DataGridViewCellEventArgs
-            Rectangle cellRect = dgv.GetCellDisplayRectangle(columnIndex, rowIndex, false);
+            var cellRect = dgv.GetCellDisplayRectangle(columnIndex, rowIndex, false);
 
             Rectangle recEdit;
             Rectangle recDelete;
-            
-            SetActionRegion(out recEdit, out  recDelete, cellRect);
+
+            SetActionRegion(out recEdit, out recDelete, cellRect);
             SetButtonAction(dgv, recEdit, recDelete, e);
         }
     }
-    
 
-    void SetActionRegion(out Rectangle recEdit, out Rectangle recDelete, Rectangle cellRect)
+
+    private void SetActionRegion(out Rectangle recEdit, out Rectangle recDelete, Rectangle cellRect)
     {
         if (_edit && _delete)
         {
             recEdit = new Rectangle(
-                cellRect.Left + (cellRect.Width - 2 * (ButtonWidth + 2*_padding) - _margin) / 2,
-                cellRect.Top + (cellRect.Height - (ButtonHeight + 2*_padding)) / 2,
-                ButtonWidth +  _padding * 2, 
+                cellRect.Left + (cellRect.Width - 2 * (ButtonWidth + 2 * _padding) - _margin) / 2,
+                cellRect.Top + (cellRect.Height - (ButtonHeight + 2 * _padding)) / 2,
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
-            ); 
-            recDelete = new Rectangle( 
+            );
+            recDelete = new Rectangle(
                 recEdit.Right + _margin,
                 recEdit.Top,
-                ButtonWidth +  _padding * 2, 
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
             );
         }
         else if (_edit && !_delete)
         {
             recEdit = new Rectangle(
-                cellRect.Left + (cellRect.Width - (ButtonWidth + 2*_padding)) / 2,
-                cellRect.Top + (cellRect.Height - (ButtonHeight + 2*_padding)) / 2,
-                ButtonWidth +  _padding * 2, 
+                cellRect.Left + (cellRect.Width - (ButtonWidth + 2 * _padding)) / 2,
+                cellRect.Top + (cellRect.Height - (ButtonHeight + 2 * _padding)) / 2,
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
             );
             recDelete = new Rectangle();
@@ -271,25 +268,26 @@ public class CustomDataGridView : DataGridView
         else
         {
             recDelete = new Rectangle(
-                cellRect.Left + (cellRect.Width - (ButtonWidth + 2*_padding)) / 2,
-                cellRect.Top + (cellRect.Height - (ButtonHeight + 2*_padding)) / 2,
-                ButtonWidth +  _padding * 2, 
+                cellRect.Left + (cellRect.Width - (ButtonWidth + 2 * _padding)) / 2,
+                cellRect.Top + (cellRect.Height - (ButtonHeight + 2 * _padding)) / 2,
+                ButtonWidth + _padding * 2,
                 ButtonHeight + _padding * 2
             );
             recEdit = new Rectangle();
         }
     }
 
-    void SetButtonAction(DataGridView dgv, Rectangle recEdit, Rectangle recDelete, DataGridViewCellMouseEventArgs e)
+    private void SetButtonAction(DataGridView dgv, Rectangle recEdit, Rectangle recDelete,
+        DataGridViewCellMouseEventArgs e)
     {
-        int index = e.RowIndex;
+        var index = e.RowIndex;
         //Kiểm tra vị trí chuột
-        Point mousePos = dgv.PointToClient(Cursor.Position);
+        var mousePos = dgv.PointToClient(Cursor.Position);
 
         //Gửi tọa độ theo screen cho panel ngoài
-        Point screenPosEdit = dgv.PointToScreen(recEdit.Location);
-        Point screenPosDelete = dgv.PointToScreen(recDelete.Location);
-            
+        var screenPosEdit = dgv.PointToScreen(recEdit.Location);
+        var screenPosDelete = dgv.PointToScreen(recDelete.Location);
+
         // xét chuột có nằm ở nút không
         if (recEdit.Contains(mousePos))
         {
@@ -307,6 +305,7 @@ public class CustomDataGridView : DataGridView
                 OnLeaveButtonEdit();
             }
         }
+
         if (recDelete.Contains(mousePos))
         {
             if (!flagDelete)
@@ -325,15 +324,14 @@ public class CustomDataGridView : DataGridView
         }
     }
 
-    int i = 0;
-    void OnLeaveCell(int rowIndex, int columnIndex)
+    private void OnLeaveCell(int rowIndex, int columnIndex)
     {
-        Rectangle cellRect = GetCellDisplayRectangle(columnIndex, rowIndex, false);
-        Point cellScreenLocation = PointToScreen(cellRect.Location);
-        Rectangle cellScreenRect = new Rectangle(cellScreenLocation, cellRect.Size);
+        var cellRect = GetCellDisplayRectangle(columnIndex, rowIndex, false);
+        var cellScreenLocation = PointToScreen(cellRect.Location);
+        var cellScreenRect = new Rectangle(cellScreenLocation, cellRect.Size);
 
         // Lấy tọa độ con trỏ chuột hiện tại trên màn hình
-        Point cursorPos = Cursor.Position;
+        var cursorPos = Cursor.Position;
 
         // Chỉ thực hiện khi chuột thật sự rời cell
         if (!cellScreenRect.Contains(cursorPos))
@@ -343,6 +341,7 @@ public class CustomDataGridView : DataGridView
                 flagEdit = false;
                 OnLeaveButtonEdit();
             }
+
             if (flagDelete)
             {
                 flagDelete = false;
@@ -351,13 +350,13 @@ public class CustomDataGridView : DataGridView
         }
     }
 
-    void OnLeaveDgv()
+    private void OnLeaveDgv()
     {
         // Lấy vị trí chuột hiện tại trên màn hình
-        Point cursorPos = Cursor.Position;
+        var cursorPos = Cursor.Position;
 
         // Lấy vùng CustomDataGridView trên màn hình
-        Rectangle dgvScreenRect = this.RectangleToScreen(this.ClientRectangle);
+        var dgvScreenRect = RectangleToScreen(ClientRectangle);
 
         // Nếu chuột vẫn còn trong vùng dgv thì không làm gì
         if (!dgvScreenRect.Contains(cursorPos))
@@ -367,51 +366,46 @@ public class CustomDataGridView : DataGridView
                 flagEdit = false;
                 OnLeaveButtonEdit();
             }
+
             if (flagDelete)
             {
                 flagDelete = false;
                 OnLeaveButtonDelete();
             }
         }
-            
-        
-        
     }
 
-    void OnHoverButtonEdit(Point rec, int index)
+    private void OnHoverButtonEdit(Point rec, int index)
     {
         BtnHoverEdit?.Invoke(rec, index);
     }
-    
-    void OnHoverButtonDelete(Point rec, int index)
+
+    private void OnHoverButtonDelete(Point rec, int index)
     {
         BtnHoverDelete?.Invoke(rec, index);
     }
 
-    void OnLeaveButtonEdit()
+    private void OnLeaveButtonEdit()
     {
         BtnEditLeave?.Invoke();
     }
-    
-    void OnLeaveButtonDelete()
+
+    private void OnLeaveButtonDelete()
     {
         BtnDeleteLeave?.Invoke();
     }
 
-    
 
-    GraphicsPath GetRoundedRec(Rectangle rect, int radius)
+    private GraphicsPath GetRoundedRec(Rectangle rect, int radius)
     {
-        GraphicsPath path = new GraphicsPath();
-        
+        var path = new GraphicsPath();
+
         path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
         path.AddArc(rect.Right - radius, rect.Y, radius, radius, 270, 90);
         path.AddArc(rect.Right - radius, rect.Bottom - radius, radius, radius, 0, 90);
         path.AddArc(rect.X, rect.Bottom - radius, radius, radius, 90, 90);
-        
+
         path.CloseFigure();
         return path;
     }
-    
-    
 }

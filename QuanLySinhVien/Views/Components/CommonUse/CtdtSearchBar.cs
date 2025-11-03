@@ -1,52 +1,51 @@
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse.Search;
 
 public class CtdtSearchBar : RoundTLP
 {
-    TextBox _txtSearch;
-    public new event Action<string> KeyDown;
-    public int TxtWidth { get; set; } = 200;
-    
+    private readonly TextBox _txtSearch;
+
     public CtdtSearchBar()
     {
         _txtSearch = new TextBox();
         Init();
     }
 
-    void Init()
-    {
-        this.Padding = new Padding(3);
-        this.AutoSize = true;
-        this.Border = true;
-        this.ColumnCount = 2;
-        
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+    public int TxtWidth { get; set; } = 200;
+    public new event Action<string> KeyDown;
 
-        
+    private void Init()
+    {
+        Padding = new Padding(3);
+        AutoSize = true;
+        Border = true;
+        ColumnCount = 2;
+
+        ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+
         _txtSearch.Width = TxtWidth;
         _txtSearch.AutoSize = true;
         _txtSearch.Font = GetFont.GetFont.GetMainFont(11, FontType.Regular);
         _txtSearch.PlaceholderText = "Tìm kiếm ...";
         _txtSearch.BorderStyle = BorderStyle.None;
 
-        PictureBox glassIcon = GetPb();
-        this.Controls.Add(glassIcon);
-        this.Controls.Add(_txtSearch);
-        
+        var glassIcon = GetPb();
+        Controls.Add(glassIcon);
+        Controls.Add(_txtSearch);
+
         _txtSearch.Enter += (sender, args) => onEnter();
         _txtSearch.Leave += (sender, args) => onLeave();
         _txtSearch.KeyDown += (sender, args) => OnKeyDown(args);
         _txtSearch.TextChanged += (sender, args) => OnTextChanged();
-        
-        
     }
 
-    PictureBox GetPb()
+    private PictureBox GetPb()
     {
-        PictureBox pb = new PictureBox
+        var pb = new PictureBox
         {
             Image = GetSvgBitmap.GetBitmap("search.svg"),
             Size = new Size(20, 20),
@@ -55,28 +54,25 @@ public class CtdtSearchBar : RoundTLP
         };
         return pb;
     }
-    
-    void onEnter()
+
+    private void onEnter()
     {
-        this.BorderColor = MyColor.MainColor;
-        this.Invalidate();
+        BorderColor = MyColor.MainColor;
+        Invalidate();
     }
 
-    void onLeave()
+    private void onLeave()
     {
-        this.BorderColor = MyColor.GraySelectColor;
-        this.Invalidate();
+        BorderColor = MyColor.GraySelectColor;
+        Invalidate();
     }
 
-    void OnKeyDown(KeyEventArgs k)
+    private void OnKeyDown(KeyEventArgs k)
     {
-        if (k.KeyCode == Keys.Enter)
-        {
-            KeyDown?.Invoke(_txtSearch.Text);
-        }
+        if (k.KeyCode == Keys.Enter) KeyDown?.Invoke(_txtSearch.Text);
     }
 
-    void OnTextChanged()
+    private void OnTextChanged()
     {
         KeyDown?.Invoke(_txtSearch.Text);
     }

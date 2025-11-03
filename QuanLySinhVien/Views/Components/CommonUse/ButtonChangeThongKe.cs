@@ -2,61 +2,64 @@ namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class ButtonChangeThongKe : TableLayoutPanel
 {
-    public event Action<string> mouseClick;
-    private string txt;
+    private readonly string txt;
+
     public ButtonChangeThongKe(string txt)
     {
         this.txt = txt;
         Init();
     }
 
-    void Init()
+    public event Action<string> mouseClick;
+
+    private void Init()
     {
         AutoSize = true;
         Margin = new Padding(0);
         BackColor = MyColor.GrayBackGround;
-        Label lbl = new Label
+        var lbl = new Label
         {
             Text = txt,
-            AutoSize = true,
+            AutoSize = true
         };
-        this.Controls.Add(lbl);
+        Controls.Add(lbl);
         SetAction();
     }
 
-    void SetAction()
+    private void SetAction()
     {
-        this.MouseEnter += (sender, args) => OnMouseEnter();
-        this.MouseLeave += (sender, args) =>  OnMouseLeave();
-        this.MouseDown += (sender, args) =>   OnMouseDown();
-        this.MouseUp += (sender, args) =>    OnMouseUp();
+        MouseEnter += (sender, args) => OnMouseEnter();
+        MouseLeave += (sender, args) => OnMouseLeave();
+        MouseDown += (sender, args) => OnMouseDown();
+        MouseUp += (sender, args) => OnMouseUp();
 
-        foreach (Control c in this.Controls)
+        foreach (Control c in Controls)
         {
-            c.MouseEnter += (sender, args) =>  OnMouseEnter();
-            c.MouseLeave += (sender, args) =>  OnMouseLeave();
-            c.MouseDown += (sender, args) =>  OnMouseDown();
-            c.MouseUp += (sender, args) =>    OnMouseUp();
+            c.MouseEnter += (sender, args) => OnMouseEnter();
+            c.MouseLeave += (sender, args) => OnMouseLeave();
+            c.MouseDown += (sender, args) => OnMouseDown();
+            c.MouseUp += (sender, args) => OnMouseUp();
         }
     }
 
-    void OnMouseEnter()
+    private void OnMouseEnter()
     {
-        this.BackColor = MyColor.GrayHoverColor;
-
+        BackColor = MyColor.GrayHoverColor;
     }
-    void OnMouseLeave()
-    {
-        this.BackColor = MyColor.GrayBackGround;
 
-    }
-    void OnMouseDown()
+    private void OnMouseLeave()
     {
-        this.BackColor = MyColor.GraySelectColor;
+        BackColor = MyColor.GrayBackGround;
+    }
+
+    private void OnMouseDown()
+    {
+        BackColor = MyColor.GraySelectColor;
         mouseClick?.Invoke(txt);
     }
-    void OnMouseUp()
+
+    private void OnMouseUp()
     {
-        this.BackColor = MyColor.GrayHoverColor;
+        BackColor = MyColor.GrayHoverColor;
     }
 }

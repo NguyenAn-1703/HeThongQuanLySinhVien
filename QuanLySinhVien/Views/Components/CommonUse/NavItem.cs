@@ -1,40 +1,41 @@
-using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Shared.Enums;
 using Svg;
 
 namespace QuanLySinhVien.Views.Components.ViewComponents;
 
 public class NavItem : RoundTLP
 {
-    public int Index { get; set; }
-    public Boolean IsSelected { get; set; } = false;
-    private String path { get; set; }
-    public String Text { get; set; }
-
-    public event Action<int> OnClickThisItem;
-    
     // thanh màu xanh nhor bên trái mooix item
-    private RoundTLP tag = new RoundTLP(false, true, true, false);
+    private readonly RoundTLP tag = new(false, true, true, false);
+
     public NavItem(int index, string path, string text)
     {
-        this.Index = index;        
-        this.path = Path.Combine(AppContext.BaseDirectory, "img", path);
-        this.Text = text;
-        this.Init();
+        Index = index;
+        this.path = Path.Combine(AppContext.BaseDirectory,"Views", "img", path);
+        Text = text;
+        Init();
     }
 
-    void Init()
+    public int Index { get; set; }
+    public bool IsSelected { get; set; }
+    private string path { get; }
+    public string Text { get; set; }
+
+    public event Action<int> OnClickThisItem;
+
+    private void Init()
     {
-        this.TopLeft = this.TopRight = this.BottomLeft = this.BottomRight = false;
-        this.BackColor = MyColor.GrayBackGround;
-        this.Margin = new Padding(0, 5, 0, 0);
+        TopLeft = TopRight = BottomLeft = BottomRight = false;
+        BackColor = MyColor.GrayBackGround;
+        Margin = new Padding(0, 5, 0, 0);
         // this.Padding = new Padding(0, 5, 0, 5);
-        this.Dock = DockStyle.Fill;
-        this.AutoSize = true;
-        this.ColumnCount = 3;
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        this.Cursor = Cursors.Hand;
+        Dock = DockStyle.Fill;
+        AutoSize = true;
+        ColumnCount = 3;
+        ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        Cursor = Cursors.Hand;
         try
         {
             if (Path.GetExtension(path).ToLower() != ".svg")
@@ -44,16 +45,16 @@ public class NavItem : RoundTLP
         {
             Console.WriteLine("Lỗi không có file");
         }
-        
-        SvgDocument svgDocument = SvgDocument.Open(this.path);
-        Bitmap btm = svgDocument.Draw();
+
+        var svgDocument = SvgDocument.Open(path);
+        var btm = svgDocument.Draw();
 
         tag.BackColor = MyColor.GrayBackGround;
         tag.Size = new Size(5, 27);
         tag.Margin = new Padding(0, 0, 5, 0);
         tag.Anchor = AnchorStyles.Left;
-        
-        PictureBox pb = new PictureBox
+
+        var pb = new PictureBox
         {
             Margin = new Padding(7, 7, 10, 7),
             Anchor = AnchorStyles.None,
@@ -62,64 +63,66 @@ public class NavItem : RoundTLP
             Image = btm
         };
 
-        Label content = new Label
+        var content = new Label
         {
             MinimumSize = new Size(200, 0),
             Margin = new Padding(0, 3, 3, 3),
             Anchor = AnchorStyles.None,
             Dock = DockStyle.Fill,
             AutoSize = true,
-            Text = this.Text,
+            Text = Text,
             Font = GetFont.GetFont.GetMainFont(10, FontType.SemiBold)
         };
-        
-        this.Controls.Add(tag);
-        this.Controls.Add(pb);
-        this.Controls.Add(content);
 
-        this.MouseEnter += (sender, args) => this.OnHover();
-        this.MouseLeave += (sender, args) => this.OnLeave();
-        
-        this.MouseClick += (sender, args) => this.OnClick();
-        foreach (Control c in this.Controls)
+        Controls.Add(tag);
+        Controls.Add(pb);
+        Controls.Add(content);
+
+        MouseEnter += (sender, args) => OnHover();
+        MouseLeave += (sender, args) => OnLeave();
+
+        MouseClick += (sender, args) => OnClick();
+        foreach (Control c in Controls)
         {
-            c.MouseEnter += (sender, args) => this.OnHover();
-            c.MouseLeave += (sender, args) => this.OnLeave();
-            c.MouseClick += (sender, args) => this.OnClick();
+            c.MouseEnter += (sender, args) => OnHover();
+            c.MouseLeave += (sender, args) => OnLeave();
+            c.MouseClick += (sender, args) => OnClick();
         }
     }
 
-    void OnHover()
+    private void OnHover()
     {
-        if (!this.IsSelected) ChangeToHoverStatus();
+        if (!IsSelected) ChangeToHoverStatus();
     }
 
-    void OnLeave()
+    private void OnLeave()
     {
-        if (!this.IsSelected) ChangeToNormalStatus();
+        if (!IsSelected) ChangeToNormalStatus();
     }
 
-    void OnClick()
+    private void OnClick()
     {
-        OnClickThisItem?.Invoke(this.Index);
+        OnClickThisItem?.Invoke(Index);
     }
+
     public void ChangeToHoverStatus()
     {
-        this.IsSelected = false;
-        this.tag.BackColor = MyColor.GrayHoverColor;
-        this.BackColor = MyColor.GrayHoverColor;
-    }
-    public void ChangeToNormalStatus()
-    {
-        this.IsSelected = false;
-        this.tag.BackColor = MyColor.GrayBackGround;
-        this.BackColor = MyColor.GrayBackGround;
-    }
-    public void ChangeToSelectStatus()
-    {
-        this.tag.BackColor = MyColor.MainColor;
-        this.BackColor = MyColor.GraySelectColor;
-        this.IsSelected = true;
+        IsSelected = false;
+        tag.BackColor = MyColor.GrayHoverColor;
+        BackColor = MyColor.GrayHoverColor;
     }
 
+    public void ChangeToNormalStatus()
+    {
+        IsSelected = false;
+        tag.BackColor = MyColor.GrayBackGround;
+        BackColor = MyColor.GrayBackGround;
+    }
+
+    public void ChangeToSelectStatus()
+    {
+        tag.BackColor = MyColor.MainColor;
+        BackColor = MyColor.GraySelectColor;
+        IsSelected = true;
+    }
 }

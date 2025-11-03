@@ -1,34 +1,32 @@
 using System.Drawing.Text;
-using QuanLySinhVien.Views.Enums;
+using QuanLySinhVien.Shared.Enums;
 
 namespace QuanLySinhVien.Views.Components.GetFont;
 
 public class GetFont
 {
-    static PrivateFontCollection pfc = new PrivateFontCollection();
+    private static readonly PrivateFontCollection pfc = new();
+
     static GetFont()
     {
         try
         {
-            pfc.AddFontFile("font/Montserrat-Regular.ttf");
-            pfc.AddFontFile("font/Montserrat-SemiBold.ttf");
-            pfc.AddFontFile("font/Montserrat-ExtraBold.ttf");
-            pfc.AddFontFile("font/Montserrat-Black.ttf");
-            pfc.AddFontFile("font/PlayfairDisplay-ExtraBold.ttf");
+            pfc.AddFontFile("Views/font/Montserrat-Regular.ttf");
+            pfc.AddFontFile("Views/font/Montserrat-SemiBold.ttf");
+            pfc.AddFontFile("Views/font/Montserrat-ExtraBold.ttf");
+            pfc.AddFontFile("Views/font/Montserrat-Black.ttf");
+            pfc.AddFontFile("Views/font/PlayfairDisplay-ExtraBold.ttf");
         }
         catch (Exception ex)
         {
             throw new Exception(ex.Message);
         }
-        
-        for (int i = 0; i < 5; i++)
-        {
-            Console.WriteLine(pfc.Families[i].Name);
-        }
+
+        for (var i = 0; i < 5; i++) Console.WriteLine(pfc.Families[i].Name);
     }
-    static public Font GetMainFont(float size, FontType type)
+
+    public static Font GetMainFont(float size, FontType type)
     {
-        
         Font font;
         switch (type)
         {
@@ -55,10 +53,11 @@ public class GetFont
                 break;
             default: throw new Exception("Font type not supported");
         }
+
         return font;
     }
 
-    static public Font GetPlayFairFont(float size, FontType type)
+    public static Font GetPlayFairFont(float size, FontType type)
     {
         Font font;
         switch (type)
@@ -73,6 +72,4 @@ public class GetFont
 
         return font;
     }
-
-    
 }

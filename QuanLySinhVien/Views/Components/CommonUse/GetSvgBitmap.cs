@@ -6,7 +6,7 @@ public class GetSvgBitmap
 {
     public static Bitmap GetBitmap(string file)
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "img", file);
+        var path = Path.Combine(AppContext.BaseDirectory,"Views", "img", file);
         try
         {
             if (Path.GetExtension(path).ToLower() != ".svg")
@@ -16,9 +16,9 @@ public class GetSvgBitmap
         {
             Console.WriteLine("Lỗi không có file");
         }
-        
-        SvgDocument svgDocument = SvgDocument.Open(path);
-        Bitmap btm = svgDocument.Draw();
+
+        var svgDocument = SvgDocument.Open(path);
+        var btm = svgDocument.Draw();
         return btm;
     }
 }

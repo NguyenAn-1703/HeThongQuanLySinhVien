@@ -1,65 +1,63 @@
 using System.Drawing.Drawing2D;
+using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Views.Components.ViewComponents;
-using QuanLySinhVien.Views.Enums;
 
 namespace QuanLySinhVien.Views.Components.CommonUse;
 
 public class CTDTTable : CustomTable
 {
-    int ButtonHeight = 20;
-    int ButtonWidth = 20;
-    int _margin = 10;
-    int _padding = 3;
-    private int actionRadius = 10;
+    private readonly int _padding = 3;
 
-    private Bitmap plusIcon = GetSvgBitmap.GetBitmap("plus.svg");
-    private Bitmap minusIcon = GetSvgBitmap.GetBitmap("minus.svg");
-    
-    private Form _topForm;
-    
+    private readonly TableCTDTType _type;
+    private readonly int actionRadius = 10;
+    private readonly int ButtonHeight = 20;
+    private readonly int ButtonWidth = 20;
+    private readonly Bitmap minusIcon = GetSvgBitmap.GetBitmap("minus.svg");
+
+    private readonly Bitmap plusIcon = GetSvgBitmap.GetBitmap("plus.svg");
+
     private CustomButton _Btn;
+    private string _columnName;
+    private int _margin = 10;
     private CustomButton _minusBtn;
+
+    private Form _topForm;
 
     private bool flagBtn;
     private bool flagBtnMinus;
 
-    private TableCTDTType _type;
-    private string _columnName;
-
-
-
-
-    public event Action<int> BtnClick;
     public CTDTTable(List<string> headerContent, List<string> columnNames, List<object> cells, TableCTDTType type)
-        : base(headerContent, columnNames, cells,
-            false, false, false)
+        : base(headerContent, columnNames, cells)
     {
         _type = type;
         Init();
     }
 
-    void Init()
+
+    public event Action<int> BtnClick;
+
+    private void Init()
     {
         if (_type == TableCTDTType.Plus)
         {
             _columnName = "ActionPlus";
             SetActionColumn();
         }
+
         if (_type == TableCTDTType.Minus)
         {
             _columnName = "ActionMinus";
             SetActionColumn();
         }
-        
     }
 
-    void SetActionColumn()
+    private void SetActionColumn()
     {
         _dataGridView.CellPainting += (sender, args) => DrawBtn(sender, args);
         _dataGridView.CellMouseMove += (sender, args) => OnHoverCell(sender, args);
     }
 
-    void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
+    private void DrawBtn(object cell, DataGridViewCellPaintingEventArgs e)
     {
         if (e.RowIndex >= 0 && e.ColumnIndex == _dataGridView.Columns[_columnName].Index)
         {
@@ -67,14 +65,14 @@ public class CTDTTable : CustomTable
             e.PaintBackground(e.CellBounds, true);
             e.PaintContent(e.CellBounds);
 
-            Rectangle CellBox = e.CellBounds;
+            var CellBox = e.CellBounds;
 
             Rectangle rectBorder;
             Rectangle rect;
 
             SetRectLoactionAndSize(out rectBorder, out rect, CellBox);
 
-            Graphics g = e.Graphics;
+            var g = e.Graphics;
 
             if (_type == TableCTDTType.Plus)
             {
@@ -92,7 +90,7 @@ public class CTDTTable : CustomTable
         }
     }
 
-    void SetRectLoactionAndSize(
+    private void SetRectLoactionAndSize(
         out Rectangle rectBorder,
         out Rectangle rect,
         Rectangle CellBox
@@ -114,35 +112,35 @@ public class CTDTTable : CustomTable
         );
     }
 
-    void DrawRecByPath(Graphics g, Rectangle rect, Color color)
+    private void DrawRecByPath(Graphics g, Rectangle rect, Color color)
     {
-        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        using (GraphicsPath path = GetRoundedRec(rect, actionRadius))
+        using (var path = GetRoundedRec(rect, actionRadius))
         using (Brush backBrush = new SolidBrush(color))
         {
             g.FillPath(backBrush, path);
         }
 
-        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+        g.SmoothingMode = SmoothingMode.None;
     }
 
-    void DrawIcon(Graphics g, Bitmap svg, Rectangle rect)
+    private void DrawIcon(Graphics g, Bitmap svg, Rectangle rect)
     {
         g.DrawImage(svg, rect);
     }
 
-    void OnHoverCell(object o, DataGridViewCellMouseEventArgs e)
+    private void OnHoverCell(object o, DataGridViewCellMouseEventArgs e)
     {
         if (e.RowIndex >= 0 && e.ColumnIndex == _dataGridView.Columns[_columnName].Index)
         {
-            int rowIndex = e.RowIndex;
-            int columnIndex = e.ColumnIndex;
+            var rowIndex = e.RowIndex;
+            var columnIndex = e.ColumnIndex;
 
-            DataGridView dgv = o as DataGridView;
+            var dgv = o as DataGridView;
 
             //Lấy display vì e kiểu DataGridViewCellEventArgs
-            Rectangle cellRect = dgv.GetCellDisplayRectangle(columnIndex, rowIndex, false);
+            var cellRect = dgv.GetCellDisplayRectangle(columnIndex, rowIndex, false);
 
             Rectangle recPlus;
 
@@ -151,7 +149,7 @@ public class CTDTTable : CustomTable
         }
     }
 
-    void SetActionRegion(out Rectangle recPlus, Rectangle cellRect)
+    private void SetActionRegion(out Rectangle recPlus, Rectangle cellRect)
     {
         recPlus = new Rectangle(
             cellRect.Left + (cellRect.Width - (ButtonWidth + 2 * _padding)) / 2,
@@ -161,13 +159,13 @@ public class CTDTTable : CustomTable
         );
     }
 
-    void SetButtonAction(DataGridView dgv, Rectangle recPlus, DataGridViewCellMouseEventArgs e)
+    private void SetButtonAction(DataGridView dgv, Rectangle recPlus, DataGridViewCellMouseEventArgs e)
     {
-        int index = e.RowIndex;
+        var index = e.RowIndex;
         //Kiểm tra vị trí chuột
-        Point mousePos = dgv.PointToClient(Cursor.Position);
+        var mousePos = dgv.PointToClient(Cursor.Position);
 
-        Point screenPosPlus = dgv.PointToScreen(recPlus.Location);
+        var screenPosPlus = dgv.PointToScreen(recPlus.Location);
 
         // xét chuột có nằm ở nút không
         if (recPlus.Contains(mousePos))
@@ -184,69 +182,58 @@ public class CTDTTable : CustomTable
             {
                 flagBtn = false;
                 OnLeaveBtn();
-
             }
         }
-
     }
 
-    void OnHoverBtn(Point rec, int index)
+    private void OnHoverBtn(Point rec, int index)
     {
-        int rowIndex = index;
+        var rowIndex = index;
         //Vẽ vào form, không phụ thuộc layout
-        _topForm = this.FindForm();
+        _topForm = FindForm();
 
         if (_type == TableCTDTType.Plus)
-        {
             _Btn = new CustomButton(20, 20, "plus.svg", MyColor.MainColor);
-        }
         else
-        {
             _Btn = new CustomButton(20, 20, "minus.svg", MyColor.RedHover);
-        }
-        
+
         _topForm.Controls.Add(_Btn);
         _Btn.BringToFront();
 
-        Point myPoint = _topForm.PointToClient(rec);
+        var myPoint = _topForm.PointToClient(rec);
         _Btn.Location = myPoint;
-        
-        Point cursorPos = Cursor.Position;
-        Point cursorOnForm = _topForm.PointToClient(cursorPos);
+
+        var cursorPos = Cursor.Position;
+        var cursorOnForm = _topForm.PointToClient(cursorPos);
 
         // Nếu chuột đang nằm trong vùng nút thì hiển thị, nếu không thì ẩn
         if (_Btn.Bounds.Contains(cursorOnForm))
-        {
             _Btn.Visible = true;
-        }
         else
-        {
             _Btn.Visible = false;
-        }
-        _Btn.MouseLeave +=  (sender, args) =>_Btn.Visible = false;
-        
-        
+        _Btn.MouseLeave += (sender, args) => _Btn.Visible = false;
+
 
         _Btn.MouseDown += (sender, args) => OnClickBtn(index);
     }
 
-    void OnLeaveBtn()
+    private void OnLeaveBtn()
     {
         _Btn.Dispose();
     }
 
-    void OnClickBtn(int index)
+    private void OnClickBtn(int index)
     {
-        int Id = (int)_dataGridView.Rows[index].Cells[0].Value;
+        var Id = (int)_dataGridView.Rows[index].Cells[0].Value;
         _Btn.Dispose();
         flagBtn = false;
         BtnClick?.Invoke(Id);
-    } 
+    }
 
 
-    GraphicsPath GetRoundedRec(Rectangle rect, int radius)
+    private GraphicsPath GetRoundedRec(Rectangle rect, int radius)
     {
-        GraphicsPath path = new GraphicsPath();
+        var path = new GraphicsPath();
 
         path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
         path.AddArc(rect.Right - radius, rect.Y, radius, radius, 270, 90);
@@ -261,5 +248,5 @@ public class CTDTTable : CustomTable
     {
         _dataGridView.Columns[_columnName].Visible = false;
         _header.Controls.RemoveAt(_header.Controls.Count - 1);
-    } 
+    }
 }
