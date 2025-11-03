@@ -28,6 +28,7 @@ public class TableNhapDiem : MyTLP
 
     private List<DiemSV> _listDiemSV;
     private int _maHp;
+    private int _tableWidth;
 
     private KetQuaController _ketQuaController;
     private CotDiemController _cotDiemController;
@@ -146,6 +147,8 @@ public class TableNhapDiem : MyTLP
     void SetEventListen()
     {
         this.Resize += (sender, args) => OnResize();
+        
+        
         this._dataGridView.CellDoubleClick += (sender, args) => OnDoubleClickRow(args);
 
         this._dataGridView.BtnHoverEdit += (rec, index) => OnHoverEditBtn(rec, index);
@@ -267,12 +270,12 @@ public class TableNhapDiem : MyTLP
 
     void OnResize()
     {
-        int tableWidth;
+        int tableWidth = this.Width;
         int columnSize;
 
         if (_dataGridView.DisplayedRowCount(false) < _dataGridView.RowCount)
         {
-            tableWidth = this.Width - 20;
+            tableWidth -= 20;
             columnSize = tableWidth / _header.Controls.Count;
             foreach (Control c in _header.Controls)
             {
@@ -283,7 +286,6 @@ public class TableNhapDiem : MyTLP
         }
         else
         {
-            tableWidth = this.Width;
             columnSize = tableWidth / _header.Controls.Count;
 
             foreach (Control c in _header.Controls)
@@ -397,8 +399,6 @@ public class TableNhapDiem : MyTLP
 
     void AddColumn()
     {
-        _header.SuspendLayout();
-
         // tối đa 5 cột điểm
         if (index >= 5)
         {
@@ -464,6 +464,7 @@ public class TableNhapDiem : MyTLP
         pnlCot.Controls.Add(lblhs);
         pnlCot.Controls.Add(hso);
 
+        _header.SuspendLayout();
         _header.Controls.Add(pnlCot);
 
         int insertIndex = _header.Controls.Count - 2;
@@ -508,10 +509,9 @@ public class TableNhapDiem : MyTLP
         _dataGridView.Columns.Remove(colName);
         UpdateListTbHso(i);
         index--;
-
+        
         OnResize();
         _header.ResumeLayout();
-        OnResize();
     }
 
     void UpdateListTbHso(int i)
@@ -528,8 +528,9 @@ public class TableNhapDiem : MyTLP
         _dataGridView.EditMode = DataGridViewEditMode.EditOnEnter;
         _dataGridView.CellValueChanged += (sender, args) => dataGridView1_CellValueChanged(sender, args);
         _dataGridView.CellLeave += (sender, args) => dataGridView1_CellLeave(sender, args);
-   
 
+        
+        
     }
 
 

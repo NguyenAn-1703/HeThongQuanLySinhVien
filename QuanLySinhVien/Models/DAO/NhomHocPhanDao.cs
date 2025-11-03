@@ -181,7 +181,7 @@ public class NhomHocPhanDao
         using var conn = MyConnection.GetConnection();
         using var cmd = new MySqlCommand(
             "SELECT MaNHP, MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo FROM NhomHocPhan " +
-            "WHERE HocKy = @HocKy AND Nam = @Nam AND MaHP = @MaHP",
+            "WHERE Status = 1 AND HocKy = @HocKy AND Nam = @Nam AND MaHP = @MaHP",
             conn);
         cmd.Parameters.AddWithValue("@HocKy", hky);
         cmd.Parameters.AddWithValue("@Nam", nam);
@@ -212,7 +212,7 @@ public class NhomHocPhanDao
         using var conn = MyConnection.GetConnection();
         using var cmd = new MySqlCommand(
             "SELECT MaNHP, MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo FROM NhomHocPhan " +
-            "WHERE HocKy = @HocKy AND Nam = @Nam",
+            "WHERE Status = 1 AND HocKy = @HocKy AND Nam = @Nam",
             conn);
         cmd.Parameters.AddWithValue("@HocKy", hky);
         cmd.Parameters.AddWithValue("@Nam", nam);
@@ -242,7 +242,7 @@ public class NhomHocPhanDao
         using var conn = MyConnection.GetConnection();
         using var cmd = new MySqlCommand(
             "SELECT MaNHP, MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo FROM NhomHocPhan " +
-            "WHERE HocKy = @HocKy AND Nam = @Nam AND MaGV = @MaGV",
+            "WHERE Status = 1 AND HocKy = @HocKy AND Nam = @Nam AND MaGV = @MaGV",
             conn);
         cmd.Parameters.AddWithValue("@HocKy", hky);
         cmd.Parameters.AddWithValue("@Nam", nam);
