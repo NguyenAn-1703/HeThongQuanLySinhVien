@@ -21,4 +21,8 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Controllers\config\Permission.json" />
+    </ItemGroup>
+
 </Project>

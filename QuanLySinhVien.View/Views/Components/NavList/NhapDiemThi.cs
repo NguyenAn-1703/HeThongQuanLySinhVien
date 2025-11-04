@@ -242,7 +242,7 @@ public class NhapDiemThi : NavBase
 
     private void SetDisplayData()
     {
-        _displayData = ConvertObject.ConvertToDisplay(ConvertDtoToDisplay(_rawData), x => new
+        _displayData = ConvertObject.ConvertToDisplay(_caThiController.ConvertDtoToDisplay(_rawData), x => new
             {
                 x.MaCT,
                 x.TenHP,
@@ -255,7 +255,7 @@ public class NhapDiemThi : NavBase
 
     private void SetSearch()
     {
-        _caThiNhapDiemSearch = new CaThiNhapDiemSearch(ConvertDtoToDisplay(_rawData));
+        _caThiNhapDiemSearch = new CaThiNhapDiemSearch(_caThiController.ConvertDtoToDisplay(_rawData));
     }
 
     private void SetAction()
@@ -283,7 +283,7 @@ public class NhapDiemThi : NavBase
         List<CaThiDto> listCaThi = _caThiController.GetByHocKyNam(hky, nam);
         _rawData = listCaThi;
 
-        UpdateDataDisplay(ConvertDtoToDisplay(_rawData));
+        UpdateDataDisplay(_caThiController.ConvertDtoToDisplay(_rawData));
         _table.UpdateData(_displayData);
     }
 
@@ -324,17 +324,7 @@ public class NhapDiemThi : NavBase
     {
     }
 
-    private List<CaThiNhapDiemDisplay> ConvertDtoToDisplay(List<CaThiDto> input)
-    {
-        List<CaThiNhapDiemDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new CaThiNhapDiemDisplay
-        {
-            MaCT = x.MaCT,
-            TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
-            NgayThi = x.ThoiGianBatDau,
-            TenPhong = _phongHocController.GetPhongHocById(x.MaPH).TenPH
-        });
-        return rs;
-    }
+
 
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
@@ -345,6 +335,6 @@ public class NhapDiemThi : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
-        _caThiNhapDiemSearch.Search(txtSearch, filter, ConvertDtoToDisplay(_rawData));
+        _caThiNhapDiemSearch.Search(txtSearch, filter, _caThiController.ConvertDtoToDisplay(_rawData));
     }
 }

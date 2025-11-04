@@ -1,6 +1,7 @@
 using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.SearchObject;
 using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.View.Views.Components.CommonUse;
@@ -181,7 +182,7 @@ public class QuanLiTaiKhoan : NavBase
 
     private void SetSearch()
     {
-        _taiKhoanSearch = new TaiKhoanSearch(_rawData);
+        _taiKhoanSearch = new TaiKhoanSearch(_taiKhoanController.ConvertDtoToDisplay(_rawData));
     }
 
     private void SetAction()
@@ -198,13 +199,13 @@ public class QuanLiTaiKhoan : NavBase
         _table.OnDelete += index => { Delete(index); };
     }
 
-    private void UpdateDataDisplay(List<TaiKhoanDto> dtos)
+    private void UpdateDataDisplay(List<TaiKhoanDisplay> dtos)
     {
-        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new
+        _displayData = ConvertObject.ConvertToDisplay(dtos, x => new TaiKhoanDisplay
         {
-            x.MaTK,
-            x.TenDangNhap,
-            TenNhomQuyen = _nhomQuyenController.GetTenQuyenByID(x.MaNQ)
+            MaTK = x.MaTK,
+            TenDangNhap = x.TenDangNhap,
+            TenNhomQuyen = x.TenNhomQuyen
         });
     }
 
@@ -225,7 +226,7 @@ public class QuanLiTaiKhoan : NavBase
 
         _taiKhoanDialog.Finish += () =>
         {
-            UpdateDataDisplay(_taiKhoanController.GetAll());
+            UpdateDataDisplay(_taiKhoanController.ConvertDtoToDisplay(_taiKhoanController.GetAll()));
             _table.UpdateData(_displayData);
         };
         _taiKhoanDialog.ShowDialog();
@@ -245,11 +246,13 @@ public class QuanLiTaiKhoan : NavBase
             _nhomQuyenController, id);
         _taiKhoanDialog.Finish += () =>
         {
-            UpdateDataDisplay(_taiKhoanController.GetAll());
+            UpdateDataDisplay(_taiKhoanController.ConvertDtoToDisplay(_taiKhoanController.GetAll()));
             _table.UpdateData(_displayData);
         };
         _taiKhoanDialog.ShowDialog();
     }
+
+
 
     private void Detail(int id)
     {
@@ -275,7 +278,7 @@ public class QuanLiTaiKhoan : NavBase
         {
             MessageBox.Show("Xóa tài khoản thành công!", "Thành công", MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
-            UpdateDataDisplay(_taiKhoanController.GetAll());
+            UpdateDataDisplay(_taiKhoanController.ConvertDtoToDisplay(_taiKhoanController.GetAll()));
             _table.UpdateData(_displayData);
         }
         else

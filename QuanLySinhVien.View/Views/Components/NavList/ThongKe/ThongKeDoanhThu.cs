@@ -8,14 +8,14 @@ using QuanLySinhVien.View.Views.Components.ViewComponents;
 
 namespace QuanLySinhVien.View.Views.Components.NavList;
 
-public class ThongKeHocLuc : MyTLP
+public class ThongKeDoanhThu : MyTLP
 {
     private MyTLP _content;
     private List<object> _displayData;
     private NganhController _nganhController;
     private List<NganhDto> _rawData;
 
-    public ThongKeHocLuc()
+    public ThongKeDoanhThu()
     {
         _rawData = new List<NganhDto>();
         _displayData = new List<object>();
@@ -48,9 +48,9 @@ public class ThongKeHocLuc : MyTLP
             ColumnCount = 2,
             AutoSize = true
         };
-        var title = GetLabel("Học lực");
+        var title = GetLabel("Doanh thu");
 
-        var combobox = new CustomCombobox(new[] { "Ngành", "Khóa" }) {Margin = new Padding(3, 7, 3, 3)};
+        var combobox = new CustomCombobox(new[] { "Ngành", "Khóa" }){Margin = new Padding(3, 7, 3, 3)};
         combobox.Anchor = AnchorStyles.None;
         combobox.SetSelectionCombobox("Ngành");
 
@@ -115,11 +115,6 @@ public class ThongKeHocLuc : MyTLP
                 SoSV = 100
             }
         );
-    }
-
-    private void UpdateDisplayData()
-    {
-        
     }
 
     private void SetPieChart()

@@ -1,5 +1,7 @@
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.SearchObject;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -8,11 +10,28 @@ public class NhomHocPhanController
     private static NhomHocPhanController _instance;
     private readonly NhomHocPhanDao _nhomHocPhanDao;
     private List<NhomHocPhanDto> _listNhomHocPhan;
+    private HocPhanController _hocPhanController;
+    private GiangVienController _giangVienController;
+    
+    private Dictionary<int, string> hocPhanDic;
+    private Dictionary<int, string> giangVienDic;
 
     private NhomHocPhanController()
     {
         _nhomHocPhanDao = NhomHocPhanDao.GetInstance();
         _listNhomHocPhan = _nhomHocPhanDao.GetAll();
+        _hocPhanController = HocPhanController.GetInstance();
+        _giangVienController = GiangVienController.GetInstance();
+        InitLookUpData();
+    }
+
+    void InitLookUpData()
+    {
+        List<HocPhanDto> listHocPhan = _hocPhanController.GetAll();
+        List<GiangVienDto> listGiangVien = _giangVienController.GetAll();
+        
+        hocPhanDic = listHocPhan.ToDictionary(x => x.MaHP, x => x.TenHP);
+        giangVienDic = listGiangVien.ToDictionary(x => x.MaGV, x => x.TenGV);
     }
 
     public static NhomHocPhanController GetInstance()
@@ -64,5 +83,18 @@ public class NhomHocPhanController
     public List<NhomHocPhanDto> GetByHkyNamMaGV(int hky, string nam, int maGV)
     {
         return _nhomHocPhanDao.GetByHkyNamMaGV(hky, nam, maGV);
+    }
+    
+    
+    public List<NhomHocPhanDisplay> ConvertDtoToDisplayNhapDiem(List<NhomHocPhanDto> input)
+    {
+        List<NhomHocPhanDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new NhomHocPhanDisplay
+        {
+            MaNHP = x.MaNHP,
+            TenHP = hocPhanDic.TryGetValue(x.MaHP, out var  ten) ? ten : "",
+            Siso = x.SiSo,
+            TenGiangVien = giangVienDic.TryGetValue(x.MaGV, out var teng) ? teng : ""
+        });
+        return rs;
     }
 }

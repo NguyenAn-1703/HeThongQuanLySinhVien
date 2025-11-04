@@ -7,7 +7,7 @@ using QuanLySinhVien.View.Views.Components.ViewComponents;
 
 namespace QuanLySinhVien.View.Views.Components.NavList;
 
-public class ThongKeTongQuan : TableLayoutPanel
+public class ThongKeTongQuan : MyTLP
 {
     #region Constructor
 
@@ -25,7 +25,7 @@ public class ThongKeTongQuan : TableLayoutPanel
         Dock = DockStyle.Fill;
         Margin = new Padding(0);
 
-        var mainLayout = new TableLayoutPanel
+        var mainLayout = new MyTLP
         {
             RowCount = ROW_COUNT,
             ColumnCount = COLUMN_COUNT,
@@ -109,7 +109,7 @@ public class ThongKeTongQuan : TableLayoutPanel
 
         return new OverviewChart(years, counts)
         {
-            Dock = DockStyle.Fill
+            Dock = DockStyle.Fill,
         };
     }
 
@@ -119,25 +119,38 @@ public class ThongKeTongQuan : TableLayoutPanel
         var panel = new RoundTLP
         {
             Dock = DockStyle.Fill,
-            RowCount = PIE_CHART_ROW_COUNT,
-            AutoSize = true,
+            // RowCount = PIE_CHART_ROW_COUNT,
+            // AutoSize = true,
+            // Anchor =AnchorStyles.None,
             Padding = new Padding(PADDING_VALUE),
             Margin = new Padding(PADDING_VALUE),
-            BackColor = MyColor.White
+            BackColor = MyColor.White,
         };
 
         // Configure row styles
-        for (var i = 0; i < PIE_CHART_ROW_COUNT; i++) panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        // for (var i = 0; i < PIE_CHART_ROW_COUNT; i++) panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         var title = new Label
         {
             AutoSize = true,
             Font = GetFont.GetFont.GetMainFont(13, FontType.SemiBold),
-            Text = "Số sinh viên theo khóa"
+            Anchor = AnchorStyles.None,
+            Text = "Số sinh viên theo khóa",
+            Margin = new Padding(3, 5, 3, 3),
         };
 
-        panel.Controls.Add(title);
-        panel.Controls.Add(CreatePieChart());
+        RoundTLP container = new RoundTLP
+        {
+            AutoSize = true,
+            Border = true,
+            Dock = DockStyle.Top,
+            Margin = new Padding(3, 3,3,50),
+        };
+        
+        container.Controls.Add(title);
+        container.Controls.Add(CreatePieChart());
+
+        panel.Controls.Add(container);
 
         return panel;
     }
@@ -153,12 +166,15 @@ public class ThongKeTongQuan : TableLayoutPanel
             .Select(count => (float)Math.Round((float)count / total * 100, 2))
             .ToArray();
 
-        return new CustomPieChart(courseNames, percentages);
+        return new CustomPieChart(courseNames, percentages)
+        {
+            Dock = DockStyle.Top,
+        };
     }
 
-    private TableLayoutPanel CreateBottomContainer()
+    private MyTLP CreateBottomContainer()
     {
-        var panel = new TableLayoutPanel
+        var panel = new MyTLP
         {
             ColumnCount = BOTTOM_CONTAINER_COLUMN_COUNT,
             Dock = DockStyle.Fill,

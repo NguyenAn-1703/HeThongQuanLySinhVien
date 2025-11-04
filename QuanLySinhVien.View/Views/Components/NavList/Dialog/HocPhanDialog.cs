@@ -210,7 +210,7 @@ public class HocPhanDialog : CustomDialog
                 MaHPTruoc = maHPTruoc,
                 TenHP = tenHP,
                 SoTinChi = int.Parse(soTinChiText),
-                HeSoHocPhan = float.Parse(heSoHPText),
+                HeSoHocPhan = heSoHPText,
                 SoTietLyThuyet = int.Parse(soTietLTText),
                 SoTietThucHanh = int.Parse(soTietTHText)
             };
@@ -257,7 +257,7 @@ public class HocPhanDialog : CustomDialog
                 MaHPTruoc = maHPTruoc,
                 TenHP = tenHP,
                 SoTinChi = int.Parse(soTinChiText),
-                HeSoHocPhan = float.Parse(heSoHPText),
+                HeSoHocPhan = heSoHPText,
                 SoTietLyThuyet = int.Parse(soTietLTText),
                 SoTietThucHanh = int.Parse(soTietTHText)
             };

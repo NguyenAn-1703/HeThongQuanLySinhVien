@@ -9,5 +9,5 @@ public class NhomHocPhanDto
     public int MaLop { get; set; }
     public int HocKy { get; set; }
     public string Nam { get; set; }
-    public int SiSo { get; set; }
+    public int SiSo { get; set; } = 0;
 }

@@ -39,7 +39,7 @@ public class HocPhanDao
                     : reader.GetInt32(reader.GetOrdinal("MaHPTruoc")),
                 TenHP = reader.GetString(reader.GetOrdinal("TenHP")),
                 SoTinChi = reader.GetInt32(reader.GetOrdinal("SoTinChi")),
-                HeSoHocPhan = reader.GetFloat(reader.GetOrdinal("HeSoHocPhan")),
+                HeSoHocPhan = reader.GetString(reader.GetOrdinal("HeSoHocPhan")),
                 SoTietLyThuyet = reader.GetInt32(reader.GetOrdinal("SoTietLyThuyet")),
                 SoTietThucHanh = reader.GetInt32(reader.GetOrdinal("SoTietThucHanh"))
             });
@@ -141,7 +141,7 @@ public class HocPhanDao
                     : reader.GetInt32(reader.GetOrdinal("MaHPTruoc")),
                 TenHP = reader.GetString(reader.GetOrdinal("TenHP")),
                 SoTinChi = reader.GetInt32(reader.GetOrdinal("SoTinChi")),
-                HeSoHocPhan = reader.GetFloat(reader.GetOrdinal("HeSoHocPhan")),
+                HeSoHocPhan = reader.GetString(reader.GetOrdinal("HeSoHocPhan")),
                 SoTietLyThuyet = reader.GetInt32(reader.GetOrdinal("SoTietLyThuyet")),
                 SoTietThucHanh = reader.GetInt32(reader.GetOrdinal("SoTietThucHanh"))
             };
@@ -169,7 +169,7 @@ public class HocPhanDao
                     : reader.GetInt32(reader.GetOrdinal("MaHPTruoc")),
                 TenHP = reader.GetString(reader.GetOrdinal("TenHP")),
                 SoTinChi = reader.GetInt32(reader.GetOrdinal("SoTinChi")),
-                HeSoHocPhan = reader.GetFloat(reader.GetOrdinal("HeSoHocPhan")),
+                HeSoHocPhan = reader.GetString(reader.GetOrdinal("HeSoHocPhan")),
                 SoTietLyThuyet = reader.GetInt32(reader.GetOrdinal("SoTietLyThuyet")),
                 SoTietThucHanh = reader.GetInt32(reader.GetOrdinal("SoTietThucHanh"))
             };
@@ -204,7 +204,7 @@ public class HocPhanDao
                 MaHPTruoc = null,
                 TenHP = "Học phần Thử Nghiệm",
                 SoTinChi = 3,
-                HeSoHocPhan = 1.0f,
+                HeSoHocPhan = "5:5",
                 SoTietLyThuyet = 30,
                 SoTietThucHanh = 15
             };

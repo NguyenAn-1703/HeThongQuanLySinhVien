@@ -13,8 +13,10 @@ public class SinhVienController
     private readonly LopController _lopController;
     private readonly NganhController _nganhController;
 
-    private Dictionary<int, string> _lopDic;
-    private Dictionary<int, string> _nganhDic;
+    private Dictionary<int, LopDto> _lopDic;
+    private Dictionary<int, NganhDto> _nganhDic;
+    private Dictionary<int, string> _khoaDic;
+    
     
     
     public LopDAO LopDao;
@@ -38,8 +40,11 @@ public class SinhVienController
     {
         var listLop = _lopController.GetAll();
         var listNganh = _nganhController.GetAll();
-        _lopDic = listLop.ToDictionary(x => x.MaLop, x => x.TenLop);
-        _nganhDic = listNganh.ToDictionary(x => x.MaNganh, x => x.TenNganh);
+        var listKhoa = _khoaController.GetDanhSachKhoa();
+        
+        _lopDic = listLop.ToDictionary(x => x.MaLop, x => x);
+        _nganhDic = listNganh.ToDictionary(x => x.MaNganh, x => x);
+        _khoaDic = listKhoa.ToDictionary(x => x.MaKhoa, x => x.TenKhoa);
     }
 
     public static SinhVienController GetInstance()
@@ -104,33 +109,6 @@ public class SinhVienController
 
         return sv;
     }
-
-
-    public string GetTenKhoa(int maSV)
-    {
-        var sinhVien = GetById(maSV);
-        var lop = _lopController.GetLopById(sinhVien.MaLop);
-        var nganhDto = _nganhController.GetNganhById(lop.MaNganh);
-        var khoaDto = _khoaController.GetKhoaById(nganhDto.MaKhoa);
-        return khoaDto.TenKhoa;
-    }
-
-    public string GetTenNganh(int maSV)
-    {
-        var sinhVien = GetById(maSV);
-        var lop = _lopController.GetLopById(sinhVien.MaLop);
-        var nganhDto = _nganhController.GetNganhById(lop.MaNganh);
-        return nganhDto.TenNganh;
-    }
-
-    public string GetTrangThaiHocPhi(int maSV, int hocKy, string nam) //tạm
-    {
-        foreach (var hpsv in _HocPhiSVController._listHocPhiSV)
-            if (hpsv.MaSV == maSV && hpsv.HocKy == hocKy && hpsv.Nam.Equals(nam))
-                return hpsv.TrangThai;
-
-        return "Chưa đóng";
-    }
     
     public List<SinhVienDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)
     {
@@ -140,10 +118,44 @@ public class SinhVienController
             TenSinhVien = x.TenSinhVien,
             NgaySinh = x.NgaySinh,
             GioiTinh = x.GioiTinh,
-            TenLop = _lopDic.TryGetValue(x.MaLop, out var tenLop) ? tenLop : "",
-            TenNganh = _nganhDic.TryGetValue(x.MaLop, out var tenNganh) ? tenNganh : "",
+            TenLop = _lopDic.TryGetValue(x.MaLop, out var lop) ? lop.TenLop : "",
+            TenNganh = GetTenNganh(x),
             TrangThai = x.TrangThai
         });
         return rs;
+    }
+    
+    public List<SVHocPhiDisplay> ConvertDtoToDisplayHocPhi(List<SinhVienDTO> input, int hky, string nam)
+    {
+        List<SVHocPhiDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new SVHocPhiDisplay
+        {
+            MaSV = x.MaSinhVien,
+            TenSV = x.TenSinhVien,
+            Khoa = GetTenKhoa(x),
+            Nganh = GetTenNganh(x),
+            TrangThaiHP = GetTrangThaiHocPhi(x.MaSinhVien, hky, nam),
+        });
+        return rs;
+    }
+
+    string GetTenNganh(SinhVienDTO x)
+    {
+        LopDto lopDto = _lopDic.TryGetValue(x.MaLop, out var lop) ? lop : new LopDto();
+        return _nganhDic.TryGetValue(lopDto.MaNganh, out var nganh) ? nganh.TenNganh : "";
+    }
+
+    string GetTenKhoa(SinhVienDTO x)
+    {
+        LopDto lopDto = _lopDic.TryGetValue(x.MaLop, out var lop) ? lop : new LopDto();
+        NganhDto nganhDto = _nganhDic.TryGetValue(lopDto.MaNganh, out var nganh) ? nganh : new NganhDto();
+        return _khoaDic.TryGetValue(nganhDto.MaKhoa, out var tenKhoa) ? tenKhoa : "";
+    }
+    
+    public string GetTrangThaiHocPhi(int maSV, int hocKy, string nam) //tạm
+    {
+        foreach (var hpsv in _HocPhiSVController._listHocPhiSV)
+            if (hpsv.MaSV == maSV && hpsv.HocKy == hocKy && hpsv.Nam.Equals(nam))
+                return hpsv.TrangThai;
+        return "Chưa đóng";
     }
 }

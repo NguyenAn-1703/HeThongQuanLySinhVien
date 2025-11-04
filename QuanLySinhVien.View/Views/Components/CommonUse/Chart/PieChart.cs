@@ -1,6 +1,8 @@
 using LiveChartsCore;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 using PieChart = LiveChartsCore.SkiaSharpView.WinForms.PieChart;
 
 namespace QuanLySinhVien.View.Views.Components.CommonUse.Chart;
@@ -33,6 +35,15 @@ public class CustomPieChart : TableLayoutPanel
         pieChart.Anchor = AnchorStyles.None;
         Controls.Add(pieChart);
     }
+    
+    private SKColor[] colors = new[]
+    {
+        SKColor.Parse("#264653"),
+        SKColor.Parse("#2A9D8F"),
+        SKColor.Parse("#E9C46A"),
+        SKColor.Parse("#F4A261"),
+        SKColor.Parse("#E76F51")
+    };
 
     private List<ISeries> GetListISeries()
     {
@@ -41,6 +52,7 @@ public class CustomPieChart : TableLayoutPanel
             list.Add(new PieSeries<float>
             {
                 Values = new[] { _percent[i] }, Name = _content[i],
+                Fill = new SolidColorPaint(colors[i % colors.Length]), 
                 ToolTipLabelFormatter = point => $"{point.Label}: {Math.Round(point.Model, 2)}%"
             });
         return list;

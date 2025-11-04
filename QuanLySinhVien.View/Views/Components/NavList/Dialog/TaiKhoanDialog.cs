@@ -205,6 +205,8 @@ public class TaiKhoanDialog : CustomDialog
 
     private bool ValidateInsert(TextBox TxtTenDangNhap, TextBox TxtMatKhau, string tenDangNhap, string matKhau)
     {
+        
+        
         if (CommonUse.Validate.IsEmpty(tenDangNhap))
         {
             MessageBox.Show("Tên đăng nhập không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);

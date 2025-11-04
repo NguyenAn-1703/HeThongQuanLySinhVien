@@ -10,11 +10,12 @@ namespace QuanLySinhVien.View.Views.Components.NavList;
 public class ThongKe : NavBase
 {
     private readonly string[] _listSelectionForComboBox = new[] { "" };
-    private readonly string[] items = new[] { "Tổng quan", "Học lực" };
+    
     private ThongKeHocLuc _panelThongKeHocLuc;
     private ThongKeTongQuan _panelThongKeTongQuan;
-    private TableLayoutPanel mainLayout;
-    private string selectedItem;
+    private ThongKeDoanhThu _panelThongKeDoanhThu;
+    private MyTLP mainLayout;
+
 
     public ThongKe(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
@@ -24,7 +25,7 @@ public class ThongKe : NavBase
 
     private void Init()
     {
-        mainLayout = new TableLayoutPanel
+        mainLayout = new MyTLP
         {
             Dock = DockStyle.Fill,
             RowCount = 2
@@ -43,46 +44,76 @@ public class ThongKe : NavBase
         Controls.Add(mainLayout);
     }
 
-
-    private TableLayoutPanel GetChangeButtonBar()
+    
+    private List<ButtonChangeThongKe> listBtnChange = new ();
+    private readonly string[] items = new[] { "Tổng quan", "Học lực", "Doanh thu" };
+    private int selectedIndex = 0;
+    private string selectedItem;
+    private MyTLP GetChangeButtonBar()
     {
-        var panel = new TableLayoutPanel
+        
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             ColumnCount = items.Length,
             Margin = new Padding(0, 0, 0, 0)
         };
-        foreach (var i in items)
+        
+        for (int i = 0; i < items.Length; i++)
         {
-            var btn = new ButtonChangeThongKe(i);
-            btn.mouseClick += text => changePanel(text);
+            var btn = new ButtonChangeThongKe(i, items[i]);
+            listBtnChange.Add(btn);
+            btn.mouseClick += (index, text) => changePanel(index, text);
             panel.Controls.Add(btn);
         }
 
         return panel;
     }
+    
 
-    //làm tạm
-    private void changePanel(string text)
+    private void changePanel(int index, string text)
     {
-        // "Tổng quan", "Học lực"
+        // "Tổng quan", "Học lực", "Doanh thu"
         if (selectedItem.Equals(text)) return;
 
         if (selectedItem.Equals("Tổng quan"))
         {
             _panelThongKeTongQuan.Dispose();
-            _panelThongKeHocLuc = new ThongKeHocLuc();
-            mainLayout.Controls.Add(_panelThongKeHocLuc);
-            selectedItem = "Học lực";
+            listBtnChange[0].UnSelected();
         }
         else if (selectedItem.Equals("Học lực"))
         {
             _panelThongKeHocLuc.Dispose();
+            listBtnChange[1].UnSelected();
+        }
+        else if (selectedItem.Equals("Doanh thu"))
+        {
+            _panelThongKeDoanhThu.Dispose();
+            listBtnChange[2].UnSelected();
+        }
+        
+        if (text.Equals("Tổng quan"))
+        {
             _panelThongKeTongQuan = new ThongKeTongQuan();
             mainLayout.Controls.Add(_panelThongKeTongQuan);
-            selectedItem = "Tổng quan";
+
         }
+        else if (text.Equals("Học lực"))
+        {
+            _panelThongKeHocLuc = new ThongKeHocLuc();
+            mainLayout.Controls.Add(_panelThongKeHocLuc);
+        }
+        else if (text.Equals("Doanh thu"))
+        {
+            _panelThongKeDoanhThu = new ThongKeDoanhThu();
+            mainLayout.Controls.Add(_panelThongKeDoanhThu);
+        }
+        
+        listBtnChange[index].SetSelected();
+        
+        selectedItem = text;
+        selectedIndex = index;
     }
 
 

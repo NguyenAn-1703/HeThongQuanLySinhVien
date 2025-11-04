@@ -9,12 +9,17 @@ public class NganhController
     private readonly NganhDao _nganhDao;
     private List<NganhDto> _listNganh;
 
+
+    
+
     // Constructor riêng tư (Singleton)
     private NganhController()
     {
         _nganhDao = NganhDao.GetInstance();
         _listNganh = _nganhDao.GetAll();
+
     }
+
 
     // Lấy instance duy nhất
     public static NganhController GetInstance()

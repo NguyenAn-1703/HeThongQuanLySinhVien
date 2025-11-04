@@ -206,7 +206,9 @@ public class HocPhi : NavBase
 
     private void SetDisplayData()
     {
-        _displayData = ConvertObject.ConvertToDisplay(ConvertDtoToDisplay(_rawData), x => new
+        var hky = int.Parse(_hocKyField.GetSelectionCombobox().Split(' ')[2]);
+        var nam = _namField._namField.Value.ToString("yyyy");
+        _displayData = ConvertObject.ConvertToDisplay(_sinhVienController.ConvertDtoToDisplayHocPhi(_rawData, hky, nam), x => new
             {
                 x.MaSV,
                 x.TenSV,
@@ -220,7 +222,9 @@ public class HocPhi : NavBase
 
     private void SetSearch()
     {
-        _SVHocPhiSearch = new SVHocPhiSearch(ConvertDtoToDisplay(_rawData));
+        var hky = int.Parse(_hocKyField.GetSelectionCombobox().Split(' ')[2]);
+        var nam = _namField._namField.Value.ToString("yyyy");
+        _SVHocPhiSearch = new SVHocPhiSearch(_sinhVienController.ConvertDtoToDisplayHocPhi(_rawData, hky, nam));
     }
 
     private void SetAction()
@@ -273,20 +277,7 @@ public class HocPhi : NavBase
     {
     }
 
-    private List<SVHocPhiDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)
-    {
-        var hky = int.Parse(_hocKyField.GetSelectionCombobox().Split(' ')[2]);
-        var nam = _namField._namField.Value.ToString("yyyy");
-        List<SVHocPhiDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new SVHocPhiDisplay
-        {
-            MaSV = x.MaSinhVien,
-            TenSV = x.TenSinhVien,
-            Khoa = _sinhVienController.GetTenKhoa(x.MaSinhVien),
-            Nganh = _sinhVienController.GetTenNganh(x.MaSinhVien),
-            TrangThaiHP = _sinhVienController.GetTrangThaiHocPhi(x.MaSinhVien, hky, nam)
-        });
-        return rs;
-    }
+
 
     private void OnChangeHkNam()
     {
@@ -295,7 +286,9 @@ public class HocPhi : NavBase
 
     private void UpdateTrangThaiHP()
     {
-        UpdateDataDisplay(ConvertDtoToDisplay(_rawData));
+        var hky = int.Parse(_hocKyField.GetSelectionCombobox().Split(' ')[2]);
+        var nam = _namField._namField.Value.ToString("yyyy");
+        UpdateDataDisplay(_sinhVienController.ConvertDtoToDisplayHocPhi(_rawData, hky, nam));
         _table.UpdateData(_displayData);
     }
 

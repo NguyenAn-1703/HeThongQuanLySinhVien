@@ -82,7 +82,7 @@ public class NhomQuyenController
     //Đọc ds quyền từ json
     public List<QuyenChucNangJS> GetListAllChucNang_HanhDong()
     {
-        var json = File.ReadAllText("config/Permission.json");
+        var json = File.ReadAllText("Views/config/Permission.json");
 
         var list = JsonConvert.DeserializeObject<ListQuyenChucNangJS>(json);
 

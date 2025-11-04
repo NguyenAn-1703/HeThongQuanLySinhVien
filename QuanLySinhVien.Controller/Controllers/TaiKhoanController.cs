@@ -1,5 +1,7 @@
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.SearchObject;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -7,12 +9,24 @@ public class TaiKhoanController
 {
     private static TaiKhoanController _instance;
     private readonly TaiKhoanDao _taiKhoanDao;
+    private NhomQuyenController _nhomQuyenController;
     private List<TaiKhoanDto> _listTaiKhoan;
+
+    private Dictionary<int, string> dicQuyen;
 
     private TaiKhoanController()
     {
         _taiKhoanDao = TaiKhoanDao.GetInstance();
         _listTaiKhoan = _taiKhoanDao.GetAll();
+        _nhomQuyenController = NhomQuyenController.GetInstance();
+
+        InitLookupData();
+    }
+
+    void InitLookupData()
+    {
+        List<NhomQuyenDto> listQuyen = _nhomQuyenController.GetAll();
+        dicQuyen = listQuyen.ToDictionary(q => q.MaNQ, q => q.TenNhomQuyen);
     }
 
     public static TaiKhoanController getInstance()
@@ -66,5 +80,16 @@ public class TaiKhoanController
                 return true;
 
         return false;
+    }
+    
+    public List<TaiKhoanDisplay> ConvertDtoToDisplay(List<TaiKhoanDto> input)
+    {
+        List<TaiKhoanDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new TaiKhoanDisplay
+        {
+            MaTK = x.MaTK,
+            TenDangNhap = x.TenDangNhap,
+            TenNhomQuyen = dicQuyen.TryGetValue(x.MaNQ, out var ten) ? ten : ""
+        });
+        return rs;
     }
 }

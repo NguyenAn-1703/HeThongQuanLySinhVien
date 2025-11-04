@@ -20,7 +20,7 @@ public class BtnThemAnh : TitleButton
                 // đường dẫn ảnh người dùng chọn
                 var selectedPath = openFile.FileName;
                 // Tạo thư mục lưu ảnh trong project (nếu chưa có)
-                var imageFolder = Path.Combine(Application.StartupPath, "img/portrait");
+                var imageFolder = Path.Combine(Application.StartupPath, "Views/img/portrait");
 
                 if (!Directory.Exists(imageFolder))
                     Directory.CreateDirectory(imageFolder);
@@ -44,7 +44,7 @@ public class BtnThemAnh : TitleButton
 
                 var finalFileName = Path.GetFileName(destPath);
 
-                var relativePath = Path.Combine("img", "portrait", finalFileName).Replace("\\", "/");
+                var relativePath = Path.Combine("Views", "img", "portrait", finalFileName).Replace("\\", "/");
                 Console.WriteLine(relativePath);
                 OnClickAddImg?.Invoke(relativePath);
             }

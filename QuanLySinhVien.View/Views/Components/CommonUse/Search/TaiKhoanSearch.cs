@@ -1,21 +1,22 @@
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.SearchObject;
 
 namespace QuanLySinhVien.View.Views.Components.CommonUse.Search;
 
 public class TaiKhoanSearch
 {
-    private readonly List<TaiKhoanDto> _rawData;
+    private readonly List<TaiKhoanDisplay> _rawData;
 
-    public TaiKhoanSearch(List<TaiKhoanDto> rawData)
+    public TaiKhoanSearch(List<TaiKhoanDisplay> rawData)
     {
         _rawData = rawData;
     }
 
-    public event Action<List<TaiKhoanDto>> FinishSearch;
+    public event Action<List<TaiKhoanDisplay>> FinishSearch;
 
     public void Search(string text, string selection)
     {
-        var result = new List<TaiKhoanDto>();
+        var result = new List<TaiKhoanDisplay>();
         var keyword = text.ToLower().Trim();
         selection = selection.Trim();
 
@@ -30,27 +31,27 @@ public class TaiKhoanSearch
         FinishSearch.Invoke(result);
     }
 
-    private List<TaiKhoanDto> SearchAll(string keyword, string selection)
+    private List<TaiKhoanDisplay> SearchAll(string keyword, string selection)
     {
         var result = _rawData
             .Where(x => x.MaTK.ToString().ToLower().Contains(keyword) ||
-                        x.MaNQ.ToString().ToLower().Contains(keyword) ||
+                        x.TenNhomQuyen.ToString().ToLower().Contains(keyword) ||
                         x.TenDangNhap.ToString().ToLower().Contains(keyword)
             )
             .ToList();
         return result;
     }
 
-    private List<TaiKhoanDto> SearchFilter(string keyword, string selection)
+    private List<TaiKhoanDisplay> SearchFilter(string keyword, string selection)
     {
-        List<TaiKhoanDto> result;
+        List<TaiKhoanDisplay> result;
         if (selection.Equals("Mã tài khoản"))
             result = _rawData
                 .Where(x => x.MaTK.ToString().ToLower().Contains(keyword))
                 .ToList();
-        else if (selection.Equals("Mã nhóm quyền"))
+        else if (selection.Equals("Tên nhóm quyền"))
             result = _rawData
-                .Where(x => x.MaNQ.ToString().ToLower().Contains(keyword))
+                .Where(x => x.TenNhomQuyen.ToString().ToLower().Contains(keyword))
                 .ToList();
         else
             result = _rawData

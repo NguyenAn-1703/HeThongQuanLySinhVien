@@ -43,7 +43,7 @@ public class NhomHocPhanDialog : Form
     private NhomHocPhanController _nhomHocPhanController;
     private PhongHocController _phongHocController;
     private CustomTable _tableLichHoc;
-
+    
     public NhomHocPhanDialog(string title, DialogType dialogType, string hocKy, string nam,
         List<NhomHocPhanDto> currentListNhp, int index = -1)
     {
@@ -126,7 +126,6 @@ public class NhomHocPhanDialog : Form
         listField.Add(new LabelTextField("Học phần", TextFieldType.ListBoxHP));
         listField.Add(new LabelTextField("Giảng viên", TextFieldType.ListBoxGV));
         listField.Add(new LabelTextField("Lớp", TextFieldType.ListBoxLop));
-        listField.Add(new LabelTextField("Sĩ số", TextFieldType.Number));
 
 
         var panel = new RoundTLP
@@ -156,7 +155,7 @@ public class NhomHocPhanDialog : Form
             Dock = DockStyle.Fill,
             Margin = new Padding(7),
             RowCount = 3,
-            Padding = new Padding(7)
+            Padding = new Padding(7),
         };
 
         var lblLich = new Label
@@ -178,6 +177,7 @@ public class NhomHocPhanDialog : Form
         // _insertButton.Margin = new Padding(3, 3, 10, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(11, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
+        _insertButton.Enabled = false;
         _lichContainer.Controls.Add(_insertButton);
 
         if (_dialogType == DialogType.ChiTiet) _insertButton.Visible = false;
@@ -195,11 +195,18 @@ public class NhomHocPhanDialog : Form
         var columnNamesList = columnNames.ToList();
 
         if (_dialogType == DialogType.ChiTiet)
+        {
             _tableLichHoc = new CustomTable(header.ToList(), columnNamesList, _lichDisplay);
-        else
-            _tableLichHoc = new CustomTable(header.ToList(), columnNamesList, _lichDisplay, true, true, true);
+            _lichContainer.Controls.Add(_tableLichHoc, 0, 2);
 
-        _lichContainer.Controls.Add(_tableLichHoc);
+        }
+        else
+        {
+            _tableLichHoc = new CustomTable(header.ToList(), columnNamesList, _lichDisplay, true, true, true);
+            _lichContainer.Controls.Add(_tableLichHoc);
+
+        }
+
     }
 
     private void UpdateDisplayDataLich(List<LichHocDto> dtos)
@@ -332,32 +339,56 @@ public class NhomHocPhanDialog : Form
 
         if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
             _btnLuu._mouseDown += () => OnClickBtnLuu();
+
+        listField[2].tb.contentTextBox.TextChanged += (sender, args) => OnChangeHP();
+    }
+
+    void OnChangeHP()
+    {
+        string tenHP = listField[2].tb.contentTextBox.Text;
+        if (_hocPhanController.ExistByTen(tenHP))
+        {
+            _insertButton.Enabled = true;
+        }
+        else
+        {
+            _insertButton.Enabled = false;
+        }
     }
 
 
     /// //////////////////////LICH/////////////////////////
     private void InsertLich()
     {
-        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them, listLichTam, _currentListNhp);
+        string tenHp =  listField[2].tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
+        
+        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them,hocPhan, listLichTam, _currentListNhp);
         _lichDialog.Finish += dto =>
         {
             listLichTam.Add(dto);
             UpdateDisplayDataLich(listLichTam);
         };
         _lichDialog.ShowDialog();
+        
+        listField[2].tb.Enable = false;
     }
 
     private void DetailLich(int index)
     {
+        string tenHp =  listField[2].tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         var lich = GetLichById(index);
-        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet, listLichTam, _currentListNhp, lich);
+        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet,hocPhan, listLichTam, _currentListNhp, lich);
         _lichDialog.ShowDialog();
     }
 
     private void UpdateLich(int index)
     {
+        string tenHp =  listField[2].tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         var lich = GetLichById(index);
-        _lichDialog = new LichHocDialog("Sửa lịch học", DialogType.Sua, listLichTam, _currentListNhp, lich);
+        _lichDialog = new LichHocDialog("Sửa lịch học", DialogType.Sua,hocPhan, listLichTam, _currentListNhp, lich);
 
         _lichDialog.Finish += dto =>
         {
@@ -383,7 +414,6 @@ public class NhomHocPhanDialog : Form
     public void DeleteLich(int index)
     {
         var lich = GetLichById(index);
-        Console.WriteLine("xo");
 
         var select = MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo,
             MessageBoxIcon.Information);
@@ -392,7 +422,6 @@ public class NhomHocPhanDialog : Form
         foreach (var item in listLichTam)
             if (item.MaLH == lich.MaLH)
             {
-                Console.WriteLine("xooke");
                 listLichTam.Remove(item);
                 break;
             }
@@ -404,6 +433,9 @@ public class NhomHocPhanDialog : Form
     /// //////////////////////NHOMHOCPHAN/////////////////////////
     private void SetupUpdate()
     {
+        //Không cho sửa học phần do ảnh hưởng lịch
+        listField[2].tb.Enable = false;
+        
         NhomHocPhanDto nhomHP = _nhomHocPhanController.GetById(_selectedId);
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(nhomHP.MaHP);
         GiangVienDto giangVien = _giangVienController.GetById(nhomHP.MaGV);
@@ -412,7 +444,6 @@ public class NhomHocPhanDialog : Form
         listField[2].tb.contentTextBox.Text = hocPhan.TenHP;
         listField[3].tbGV.contentTextBox.Text = giangVien.TenGV;
         listField[4].tbLop.contentTextBox.Text = lop.TenLop;
-        listField[5]._numberField.contentTextBox.Text = nhomHP.SiSo + "";
 
         SetupListLich();
     }
@@ -427,12 +458,10 @@ public class NhomHocPhanDialog : Form
         listField[2].tb.contentTextBox.Text = hocPhan.TenHP;
         listField[3].tbGV.contentTextBox.Text = giangVien.TenGV;
         listField[4].tbLop.contentTextBox.Text = lop.TenLop;
-        listField[5]._numberField.contentTextBox.Text = nhomHP.SiSo + "";
 
         listField[2].tb.Enable = false;
         listField[3].tbGV.Enable = false;
         listField[4].tbLop.Enable = false;
-        listField[5]._numberField.Enable = false;
 
         SetupListLich();
     }
@@ -463,15 +492,13 @@ public class NhomHocPhanDialog : Form
         var tenHp = listField[2].tb.contentTextBox.Text;
         var tenGv = listField[3].tbGV.contentTextBox.Text;
         var tenLop = listField[4].tbLop.contentTextBox.Text;
-        var sisos = listField[5]._numberField.contentTextBox.Text;
 
-        if (!Validate(tenHp, tenGv, tenLop, sisos)) return;
+        if (!Validate(tenHp, tenGv, tenLop, listLichTam)) return;
 
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         GiangVienDto giangVien = _giangVienController.GetByTen(tenGv);
         LopDto lop = _lopController.GetByTen(tenLop);
 
-        int siso = short.Parse(sisos);
         var hocKy = int.Parse(_hocKy.Split(" ")[2]);
         var nam = _nam;
 
@@ -482,7 +509,6 @@ public class NhomHocPhanDialog : Form
             MaLop = lop.MaLop,
             HocKy = hocKy,
             Nam = nam,
-            SiSo = siso
         };
 
         if (!_nhomHocPhanController.Insert(nhomHP))
@@ -525,15 +551,13 @@ public class NhomHocPhanDialog : Form
         var tenHp = listField[2].tb.contentTextBox.Text;
         var tenGv = listField[3].tbGV.contentTextBox.Text;
         var tenLop = listField[4].tbLop.contentTextBox.Text;
-        var sisos = listField[5]._numberField.contentTextBox.Text;
 
-        if (!Validate(tenHp, tenGv, tenLop, sisos)) return;
+        if (!Validate(tenHp, tenGv, tenLop, listLichTam)) return;
 
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         GiangVienDto giangVien = _giangVienController.GetByTen(tenGv);
         LopDto lop = _lopController.GetByTen(tenLop);
 
-        int siso = short.Parse(sisos);
         var hocKy = int.Parse(_hocKy.Split(" ")[2]);
         var nam = _nam;
 
@@ -545,7 +569,6 @@ public class NhomHocPhanDialog : Form
             MaLop = lop.MaLop,
             HocKy = hocKy,
             Nam = nam,
-            SiSo = siso
         };
 
         if (!_nhomHocPhanController.Update(nhomHP))
@@ -584,7 +607,7 @@ public class NhomHocPhanDialog : Form
         Close();
     }
 
-    private bool Validate(string tenHP, string tenGV, string tenLop, string siso)
+    private bool Validate(string tenHP, string tenGV, string tenLop, List<LichHocDto> listLich)
     {
         if (tenHP.Equals(""))
         {
@@ -622,18 +645,33 @@ public class NhomHocPhanDialog : Form
             return false;
         }
 
-        if (siso.Equals(""))
-        {
-            MessageBox.Show("Sĩ số không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
         if (listLichTam.Count == 0)
         {
             MessageBox.Show("Vui lòng thêm lịch học!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
-
+        
+        string tenHp =  listField[2].tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
+                
+        if (hocPhan.SoTietThucHanh != 0)
+        {
+            if (!listLich.Any(x => x.Type.Equals("Thực hành")))
+            {
+                MessageBox.Show($"Chưa đủ tiết học, vui lòng thêm lịch học \nSố tiết thực hành học phần {tenHp} là {hocPhan.SoTietThucHanh} tiết", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+        }
+        
+        if (hocPhan.SoTietLyThuyet != 0)
+        {
+            if (!listLich.Any(x => x.Type.Equals("Lý thuyết")))
+            {
+                MessageBox.Show($"Chưa đủ tiết học, vui lòng thêm lịch học \nSố tiết lý thuyết học phần{tenHp} là {hocPhan.SoTietLyThuyet} tiết", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+        }
+        
         return true;
     }
 }

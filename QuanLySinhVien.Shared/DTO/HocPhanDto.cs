@@ -12,7 +12,7 @@ public class HocPhanDto
     public int? MaHPTruoc { get; set; }
     public string TenHP { get; set; }
     public int SoTinChi { get; set; }
-    public float HeSoHocPhan { get; set; }
+    public string HeSoHocPhan { get; set; }
     public int SoTietLyThuyet { get; set; }
     public int SoTietThucHanh { get; set; }
     public int Status { get; set; } = 1;

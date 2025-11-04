@@ -247,7 +247,7 @@ public class NhapDiem : NavBase
 
     private void SetDisplayData()
     {
-        _displayData = ConvertObject.ConvertToDisplay(ConvertDtoToDisplay(_rawData), x => new
+        _displayData = ConvertObject.ConvertToDisplay(_NhomHocPhanController.ConvertDtoToDisplayNhapDiem(_rawData), x => new
             {
                 x.MaNHP,
                 x.TenHP,
@@ -260,7 +260,7 @@ public class NhapDiem : NavBase
 
     private void SetSearch()
     {
-        _NhomHocPhanSearch = new NhomHocPhanSearch(ConvertDtoToDisplay(_rawData));
+        _NhomHocPhanSearch = new NhomHocPhanSearch(_NhomHocPhanController.ConvertDtoToDisplayNhapDiem(_rawData));
     }
 
     private void SetAction()
@@ -296,7 +296,7 @@ public class NhapDiem : NavBase
             _rawData = _NhomHocPhanController.GetByHkyNamMaGV(hky, nam, GV.MaGV);
         }
 
-        UpdateDataDisplay(ConvertDtoToDisplay(_rawData));
+        UpdateDataDisplay(_NhomHocPhanController.ConvertDtoToDisplayNhapDiem(_rawData));
         _table.UpdateData(_displayData);
     }
 
@@ -337,17 +337,7 @@ public class NhapDiem : NavBase
     {
     }
 
-    private List<NhomHocPhanDisplay> ConvertDtoToDisplay(List<NhomHocPhanDto> input)
-    {
-        List<NhomHocPhanDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new NhomHocPhanDisplay
-        {
-            MaNHP = x.MaNHP,
-            TenHP = _hocPhanController.GetHocPhanById(x.MaHP).TenHP,
-            Siso = x.SiSo,
-            TenGiangVien = _giangVienController.GetById(x.MaGV).TenGV
-        });
-        return rs;
-    }
+
 
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
@@ -358,6 +348,6 @@ public class NhapDiem : NavBase
 
     public override void onSearch(string txtSearch, string filter)
     {
-        _NhomHocPhanSearch.Search(txtSearch, filter, ConvertDtoToDisplay(_rawData));
+        _NhomHocPhanSearch.Search(txtSearch, filter, _NhomHocPhanController.ConvertDtoToDisplayNhapDiem(_rawData));
     }
 }
