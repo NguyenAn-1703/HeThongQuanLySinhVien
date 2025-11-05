@@ -1,5 +1,9 @@
+using QuanLySinhVien.Model.DAO;
 using QuanLySinhVien.Models.DAO;
+using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.SearchObject;
+using QuanLySinhVien.Shared.DTO.ThongKe;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -8,8 +12,14 @@ public class NganhController
     private static NganhController _instance;
     private readonly NganhDao _nganhDao;
     private List<NganhDto> _listNganh;
+    
+    
+    private LopController _lopController;
+    private SinhVienController _sinhVienController;
+    private KetQuaController _ketQuaController;
 
-
+    private Dictionary<int, int> svGioiXuatSacDic;
+    private Dictionary<int, int> svGioiXuatSaDic;
     
 
     // Constructor riêng tư (Singleton)
@@ -17,7 +27,6 @@ public class NganhController
     {
         _nganhDao = NganhDao.GetInstance();
         _listNganh = _nganhDao.GetAll();
-
     }
 
 
@@ -70,4 +79,9 @@ public class NganhController
         var lastIndex = _listNganh.Count - 1;
         return _listNganh[lastIndex].MaNganh;
     }
+    
+
+
+    
+    //Lop, SinhVien, KetQua
 }

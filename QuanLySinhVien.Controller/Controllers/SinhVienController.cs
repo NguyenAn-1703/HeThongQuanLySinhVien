@@ -17,6 +17,9 @@ public class SinhVienController
     private Dictionary<int, NganhDto> _nganhDic;
     private Dictionary<int, string> _khoaDic;
     
+    private ChuongTrinhDaoTao_HocPhanController _chuongTrinhDaoTao_HocPhanController;
+    private KetQuaController _ketQuaController;
+    
     
     
     public LopDAO LopDao;
@@ -32,6 +35,8 @@ public class SinhVienController
         _nganhController = NganhController.GetInstance();
         _khoaController = KhoaController.GetInstance();
         _HocPhiSVController = HocPhiSVController.GetInstance();
+        _chuongTrinhDaoTao_HocPhanController = ChuongTrinhDaoTao_HocPhanController.GetInstance();
+        _ketQuaController = KetQuaController.GetInstance();
 
         InitLookupData();
     }
@@ -158,4 +163,46 @@ public class SinhVienController
                 return hpsv.TrangThai;
         return "Chưa đóng";
     }
+
+
+    public void UpdateTrangThaiSv()
+    {
+        Dictionary<int, int> MaSvMaCTDTDic = SinhVienDao.GetSinhVien_ChuongTrinhDaoTao();
+        foreach (var item in MaSvMaCTDTDic)
+        {
+            //ds hp sv cần học để tốt nghiệp
+            int maSV = item.Key;
+            int maCTDT = item.Value;
+            List<ChuongTrinhDaoTao_HocPhanDto> listCTDT = _chuongTrinhDaoTao_HocPhanController.GetByMaCTDT(maCTDT);
+            List<int> listSVCanHoc = listCTDT.Select(x => x.MaHP).ToList();
+
+            //ds hp đã học và không liệt
+            List<KetQuaDto> listKetQua = _ketQuaController.GetListQuaMonByMaSV(maSV);
+            List<int> listDaHoc = listKetQua.Select(x => x.MaHP).ToList();
+            
+            
+            bool totNghiep = listSVCanHoc.All(hp => listDaHoc.Contains(hp));
+
+            if (totNghiep)
+            {
+                SinhVienDTO sv =  GetById(maSV);
+                sv.TrangThai = "Tốt nghiệp";
+                if (!EditSinhVien(sv))
+                {
+                    throw new Exception("sua sv that bai");
+                }
+            }
+            
+            // ✅ Log ra nếu là sinh viên mã số 1
+            if (maSV == 1)
+            {
+                Console.WriteLine($"Sinh viên {maSV}:");
+                Console.WriteLine($"- Danh sách học phần cần học ({listSVCanHoc.Count}): {string.Join(", ", listSVCanHoc)}");
+                Console.WriteLine($"- Danh sách học phần đã học qua môn ({listDaHoc.Count}): {string.Join(", ", listDaHoc)}");
+                Console.WriteLine("------------------------------------------------------------");
+            }
+        }
+        
+    }
+    
 }

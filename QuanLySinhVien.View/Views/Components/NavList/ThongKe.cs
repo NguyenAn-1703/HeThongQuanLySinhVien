@@ -67,6 +67,8 @@ public class ThongKe : NavBase
             btn.mouseClick += (index, text) => changePanel(index, text);
             panel.Controls.Add(btn);
         }
+        
+        listBtnChange[0].SetSelected();
 
         return panel;
     }
@@ -77,6 +79,8 @@ public class ThongKe : NavBase
         // "Tổng quan", "Học lực", "Doanh thu"
         if (selectedItem.Equals(text)) return;
 
+        mainLayout.SuspendLayout();
+        
         if (selectedItem.Equals("Tổng quan"))
         {
             _panelThongKeTongQuan.Dispose();
@@ -109,6 +113,8 @@ public class ThongKe : NavBase
             _panelThongKeDoanhThu = new ThongKeDoanhThu();
             mainLayout.Controls.Add(_panelThongKeDoanhThu);
         }
+        
+        mainLayout.ResumeLayout();
         
         listBtnChange[index].SetSelected();
         

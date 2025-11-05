@@ -12,6 +12,7 @@ namespace QuanLySinhVien.View.Views.Components.NavList.Dialog;
 public class NhapDiemThiDialog : RoundTLP
 {
     private readonly int _idCaThi;
+    private CaThiDto _caThi;
 
     private readonly List<DiemThiSV> listDiemThiSV = new();
     private CustomButton _backButton;
@@ -51,6 +52,8 @@ public class NhapDiemThiDialog : RoundTLP
         _ketQuaController = KetQuaController.GetInstance();
         _cotDiemController = CotDiemController.GetInstance();
         _caThiController = CaThiController.GetInstance();
+        _caThi = _caThiController.GetById(_idCaThi);
+        _hocPhan = _hocPhanController.GetHocPhanById(_caThi.MaHP);
         Init();
     }
 
@@ -211,6 +214,9 @@ public class NhapDiemThiDialog : RoundTLP
             MessageBoxIcon.Warning);
         if (rs == DialogResult.No) return;
         _tableSV.UpdateDiem();
+        
+        _ketQuaController.UpdateDiemHeSoSV(_rawData, _hocPhan);
+
     }
 
     private List<SVNhapDiemDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)

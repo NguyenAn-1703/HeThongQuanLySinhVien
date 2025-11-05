@@ -27,8 +27,8 @@ public class CaThiController
 
     void InitLookUpData()
     {
-        List<HocPhanDto> listHocPhan = new List<HocPhanDto>();
-        List<PhongHocDto> listPhongHoc = new List<PhongHocDto>();
+        List<HocPhanDto> listHocPhan = _hocPhanController.GetAll();
+        List<PhongHocDto> listPhongHoc = _phongHocController.GetDanhSachPhongHoc();
         _hocPhanDic = listHocPhan.ToDictionary(hp => hp.MaHP, hp => hp.TenHP);
         _phongHocDic = listPhongHoc.ToDictionary(ph => ph.MaPH, ph => ph.TenPH);
         

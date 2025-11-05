@@ -51,7 +51,7 @@ public class OverviewChart : RoundTLP
 
         var titleLabel = new Label
         {
-            Text = "Tổng số sinh viên nhập học 7 năm gần nhất",
+            Text = "Tổng số sinh viên nhập học 5 năm gần nhất",
             Font = GetFont.GetFont.GetMainFont(10, FontType.Regular),
             TextAlign = ContentAlignment.MiddleCenter,
             Dock = DockStyle.Top,

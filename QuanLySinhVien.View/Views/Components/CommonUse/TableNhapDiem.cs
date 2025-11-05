@@ -765,8 +765,10 @@ public class TableNhapDiem : MyTLP
         }
 
         if (tongHeSo == 0) return 0;
-        Console.WriteLine("he " + tongDiem / tongHeSo);
-        return tongDiem / tongHeSo;
+
+        double rs = Math.Round(tongDiem / tongHeSo, 2);
+        
+        return (float)rs;
     }
 
     public List<DiemSV> GetListDiemSV()

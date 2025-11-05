@@ -206,7 +206,11 @@ public class NhapDiemDialog : RoundTLP
             MessageBoxIcon.Warning);
         if (rs == DialogResult.No) return;
         _tableSV.UpdateDiem();
+        
+        _ketQuaController.UpdateDiemHeSoSV(_rawData, _hocPhanController.GetHocPhanById(_nhomHP.MaHP));
     }
+
+
 
     private List<SVNhapDiemDisplay> ConvertDtoToDisplay(List<SinhVienDTO> input)
     {

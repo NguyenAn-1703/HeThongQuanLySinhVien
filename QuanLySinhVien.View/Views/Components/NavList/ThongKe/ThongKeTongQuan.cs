@@ -1,3 +1,4 @@
+using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Models;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared.Enums;
@@ -10,9 +11,13 @@ namespace QuanLySinhVien.View.Views.Components.NavList;
 public class ThongKeTongQuan : MyTLP
 {
     #region Constructor
+    
+    SinhVienController _sinhVienController;
 
     public ThongKeTongQuan()
     {
+        _sinhVienController = SinhVienController.GetInstance();
+        _sinhVienController.UpdateTrangThaiSv();
         InitializeComponent();
     }
 

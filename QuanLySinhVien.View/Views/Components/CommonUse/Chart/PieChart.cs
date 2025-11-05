@@ -7,7 +7,7 @@ using PieChart = LiveChartsCore.SkiaSharpView.WinForms.PieChart;
 
 namespace QuanLySinhVien.View.Views.Components.CommonUse.Chart;
 
-public class CustomPieChart : TableLayoutPanel
+public class CustomPieChart : MyTLP
 {
     private readonly string[] _content;
     private readonly float[] _percent;
@@ -26,7 +26,7 @@ public class CustomPieChart : TableLayoutPanel
         AutoSize = true;
         pieChart = new PieChart
         {
-            Size = new Size(300, 300)
+            Size = new Size(350, 300)
         };
 
         pieChart.Series = GetListISeries();

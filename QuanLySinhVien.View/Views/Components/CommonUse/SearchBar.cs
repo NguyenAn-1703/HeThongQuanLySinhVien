@@ -40,6 +40,8 @@ public class SearchBar : MyTLP
         Controls.Add(_searchFieldPanel);
 
         Controls.Add(Filter);
+
+        
     }
 
     private void SetSearchField()

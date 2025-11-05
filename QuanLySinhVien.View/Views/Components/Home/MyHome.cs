@@ -247,6 +247,13 @@ public class MyHome : Form
         mainLayout.ResumeLayout(true);
 
         _searchBar.KeyDown += (txtSearch, selectedItem) => { rightBottomChange.onSearch(txtSearch, selectedItem); };
+
+        UpdateStartUpData();
+    }
+
+    void UpdateStartUpData()
+    {
+        _sinhVienController.UpdateTrangThaiSv();
     }
 
     //update khi 1 item khác được chọn

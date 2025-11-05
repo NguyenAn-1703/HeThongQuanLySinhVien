@@ -23,8 +23,8 @@ public class DiemSinhVienDto
     public int SoTinChi { get; set; }
     public float DiemQuaTrinh { get; set; }
     public float DiemThi { get; set; }
-    public float DiemHe10 { get; set; }
-    public float DiemHe4 { get; set; }
+    public float DiemHe10 { get; set; } = 0;
+    public float DiemHe4 { get; set; } = 0;
     public int HocKy { get; set; }
     public string Nam { get; set; }
     public string KetQua { get; set; }

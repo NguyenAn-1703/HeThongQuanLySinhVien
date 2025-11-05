@@ -492,10 +492,11 @@ public class TableNhapDiemThi : MyTLP
         {
             var row = GetRowIndexByMaSv(item.MaSV);
             var cell = GetColumnIndexByName("colNhapDiemThi");
-            var diem = float.Parse(_dataGridView.Rows[row].Cells[cell].Value.ToString());
+            var diem = double.Parse(_dataGridView.Rows[row].Cells[cell].Value.ToString());
+            diem = Math.Round(diem, 2);
 
             KetQuaDto ketQua = _ketQuaController.GetByMaSVMaHP(item.MaSV, _maHp);
-            ketQua.DiemThi = diem;
+            ketQua.DiemThi = (float)diem;
             Console.WriteLine("masv " + ketQua.MaSV + "diem " + ketQua.DiemThi);
             if (!_ketQuaController.Update(ketQua))
             {

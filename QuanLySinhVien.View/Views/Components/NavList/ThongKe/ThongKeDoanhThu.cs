@@ -1,7 +1,9 @@
 using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.DTO.ThongKe;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 using QuanLySinhVien.View.Views.Components.CommonUse.Chart;
 using QuanLySinhVien.View.Views.Components.ViewComponents;
@@ -12,14 +14,15 @@ public class ThongKeDoanhThu : MyTLP
 {
     private MyTLP _content;
     private List<object> _displayData;
-    private NganhController _nganhController;
-    private List<NganhDto> _rawData;
+    private ThongKeDoanhThuController _thongKeDoanhThuController;
+    private List<ThongKeDoanhThuDto> _rawData;
+    
 
     public ThongKeDoanhThu()
     {
-        _rawData = new List<NganhDto>();
+        _rawData = new List<ThongKeDoanhThuDto>();
         _displayData = new List<object>();
-        _nganhController = NganhController.GetInstance();
+        _thongKeDoanhThuController = ThongKeDoanhThuController.GetInstance();
         Init();
     }
 
@@ -35,6 +38,7 @@ public class ThongKeDoanhThu : MyTLP
         Dock = DockStyle.Fill;
         BackColor = MyColor.GrayBackGround;
         Margin = new Padding(0);
+        Padding = new Padding(5);
         RowCount = 2;
 
         RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -46,16 +50,17 @@ public class ThongKeDoanhThu : MyTLP
         var panel = new MyTLP
         {
             ColumnCount = 2,
-            AutoSize = true
+            AutoSize = true,
+            Dock = DockStyle.Fill,
         };
         var title = GetLabel("Doanh thu");
 
-        var combobox = new CustomCombobox(new[] { "Ngành", "Khóa" }){Margin = new Padding(3, 7, 3, 3)};
-        combobox.Anchor = AnchorStyles.None;
+        var combobox = new CustomCombobox(new[] { "Ngành", "Khóa" }) {Margin = new Padding(3, 7, 400, 3)};
+        combobox.Anchor = AnchorStyles.Right;
         combobox.SetSelectionCombobox("Ngành");
 
         panel.Controls.Add(title);
-        panel.Controls.Add(combobox);
+        // panel.Controls.Add(combobox);
         Controls.Add(panel);
     }
 
@@ -97,9 +102,9 @@ public class ThongKeDoanhThu : MyTLP
 
     private void SetTable()
     {
-        var header = new[] { "Mã ngành", "Tên ngành", "Số sinh viên giỏi, xuất sắc" };
-        var ColumnName = new[] { "MaNganh", "TenNganh", "SoSV" };
-        _rawData = _nganhController.GetAll();
+        var header = new[] { "Mã ngành", "Tên ngành", "Tổng tiền đã thu" };
+        var ColumnName = new[] { "MaNganh", "TenNganh", "TongTien" };
+        _rawData = _thongKeDoanhThuController.GetListThongKeDoanhThu();
         SetDisplayData();
         var table = new CustomTable(header.ToList(), ColumnName.ToList(), _displayData.ToList());
         table.Margin = new Padding(6);
@@ -112,27 +117,65 @@ public class ThongKeDoanhThu : MyTLP
             {
                 x.MaNganh,
                 x.TenNganh,
-                SoSV = 100
+                TongTien = FormatMoney.formatVN(x.TongTien)
             }
         );
     }
 
+    private void UpdateDisplayData()
+    {
+        
+    }
+
     private void SetPieChart()
     {
-        var container = new RoundTLP
+        var panel = new RoundTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
             BackColor = MyColor.White,
-            Margin = new Padding(6)
+            Margin = new Padding(6),
+            Padding = new Padding(10),
+            RowCount = 2
         };
-        var dsKhoaHoc = new[] { "Xuất sắc", "Giỏi", "Khá", "Trung bình", "Yếu" };
-        var percent = new[] { 20f, 20f, 25f, 25f, 10f };
-        var chart = new CustomPieChart(dsKhoaHoc, percent);
-        chart.Dock = DockStyle.Top;
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+
+        Label title = new Label
+        {
+            Text = "Top 5 ngành",
+            AutoSize = true,
+            Anchor = AnchorStyles.None,
+            Font = GetFont.GetFont.GetMainFont(13,  FontType.SemiBold),
+        };
+        panel.Controls.Add(title);
+
+        
+        RoundTLP container = new RoundTLP
+        {
+            Dock = DockStyle.Top,
+            Border = true,
+            AutoSize = true,
+        };
+
+
+        List<string> dsKhoaHoc = new List<string>();
+        List<float> percent =  new List<float>();
+        
+        List<NganhDoanhThu> listNganhDoanhThu = _thongKeDoanhThuController.GetListPieChart();
+        foreach (var item in listNganhDoanhThu)
+        {
+            dsKhoaHoc.Add(item.ten);
+            percent.Add((float)item.phanTram);
+        }
+        
+
+        var chart = new CustomPieChart(dsKhoaHoc.ToArray(), percent.ToArray());
         container.Controls.Add(chart);
+        panel.Controls.Add(container);
 
 
-        _content.Controls.Add(container);
+        _content.Controls.Add(panel);
     }
 }

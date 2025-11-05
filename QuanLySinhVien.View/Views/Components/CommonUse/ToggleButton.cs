@@ -18,7 +18,7 @@ public class ToggleButton : RoundTLP
         BorderRadius = 6;
         Size = new Size(30, 30);
         BackColor = MyColor.LightGray;
-
+        Cursor = Cursors.SizeWE;
 
         pb = new PictureBox
         {

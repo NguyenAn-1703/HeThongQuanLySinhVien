@@ -336,9 +336,7 @@ public class NhapDiem : NavBase
     private void Delete(int index)
     {
     }
-
-
-
+    
 
     /// ///////////////////////////SETBOTTOM////////////////////////////////////
     public override List<string> getComboboxList()

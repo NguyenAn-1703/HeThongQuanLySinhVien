@@ -395,4 +395,35 @@ public class SinhVienDAO
 
         return result;
     }
+    
+    public Dictionary<int, int> GetSinhVien_ChuongTrinhDaoTao()
+    {
+        Dictionary<int, int> result = new();
+        using var conn = MyConnection.GetConnection();
+    
+        string query = @"
+        SELECT sv.MaSV, ctdt.MaCTDT
+        FROM SinhVien sv
+        JOIN Lop l ON sv.MaLop = l.MaLop
+        JOIN KhoaHoc kh ON sv.MaKhoaHoc = kh.MaKhoaHoc
+        JOIN ChuongTrinhDaoTao ctdt 
+            ON ctdt.MaNganh = l.MaNganh 
+            AND ctdt.MaCKDT = kh.MaCKDT;
+    ";
+
+        using var cmd = new MySqlCommand(query, conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            int maSV = reader.GetInt32("MaSV");
+            int maCTDT = reader.GetInt32("MaCTDT");
+
+            if (!result.ContainsKey(maSV))
+                result.Add(maSV, maCTDT);
+        }
+
+        return result;
+    }
+
 }
