@@ -4,6 +4,7 @@ using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.DTO.SearchObject;
 using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Shared.Structs;
+using QuanLySinhVien.View.utils;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 using QuanLySinhVien.View.Views.Components.CommonUse.Search;
 using QuanLySinhVien.View.Views.Components.NavList;
@@ -91,6 +92,7 @@ public class SinhVien : NavBase
     }
 
 
+    private TitleButton _exportExBtn;
     private Panel Top()
     {
         var panel = new MyTLP
@@ -109,12 +111,32 @@ public class SinhVien : NavBase
 
         panel.Controls.Add(getTitle());
 
+        MyTLP container = new MyTLP
+        {
+            Dock = DockStyle.Right,
+            AutoSize = true,
+            ColumnCount = 2
+        };
+        
+        _exportExBtn = new TitleButton("Xuất", "exportexcel.svg")
+        {
+            BackgroundColor = MyColor.Green,
+            HoverColor = MyColor.GreenHover,
+            SelectColor = MyColor.GreenClick,
+        };
+        _exportExBtn.SetBackGroundColor(MyColor.Green);
+        _exportExBtn.Margin = new Padding(3, 3, 10, 3);
+        _exportExBtn._label.Font = GetFont.GetFont.GetMainFont(12, FontType.Bold);
+        _exportExBtn.Anchor = AnchorStyles.Right;
+
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        if (them) panel.Controls.Add(_insertButton);
+        container.Controls.Add(_exportExBtn);
+        if (them) container.Controls.Add(_insertButton);
 
+        panel.Controls.Add(container);
 
         return panel;
     }
@@ -162,7 +184,7 @@ public class SinhVien : NavBase
         _listSelectionForComboBox = _headerList;
     }
 
-
+    private List<string> columnNamesList;
     private void SetDataTableFromDb()
     {
         _rawData = _SinhVienController.GetAll();
@@ -170,7 +192,7 @@ public class SinhVien : NavBase
 
         var columnNames = new[]
             { "MaSinhVien", "TenSinhVien", "NgaySinh", "GioiTinh", "TenLop", "TenNganh", "TrangThai" };
-        var columnNamesList = columnNames.ToList();
+        columnNamesList = columnNames.ToList();
 
         _table = new CustomTable(_headerList, columnNamesList, _displayData, sua || xoa, sua, xoa);
     }
@@ -209,6 +231,19 @@ public class SinhVien : NavBase
         _table.OnEdit += index => { Update(index); };
         _table.OnDetail += index => { Detail(index); };
         _table.OnDelete += index => { Delete(index); };
+
+        _exportExBtn._mouseDown += () => ExportExcel(_SinhVienController.ConvertDtoToDisplay(_rawData));
+    }
+
+    void ExportExcel(List<SinhVienDisplay> list)
+    {
+        var header = new Dictionary<string, string>();
+        for (int i = 0; i < _headerArray.Length; i++)
+        {
+            header.Add(columnNamesList[i], _headerArray[i]);
+        }
+        
+        ExcelExporter.ExportToExcel(list, "sheet1","Danh sách sinh viên", header);
     }
 
     private void UpdateDataDisplay(List<SinhVienDisplay> input)

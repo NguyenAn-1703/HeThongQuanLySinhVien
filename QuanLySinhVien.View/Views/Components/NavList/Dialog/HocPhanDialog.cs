@@ -1,6 +1,8 @@
+using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 
 namespace QuanLySinhVien.View.Views.Components.NavList.Dialog;
@@ -11,6 +13,7 @@ public class HocPhanDialog : CustomDialog
     private readonly HocPhanDto _hocPhanDto;
     private readonly int _hocPhanId;
     private readonly List<LabelTextField> _listLabelTextField;
+    private HocPhanController _hocPhanController;
 
     public HocPhanDialog(DialogType dialogType, HocPhanDto hocPhanDto, HocPhanDao hocPhanDao)
         : base(GetTitle(dialogType), dialogType, 500, 700)
@@ -18,6 +21,7 @@ public class HocPhanDialog : CustomDialog
         _listLabelTextField = new List<LabelTextField>();
         _hocPhanDao = hocPhanDao;
         _hocPhanDto = hocPhanDto;
+        _hocPhanController = HocPhanController.GetInstance();
         _hocPhanId = hocPhanDto?.MaHP ?? -1;
         Init();
     }
@@ -199,7 +203,19 @@ public class HocPhanDialog : CustomDialog
         var soTietLTText = _listLabelTextField[soTietLTIndex].GetTextTextField();
         var soTietTHText = _listLabelTextField[soTietTHIndex].GetTextTextField();
 
-        if (ValidateInsert(tenHP, selectedHPTruoc, soTinChiText, heSoHPText, soTietLTText, soTietTHText))
+        TextBox tbTenHp = _listLabelTextField[tenHPIndex].GetTextField();
+        TextBox tbTinChi = _listLabelTextField[soTinChiIndex].GetTextField();
+        TextBox tbHeSo = _listLabelTextField[heSoHPIndex].GetTextField();
+        TextBox tbSoTietLT = _listLabelTextField[soTietLTIndex].GetTextField();
+        TextBox tbSoTietTH = _listLabelTextField[soTietTHIndex].GetTextField();
+        
+        tbTenHp.TabIndex = 1;
+        tbTinChi.TabIndex = 2;
+        tbHeSo.TabIndex = 3;
+        tbSoTietLT.TabIndex = 4;
+        tbSoTietTH.TabIndex = 5;
+
+        if (Validate(tenHP, soTinChiText, heSoHPText, soTietLTText, soTietTHText, tbTenHp, tbTinChi, tbHeSo, tbSoTietLT, tbSoTietTH))
         {
             int? maHPTruoc = null;
             if (selectedHPTruoc != "(Không có)" && !string.IsNullOrEmpty(selectedHPTruoc))
@@ -245,7 +261,19 @@ public class HocPhanDialog : CustomDialog
         var soTietLTText = _listLabelTextField[soTietLTIndex].GetTextTextField();
         var soTietTHText = _listLabelTextField[soTietTHIndex].GetTextTextField();
 
-        if (ValidateUpdate(tenHP, selectedHPTruoc, soTinChiText, heSoHPText, soTietLTText, soTietTHText))
+        TextBox tbTenHp = _listLabelTextField[tenHPIndex].GetTextField();
+        TextBox tbTinChi = _listLabelTextField[tenHPIndex].GetTextField();
+        TextBox tbHeSo = _listLabelTextField[tenHPIndex].GetTextField();
+        TextBox tbSoTietLT = _listLabelTextField[tenHPIndex].GetTextField();
+        TextBox tbSoTietTH = _listLabelTextField[tenHPIndex].GetTextField();
+        
+        tbTenHp.TabIndex = 1;
+        tbTinChi.TabIndex = 2;
+        tbHeSo.TabIndex = 3;
+        tbSoTietLT.TabIndex = 4;
+        tbSoTietTH.TabIndex = 5;
+
+        if (Validate(tenHP, soTinChiText, heSoHPText, soTietLTText, soTietTHText, tbTenHp, tbTinChi, tbHeSo, tbSoTietLT, tbSoTietTH))
         {
             int? maHPTruoc = null;
             if (selectedHPTruoc != "(Không có)" && !string.IsNullOrEmpty(selectedHPTruoc))
@@ -276,87 +304,37 @@ public class HocPhanDialog : CustomDialog
         }
     }
 
-    private bool ValidateInsert(string tenHP, string selectedHPTruoc, string soTinChiText, string heSoHPText,
-        string soTietLTText, string soTietTHText)
+    private bool Validate(string tenHP, string soTinChiText, string heSoHPText,
+        string soTietLTText, string soTietTHText,
+        TextBox tbTenHp, TextBox tbTinChi, TextBox tbHeSo, TextBox tbSoTietLT, TextBox tbSoTietTH)
     {
-        if (CommonUse.Validate.IsEmpty(tenHP))
+        Dictionary<int, Control> dic = new Dictionary<int, Control>();
+        dic.Add(0 , tbTenHp);
+        dic.Add(1 , tbTinChi);
+        dic.Add(2 , tbHeSo);
+        dic.Add(3 , tbSoTietLT);
+        dic.Add(4 , tbSoTietTH);
+
+        ValidateResult rs = _hocPhanController.Validate(tenHP, soTinChiText, heSoHPText, soTietLTText, soTietTHText);
+
+        if (rs.index == -1)
         {
-            MessageBox.Show("Tên HP không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
+            return true;
+        }
+        
+        MessageBox.Show(rs.message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        Control c = dic.TryGetValue(rs.index, out Control c2) ? c2 : new Control();
+        c.Focus();
+        if (c is TextBoxBase tb)
+        {
+            tb.SelectAll();
         }
 
-        if (string.IsNullOrEmpty(selectedHPTruoc))
-        {
-            MessageBox.Show("Vui lòng chọn Mã HP Trước!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!int.TryParse(soTinChiText, out _))
-        {
-            MessageBox.Show("Số tín chỉ phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!float.TryParse(heSoHPText, out _))
-        {
-            MessageBox.Show("Hệ số học phần phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!int.TryParse(soTietLTText, out _))
-        {
-            MessageBox.Show("Số tiết lý thuyết phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!int.TryParse(soTietTHText, out _))
-        {
-            MessageBox.Show("Số tiết thực hành phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        return true;
+        return false;
+        
+        
+        
     }
 
-    private bool ValidateUpdate(string tenHP, string selectedHPTruoc, string soTinChiText, string heSoHPText,
-        string soTietLTText, string soTietTHText)
-    {
-        if (CommonUse.Validate.IsEmpty(tenHP))
-        {
-            MessageBox.Show("Tên HP không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
 
-        if (string.IsNullOrEmpty(selectedHPTruoc))
-        {
-            MessageBox.Show("Vui lòng chọn Mã HP Trước!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!int.TryParse(soTinChiText, out _))
-        {
-            MessageBox.Show("Số tín chỉ phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!float.TryParse(heSoHPText, out _))
-        {
-            MessageBox.Show("Hệ số học phần phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!int.TryParse(soTietLTText, out _))
-        {
-            MessageBox.Show("Số tiết lý thuyết phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (!int.TryParse(soTietTHText, out _))
-        {
-            MessageBox.Show("Số tiết thực hành phải là số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        return true;
-    }
 }

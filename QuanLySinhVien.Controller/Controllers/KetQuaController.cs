@@ -11,6 +11,7 @@ public class KetQuaController
     
     private HocPhanController _hocPhanController;
     private DiemQuaTrinhController _diemQuaTrinhController;
+    private SinhVienController _sinhVienController;
 
     private KetQuaController()
     {
@@ -156,6 +157,70 @@ public class KetQuaController
             
         }
     }
+    
+    public void UpdateAllDiemHeSoSV()
+    {
+        _sinhVienController = SinhVienController.GetInstance();
+        List<SinhVienDTO> _listSinhVien = _sinhVienController.GetAll();
+        List<HocPhanDto> _listHocPhan = _hocPhanController.GetAll();
+
+        foreach (var sv in _listSinhVien)
+        {
+            foreach (var hp in _listHocPhan)
+            {
+                if (ExistByMaSVMaHP(sv.MaSinhVien, hp.MaHP))
+                {
+                    KetQuaDto ketQua = GetByMaSVMaHP(sv.MaSinhVien, hp.MaHP);
+
+                    DiemQuaTrinhDto diemQuaTrinhDto = (_diemQuaTrinhController.ExistsByMaKQ(ketQua.MaKQ))
+                        ? _diemQuaTrinhController.GetByMaKQ(ketQua.MaKQ)
+                        : new DiemQuaTrinhDto();
+                    
+                    string[] heso = hp.HeSoHocPhan.Split(':');
+
+                    double diemQuaTrinh = diemQuaTrinhDto.DiemSo;
+                    double diemThi = ketQua.DiemThi;
+            
+                    int hesoThi = int.Parse(heso[0]);
+                    int hesoQt = int.Parse(heso[1]);
+            
+                    double diemHe10 = (diemThi * hesoThi +  diemQuaTrinh * hesoQt) / (hesoThi + hesoQt);
+                    double diemHe4;
+                    switch (diemHe10)
+                    {
+                        case >= 8.5 and <= 10.0:
+                            diemHe4 = 4.0;
+                            break;
+                        case >= 7.0 and < 8.5:
+                            diemHe4 = 3.0;
+                            break;
+                        case >= 5.5 and < 7.0:
+                            diemHe4 = 2.0;
+                            break;
+                        case >= 4.0 and < 5.5:
+                            diemHe4 = 1.0;
+                            break;
+                        default:
+                            diemHe4 = 0.0;
+                            break;
+                    }
+            
+                    diemHe10 = Math.Round(diemHe10, 2);
+                    diemHe4 = Math.Round(diemHe4, 2);
+            
+                    ketQua.DiemHe4 = (float)diemHe4;
+                    ketQua.DiemHe10 = (float)diemHe10;
+
+                    if (!Update(ketQua))
+                    {
+                        throw new Exception("loi sua ket qua");
+                    }
+                }
+            }
+        }
+        
+    }
+    
     
     public List<float> SetPercentPiChart()
     {

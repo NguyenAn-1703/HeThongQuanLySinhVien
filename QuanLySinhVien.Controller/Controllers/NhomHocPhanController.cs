@@ -12,6 +12,7 @@ public class NhomHocPhanController
     private List<NhomHocPhanDto> _listNhomHocPhan;
     private HocPhanController _hocPhanController;
     private GiangVienController _giangVienController;
+    private DangKyController _dangKyController;
     
     private Dictionary<int, string> hocPhanDic;
     private Dictionary<int, string> giangVienDic;
@@ -96,5 +97,22 @@ public class NhomHocPhanController
             TenGiangVien = giangVienDic.TryGetValue(x.MaGV, out var teng) ? teng : ""
         });
         return rs;
+    }
+
+    public void UpdateSiso()
+    {
+        _listNhomHocPhan = _nhomHocPhanDao.GetAll();
+        _dangKyController = DangKyController.GetInstance();
+        List<DangKyDto> listDangKy = _dangKyController.GetAll();
+
+        foreach (var item in _listNhomHocPhan)
+        {
+            int siSo = listDangKy.Count(x => x.MaNHP == item.MaNHP);
+            item.SiSo = siSo;
+            if (!Update(item))
+            {
+                throw new Exception("Sua nhp that bai");
+            }
+        }
     }
 }

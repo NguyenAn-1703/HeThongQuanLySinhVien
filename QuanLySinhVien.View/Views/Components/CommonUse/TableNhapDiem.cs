@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Shared.Structs;
@@ -585,7 +586,17 @@ public class TableNhapDiem : MyTLP
 
     private void OnChangeHeSo(TextBox heso)
     {
-        if (!ValidateHeSo(heso.Text.Trim())) heso.Text = "1";
+        if (!ValidateHeSo(heso.Text.Trim()))
+        {
+            heso.Text = "1";
+        }
+        else
+        {
+            for (int rowIndex = 0; rowIndex < _dataGridView.Rows.Count; rowIndex++)
+            {
+                UpdateTongDiem(rowIndex);
+            }
+        }
     }
 
     private void UpdateTongDiem(int rowIndex)
@@ -795,7 +806,6 @@ public class TableNhapDiem : MyTLP
                 };
                 listCotDiem.Add(cotDiem);
                 colIndex++;
-                // Console.WriteLine(cotDiem.TenCotDiem + " " + cotDiem.DiemSo + " " + cotDiem.HeSo);
             }
 
             diemSV.listCotDiem = listCotDiem;
@@ -803,5 +813,83 @@ public class TableNhapDiem : MyTLP
         }
 
         return rs;
+    }
+
+    public void ImportEx(Dictionary<string, List<double>> diemSv)
+    {
+        ValidateImport();
+        if (diemSv.Count == 0)
+        {
+            return;
+        }
+        var first = diemSv.First();
+
+        List<double> listDiem = first.Value;
+
+        int soCotThem = listDiem.Count - 1;
+        for (int i = 0; i < soCotThem; i++)
+        {
+            AddColumn();
+        }
+
+
+        foreach (DataGridViewRow row in _dataGridView.Rows)
+        {
+            var cellMaSV = row.Cells["MaSV"];
+            string maSV = cellMaSV.Value.ToString();
+            
+            Console.WriteLine("ma : " + maSV);
+            
+            if (!diemSv.TryGetValue(maSV, out var list)) //Nếu mã trong ex không có trong table
+            {
+                continue;
+            }
+            
+            List<double> diemCacCot = diemSv.TryGetValue(maSV, out var diem) ? diem : new List<double>();
+
+            int diemCacCotIndex = 0;
+            foreach (DataGridViewColumn col in _dataGridView.Columns)
+            {
+                if (col.Name.StartsWith("colNhapDiem"))
+                {
+                    row.Cells[col.Name].Value = diemCacCot[diemCacCotIndex];
+                    diemCacCotIndex++;
+                }
+            }
+        }
+
+    }
+
+    bool ValidateImport()
+    {
+        int columnCount = 0;
+        DataGridViewColumn col = new DataGridViewColumn();
+        foreach (DataGridViewColumn column in _dataGridView.Columns)
+        {
+            if (column.Name.StartsWith("colNhapDiem"))
+            {
+                col =  column;
+                columnCount++;
+            }
+        }
+
+        if (columnCount != 1)
+        {
+            MessageBox.Show("Chỉ được nhập khi bảng trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+
+        foreach (DataGridViewRow row in _dataGridView.Rows)
+        {
+            DataGridViewCell cell = row.Cells[col.Name];
+            if (Convert.ToDouble(cell.Value) != 0)
+            {
+                MessageBox.Show("Chỉ được nhập khi bảng trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+        }
+        
+        
+        return true;
     }
 }

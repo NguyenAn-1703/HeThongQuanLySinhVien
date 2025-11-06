@@ -383,21 +383,15 @@ public class SinhVienDialog : Form
         var tbTenLop = _listTextBox[9].tbLop.contentTextBox;
         var tbTenTK = _listTextBox[10].tbTK.contentTextBox;
 
-
-        // public int MaSinhVien { get; set; }
-        // public string TenSinhVien { get; set; }
-        // public string NgaySinh { get; set; }
-        // public string GioiTinh { get; set; }
-        // public string Nganh { get; set; }
-        // public string TrangThai { get; set; }
-        // public int MaKhoaHoc { get; set; }
-        // public int MaLop { get; set; }
-        // public int? MaTk { get; set; }
-        // public string SdtSinhVien { get; set; }
-        // public string QueQuanSinhVien { get; set; }
-        // public string Email { get; set; }
-        // public string CCCD { get; set; }
-        // public string AnhDaiDienSinhVien { get; set; }
+        tbTenSV.TabIndex = 1;
+        tbSoDT.TabIndex = 2;
+        tbNgaySinh.TabIndex = 3;
+        tbEmail.TabIndex = 4;
+        tbCCCD.TabIndex = 5;
+        tbQueQuan.TabIndex = 6;
+        tbTenLop.TabIndex = 7;
+        tbTenTK.TabIndex = 8;
+        
 
         var tenSV = _listTextBox[0].GetTextTextField(); //
         var gioiTinh = _listTextBox[1].GetSelectionCombobox();
@@ -470,6 +464,15 @@ public class SinhVienDialog : Form
         var tenKH = _listTextBox[8].GetSelectionCombobox();
         var tenLop = _listTextBox[9].tbLop.contentTextBox.Text; //
         var tenTK = _listTextBox[10].tbTK.contentTextBox.Text; //
+        
+        tbTenSV.TabIndex = 1;
+        tbSoDT.TabIndex = 2;
+        tbNgaySinh.TabIndex = 3;
+        tbEmail.TabIndex = 4;
+        tbCCCD.TabIndex = 5;
+        tbQueQuan.TabIndex = 6;
+        tbTenLop.TabIndex = 7;
+        tbTenTK.TabIndex = 8;
 
         if (Validate(imgPath,
                 tenSV, soDT, ngaySinh,
@@ -518,133 +521,34 @@ public class SinhVienDialog : Form
         TextBox tbEmail, TextBox tbCCCD, TextBox tbQueQuan,
         TextBox tbTenLop, TextBox tbTenTK)
     {
-        var homNay = DateTime.Now;
-        DateTime ngaySinhDate = ConvertDate.ConvertStringToDate(ngaySinh);
-        var tuoi = homNay.Year - ngaySinhDate.Year;
+        Dictionary<int, Control> dic = new Dictionary<int, Control>();
+        dic.Add(0 , tbTenSV);
+        dic.Add(1 , tbSoDT);
+        dic.Add(2 , tbNgaySinh);
+        dic.Add(3 , tbEmail);
+        dic.Add(4 , tbCCCD);
+        dic.Add(5 , tbQueQuan);
+        dic.Add(6 , tbTenLop);
+        dic.Add(7 , tbTenTK);
 
-        if (homNay.Month < ngaySinhDate.Month ||
-            (homNay.Month == ngaySinhDate.Month && homNay.Day < ngaySinhDate.Day))
-            tuoi--;
+        ValidateResult rs = _SinhVienController.Validate(imgPath, tenSV, soDT, ngaySinh,
+            email, cccd, queQuan,
+            tenLop, tenTK);
 
-        if (CommonUse.Validate.IsEmpty(imgPath))
+        if (rs.index == -1)
         {
-            MessageBox.Show("Vui lòng thêm ảnh!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenSV.Focus();
-            tbTenSV.SelectAll();
-            return false;
+            return true;
+        }
+        
+        MessageBox.Show(rs.message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        Control c = dic.TryGetValue(rs.index, out Control c2) ? c2 : new Control();
+        c.Focus();
+        if (c is TextBoxBase tb)
+        {
+            tb.SelectAll();
         }
 
-        if (CommonUse.Validate.IsEmpty(tenSV))
-        {
-            MessageBox.Show("Tên sinh viên không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenSV.Focus();
-            tbTenSV.SelectAll();
-            return false;
-        }
+        return false;
 
-        if (CommonUse.Validate.IsEmpty(soDT))
-        {
-            MessageBox.Show("Số điện thoại không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbSoDT.Focus();
-            tbSoDT.SelectAll();
-            return false;
-        }
-
-        if (!CommonUse.Validate.IsValidPhoneNumber(soDT))
-        {
-            MessageBox.Show("Số điện thoại không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbSoDT.Focus();
-            tbSoDT.SelectAll();
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(ngaySinh))
-        {
-            MessageBox.Show("Ngày sinh không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbNgaySinh.Focus();
-            return false;
-        }
-
-        if (tuoi < 17)
-        {
-            MessageBox.Show("Tuổi sinh viên phải lớn hơn 16!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbNgaySinh.Focus();
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(email))
-        {
-            MessageBox.Show("Email không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbEmail.Focus();
-            tbEmail.SelectAll();
-            return false;
-        }
-
-        if (!CommonUse.Validate.IsValidEmail(email))
-        {
-            MessageBox.Show("Email không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbEmail.Focus();
-            tbEmail.SelectAll();
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(cccd))
-        {
-            MessageBox.Show("Căn cước công dân không được để trống!", "Lỗi", MessageBoxButtons.OK,
-                MessageBoxIcon.Warning);
-            tbCCCD.Focus();
-            tbCCCD.SelectAll();
-            return false;
-        }
-
-        if (!CommonUse.Validate.IsValidCCCD(cccd))
-        {
-            MessageBox.Show("Căn cước công dân không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbCCCD.Focus();
-            tbCCCD.SelectAll();
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(queQuan))
-        {
-            MessageBox.Show("Quê quán không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbQueQuan.Focus();
-            tbQueQuan.SelectAll();
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(tenLop))
-        {
-            MessageBox.Show("Tên lớp không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenLop.Focus();
-            tbTenLop.SelectAll();
-            return false;
-        }
-
-        if (!_lopController.ExistByTen(tenLop))
-        {
-            MessageBox.Show("Lớp không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenLop.Focus();
-            tbTenLop.SelectAll();
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(tenTK))
-        {
-            MessageBox.Show("Tên tài khoản không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenTK.Focus();
-            tbTenTK.SelectAll();
-            return false;
-        }
-
-        if (!_taiKhoanController.ExistByTen(tenTK))
-        {
-            MessageBox.Show("Tài khoản không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenTK.Focus();
-            tbTenTK.SelectAll();
-            return false;
-        }
-
-        return true;
     }
 }

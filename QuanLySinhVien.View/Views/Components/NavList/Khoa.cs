@@ -2,16 +2,23 @@ using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.View.utils;
 using QuanLySinhVien.View.Views.Components.CommonUse;
-using QuanLySinhVien.View.Views.Components.NavList;
 using QuanLySinhVien.View.Views.Components.NavList.Dialog;
 
-namespace QuanLySinhVien.View.Views.Components;
+namespace QuanLySinhVien.View.Views.Components.NavList;
 
 public class Khoa : NavBase
 {
+    // public int MaKhoa { get; set; }
+    // public string TenKhoa { get; set; }
+    // public string Email { get; set; }
+    // public string DiaChi { get; set; }
     // variable
     private readonly string[] _listSelectionForComboBox = new[] { "Mã khoa", "Tên khoa" };
+    
+    private string[] _headerArr = { "Mã khoa", "Tên khoa", "email", "Địa chỉ"};
+    private string[] _columnNames = { "MaKhoa", "TenKhoa", "Email", "DiaChi"};
 
     private readonly string ID = "KHOA";
 
@@ -28,12 +35,14 @@ public class Khoa : NavBase
     private Button btnSua;
 
     //button
-    private Button btnThem;
+    private TitleButton _insertButton;
     private Button btnXoa;
     private List<KhoaDto> listKhoa;
     private bool sua;
     private bool them;
     private bool xoa;
+
+    private string _title = "Khoa";
 
 
     public Khoa(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
@@ -61,11 +70,23 @@ public class Khoa : NavBase
     private void Init()
     {
         CheckQuyen();
+        
         Dock = DockStyle.Fill;
-        Size = new Size(1200, 900);
+
+        var mainLayout = new MyTLP
+        {
+            RowCount = 2,
+            Dock = DockStyle.Fill
+        };
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
         _mainBot = Bottom();
-        Controls.Add(_mainBot);
-        Controls.Add(Top());
+        mainLayout.Controls.Add(Top());
+        mainLayout.Controls.Add(_mainBot);
+
+        Controls.Add(mainLayout);
+        
     }
 
     private void CheckQuyen()
@@ -78,26 +99,63 @@ public class Khoa : NavBase
         if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
+    private TitleButton _exportExBtn;
     private new Panel Top()
     {
-        var mainTop = new Panel
+        var panel = new MyTLP
         {
-            Dock = DockStyle.Top,
-            BackColor = MyColor.GrayBackGround,
-            Height = 90
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            // CellBorderStyle = MyTLPCellBorderStyle.Single,
+            Padding = new Padding(10),
+            ColumnCount = 2,
+            BackColor = MyColor.GrayBackGround
         };
 
-        // edit button
-        btnThem = new Button
-        {
-            Text = "Thêm khoa",
-            Size = new Size(120, 40),
-            Location = new Point(30, 25)
-        };
-        btnThem.Click += BtnThem_Click;
-        mainTop.Controls.Add(btnThem);
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-        return mainTop;
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        panel.Controls.Add(getTitle());
+        
+        MyTLP container = new MyTLP
+        {
+            Dock = DockStyle.Right,
+            AutoSize = true,
+            ColumnCount = 2
+        };
+        
+        _exportExBtn = new TitleButton("Xuất", "exportexcel.svg")
+        {
+            BackgroundColor = MyColor.Green,
+            HoverColor = MyColor.GreenHover,
+            SelectColor = MyColor.GreenClick,
+        };
+        _exportExBtn.SetBackGroundColor(MyColor.Green);
+        _exportExBtn.Margin = new Padding(3, 3, 10, 3);
+        _exportExBtn._label.Font = GetFont.GetFont.GetMainFont(12, FontType.Bold);
+        _exportExBtn.Anchor = AnchorStyles.Right;
+
+        _insertButton = new TitleButton("Thêm", "plus.svg");
+        _insertButton.Margin = new Padding(3, 3, 20, 3);
+        _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
+        _insertButton.Anchor = AnchorStyles.Right;
+        container.Controls.Add(_exportExBtn);
+        if (them) container.Controls.Add(_insertButton);
+        panel.Controls.Add(container);
+
+        return panel;
+    }
+    
+    private Label getTitle()
+    {
+        var titlePnl = new Label
+        {
+            Text = _title,
+            Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
+            AutoSize = true
+        };
+        return titlePnl;
     }
 
     private void setActionListener()
@@ -108,6 +166,20 @@ public class Khoa : NavBase
             _table.OnDelete += maKhoa => BtnXoa_Click(maKhoa);
             _table.OnDetail += maKhoa => BtnChiTiet_Click(maKhoa);
         }
+
+        _insertButton._mouseDown += _insertButton_Click;
+        _exportExBtn._mouseDown += () => ExportExcel(listKhoa);
+    }
+    
+    void ExportExcel(List<KhoaDto> list)
+    {
+        var header = new Dictionary<string, string>();
+        for (int i = 0; i < _columnNames.Length; i++)
+        {
+            header.Add(_columnNames[i], _headerArr[i]);
+        }
+        
+        ExcelExporter.ExportToExcel(list, "sheet1","Danh sách khoa", header);
     }
 
     private new Panel Bottom()
@@ -116,7 +188,7 @@ public class Khoa : NavBase
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
-            Padding = new Padding(20, 0, 20, 0)
+            // Padding = new Padding(20, 0, 20, 0)
         };
 
         return mainBot;
@@ -134,7 +206,8 @@ public class Khoa : NavBase
             var columnNames = new List<string> { "MaKhoa", "TenKhoa", "Email", "DiaChi" };
 
             var cells = listKhoa.Cast<object>().ToList();
-            _table = new CustomTable(headerList, columnNames, cells, true, true, true);
+            _table = new CustomTable(headerList, columnNames, cells, sua || xoa, sua, xoa);
+            _table.Margin = new Padding(0);
             _mainBot.Controls.Add(_table);
         }
         else
@@ -144,7 +217,7 @@ public class Khoa : NavBase
     }
 
     // event
-    private void BtnThem_Click(object? sender, EventArgs e)
+    private void _insertButton_Click()
     {
         try
         {

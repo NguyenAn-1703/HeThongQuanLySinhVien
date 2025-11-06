@@ -100,6 +100,12 @@ public class PhongHocDialog : CustomDialog
         _textBoxsContainer.Controls.Add(
             new Label { Text = "Tình trạng:", Anchor = AnchorStyles.Left, Dock = DockStyle.Fill }, 0, 4);
         _textBoxsContainer.Controls.Add(TxtTinhTrang, 1, 4);
+
+        TxtTenPH.TabIndex = 1;
+        TxtLoaiPH.TabIndex = 2;
+        TxtCoSo.TabIndex = 3;
+        NumSucChua.TabIndex = 4;
+        TxtTinhTrang.TabIndex = 5;
     }
 
     // check value trống

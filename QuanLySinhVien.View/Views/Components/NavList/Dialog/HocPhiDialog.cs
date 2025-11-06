@@ -386,7 +386,7 @@ public class HocPhiDialog : Form
 
     public bool Validate(string daThu)
     {
-        if (CommonUse.Validate.IsEmpty(daThu))
+        if (Shared.Validate.IsEmpty(daThu))
         {
             MessageBox.Show("Số tiền thu không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;

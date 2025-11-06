@@ -206,6 +206,13 @@ public class NhapDiemThiDialog : RoundTLP
     {
         _backButton._mouseDown += () => Back?.Invoke();
         _btnLuu._mouseDown += () => UpdateDiem();
+        _tableSV.OnDetail += (i) => DetailSV(i);
+    }
+
+    void DetailSV(int maSV)
+    {
+        DiemSVDialog dialog = new DiemSVDialog(maSV, _hocPhan.MaHP);
+        dialog.ShowDialog();
     }
 
     private void UpdateDiem()

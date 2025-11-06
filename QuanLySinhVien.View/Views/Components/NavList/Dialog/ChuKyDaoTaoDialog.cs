@@ -137,35 +137,35 @@ public class ChuKyDaoTaoDialog : CustomDialog
 
     private bool Validate(TextBox TxtNamBatDau, TextBox TxtNamKetThuc, string namBatDau, string namKetThuc)
     {
-        if (CommonUse.Validate.IsEmpty(namBatDau))
+        if (Shared.Validate.IsEmpty(namBatDau))
         {
             MessageBox.Show("Năm bắt đầu không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtNamBatDau.Focus();
             return false;
         }
 
-        if (CommonUse.Validate.IsEmpty(namKetThuc))
+        if (Shared.Validate.IsEmpty(namKetThuc))
         {
             MessageBox.Show("Năm kết thúc không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtNamKetThuc.Focus();
             return false;
         }
 
-        if (!CommonUse.Validate.IsYear(namBatDau))
+        if (!Shared.Validate.IsYear(namBatDau))
         {
             MessageBox.Show("Năm bắt đầu không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtNamBatDau.Focus();
             return false;
         }
 
-        if (!CommonUse.Validate.IsYear(namKetThuc))
+        if (!Shared.Validate.IsYear(namKetThuc))
         {
             MessageBox.Show("Năm kết thúc không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtNamKetThuc.Focus();
             return false;
         }
 
-        if (!CommonUse.Validate.IsStartYearAndEndYear(namBatDau, namKetThuc))
+        if (!Shared.Validate.IsStartYearAndEndYear(namBatDau, namKetThuc))
         {
             MessageBox.Show("Năm bắt đầu phải nhỏ hơn năm kết thúc!", "Lỗi", MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);

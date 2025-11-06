@@ -4,6 +4,7 @@ using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.DTO.SearchObject;
 using QuanLySinhVien.Shared.DTO.ThongKe;
+using QuanLySinhVien.Shared.Structs;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -80,8 +81,31 @@ public class NganhController
         return _listNganh[lastIndex].MaNganh;
     }
     
+    public ValidateResult Validate(
+        string tenNganh, string hocPhi)
+    {
+        ValidateResult rs = new ValidateResult
+        {
+            index = -1,
+            message = "",
+        };
+        if (Shared.Validate.IsEmpty(tenNganh))
+        {
+            rs.index = 0;
+            rs.message = "Tên ngành không được để trống!";
+            return rs;
+        }
 
+        if (Shared.Validate.IsEmpty(hocPhi))
+        {
+            rs.index = 1;
+            rs.message = "Học phí không được để trống!";
+            return rs;
+        }
+        
 
+        return rs;
+    }
     
-    //Lop, SinhVien, KetQua
+   
 }

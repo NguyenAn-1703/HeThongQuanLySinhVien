@@ -148,21 +148,21 @@ public class KhoaHocDialog : CustomDialog
 
     private bool Validate(TextBox TxtTenKhoaHoc, TextBox NienKhoaHoc, string tenKhoaHoc, string nienKhoaHoc)
     {
-        if (CommonUse.Validate.IsEmpty(tenKhoaHoc))
+        if (Shared.Validate.IsEmpty(tenKhoaHoc))
         {
             MessageBox.Show("Tên khóa học không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtTenKhoaHoc.Focus();
             return false;
         }
 
-        if (CommonUse.Validate.IsEmpty(nienKhoaHoc))
+        if (Shared.Validate.IsEmpty(nienKhoaHoc))
         {
             MessageBox.Show("Niên khóa học không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             NienKhoaHoc.Focus();
             return false;
         }
 
-        if (!CommonUse.Validate.IsAcademicYear(nienKhoaHoc))
+        if (!Shared.Validate.IsAcademicYear(nienKhoaHoc))
         {
             MessageBox.Show("Niên khóa học không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             NienKhoaHoc.Focus();

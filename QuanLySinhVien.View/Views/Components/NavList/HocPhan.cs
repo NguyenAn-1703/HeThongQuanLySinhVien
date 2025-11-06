@@ -3,6 +3,7 @@ using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.View.utils;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 using QuanLySinhVien.View.Views.Components.CommonUse.Search;
 using QuanLySinhVien.View.Views.Components.NavList.Dialog;
@@ -52,7 +53,7 @@ public class HocPhan : NavBase
         CheckQuyen();
         Dock = DockStyle.Fill;
 
-        var mainLayout = new TableLayoutPanel
+        var mainLayout = new MyTLP
         {
             RowCount = 2,
             Dock = DockStyle.Fill
@@ -76,9 +77,10 @@ public class HocPhan : NavBase
         if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
+    private TitleButton _exportExBtn;
     private Panel Top()
     {
-        var panel = new TableLayoutPanel
+        var panel = new MyTLP
         {
             Dock = DockStyle.Fill,
             AutoSize = true,
@@ -91,11 +93,33 @@ public class HocPhan : NavBase
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         panel.Controls.Add(getTitle());
+        
+        MyTLP container = new MyTLP
+        {
+            Dock = DockStyle.Right,
+            AutoSize = true,
+            ColumnCount = 2
+        };
+        
+        _exportExBtn = new TitleButton("Xuất", "exportexcel.svg")
+        {
+            BackgroundColor = MyColor.Green,
+            HoverColor = MyColor.GreenHover,
+            SelectColor = MyColor.GreenClick,
+        };
+        _exportExBtn.SetBackGroundColor(MyColor.Green);
+        _exportExBtn.Margin = new Padding(3, 3, 10, 3);
+        _exportExBtn._label.Font = GetFont.GetFont.GetMainFont(12, FontType.Bold);
+        _exportExBtn.Anchor = AnchorStyles.Right;
+        
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
-        if (them) panel.Controls.Add(_insertButton);
+        container.Controls.Add(_exportExBtn);
+        if (them) container.Controls.Add(_insertButton);
+        
+        panel.Controls.Add(container);
 
         return panel;
     }
@@ -117,7 +141,6 @@ public class HocPhan : NavBase
         {
             Dock = DockStyle.Fill,
             BackColor = ColorTranslator.FromHtml("#E5E7EB"),
-            Padding = new Padding(20)
         };
 
         _tableContainer = new Panel
@@ -141,6 +164,7 @@ public class HocPhan : NavBase
         _listSelectionForComboBox = _headerList;
     }
 
+    private List<string> columnNames;
     private void SetDataTableFromDb()
     {
         try
@@ -155,10 +179,13 @@ public class HocPhan : NavBase
 
         SetDisplayData();
 
-        var columnNames = new List<string>
+        columnNames = new List<string>
             { "MaHP", "MaHPTruoc", "TenHP", "SoTinChi", "HeSoHocPhan", "SoTietLyThuyet", "SoTietThucHanh" };
 
-        _table = new CustomTable(_headerList, columnNames, _displayData, true, true, true);
+        _table = new CustomTable(_headerList, columnNames, _displayData, sua || xoa, sua, xoa)
+        {
+            Margin = new Padding(0),
+        };
     }
 
     private void SetDisplayData()
@@ -192,6 +219,19 @@ public class HocPhan : NavBase
         _table.OnEdit += id => { Update(id); };
         _table.OnDetail += id => { Detail(id); };
         _table.OnDelete += id => { Delete(id); };
+
+        _exportExBtn._mouseDown += () => ExportExcel(_rawData);
+    }
+    
+    void ExportExcel(List<HocPhanDto> list)
+    {
+        var header = new Dictionary<string, string>();
+        for (int i = 0; i < _headerArray.Length; i++)
+        {
+            header.Add(columnNames[i], _headerArray[i]);
+        }
+        
+        ExcelExporter.ExportToExcel(list, "sheet1","Danh sách lớp", header);
     }
 
     private void UpdateDataDisplay(List<HocPhanDto> dtos)

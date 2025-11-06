@@ -178,13 +178,24 @@ public class LopDialog : CustomDialog
 
     private bool Validate(TextBox TxtLop, string tenLop)
     {
-        if (CommonUse.Validate.IsEmpty(tenLop))
+        Dictionary<int, Control> dic = new Dictionary<int, Control>();
+        dic.Add(0 , TxtLop);
+
+        ValidateResult rs = _LopController.Validate(tenLop);
+
+        if (rs.index == -1)
         {
-            MessageBox.Show("Tên lớp không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            TxtLop.Focus();
-            return false;
+            return true;
+        }
+        
+        MessageBox.Show(rs.message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        Control c = dic.TryGetValue(rs.index, out Control c2) ? c2 : new Control();
+        c.Focus();
+        if (c is TextBoxBase tb)
+        {
+            tb.SelectAll();
         }
 
-        return true;
+        return false;
     }
 }

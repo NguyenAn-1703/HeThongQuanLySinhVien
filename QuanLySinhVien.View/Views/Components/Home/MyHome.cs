@@ -17,6 +17,8 @@ public class MyHome : Form
     private readonly NhomQuyenDto _quyen;
 
     private readonly SinhVienController _sinhVienController;
+    private KetQuaController _ketQuaController;
+    private NhomHocPhanController _nhomHocPhanController;
     private readonly TaiKhoanDto _taiKhoan;
     private readonly NavBar navBar;
 
@@ -253,7 +255,13 @@ public class MyHome : Form
 
     void UpdateStartUpData()
     {
+        _ketQuaController = KetQuaController.GetInstance();
+        _ketQuaController.UpdateAllDiemHeSoSV();
         _sinhVienController.UpdateTrangThaiSv();
+        
+        _nhomHocPhanController = NhomHocPhanController.GetInstance();
+        _nhomHocPhanController.UpdateSiso();
+
     }
 
     //update khi 1 item khác được chọn
@@ -349,15 +357,21 @@ public class MyHome : Form
         textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         textAccount.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        string gmail;
+        string gmail = "";
         if (_taiKhoan.Type.Equals("Quản trị viên"))
         {
-            gmail = _giangVienController.GetByMaTK(_taiKhoan.MaTK).Email;
+            if (_giangVienController.ExistByMaTk(_taiKhoan.MaTK))
+            {
+                gmail = _giangVienController.GetByMaTK(_taiKhoan.MaTK).Email;
+            }
         }
         else
         {
-            Console.WriteLine("sv" + _sinhVienController.GetByMaTK(_taiKhoan.MaTK).MaSinhVien);
-            gmail = _sinhVienController.GetByMaTK(_taiKhoan.MaTK).Email;
+            if (_sinhVienController.ExistByMaTk(_taiKhoan.MaTK))
+            {
+                gmail = _sinhVienController.GetByMaTK(_taiKhoan.MaTK).Email;
+
+            }
         }
 
         var userTextName = new Label

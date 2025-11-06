@@ -2,6 +2,7 @@ using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.Shared.Structs;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 
 namespace QuanLySinhVien.View.Views.Components.NavList.Dialog;
@@ -143,7 +144,13 @@ public class NganhDialog : CustomDialog
         var selectedKhoa = _listLabelTextField[1]._combobox.combobox.SelectedItem?.ToString();
         var hocPhi = _listLabelTextField[2]._numberField.contentTextBox.Text;
 
-        if (Validate(tenNganh, selectedKhoa, hocPhi))
+        TextBox tbNganh = _listLabelTextField[0].GetTextField();
+        TextBox tbHocPhi = _listLabelTextField[2]._numberField.contentTextBox;
+
+        tbNganh.TabIndex = 1;
+        tbHocPhi.TabIndex = 2;
+
+        if (Validate(tenNganh, hocPhi, tbNganh, tbHocPhi))
         {
             var maKhoa = int.Parse(selectedKhoa.Split('-')[0].Trim());
 
@@ -179,8 +186,13 @@ public class NganhDialog : CustomDialog
         var selectedKhoa = _listLabelTextField[khoaIndex]._combobox.combobox.SelectedItem?.ToString();
         var hocPhi = _listLabelTextField[2]._numberField.contentTextBox.Text;
 
+        TextBox tbNganh = _listLabelTextField[tenNganhIndex].GetTextField();
+        TextBox tbHocPhi = _listLabelTextField[2]._numberField.contentTextBox;
+        
+        tbNganh.TabIndex = 1;
+        tbHocPhi.TabIndex = 2;
 
-        if (Validate(tenNganh, selectedKhoa, hocPhi))
+        if (Validate(tenNganh, hocPhi, tbNganh, tbHocPhi))
         {
             var maKhoa = int.Parse(selectedKhoa.Split('-')[0].Trim());
 
@@ -222,26 +234,29 @@ public class NganhDialog : CustomDialog
             MessageBox.Show("Lỗi thêm học phí tín chỉ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 
-    private bool Validate(string tenNganh, string selectedKhoa, string hocPhi)
+    private bool Validate(string tenNganh, string hocPhi, TextBox tbNganh, TextBox tbHocPhi)
     {
-        if (CommonUse.Validate.IsEmpty(tenNganh))
+        Dictionary<int, Control> dic = new Dictionary<int, Control>();
+        dic.Add(0 , tbNganh);
+        dic.Add(1 , tbHocPhi);
+
+        ValidateResult rs = _nganhController.Validate(tenNganh, hocPhi);
+
+        if (rs.index == -1)
         {
-            MessageBox.Show("Tên ngành không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
+            return true;
+        }
+        
+        MessageBox.Show(rs.message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        Control c = dic.TryGetValue(rs.index, out Control c2) ? c2 : new Control();
+        c.Focus();
+        if (c is TextBoxBase tb)
+        {
+            tb.SelectAll();
         }
 
-        if (string.IsNullOrEmpty(selectedKhoa))
-        {
-            MessageBox.Show("Vui lòng chọn khoa!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        if (CommonUse.Validate.IsEmpty(hocPhi))
-        {
-            MessageBox.Show("Học phí không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
-        }
-
-        return true;
+        return false;
+        
+        
     }
 }

@@ -24,4 +24,9 @@ public static class MyColor
     public static Color RedClick = ColorTranslator.FromHtml("#E64646");
 
     public static Color BlueButton = ColorTranslator.FromHtml("#67AAD0");
+    
+    
+    public static Color Green = ColorTranslator.FromHtml("#b7d5ad");
+    public static Color GreenHover = ColorTranslator.FromHtml("#93bf85");
+    public static Color GreenClick = ColorTranslator.FromHtml("#6eaa5e");
 }

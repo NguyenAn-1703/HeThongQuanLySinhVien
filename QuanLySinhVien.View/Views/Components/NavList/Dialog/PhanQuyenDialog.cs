@@ -409,7 +409,7 @@ public class PhanQuyenDialog : Form
 
     private void Insert()
     {
-        if (CommonUse.Validate.IsEmpty(_txtTenNQ.GetTextField().Text))
+        if (Shared.Validate.IsEmpty(_txtTenNQ.GetTextField().Text))
         {
             MessageBox.Show("Tên nhóm quyền không được để trống", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
@@ -460,7 +460,7 @@ public class PhanQuyenDialog : Form
 
     private void Update()
     {
-        if (CommonUse.Validate.IsEmpty(_txtTenNQ.GetTextField().Text))
+        if (Shared.Validate.IsEmpty(_txtTenNQ.GetTextField().Text))
         {
             MessageBox.Show("Tên nhóm quyền không được để trống", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;

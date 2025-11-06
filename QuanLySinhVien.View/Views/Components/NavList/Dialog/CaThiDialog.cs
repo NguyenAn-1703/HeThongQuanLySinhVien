@@ -597,7 +597,7 @@ public class CaThiDialog : Form
 
     public bool Validate(TextBox tbHocPhan, TextBox tbPhongHoc)
     {
-        if (CommonUse.Validate.IsEmpty(tbHocPhan.Text))
+        if (Shared.Validate.IsEmpty(tbHocPhan.Text))
         {
             MessageBox.Show("Học phần không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             tbHocPhan.Focus();
@@ -613,7 +613,7 @@ public class CaThiDialog : Form
             return false;
         }
 
-        if (CommonUse.Validate.IsEmpty(tbPhongHoc.Text))
+        if (Shared.Validate.IsEmpty(tbPhongHoc.Text))
         {
             MessageBox.Show("Phòng học không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             tbPhongHoc.Focus();

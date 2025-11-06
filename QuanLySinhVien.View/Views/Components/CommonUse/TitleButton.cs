@@ -7,6 +7,11 @@ public class TitleButton : RoundTLP
 {
     private readonly string _path;
     private readonly string _title;
+    
+    public Color BackgroundColor { get; set; } = MyColor.White;
+    public Color HoverColor { get; set; } = MyColor.GrayHoverColor;
+    public Color SelectColor { get; set; } = MyColor.GraySelectColor;
+    public Label _label { get; set; }
 
     public TitleButton(string title, string path = "")
     {
@@ -16,10 +21,7 @@ public class TitleButton : RoundTLP
         Init();
     }
 
-    public Color BackgroundColor { get; set; } = MyColor.White;
-    public Color HoverColor { get; set; } = MyColor.GrayHoverColor;
-    public Color SelectColor { get; set; } = MyColor.GraySelectColor;
-    public Label _label { get; set; }
+
 
     public event Action _mouseDown;
 
@@ -27,9 +29,9 @@ public class TitleButton : RoundTLP
     {
         Cursor = Cursors.Hand;
         ColumnCount = 2;
-        BackColor = MyColor.White;
         AutoSize = true;
         Padding = new Padding(7, 5, 7, 5);
+        BackColor = BackgroundColor;
 
 
         ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -79,24 +81,29 @@ public class TitleButton : RoundTLP
         }
     }
 
+    public void SetBackGroundColor(Color c)
+    {
+        this.BackColor = c;
+    }
+
     private void OnMouseEnter()
     {
-        BackColor = MyColor.GrayHoverColor;
+        BackColor = HoverColor;
     }
 
     private void OnMouseLeave()
     {
-        BackColor = MyColor.White;
+        BackColor = BackgroundColor;
     }
 
     private void OnMouseDown()
     {
-        BackColor = MyColor.GraySelectColor;
+        BackColor = SelectColor;
         _mouseDown?.Invoke();
     }
 
     private void OnMouseUp()
     {
-        BackColor = MyColor.GrayHoverColor;
+        BackColor = HoverColor;
     }
 }

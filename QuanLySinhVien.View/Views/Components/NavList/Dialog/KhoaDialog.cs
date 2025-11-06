@@ -86,6 +86,9 @@ public class KhoaDialog : CustomDialog
         TxtDiaChi = new TextBox { Dock = DockStyle.Fill };
         _textBoxsContainer.Controls.Add(lblDiaChi, 0, 2);
         _textBoxsContainer.Controls.Add(TxtDiaChi, 1, 2);
+
+        TxtEmail.TabIndex = 1;
+        TxtDiaChi.TabIndex = 2;
     }
 
     private bool ValidateInput()

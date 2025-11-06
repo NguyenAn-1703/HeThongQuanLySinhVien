@@ -110,6 +110,7 @@ public class NhapDiemDialog : RoundTLP
         _mainLayout.Controls.Add(_contentLayout);
     }
 
+    private TitleButton _exportExBtn;
     private void SetTitleBar()
     {
         var panel = new MyTLP
@@ -136,8 +137,16 @@ public class NhapDiemDialog : RoundTLP
             Font = GetFont.GetFont.GetMainFont(12, FontType.SemiBold),
             Margin = new Padding(7, 3, 3, 3)
         };
+
+        _exportExBtn = new TitleButton("Nhập từ excel", "exportexcel.svg");
+        _exportExBtn.Margin = new Padding(3, 3, 10, 3);
+        _exportExBtn._label.Font = GetFont.GetFont.GetMainFont(10, FontType.Bold);
+        _exportExBtn.Anchor = AnchorStyles.Right;
+        
+        
         panel.Controls.Add(_backButton);
         panel.Controls.Add(lblTitle);
+        panel.Controls.Add(_exportExBtn);
 
         _contentLayout.Controls.Add(panel);
     }
@@ -198,6 +207,28 @@ public class NhapDiemDialog : RoundTLP
     {
         _backButton._mouseDown += () => Back?.Invoke();
         _btnLuu._mouseDown += () => UpdateDiem();
+        _exportExBtn._mouseDown +=  () => InportDiem();
+    }
+
+    void InportDiem()
+    {
+        Dictionary<string, List<double>> diem = new Dictionary<string, List<double>>();
+        using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "Excel Files|*.xlsx;*.xls" })
+        {
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    diem = ExcelDiemHelper.ImportDiem(ofd.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi khi import: {ex.Message}");
+                }
+            }
+        }
+
+        _tableSV.ImportEx(diem);
     }
 
     private void UpdateDiem()

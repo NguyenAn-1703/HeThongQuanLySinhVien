@@ -1,5 +1,6 @@
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Structs;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -59,5 +60,23 @@ public class LopController
                 return true;
 
         return false;
+    }
+
+    public ValidateResult Validate(
+        string tenLop)
+    {
+        ValidateResult rs = new ValidateResult
+        {
+            index = -1,
+            message = "",
+        };
+        if (Shared.Validate.IsEmpty(tenLop))
+        {
+            rs.index = 0;
+            rs.message = "Tên lớp không được để trống!";
+            return rs;
+        }
+
+        return rs;
     }
 }

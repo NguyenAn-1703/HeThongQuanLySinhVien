@@ -142,6 +142,9 @@ public class TaiKhoanDialog : CustomDialog
 
         var hashPassword = PasswordHasher.HashPassword(matKhau);
 
+        TxtTenDangNhap.TabIndex = 1;
+        TxtMatKhau.TabIndex = 2;
+
         if (ValidateInsert(TxtTenDangNhap, TxtMatKhau, tenDangNhap, matKhau))
         {
             var taiKhoan = new TaiKhoanDto
@@ -176,6 +179,7 @@ public class TaiKhoanDialog : CustomDialog
         var tenNhomQuyen = _listTextBox[2].GetSelectionCombobox();
 
         int maNQ = _nhomQuyenController.GetMaNhomQuyenByTen(tenNhomQuyen);
+        
 
         if (ValidateUpdate(TxtTenDangNhap, tenDangNhap))
         {
@@ -207,21 +211,21 @@ public class TaiKhoanDialog : CustomDialog
     {
         
         
-        if (CommonUse.Validate.IsEmpty(tenDangNhap))
+        if (Shared.Validate.IsEmpty(tenDangNhap))
         {
             MessageBox.Show("Tên đăng nhập không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtTenDangNhap.Focus();
             return false;
         }
 
-        if (CommonUse.Validate.IsEmpty(matKhau))
+        if (Shared.Validate.IsEmpty(matKhau))
         {
             MessageBox.Show("Mật khẩu không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtMatKhau.Focus();
             return false;
         }
 
-        if (!CommonUse.Validate.HasMinLength(matKhau, 6))
+        if (!Shared.Validate.HasMinLength(matKhau, 6))
         {
             MessageBox.Show("Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtMatKhau.Focus();
@@ -229,7 +233,7 @@ public class TaiKhoanDialog : CustomDialog
             return false;
         }
 
-        if (!CommonUse.Validate.HasMaxLength(matKhau, 20))
+        if (!Shared.Validate.HasMaxLength(matKhau, 20))
         {
             MessageBox.Show("Mật khẩu không quá 20 ký tự!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtMatKhau.Focus();
@@ -242,7 +246,7 @@ public class TaiKhoanDialog : CustomDialog
 
     private bool ValidateUpdate(TextBox TxtTenDangNhap, string tenDangNhap)
     {
-        if (CommonUse.Validate.IsEmpty(tenDangNhap))
+        if (Shared.Validate.IsEmpty(tenDangNhap))
         {
             MessageBox.Show("Tên đăng nhập không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             TxtTenDangNhap.Focus();

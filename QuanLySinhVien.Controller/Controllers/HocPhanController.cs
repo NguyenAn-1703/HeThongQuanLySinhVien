@@ -1,5 +1,6 @@
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared.DTO;
+using QuanLySinhVien.Shared.Structs;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -72,4 +73,54 @@ public class HocPhanController
     {
         return _hocPhanDao.GetHocPhanByTen(ten);
     }
+    
+    public ValidateResult Validate(
+        string tenHP, string soTinChiText, string heSoHPText,
+        string soTietLTText, string soTietTHText)
+    {
+        ValidateResult rs = new ValidateResult
+        {
+            index = -1,
+            message = "",
+        };
+
+        if (Shared.Validate.IsEmpty(tenHP))
+        {
+            rs.index = 0;
+            rs.message = "Tên học phần không được để trống!";
+            return rs;
+        }
+
+        if (!int.TryParse(soTinChiText, out _))
+        {
+            rs.index = 1;
+            rs.message = "Số tín chỉ phải là số!";
+            return rs;
+        }
+
+        if (!Shared.Validate.IsValidHeSo(heSoHPText))
+        {
+            rs.index = 2;
+            rs.message = "Hệ số học phần không hợp lệ!";
+            return rs;
+        }
+
+        if (!int.TryParse(soTietLTText, out _))
+        {
+            rs.index = 3;
+            rs.message = "Số tiết lý thuyết phải là số!";
+            return rs;
+        }
+
+        if (!int.TryParse(soTietTHText, out _))
+        {
+            rs.index = 4;
+            rs.message = "Số tiết thực hành phải là số!";
+            return rs;
+        }
+        
+        return rs;
+    }
+    
+
 }

@@ -233,8 +233,12 @@ public class NhapDiem : NavBase
         }
         else
         {
-            GiangVienDto GV = _giangVienController.GetByMaTK(_taiKhoan.MaTK);
-            _rawData = _NhomHocPhanController.GetByHkyNamMaGV(hky, nam, GV.MaGV);
+            if (_giangVienController.ExistByMaTk(_taiKhoan.MaTK))
+            {
+                GiangVienDto GV = _giangVienController.GetByMaTK(_taiKhoan.MaTK);
+                _rawData = _NhomHocPhanController.GetByHkyNamMaGV(hky, nam, GV.MaGV);
+            }
+
         }
 
         SetDisplayData();

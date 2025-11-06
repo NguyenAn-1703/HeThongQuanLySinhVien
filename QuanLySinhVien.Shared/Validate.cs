@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace QuanLySinhVien.View.Views.Components.CommonUse;
+namespace QuanLySinhVien.Shared;
 
 public class Validate
 {
@@ -84,7 +84,6 @@ public class Validate
 
     public static bool IsStartYearAndEndYear(string input1, string input2)
     {
-        Console.WriteLine(input1 + " " + input2);
 
         var year1 = int.Parse(input1);
         var year2 = int.Parse(input2);
@@ -109,5 +108,13 @@ public class Validate
     {
         if (double.TryParse(text, out var diem)) return diem >= 0 && diem <= 10;
         return false;
+    }
+
+    public static bool IsValidHeSo(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return false;
+        var pattern = @"^\d:\d$";
+
+        return Regex.IsMatch(input, pattern);
     }
 }

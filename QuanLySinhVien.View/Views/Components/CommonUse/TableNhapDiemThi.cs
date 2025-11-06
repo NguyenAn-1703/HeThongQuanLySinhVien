@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using QuanLySinhVien.Controller.Controllers;
+using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.Shared.Structs;

@@ -1,6 +1,8 @@
+using OpenTK.Platform.Windows;
 using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.View.utils;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 using QuanLySinhVien.View.Views.Components.NavList;
 using QuanLySinhVien.View.Views.Components.NavList.Dialog;
@@ -9,11 +11,20 @@ namespace QuanLySinhVien.View.Views.Components;
 
 public class PhongHoc : NavBase
 {
+    // public int MaPH { get; set; }
+    // public string TenPH { get; set; }
+    // public string LoaiPH { get; set; }
+    // public string CoSo { get; set; }
+    // public int SucChua { get; set; }
+    // public string TinhTrang { get; set; }
+    
     private readonly string[] _listSelectionForComboBox = { "Mã phòng", "Tên phòng", "Loại phòng", "Cơ sở" };
+    private string[] _headerArr = { "Mã phòng", "Tên phòng", "Loại phòng", "Cơ sở" , "Sức chứa", "Tình trạng"};
+    private string[] _columnNames = { "MaPH", "TenPH", "LoaiPH", "CoSo", "SucChua", "TinhTrang"};
 
     // variable
     private readonly string ID = "PHONGHOC";
-    private Button _btnThem;
+    private TitleButton _insertButton;
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
     private List<ChiTietQuyenDto> _listAccess;
@@ -24,6 +35,13 @@ public class PhongHoc : NavBase
     private PhongHocController _phongHocController;
     private SearchBar _searchBar;
     private CustomTable _table;
+
+    private string _title = "Phòng học";
+    
+    private bool sua;
+
+    private bool them;
+    private bool xoa;
 
     public PhongHoc(NhomQuyenDto quyen, TaiKhoanDto taiKhoan) : base(quyen, taiKhoan)
     {
@@ -50,11 +68,22 @@ public class PhongHoc : NavBase
     private void Init()
     {
         CheckQuyen();
+        
         Dock = DockStyle.Fill;
-        Size = new Size(1200, 900);
+
+        var mainLayout = new MyTLP
+        {
+            RowCount = 2,
+            Dock = DockStyle.Fill
+        };
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
         _mainBot = Bottom();
-        Controls.Add(_mainBot);
-        Controls.Add(Top());
+        mainLayout.Controls.Add(Top());
+        mainLayout.Controls.Add(_mainBot);
+
+        Controls.Add(mainLayout);
     }
 
 
@@ -63,28 +92,76 @@ public class PhongHoc : NavBase
         int maCN = _chucNangController.GetByTen(ID).MaCN;
         _listAccess = _chiTietQuyenController.GetByMaNQMaCN(_quyen.MaNQ, maCN);
         foreach (var x in _listAccess) Console.WriteLine(x.HanhDong);
+        
+        if (_listAccess.Any(x => x.HanhDong.Equals("Them"))) them = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Sua"))) sua = true;
+        if (_listAccess.Any(x => x.HanhDong.Equals("Xoa"))) xoa = true;
     }
 
 
+    private TitleButton _exportExBtn;
     private new Panel Top()
     {
-        var mainTop = new Panel
+        var panel = new MyTLP
         {
-            Dock = DockStyle.Top,
-            BackColor = MyColor.GrayBackGround,
-            Height = 90
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            // CellBorderStyle = MyTLPCellBorderStyle.Single,
+            Padding = new Padding(10),
+            ColumnCount = 2,
+            BackColor = MyColor.GrayBackGround
         };
 
-        _btnThem = new Button
-        {
-            Text = "Thêm phòng học",
-            Size = new Size(150, 40),
-            Location = new Point(30, 25)
-        };
-        _btnThem.Click += BtnThem_Click;
-        mainTop.Controls.Add(_btnThem);
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-        return mainTop;
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        panel.Controls.Add(getTitle());
+        
+        MyTLP container = new MyTLP
+        {
+            Dock = DockStyle.Right,
+            AutoSize = true,
+            ColumnCount = 2
+        };
+        
+        _exportExBtn = new TitleButton("Xuất", "exportexcel.svg")
+        {
+            BackgroundColor = MyColor.Green,
+            HoverColor = MyColor.GreenHover,
+            SelectColor = MyColor.GreenClick,
+        };
+        _exportExBtn.SetBackGroundColor(MyColor.Green);
+        _exportExBtn.Margin = new Padding(3, 3, 10, 3);
+        _exportExBtn._label.Font = GetFont.GetFont.GetMainFont(12, FontType.Bold);
+        _exportExBtn.Anchor = AnchorStyles.Right;
+
+        _insertButton = new TitleButton("Thêm", "plus.svg");
+        _insertButton.Margin = new Padding(3, 3, 20, 3);
+        _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
+        _insertButton.Anchor = AnchorStyles.Right;
+        container.Controls.Add(_exportExBtn);
+        if (them)
+        {
+            container.Controls.Add(_insertButton);
+        }
+        
+        _insertButton._mouseDown += BtnThem_Click;
+        
+        panel.Controls.Add(container);
+
+        return panel;
+    }
+    
+    private Label getTitle()
+    {
+        var titlePnl = new Label
+        {
+            Text = _title,
+            Font = GetFont.GetFont.GetMainFont(17, FontType.ExtraBold),
+            AutoSize = true
+        };
+        return titlePnl;
     }
 
     private new Panel Bottom()
@@ -93,7 +170,7 @@ public class PhongHoc : NavBase
         {
             Dock = DockStyle.Fill,
             BackColor = MyColor.GrayBackGround,
-            Padding = new Padding(20, 0, 20, 20)
+            // Padding = new Padding(20, 0, 20, 20)
         };
     }
 
@@ -105,6 +182,17 @@ public class PhongHoc : NavBase
             _table.OnDelete += maPH => BtnXoa_Click(maPH);
             _table.OnDetail += maPH => BtnChiTiet_Click(maPH);
         }
+        _exportExBtn._mouseDown += () => ExportExcel(_listPhongHoc);
+    }
+    void ExportExcel(List<PhongHocDto> list)
+    {
+        var header = new Dictionary<string, string>();
+        for (int i = 0; i < _columnNames.Length; i++)
+        {
+            header.Add(_columnNames[i], _headerArr[i]);
+        }
+        
+        ExcelExporter.ExportToExcel(list, "sheet1","Danh sách phòng học", header);
     }
 
     private void ShowSchedule(int maPh)
@@ -123,7 +211,10 @@ public class PhongHoc : NavBase
             var columnNames = new List<string> { "MaPH", "TenPH", "LoaiPH", "CoSo", "SucChua", "TinhTrang" };
 
             var cells = _listPhongHoc.Cast<object>().ToList();
-            _table = new CustomTable(headerList, columnNames, cells, true, true, true);
+            _table = new CustomTable(headerList, columnNames, cells, sua || xoa, sua, xoa)
+            {
+                Margin = new Padding(0),
+            };
             _mainBot.Controls.Add(_table);
         }
         else
@@ -133,7 +224,7 @@ public class PhongHoc : NavBase
     }
 
     // event
-    private void BtnThem_Click(object? sender, EventArgs e)
+    private void BtnThem_Click()
     {
         try
         {

@@ -2,6 +2,7 @@ using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.DTO.SearchObject;
+using QuanLySinhVien.Shared.Structs;
 
 namespace QuanLySinhVien.Controller.Controllers;
 
@@ -19,6 +20,7 @@ public class SinhVienController
     
     private ChuongTrinhDaoTao_HocPhanController _chuongTrinhDaoTao_HocPhanController;
     private KetQuaController _ketQuaController;
+    private TaiKhoanController _taiKhoanController;
     
     
     
@@ -37,6 +39,7 @@ public class SinhVienController
         _HocPhiSVController = HocPhiSVController.GetInstance();
         _chuongTrinhDaoTao_HocPhanController = ChuongTrinhDaoTao_HocPhanController.GetInstance();
         _ketQuaController = KetQuaController.GetInstance();
+        _taiKhoanController = TaiKhoanController.getInstance();
 
         InitLookupData();
     }
@@ -202,7 +205,148 @@ public class SinhVienController
                 Console.WriteLine("------------------------------------------------------------");
             }
         }
+    }
+    
+    public bool ExistByMaTk(int maTK)
+    {
+        var listSV = SinhVienDao.GetAll();
+        foreach (var item in listSV)
+        {
+            if (item.MaTk == maTK)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public ValidateResult Validate(
+        string imgPath, string tenSV, string soDT, string ngaySinh,
+        string email, string cccd, string queQuan,
+        string tenLop, string tenTK)
+    {
+        ValidateResult rs = new ValidateResult
+        {
+            index = -1,
+            message = "",
+        };
         
+        var homNay = DateTime.Now;
+        DateTime ngaySinhDate = ConvertDate.ConvertStringToDate(ngaySinh);
+        var tuoi = homNay.Year - ngaySinhDate.Year;
+
+        if (homNay.Month < ngaySinhDate.Month ||
+            (homNay.Month == ngaySinhDate.Month && homNay.Day < ngaySinhDate.Day))
+            tuoi--;
+
+        if (Shared.Validate.IsEmpty(imgPath))
+        {
+            rs.index = 0;
+            rs.message = "Vui lòng thêm ảnh!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(tenSV))
+        {
+            rs.index = 0;
+            rs.message = "Tên sinh viên không được để trống!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(soDT))
+        {
+            rs.index = 1;
+            rs.message = "Số điện thoại không được để trống!";
+            return rs;
+        }
+
+        if (!Shared.Validate.IsValidPhoneNumber(soDT))
+        {
+            rs.index = 1;
+            rs.message = "Số điện thoại không hợp lệ!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(ngaySinh))
+        {
+            rs.index = 2;
+            rs.message = "Ngày sinh không được để trống!";
+            return rs;
+        }
+
+        if (tuoi < 17)
+        {
+            rs.index = 2;
+            rs.message = "Tuổi sinh viên phải lớn hơn 16!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(email))
+        {
+            rs.index = 3;
+            rs.message = "Email không được để trống!";
+            return rs;
+        }
+
+        if (!Shared.Validate.IsValidEmail(email))
+        {
+            rs.index = 3;
+            rs.message = "Email không hợp lệ!";
+            return rs;
+
+        }
+
+        if (Shared.Validate.IsEmpty(cccd))
+        {
+            rs.index = 4;
+            rs.message = "Căn cước công dân không được để trống!";
+            return rs;
+        }
+
+        if (!Shared.Validate.IsValidCCCD(cccd))
+        {
+            rs.index = 4;
+            rs.message = "Căn cước công dân không hợp lệ!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(queQuan))
+        {
+            rs.index = 5;
+            rs.message = "Quê quán không được để trống!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(tenLop))
+        {
+            rs.index = 6;
+            rs.message = "Tên lớp không được để trống!";
+            return rs;
+        }
+
+        if (!_lopController.ExistByTen(tenLop))
+        {
+            rs.index = 6;
+            rs.message = "Lớp không tồn tại!";
+            return rs;
+        }
+
+        if (Shared.Validate.IsEmpty(tenTK))
+        {
+            rs.index = 7;
+            rs.message = "Tên tài khoản không được để trống!";
+            return rs;
+        }
+
+        if (!_taiKhoanController.ExistByTen(tenTK))
+        {
+            rs.index = 7;
+            rs.message = "Tài khoản không tồn tại!";
+            return rs;
+        }
+
+        return rs;
     }
     
 }

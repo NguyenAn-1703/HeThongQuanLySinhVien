@@ -361,6 +361,12 @@ public class GiangVienDialog : Form
         var soDienThoai = tbSoDienThoai.Text;
         var email = tbEmail.Text;
         var taiKhoan = tbTK.Text;
+        
+        tbTenGV.TabIndex = 1;
+        tbNgaySinh.TabIndex = 2;
+        tbSoDienThoai.TabIndex = 3;
+        tbEmail.TabIndex = 4;
+        tbTK.TabIndex = 5;
 
         var gioiTinh = _listTextBox[2].GetSelectionCombobox();
         int maKhoa = _KhoaController.GetByTen(_listTextBox[6].GetSelectionCombobox()).MaKhoa;
@@ -401,6 +407,12 @@ public class GiangVienDialog : Form
         var tbEmail = _listTextBox[4]._field.contentTextBox;
         var tbTK = _listTextBox[5].tbTK.contentTextBox;
 
+        tbTenGV.TabIndex = 1;
+        tbNgaySinh.TabIndex = 2;
+        tbSoDienThoai.TabIndex = 3;
+        tbEmail.TabIndex = 4;
+        tbTK.TabIndex = 5;
+        
         var tenGV = tbTenGV.Text;
         var ngaySinh = tbNgaySinh.Text;
         var soDienThoai = tbSoDienThoai.Text;
@@ -448,98 +460,34 @@ public class GiangVienDialog : Form
         TextBox tbTenGV, DateTimePicker tbNgaySinh, TextBox tbSoDienThoai,
         TextBox tbEmail, TextBox tbTK)
     {
-        // 1. Kiểm tra ảnh
-        if (CommonUse.Validate.IsEmpty(imgPath))
+        
+        Dictionary<int, Control> dic = new Dictionary<int, Control>();
+        dic.Add(0 , tbTenGV);
+        dic.Add(1 , tbNgaySinh);
+        dic.Add(2 , tbSoDienThoai);
+        dic.Add(3 , tbEmail);
+        dic.Add(4 , tbTK);
+
+        ValidateResult rs = _GiangVienController.Validate(imgPath,
+            tenGV, ngaySinh, soDienThoai,
+            email, taiKhoan);
+
+        if (rs.index == -1)
         {
-            MessageBox.Show("Vui lòng thêm ảnh giảng viên!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return false;
+            return true;
+        }
+        
+        MessageBox.Show(rs.message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        Control c = dic.TryGetValue(rs.index, out Control c2) ? c2 : new Control();
+        c.Focus();
+        if (c is TextBoxBase tb)
+        {
+            tb.SelectAll();
         }
 
-        // 2. Kiểm tra tên giảng viên
-        if (CommonUse.Validate.IsEmpty(tenGV))
-        {
-            MessageBox.Show("Tên giảng viên không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTenGV.Focus();
-            tbTenGV.SelectAll();
-            return false;
-        }
+        return false;
+        
+        
 
-        // 3. Kiểm tra ngày sinh
-        if (CommonUse.Validate.IsEmpty(ngaySinh))
-        {
-            MessageBox.Show("Ngày sinh không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbNgaySinh.Focus();
-            return false;
-        }
-
-        DateTime ngaySinhDate;
-        ngaySinhDate = ConvertDate.ConvertStringToDate(ngaySinh);
-
-        // 4. Kiểm tra tuổi giảng viên (tối thiểu 22 tuổi)
-        var homNay = DateTime.Now;
-        var tuoi = homNay.Year - ngaySinhDate.Year;
-        if (homNay.Month < ngaySinhDate.Month ||
-            (homNay.Month == ngaySinhDate.Month && homNay.Day < ngaySinhDate.Day))
-            tuoi--;
-
-        if (tuoi < 22)
-        {
-            MessageBox.Show("Giảng viên phải từ 22 tuổi trở lên!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbNgaySinh.Focus();
-            return false;
-        }
-
-        // 5. Kiểm tra số điện thoại
-        if (CommonUse.Validate.IsEmpty(soDienThoai))
-        {
-            MessageBox.Show("Số điện thoại không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbSoDienThoai.Focus();
-            tbSoDienThoai.SelectAll();
-            return false;
-        }
-
-        if (!CommonUse.Validate.IsValidPhoneNumber(soDienThoai))
-        {
-            MessageBox.Show("Số điện thoại không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbSoDienThoai.Focus();
-            tbSoDienThoai.SelectAll();
-            return false;
-        }
-
-        // 6. Kiểm tra email
-        if (CommonUse.Validate.IsEmpty(email))
-        {
-            MessageBox.Show("Email không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbEmail.Focus();
-            tbEmail.SelectAll();
-            return false;
-        }
-
-        if (!CommonUse.Validate.IsValidEmail(email))
-        {
-            MessageBox.Show("Email không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbEmail.Focus();
-            tbEmail.SelectAll();
-            return false;
-        }
-
-        // 7. Kiểm tra tài khoản
-        if (CommonUse.Validate.IsEmpty(taiKhoan))
-        {
-            MessageBox.Show("Tên tài khoản không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTK.Focus();
-            tbTK.SelectAll();
-            return false;
-        }
-
-        if (!_taiKhoanController.ExistByTen(taiKhoan))
-        {
-            MessageBox.Show("Tài khoản không tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            tbTK.Focus();
-            tbTK.SelectAll();
-            return false;
-        }
-
-        return true;
     }
 }
