@@ -17,22 +17,22 @@ internal static class Program
 
         ApplicationConfiguration.Initialize();
 
-        // Application.Run(new FLogin());
+        Application.Run(new FLogin());
 
 
         //ADMIN
-        var nhomQuyen = new NhomQuyenDto
-        {
-            MaNQ = 2,
-            TenNhomQuyen = "admin"
-        };
-        var taiKhoan = new TaiKhoanDto
-        {
-            MaTK = 1,
-            TenDangNhap = "admin",
-            Type = "Quản trị viên"
-        };
-        Application.Run(new MyHome(nhomQuyen, taiKhoan));
+        // var nhomQuyen = new NhomQuyenDto
+        // {
+        //     MaNQ = 2,
+        //     TenNhomQuyen = "admin"
+        // };
+        // var taiKhoan = new TaiKhoanDto
+        // {
+        //     MaTK = 1,
+        //     TenDangNhap = "admin",
+        //     Type = "Quản trị viên"
+        // };
+        // Application.Run(new MyHome(nhomQuyen, taiKhoan));
 
         //SINHVIEN
         // NhomQuyenDto nhomQuyen = new NhomQuyenDto

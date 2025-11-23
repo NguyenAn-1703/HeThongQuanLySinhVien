@@ -164,10 +164,10 @@ public class TrangChu : NavBase
         name.Font = GetFont.GetFont.GetPlayFairFont(25, FontType.Regular);
         name.ForeColor = MyColor.MainColor;
 
-        var box1 = new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn.");
-        var box2 = new BoxHome("Bảo mật", "Hệ thống bảo mật an toàn.");
-        var box3 = new BoxHome("Nhanh chóng", "Lưu trữ và tải dữ liệu nhanh chóng.");
-        var box4 = new BoxHome("Thân thiện", "Thao tác dễ dàng.");
+        var box1 = new BoxHome("Tiện lợi", "Quản lý thông tin nhanh gọn. \nTối ưu thao tác người dùng.");
+        var box2 = new BoxHome("Bảo mật", "Hệ thống bảo mật an toàn. \nCông nghệ xác thực tiên tiến nhất.");
+        var box3 = new BoxHome("Nhanh chóng", "Lưu trữ và tải dữ liệu nhanh chóng. \nTối ưu hóa quy trình tải dữ liệu.");
+        var box4 = new BoxHome("Thân thiện", "Thao tác dễ dàng. \nBiểu tượng gần gủi.");
 
         box1.Anchor = AnchorStyles.Left;
         box3.Anchor = AnchorStyles.Left;

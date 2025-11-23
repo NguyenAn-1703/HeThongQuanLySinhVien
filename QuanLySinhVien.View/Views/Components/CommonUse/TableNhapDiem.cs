@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Org.BouncyCastle.Math.Field;
 using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
@@ -18,7 +19,7 @@ public class TableNhapDiem : MyTLP
     private readonly List<DiemSV> _listDiemSV;
     private readonly int _maHp;
 
-    private readonly List<TextBox> listTbHeSo = new();
+    private readonly List<IndexTextBox> listTbHeSo = new();
 
     private CustomButton _addColBtn;
     private List<object> _cellDatas;
@@ -35,6 +36,8 @@ public class TableNhapDiem : MyTLP
     private int _tableWidth;
     private Form _topForm;
     private int index;
+
+    private List<int> _listIndexColumn =  new List<int>();
 
     public TableNhapDiem(List<string> headerContent, List<string> columnNames, List<object> cells,
         List<DiemSV> listDiemSV, int mahp, bool action = false,
@@ -372,7 +375,16 @@ public class TableNhapDiem : MyTLP
     private void AddColumn()
     {
         // tối đa 5 cột điểm
-        if (index >= 5)
+        // tối thiểu 1 cột điểm
+        int count = 0;
+        for (int j = 0; j < _dataGridView.Columns.Count; j++)
+        {
+            if (_dataGridView.Columns[j].Name.StartsWith("colNhapDiem"))
+            {
+                count++;
+            }
+        }
+        if (count >= 5)
         {
             MessageBox.Show("Chỉ được thêm tối đa 5 cột điểm", "Thông báo", MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
@@ -418,14 +430,15 @@ public class TableNhapDiem : MyTLP
 
         var lblhs = GetLabel("H.Số:");
         lblhs.AutoSize = true;
-        var hso = new TextBox
+        var hso = new IndexTextBox()
         {
             Dock = DockStyle.Fill,
             Font = GetFont.GetFont.GetMainFont(9, FontType.Regular),
             TextAlign = HorizontalAlignment.Center,
             PlaceholderText = "Hệ số",
             TabIndex = index,
-            Text = "1"
+            Text = "1",
+            index = index
         };
         hso.Leave += (sender, args) => OnChangeHeSo(hso);
 
@@ -447,6 +460,8 @@ public class TableNhapDiem : MyTLP
         colNhapDiem.HeaderText = "Nhập điểm";
         colNhapDiem.Name = "colNhapDiem " + index;
         // colNhapDiem.DefaultCellStyle.NullValue = 0 + "";
+        
+        _listIndexColumn.Add(index);
 
         _dataGridView.Columns.Insert(insertIndex, colNhapDiem);
         OnResize();
@@ -457,7 +472,16 @@ public class TableNhapDiem : MyTLP
     private void RemoveColumn(int i)
     {
         // tối thiểu 1 cột điểm
-        if (index <= 1)
+        int count = 0;
+        for (int j = 0; j < _dataGridView.Columns.Count; j++)
+        {
+            if (_dataGridView.Columns[j].Name.StartsWith("colNhapDiem"))
+            {
+                count++;
+            }
+        }
+        
+        if (count <= 1)
         {
             MessageBox.Show("Có ít nhất 1 cột điểm", "Thông báo", MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
@@ -469,15 +493,30 @@ public class TableNhapDiem : MyTLP
         if (rs == DialogResult.No) return;
 
         _header.SuspendLayout();
+        
         // Xóa header, xóa cột, resetindex
-        var numCol = _header.Controls.Count;
-        var pos = numCol - (index + 1) + i - 1;
+        
+        int pos = 0;
+        for (int j = 0; j < _dataGridView.Columns.Count; j++)
+        {
+            if (_dataGridView.Columns[j].Name.StartsWith("colNhapDiem"))
+            {
+                int namesNumber = int.Parse(_dataGridView.Columns[j].Name.Split(' ')[1]);
+                if (namesNumber == i)
+                {
+                    pos = j;
+                }
+            }
+        }
+        
+        
         _header.Controls.RemoveAt(pos);
 
         var colName = "colNhapDiem " + i;
         _dataGridView.Columns.Remove(colName);
         UpdateListTbHso(i);
-        index--;
+        _listIndexColumn.RemoveAll(x => x == i);
+        // index--;
 
         OnResize();
         _header.ResumeLayout();
@@ -485,8 +524,7 @@ public class TableNhapDiem : MyTLP
 
     private void UpdateListTbHso(int i)
     {
-        var pos = i - 1;
-        listTbHeSo.RemoveAt(pos);
+        listTbHeSo.RemoveAll(x => x.index == i);
     }
 
     private void SetActionDgv()
@@ -605,7 +643,7 @@ public class TableNhapDiem : MyTLP
         float tongHeSo = 0;
         for (var i = 0; i < listTbHeSo.Count; i++)
         {
-            var index = i + 1;
+            var index = _listIndexColumn[i];
             var cell = _dataGridView.Rows[rowIndex].Cells["colNhapDiem " + index];
             float diem;
             int heso;
@@ -619,6 +657,7 @@ public class TableNhapDiem : MyTLP
                 heso = 0;
             else
                 heso = int.Parse(listTbHeSo[i].Text.Trim());
+
 
             tongDiem += diem * heso;
             tongHeSo += heso;

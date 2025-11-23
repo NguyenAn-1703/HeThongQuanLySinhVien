@@ -59,7 +59,6 @@ public class MoDangKyHocPhan : NavBase
     private CustomTable _table;
     private TitleButton _updateTimeButton;
     private LabelTextField endDTField;
-
     private LabelTextField startDTField;
     private bool sua;
     private bool them;
@@ -235,10 +234,11 @@ public class MoDangKyHocPhan : NavBase
         _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         _bottomTimePnl.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
-
         startDTField = new LabelTextField("Thời gian bắt đầu", TextFieldType.DateTime);
+        startDTField.Dock = DockStyle.None;
         _bottomTimePnl.Controls.Add(startDTField);
         endDTField = new LabelTextField("Thời gian kết thúc", TextFieldType.DateTime);
+        endDTField.Dock = DockStyle.None;
         _bottomTimePnl.Controls.Add(endDTField);
 
 
@@ -265,7 +265,7 @@ public class MoDangKyHocPhan : NavBase
             startDTField._dTGioField.dateField.Value = now;
             endDTField._dTNgayField.dateField.Value = now;
             endDTField._dTGioField.dateField.Value = now;
-
+            
             startDTField._dTNgayField.dateField.Enabled = true;
             startDTField._dTGioField.dateField.Enabled = true;
             endDTField._dTNgayField.dateField.Enabled = true;
@@ -286,7 +286,7 @@ public class MoDangKyHocPhan : NavBase
             startDTField._dTGioField.dateField.Value = now;
             endDTField._dTNgayField.dateField.Value = now;
             endDTField._dTGioField.dateField.Value = now;
-
+            
             startDTField._dTNgayField.dateField.Enabled = true;
             startDTField._dTGioField.dateField.Enabled = true;
             endDTField._dTNgayField.dateField.Enabled = true;
@@ -297,10 +297,10 @@ public class MoDangKyHocPhan : NavBase
 
             return;
         }
-
+        
         var start = lichDangKy.ThoiGianBatDau;
         var end = lichDangKy.ThoiGianKetThuc;
-
+        
         startDTField._dTNgayField.dateField.Value = start;
         startDTField._dTGioField.dateField.Value = start;
         endDTField._dTNgayField.dateField.Value = end;
@@ -398,7 +398,6 @@ public class MoDangKyHocPhan : NavBase
         _table.OnEdit += index => { Update(index); };
         _table.OnDetail += index => { Detail(index); };
         _table.OnDelete += index => { Delete(index); };
-
         _hocKyField.GetComboboxField().SelectedIndexChanged += (sender, args) => OnChangeNamHK();
         _namField._namField.ValueChanged += (sender, args) => OnChangeNamHK();
 

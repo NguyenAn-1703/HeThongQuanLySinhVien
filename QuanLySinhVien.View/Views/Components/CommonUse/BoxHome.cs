@@ -19,7 +19,7 @@ public class BoxHome : RoundTLP
     {
         RowCount = 2;
         ColumnCount = 3;
-        Size = new Size(370, 130);
+        Size = new Size(470, 130);
         BackColor = MyColor.LightGray;
 
         ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));

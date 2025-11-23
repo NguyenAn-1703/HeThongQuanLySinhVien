@@ -227,7 +227,7 @@ public class NhapDiem : NavBase
         var nam = DateTime.Now.ToString("yyyy");
 
         // lấy ds nhóm học phần theo học kỳ và năm, theo giảng viên, nếu admin thì lấy toàn bộ giảng viên
-        if (_quyen.TenNhomQuyen.Equals("admin"))
+        if (_quyen.TenNhomQuyen.Equals("Admin"))
         {
             _rawData = _NhomHocPhanController.GetByHkyNam(hky, nam);
         }
@@ -290,7 +290,7 @@ public class NhapDiem : NavBase
         var nam = _namField.GetTextNam();
 
         // lấy ds nhóm học phần theo học kỳ và năm, theo giảng viên, nếu admin thì lấy toàn bộ giảng viên
-        if (_quyen.TenNhomQuyen.Equals("admin"))
+        if (_quyen.TenNhomQuyen.Equals("Admin"))
         {
             _rawData = _NhomHocPhanController.GetByHkyNam(hky, nam);
         }

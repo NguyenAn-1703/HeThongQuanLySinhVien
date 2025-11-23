@@ -1,5 +1,6 @@
 // using QuanLySinhVien.View.Views;
 
+using OpenTK.Graphics.ES30;
 using QuanLySinhVien.Controller.Controllers;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
@@ -82,7 +83,8 @@ public class MyHome : Form
         // Client
         Text = "Hệ thống quản lí sinh viên";
         StartPosition = FormStartPosition.CenterScreen;
-        ClientSize = new Size(1600, 950);
+        ClientSize = new Size(1600, 1000);
+        Icon = new Icon("Views/img/ico/Logo ĐH Sài Gòn - SGU.ico");
 
         // layout border
         parLeft = new Panel
@@ -261,7 +263,6 @@ public class MyHome : Form
         
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
         _nhomHocPhanController.UpdateSiso();
-
     }
 
     //update khi 1 item khác được chọn

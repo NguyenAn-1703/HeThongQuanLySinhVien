@@ -7,19 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EditorConfigFiles Include="C:\Program Files\dotnet\sdk\8.0.415\Sdks\Microsoft.NET.Sdk\analyzers\build\config\analysislevel_8_default.globalconfig">
-            <Link>Controllers\config\analysislevel_8_default.globalconfig</Link>
-        </EditorConfigFiles>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\QuanLySinhVien.Model\QuanLySinhVien.Model.csproj"/>
         <ProjectReference Include="..\QuanLySinhVien.Shared\QuanLySinhVien.Shared.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="EPPlus" Version="7.7.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>

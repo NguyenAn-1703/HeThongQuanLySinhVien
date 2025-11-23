@@ -1,3 +1,5 @@
+using System.Drawing.Imaging;
+
 namespace QuanLySinhVien.View.Views.Components.CommonUse;
 
 public class GetPng
@@ -18,4 +20,6 @@ public class GetPng
 
         return img;
     }
+    
+    
 }

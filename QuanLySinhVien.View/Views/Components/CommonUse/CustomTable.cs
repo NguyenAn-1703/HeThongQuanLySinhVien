@@ -260,10 +260,11 @@ public class CustomTable : MyTLP
     {
         int tableWidth;
         int columnSize;
+        int scrollbarWidth = SystemInformation.HorizontalScrollBarHeight;
 
         if (_dataGridView.DisplayedRowCount(false) < _dataGridView.RowCount)
         {
-            tableWidth = Width - 25;
+            tableWidth = Width - scrollbarWidth;
             columnSize = tableWidth / _header.Controls.Count;
             foreach (Control c in _header.Controls) c.Size = new Size(columnSize, c.Height);
             _header.Controls[_header.Controls.Count - 1].Width = columnSize + 25;
