@@ -190,7 +190,7 @@ public class SinhVienController
             {
                 SinhVienDTO sv =  GetById(maSV);
                 sv.TrangThai = "Tốt nghiệp";
-                if (!EditSinhVien(sv))
+                if (!SinhVienDao.UpdateTrangThaiSV(sv))
                 {
                     throw new Exception("sua sv that bai");
                 }

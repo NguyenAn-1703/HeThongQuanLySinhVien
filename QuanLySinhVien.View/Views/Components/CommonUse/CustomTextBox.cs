@@ -37,7 +37,7 @@ public class CustomTextBox : RoundTLP
         contentTextBox.Dock = DockStyle.Fill;
         contentTextBox.Margin = new Padding(5);
 
-        contentTextBox.Font = GetFont.GetFont.GetMainFont(11, FontType.Regular);
+        contentTextBox.Font = new Font("Segoe UI", 11);
 
         // contentTextBox.BorderStyle = BorderStyle.FixedSingle;
 

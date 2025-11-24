@@ -823,10 +823,19 @@ public class TableNhapDiem : MyTLP
 
     public List<DiemSV> GetListDiemSV()
     {
+        
         List<DiemSV> rs = new();
-        var numCol = _header.Controls.Count;
-        var startPos = numCol - (index + 1);
+        int startPos = 0;
         var endPos = _header.Controls.Count - 2; //index -1, cot tong diem -11
+        
+        for (int j = 0; j < _dataGridView.Columns.Count; j++)
+        {
+            if (_dataGridView.Columns[j].Name.StartsWith("colNhapDiem"))
+            {
+                startPos = j;
+                break;
+            }
+        }
 
         foreach (DataGridViewRow row in _dataGridView.Rows)
         {

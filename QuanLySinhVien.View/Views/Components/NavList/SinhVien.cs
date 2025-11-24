@@ -101,6 +101,7 @@ public class SinhVien : NavBase
             AutoSize = true,
             // CellBorderStyle = MyTLPCellBorderStyle.Single,
             Padding = new Padding(10),
+            Margin = new Padding(6),
             ColumnCount = 2,
             BackColor = MyColor.GrayBackGround
         };
@@ -269,6 +270,7 @@ public class SinhVien : NavBase
             var listSv = _SinhVienController.ConvertDtoToDisplay(_SinhVienController.GetAll());
             UpdateDataDisplay(listSv);
             _table.UpdateData(_displayData);
+            _table.FocusLastRow();
         };
         _SinhVienDialog.ShowDialog();
     }

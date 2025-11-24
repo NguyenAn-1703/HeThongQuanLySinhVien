@@ -440,4 +440,15 @@ public class CustomTable : MyTLP
     {
         MouseClickBtnCapNhat?.Invoke(maSV);
     }
+    
+    public void FocusLastRow()
+    {
+        int lastRow = _dataGridView.Rows.Count - 1;
+        if (lastRow >= 0)
+        {
+            _dataGridView.ClearSelection();
+            _dataGridView.Rows[lastRow].Selected = true;
+            _dataGridView.FirstDisplayedScrollingRowIndex = lastRow;
+        }
+    }
 }

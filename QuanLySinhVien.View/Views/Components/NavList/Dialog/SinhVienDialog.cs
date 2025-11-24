@@ -184,10 +184,9 @@ public class SinhVienDialog : Form
             new InputFormItem("Email", TextFieldType.NormalText), //4
             new InputFormItem("CCCD", TextFieldType.Number), //5
             new InputFormItem("Quê quán", TextFieldType.NormalText), //6
-            new InputFormItem("Trạng thái", TextFieldType.Combobox), //7
-            new InputFormItem("Khóa", TextFieldType.Combobox), //8
-            new InputFormItem("Lớp", TextFieldType.ListBoxLop), //9
-            new InputFormItem("Tài khoản", TextFieldType.ListBoxTK) //10
+            new InputFormItem("Khóa", TextFieldType.Combobox), //7
+            new InputFormItem("Lớp", TextFieldType.ListBoxLop), //8
+            new InputFormItem("Tài khoản", TextFieldType.ListBoxTK) //9
         };
 
         _listIFI = arr.ToList();
@@ -208,13 +207,9 @@ public class SinhVienDialog : Form
         _listTextBox[1].SetComboboxList(gioiTinh.ToList());
         _listTextBox[1].SetComboboxSelection(gioiTinh[0]);
 
-        var trangThai = new[] { "Đang học", "Tốt nghiệp", "Thôi học" };
-        _listTextBox[7].SetComboboxList(trangThai.ToList());
-        _listTextBox[7].SetComboboxSelection(trangThai[0]);
-
         List<string> listKh = _khoaHocController.GetAll().Select(x => x.TenKhoaHoc).ToList();
-        _listTextBox[8].SetComboboxList(listKh.ToList());
-        _listTextBox[8].SetComboboxSelection(listKh[0]);
+        _listTextBox[7].SetComboboxList(listKh.ToList());
+        _listTextBox[7].SetComboboxSelection(listKh[0]);
     }
 
     private void SetContainerPictureBox()
@@ -313,10 +308,9 @@ public class SinhVienDialog : Form
         _listTextBox[4].SetText(sinhVien.Email);
         _listTextBox[5]._numberField.contentTextBox.Text = sinhVien.CCCD;
         _listTextBox[6].SetText(sinhVien.QueQuanSinhVien);
-        _listTextBox[7].SetComboboxSelection(sinhVien.TrangThai);
-        _listTextBox[8].SetComboboxSelection(_khoaHocController.GetKhoaHocById(sinhVien.MaKhoaHoc).TenKhoaHoc);
-        _listTextBox[9].tbLop.contentTextBox.Text = _lopController.GetLopById(sinhVien.MaLop).TenLop;
-        _listTextBox[10].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(sinhVien.MaTk).TenDangNhap;
+        _listTextBox[7].SetComboboxSelection(_khoaHocController.GetKhoaHocById(sinhVien.MaKhoaHoc).TenKhoaHoc);
+        _listTextBox[8].tbLop.contentTextBox.Text = _lopController.GetLopById(sinhVien.MaLop).TenLop;
+        _listTextBox[9].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(sinhVien.MaTk).TenDangNhap;
         LoadImage(sinhVien.AnhDaiDienSinhVien);
     }
 
@@ -330,10 +324,9 @@ public class SinhVienDialog : Form
         _listTextBox[4].SetText(sinhVien.Email);
         _listTextBox[5]._numberField.contentTextBox.Text = sinhVien.CCCD;
         _listTextBox[6].SetText(sinhVien.QueQuanSinhVien);
-        _listTextBox[7].SetComboboxSelection(sinhVien.TrangThai);
-        _listTextBox[8].SetComboboxSelection(_khoaHocController.GetKhoaHocById(sinhVien.MaKhoaHoc).TenKhoaHoc);
-        _listTextBox[9].tbLop.contentTextBox.Text = _lopController.GetLopById(sinhVien.MaLop).TenLop;
-        _listTextBox[10].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(sinhVien.MaTk).TenDangNhap;
+        _listTextBox[7].SetComboboxSelection(_khoaHocController.GetKhoaHocById(sinhVien.MaKhoaHoc).TenKhoaHoc);
+        _listTextBox[8].tbLop.contentTextBox.Text = _lopController.GetLopById(sinhVien.MaLop).TenLop;
+        _listTextBox[9].tbTK.contentTextBox.Text = _taiKhoanController.GetTaiKhoanById(sinhVien.MaTk).TenDangNhap;
         LoadImage(sinhVien.AnhDaiDienSinhVien);
 
 
@@ -345,9 +338,8 @@ public class SinhVienDialog : Form
         _listTextBox[5]._numberField.Enable = false;
         _listTextBox[6]._field.Enable = false;
         _listTextBox[7]._combobox.Enabled = false;
-        _listTextBox[8]._combobox.Enabled = false;
-        _listTextBox[9].tbLop.Enable = false;
-        _listTextBox[10].tbTK.Enable = false;
+        _listTextBox[8].tbLop.Enable = false;
+        _listTextBox[9].tbTK.Enable = false;
 
         _btnUpimg.Visible = false;
     }
@@ -380,8 +372,8 @@ public class SinhVienDialog : Form
         var tbEmail = _listTextBox[4]._field.contentTextBox;
         var tbCCCD = _listTextBox[5]._numberField.contentTextBox;
         var tbQueQuan = _listTextBox[6]._field.contentTextBox;
-        var tbTenLop = _listTextBox[9].tbLop.contentTextBox;
-        var tbTenTK = _listTextBox[10].tbTK.contentTextBox;
+        var tbTenLop = _listTextBox[8].tbLop.contentTextBox;
+        var tbTenTK = _listTextBox[9].tbTK.contentTextBox;
 
         tbTenSV.TabIndex = 1;
         tbSoDT.TabIndex = 2;
@@ -400,10 +392,9 @@ public class SinhVienDialog : Form
         var email = _listTextBox[4].GetTextTextField(); //
         var cccd = _listTextBox[5]._numberField.contentTextBox.Text; //
         var queQuan = _listTextBox[6].GetTextTextField(); //
-        var trangThai = _listTextBox[7].GetSelectionCombobox();
-        var tenKH = _listTextBox[8].GetSelectionCombobox();
-        var tenLop = _listTextBox[9].tbLop.contentTextBox.Text; //
-        var tenTK = _listTextBox[10].tbTK.contentTextBox.Text; //
+        var tenKH = _listTextBox[7].GetSelectionCombobox();
+        var tenLop = _listTextBox[8].tbLop.contentTextBox.Text; //
+        var tenTK = _listTextBox[9].tbTK.contentTextBox.Text; //
 
         if (Validate(imgPath,
                 tenSV, soDT, ngaySinh,
@@ -423,7 +414,6 @@ public class SinhVienDialog : Form
                 Email = email,
                 CCCD = cccd,
                 QueQuanSinhVien = queQuan,
-                TrangThai = trangThai,
                 MaKhoaHoc = _khoaHocController.GetByTen(tenKH).MaKhoaHoc,
                 MaLop = _lopController.GetByTen(tenLop).MaLop,
                 MaTk = _taiKhoanController.GetTaiKhoanByUsrName(tenTK).MaTK,
@@ -450,8 +440,8 @@ public class SinhVienDialog : Form
         var tbEmail = _listTextBox[4]._field.contentTextBox;
         var tbCCCD = _listTextBox[5]._numberField.contentTextBox;
         var tbQueQuan = _listTextBox[6]._field.contentTextBox;
-        var tbTenLop = _listTextBox[9].tbLop.contentTextBox;
-        var tbTenTK = _listTextBox[10].tbTK.contentTextBox;
+        var tbTenLop = _listTextBox[8].tbLop.contentTextBox;
+        var tbTenTK = _listTextBox[9].tbTK.contentTextBox;
 
         var tenSV = _listTextBox[0].GetTextTextField(); //
         var gioiTinh = _listTextBox[1].GetSelectionCombobox();
@@ -459,11 +449,10 @@ public class SinhVienDialog : Form
         var ngaySinh = _listTextBox[3].GetDField().Text; //
         var email = _listTextBox[4].GetTextTextField(); //
         var cccd = _listTextBox[5]._numberField.contentTextBox.Text; //
-        var queQuan = _listTextBox[6].GetTextTextField(); //
-        var trangThai = _listTextBox[7].GetSelectionCombobox();
-        var tenKH = _listTextBox[8].GetSelectionCombobox();
-        var tenLop = _listTextBox[9].tbLop.contentTextBox.Text; //
-        var tenTK = _listTextBox[10].tbTK.contentTextBox.Text; //
+        var queQuan = _listTextBox[6].GetTextTextField();
+        var tenKH = _listTextBox[7].GetSelectionCombobox();
+        var tenLop = _listTextBox[8].tbLop.contentTextBox.Text; //
+        var tenTK = _listTextBox[9].tbTK.contentTextBox.Text; //
         
         tbTenSV.TabIndex = 1;
         tbSoDT.TabIndex = 2;
@@ -493,7 +482,6 @@ public class SinhVienDialog : Form
                 Email = email,
                 CCCD = cccd,
                 QueQuanSinhVien = queQuan,
-                TrangThai = trangThai,
                 MaKhoaHoc = _khoaHocController.GetByTen(tenKH).MaKhoaHoc,
                 MaLop = _lopController.GetByTen(tenLop).MaLop,
                 MaTk = _taiKhoanController.GetTaiKhoanByUsrName(tenTK).MaTK,
