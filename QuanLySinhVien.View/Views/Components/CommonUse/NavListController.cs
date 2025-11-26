@@ -42,6 +42,8 @@ public class NavListController
         //SV
         buttonClickTrans["Thông tin cá nhân"] = "ThongTinSinhVien";
         buttonClickTrans["Đăng ký học phần"] = "DangKyHocPhan";
+        buttonClickTrans["Chi tiết lịch thi"] = "ChiTietLichThi";
+        buttonClickTrans["Chi tiết học phí"] = "ChiTietHocPhi";
     }
 
     public string getDataButton(string key)
@@ -94,7 +96,10 @@ public class NavListController
             ans = new ThongTinSinhVien(_quyen, _taiKhoan);
         else if (s.Equals("DangKyHocPhan"))
             ans = new DangKyHocPhan(_quyen, _taiKhoan);
-
+        else if (s.Equals("ChiTietLichThi"))
+            ans = new ChiTietLichThi(_quyen, _taiKhoan);
+        else if (s.Equals("ChiTietHocPhi"))
+            ans = new ChiTietHocPhi(_quyen, _taiKhoan);
         else
             ans = new Khoa(_quyen, _taiKhoan);
         return ans;

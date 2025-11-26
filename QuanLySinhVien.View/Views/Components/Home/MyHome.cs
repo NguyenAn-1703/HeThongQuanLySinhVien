@@ -297,7 +297,11 @@ public class MyHome : Form
         //     _searchBar.Visible = true;
         // }
 
-        if (rightBottomChange is TrangChu || rightBottomChange is DangKyHocPhan)
+        if (rightBottomChange is TrangChu 
+            || rightBottomChange is DangKyHocPhan
+            || rightBottomChange is ChiTietLichThi
+            || rightBottomChange is ChiTietHocPhi
+            )
         {
             rightTop.Visible = false;
             _emptyForUnTopBar.Visible = true;

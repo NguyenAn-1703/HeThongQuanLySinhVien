@@ -71,7 +71,9 @@ public class NavBar : Panel
         _arrDataNavItemForSV = new[]
         {
             new NavItemValue { ID = "TRANGCHU", Svg = "trangchu", Name = "Trang chủ" },
-            new NavItemValue { ID = "THONGTINSINHVIEN", Svg = "sinhvien", Name = "Thông tin cá nhân" }
+            new NavItemValue { ID = "THONGTINSINHVIEN", Svg = "sinhvien", Name = "Thông tin cá nhân" },
+            new NavItemValue { ID = "CHITIETLICHTHI", Svg = "chitietlichthi", Name = "Chi tiết lịch thi" },
+            new NavItemValue { ID = "CHITIETHOCPHI", Svg = "chitiethocphi", Name = "Chi tiết học phí" },
         };
         _listDataNavItemForSV = _arrDataNavItemForSV.ToList();
         if (ValidateDangKyHP())
