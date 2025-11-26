@@ -75,4 +75,14 @@ public class HocPhiSVController
 
         return rs;
     }
+
+    public List<HocPhiSVDto> GetByMaSV(int maSV)
+    {
+        return _hocPhiSVDao.GetByMaSV(maSV);
+    }
+
+    public List<HocPhiHocPhanDetailDto> GetDetailsByMaSVHocKyNam(int maSV, int hocKy, string nam)
+    {
+        return _hocPhiSVDao.GetDetailsByMaSVHocKyNam(maSV, hocKy, nam);
+    }
 }
