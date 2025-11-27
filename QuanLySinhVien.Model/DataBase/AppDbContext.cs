@@ -10,7 +10,7 @@ public class AppDbContext : DbContext
     private static readonly string _connectionString = "Server=localhost;" +
                                                        "Database=quanlysinhvien;" +
                                                        "Uid=root;" +
-                                                       "Pwd=bi2552453;";
+                                                       "Pwd=;";
     
     public DbSet<LopEntity> Lops { get; set; }
 

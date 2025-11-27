@@ -7,7 +7,7 @@ public class MyConnection
     private static readonly string _connectionString = "Server=localhost;" +
                                                        "Database=quanlysinhvien;" +
                                                        "Uid=root;" +
-                                                       "Pwd=bi2552453;";
+                                                       "Pwd=;";
 
     public static MySqlConnection GetConnection()
     {
