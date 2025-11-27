@@ -253,6 +253,7 @@ public class ChiTietHocPhi : NavBase
         
         if (filteredData.Count > 0)
         {
+            var tongNo = totalDaThu - totalTongHocPhi;
             rows.Add(new List<object>
             {
                 "Tổng cộng",
@@ -260,7 +261,7 @@ public class ChiTietHocPhi : NavBase
                 string.Empty,
                 FormatMoney.formatVN(totalTongHocPhi),
                 FormatMoney.formatVN(totalDaThu),
-                string.Empty
+                FormatMoney.formatVN(tongNo)
             });
         }
         
