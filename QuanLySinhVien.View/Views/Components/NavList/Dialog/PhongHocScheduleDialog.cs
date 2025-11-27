@@ -1,7 +1,7 @@
 using System.Globalization;
 using QuanLySinhVien.Models.DAO;
 using QuanLySinhVien.Shared.DTO;
-
+using System.Diagnostics;
 
 // file này chỉ để hiển thị chi tiết lịch học ..., nếu có thể update thông báo ...
 namespace QuanLySinhVien.View.Views.Components.NavList.Dialog;
@@ -124,11 +124,12 @@ public class PhongHocScheduleDialog : Form
 
         try
         {
-            // Lấy lịch học hôm nay
-            _lichHocList = _lichHocDao.GetLichHocByPhongAndDate(_phongHoc.MaPH, DateTime.Now);
+            // lấy lịch học hiện tại
+            var today = DateTime.Now;
+            _lichHocList = _lichHocDao.GetLichHocByPhongAndDate(_phongHoc.MaPH, today);
 
-            // không có lịch -> 1 panel trắng
-            if (_lichHocList.Count == 0)
+            // if null
+            if (_lichHocList == null || _lichHocList.Count == 0)
             {
                 var emptyPanel = new Panel
                 {
@@ -141,7 +142,7 @@ public class PhongHocScheduleDialog : Form
 
                 var emptyLabel = new Label
                 {
-                    Text = "📅 Không có lịch học hôm nay",
+                    Text = $"📅 Hôm nay ({today:dd/MM/yyyy}) phòng này không có lịch học.",
                     Font = new Font("Segoe UI", 14, FontStyle.Italic),
                     ForeColor = Color.Gray,
                     Dock = DockStyle.Fill,
@@ -149,10 +150,15 @@ public class PhongHocScheduleDialog : Form
                 };
                 emptyPanel.Controls.Add(emptyLabel);
                 _scheduleContainer.Controls.Add(emptyPanel);
-                return;
+            
+                // // Debug
+                // Console.WriteLine($"Không tìm thấy lịch học nào cho phòng {_phongHoc.TenPH} vào ngày {today:dd/MM/yyyy}");
+                // return;
             }
 
-            // Hiển thị từng tiết học
+            Console.WriteLine($"Tìm thấy {_lichHocList.Count} tiết học hôm nay.");
+        
+            // Nếu có lịch -> Hiển thị danh sách
             foreach (var lichHoc in _lichHocList)
             {
                 var scheduleCard = CreateScheduleCard(lichHoc);
