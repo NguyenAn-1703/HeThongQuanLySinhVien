@@ -53,7 +53,7 @@ public class HocPhiSVDao
                 cmd.Parameters.AddWithValue("@MaSV", hocPhiSVDto.MaSV);
                 cmd.Parameters.AddWithValue("@HocKy", hocPhiSVDto.HocKy);
                 cmd.Parameters.AddWithValue("@Nam", hocPhiSVDto.Nam);
-                cmd.Parameters.AddWithValue("@TongHocPhi", hocPhiSVDto.TongHocPhi);
+                cmd.Parameters.AddWithValue("@TongHocPhi", HocPhiHocPhanDao.GetInstance().GetByMaSVHocKyNam(hocPhiSVDto.MaSV, hocPhiSVDto.HocKy, hocPhiSVDto.Nam).Sum(x => x.TongTien));
                 cmd.Parameters.AddWithValue("@DaThu", hocPhiSVDto.DaThu);
                 cmd.Parameters.AddWithValue("@TrangThai", hocPhiSVDto.TrangThai);
 
@@ -83,7 +83,7 @@ public class HocPhiSVDao
                 cmd.Parameters.AddWithValue("@MaSV", hocPhiSVDto.MaSV);
                 cmd.Parameters.AddWithValue("@HocKy", hocPhiSVDto.HocKy);
                 cmd.Parameters.AddWithValue("@Nam", hocPhiSVDto.Nam);
-                cmd.Parameters.AddWithValue("@TongHocPhi", hocPhiSVDto.TongHocPhi);
+                cmd.Parameters.AddWithValue("@TongHocPhi", HocPhiHocPhanDao.GetInstance().GetByMaSVHocKyNam(hocPhiSVDto.MaSV, hocPhiSVDto.HocKy, hocPhiSVDto.Nam).Sum(x => x.TongTien));
                 cmd.Parameters.AddWithValue("@DaThu", hocPhiSVDto.DaThu);
                 cmd.Parameters.AddWithValue("@TrangThai", hocPhiSVDto.TrangThai);
 
