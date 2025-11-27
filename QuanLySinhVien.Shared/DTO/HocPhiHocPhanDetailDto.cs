@@ -6,7 +6,5 @@ public class HocPhiHocPhanDetailDto
     public string TenHP { get; set; }
     public int SoTinChi { get; set; }
     public double SoTien { get; set; }
-    public double PhaiThu { get; set; }
-    public string TrangThai { get; set; }
 }
 

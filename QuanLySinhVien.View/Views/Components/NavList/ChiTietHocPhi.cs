@@ -171,8 +171,8 @@ public class ChiTietHocPhi : NavBase
         _contentLayout.Controls.Remove(_table);
         _table?.Dispose();
         
-        var headerList = new List<string> { "STT", "Mã HP", "Tên HP", "Số TC", "Số tiền", "Phải thu", "Trạng thái" };
-        var columnNames = new List<string> { "STT", "MaHP", "TenHP", "SoTC", "SoTien", "PhaiThu", "TrangThai" };
+        var headerList = new List<string> { "STT", "Mã HP", "Tên HP", "Số TC", "Số tiền"};
+        var columnNames = new List<string> { "STT", "MaHP", "TenHP", "SoTC", "SoTien" };
         
         _table = new CustomTable(headerList, columnNames, _displayData, false, false, false);
         _table.Dock = DockStyle.Fill;
@@ -308,11 +308,14 @@ public class ChiTietHocPhi : NavBase
             _isDetailView = true;
         }
         
+        var summaryEntry = _rawData?
+            .FirstOrDefault(x => x.HocKy == hocky && x.Nam == namStr);
+        var summaryDaThu = summaryEntry?.DaThu ?? 0.0;
+        
         var rows = new List<List<object>>();
         var stt = 1;
         var totalSoTC = 0;
         var totalSoTien = 0.0;
-        var totalPhaiThu = 0.0;
         
         foreach (var item in detailData)
         {
@@ -323,16 +326,17 @@ public class ChiTietHocPhi : NavBase
                 item.TenHP,
                 item.SoTinChi.ToString(),
                 FormatMoney.formatVN(item.SoTien),
-                FormatMoney.formatVN(item.PhaiThu),
-                item.TrangThai
             });
             totalSoTC += item.SoTinChi;
             totalSoTien += item.SoTien;
-            totalPhaiThu += item.PhaiThu;
         }
         
         if (detailData.Count > 0)
         {
+            var summaryTongHocPhi = summaryEntry?.TongHocPhi ?? totalSoTien;
+            var summaryConNo = summaryTongHocPhi - summaryDaThu;
+            if (summaryConNo < 0) summaryConNo = 0;
+            
             rows.Add(new List<object>
             {
                 "Tổng cộng",
@@ -340,8 +344,24 @@ public class ChiTietHocPhi : NavBase
                 string.Empty,
                 totalSoTC.ToString(),
                 FormatMoney.formatVN(totalSoTien),
-                FormatMoney.formatVN(totalPhaiThu),
-                string.Empty
+            });
+            
+            rows.Add(new List<object>
+            {
+                "Đã thu",
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                FormatMoney.formatVN(summaryDaThu)
+            });
+            
+            rows.Add(new List<object>
+            {
+                "Còn nợ",
+                string.Empty,
+                string.Empty,
+                string.Empty,
+                FormatMoney.formatVN(summaryConNo)
             });
         }
         

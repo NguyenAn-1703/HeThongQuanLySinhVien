@@ -171,13 +171,7 @@ public class HocPhiSVDao
                 hphp.MaHP,
                 hp.TenHP,
                 hp.SoTinChi,
-                hphp.TongTien AS SoTien,
-                hphp.TongTien AS PhaiThu,
-                CASE 
-                    WHEN hphp.Status = 0 THEN 'Chưa đóng'
-                    WHEN hphp.Status = 1 THEN 'Đã đóng'
-                    ELSE 'Chưa đóng'
-                END AS TrangThai
+                hphp.TongTien AS SoTien
             FROM hocphihocphan hphp
             INNER JOIN hocphan hp ON hphp.MaHP = hp.MaHP AND hp.Status = 1
             WHERE hphp.MaSV = @MaSV 
@@ -197,8 +191,6 @@ public class HocPhiSVDao
                 TenHP = reader.GetString("TenHP"),
                 SoTinChi = reader.GetInt32("SoTinChi"),
                 SoTien = reader.GetDouble("SoTien"),
-                PhaiThu = reader.GetDouble("PhaiThu"),
-                TrangThai = reader.GetString("TrangThai")
             });
 
         return result;
