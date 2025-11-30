@@ -344,8 +344,10 @@ public class HocPhiDialog : Form
         if (!Validate(daThuS)) return;
 
         var daThu = double.Parse(daThuS);
+        bool isExist = _hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam);
+
         //chưa có -> tạo mới, có -> update
-        if (!_hocPhiSVController.ExistByMaSVHKyNam(_idSinhVien, _hky, _nam))
+        if (!isExist)
         {
             var hocPhiSV = new HocPhiSVDto
             {
