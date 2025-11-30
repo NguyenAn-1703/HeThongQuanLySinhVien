@@ -10,6 +10,7 @@ public class GiangVienController
     private static GiangVienController _instance;
     private static List<GiangVienDto> giangVien;
     private TaiKhoanController _taiKhoanController;
+    private List<GiangVienDto> _listGiangVien;
 
     private GiangVienController()
     {
@@ -237,5 +238,16 @@ public class GiangVienController
         }
 
         return rs;
+    }
+    
+    public bool ExistById(int id)
+    {
+        _listGiangVien = GiangVienDao.GetAll();
+        foreach (var item in _listGiangVien)
+        {
+            if (item.MaGV == id) return true;
+        }
+
+        return false;
     }
 }

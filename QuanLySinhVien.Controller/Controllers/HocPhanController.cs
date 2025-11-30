@@ -136,6 +136,16 @@ public class HocPhanController
 
         return result;
     }
-    
 
+    public bool ExistById(int idHocPhan)
+    {
+        _listHocPhan = _hocPhanDao.GetAll();
+        foreach (var item in _listHocPhan)
+        {
+            if (item.MaHP == idHocPhan) return true;
+        }
+
+        return false;
+    }
+    
 }

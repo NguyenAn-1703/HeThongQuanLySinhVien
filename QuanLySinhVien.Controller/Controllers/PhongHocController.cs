@@ -58,4 +58,14 @@ public class PhongHocController
 
         return false;
     }
+    
+    public bool ExistById(int id)
+    {
+        var listPh = GetDanhSachPhongHoc();
+        foreach (var item in listPh)
+            if (item.MaPH == id)
+                return true;
+
+        return false;
+    }
 }

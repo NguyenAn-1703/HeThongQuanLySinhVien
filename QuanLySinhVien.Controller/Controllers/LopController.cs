@@ -79,4 +79,15 @@ public class LopController
 
         return rs;
     }
+    
+    public bool ExistById(int id)
+    {
+        _listLop = _lopDao.GetAll();
+        foreach (var item in _listLop)
+        {
+            if (item.MaLop == id) return true;
+        }
+
+        return false;
+    }
 }

@@ -3,6 +3,7 @@ using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.DTO.SearchObject;
 using QuanLySinhVien.Shared.Enums;
+using QuanLySinhVien.View.utils;
 using QuanLySinhVien.View.Views.Components.CommonUse;
 using QuanLySinhVien.View.Views.Components.NavList.Dialog;
 using QuanLySinhVien.View.Views.Components.ViewComponents;
@@ -22,6 +23,7 @@ public class NhomHocPhanScreen : RoundTLP
     private string _title;
     private string imgPath = "";
     private TitleButton _insertButton;
+    private TitleButton _importExcelButton;
 
     private int _hky;
     private string _nam;
@@ -38,6 +40,7 @@ public class NhomHocPhanScreen : RoundTLP
     private LichHocController _lichHocController;
     private LichSuDungController _lichSuDungController;
     private LichSD_NhomHPController _lichSD_NhomHPController;
+    private ImportNhp _importNhp;
 
     public NhomHocPhanScreen(string title, int hky, string nam, int idDotDK, DialogType dialogType)
     {
@@ -252,17 +255,23 @@ public class NhomHocPhanScreen : RoundTLP
         {
             AutoSize = true,
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
+            ColumnCount = 4,
             Margin = new Padding(0),
         };
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         
         _insertButton = new TitleButton("Thêm", "plus.svg");
         _insertButton.Margin = new Padding(3, 3, 20, 3);
         _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
         _insertButton.Anchor = AnchorStyles.Right;
+        
+        _importExcelButton = new TitleButton("Nhập từ excel", "exportexcel.svg");
+        _importExcelButton.Margin = new Padding(3, 3, 20, 3);
+        _importExcelButton._label.Font = GetFont.GetFont.GetMainFont(9, FontType.SemiBold);
+        _importExcelButton.Anchor = AnchorStyles.Right;
 
         _backButton = new CustomButton(20, 20, "back.svg", MyColor.GrayBackGround)
             { Pad = 5, Anchor = AnchorStyles.None };
@@ -279,6 +288,7 @@ public class NhomHocPhanScreen : RoundTLP
         };
         panel.Controls.Add(_backButton);
         panel.Controls.Add(lblTitle);
+        panel.Controls.Add(_importExcelButton);
         panel.Controls.Add(_insertButton);
 
         _contentLayout.Controls.Add(panel);
@@ -368,6 +378,17 @@ public class NhomHocPhanScreen : RoundTLP
         _table.OnDelete += i => DeleteNhp(i);
         
         _insertButton._mouseDown += () => InsertNHP();
+        _importExcelButton._mouseDown += () =>
+        {
+            _importNhp = new ImportNhp(_idDotDK,  _hky, _nam);
+            _importNhp.Finish += () =>
+            {
+                SetRawData();
+                SetDisplayData();
+                _table.UpdateData(_displayData);
+            };
+            _importNhp.Import();
+        };
         updateBtn._mouseDown += () => UpdateTgdk();
     }
 
