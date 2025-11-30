@@ -1,6 +1,7 @@
 using MySqlConnector;
 using QuanLySinhVien.Database;
 using QuanLySinhVien.Shared.DTO;
+using System.Globalization;
 
 namespace QuanLySinhVien.Models.DAO;
 
@@ -23,27 +24,29 @@ public class LichHocDao
     {
         List<LichHocDto> result = new();
         using var conn = MyConnection.GetConnection();
-        using var cmd = new MySqlCommand(@"SELECT MaLH, MaPH, MaNHP, Thu, 
-                                                  TietBatDau, TuNgay, DenNgay, 
-                                                  TietKetThuc, SoTiet, Type
-                                           FROM LichHoc
-                                           WHERE Status = 1", conn);
+        // Cần JOIN để lấy tên môn, tên GV... nếu muốn hiển thị fallback đầy đủ
+        var query = @"
+            SELECT 
+                lh.MaLH, lh.MaPH, lh.MaNHP, lh.Thu, 
+                lh.TietBatDau, lh.TuNgay, lh.DenNgay, lh.TietKetThuc, lh.SoTiet, lh.Type,
+                ph.TenPH,
+                hp.TenHP,
+                gv.TenGV,
+                nhp.SiSo
+            FROM LichHoc lh
+            LEFT JOIN PhongHoc ph ON lh.MaPH = ph.MaPH
+            LEFT JOIN NhomHocPhan nhp ON lh.MaNHP = nhp.MaNHP
+            LEFT JOIN HocPhan hp ON nhp.MaHP = hp.MaHP
+            LEFT JOIN GiangVien gv ON nhp.MaGV = gv.MaGV
+            WHERE lh.Status = 1";
+
+        using var cmd = new MySqlCommand(query, conn);
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read())
-            result.Add(new LichHocDto
-            {
-                MaLH = reader.GetInt32("MaLH"),
-                MaPH = reader.GetInt32("MaPH"),
-                MaNHP = reader.GetInt32("MaNHP"),
-                Thu = reader.GetString("Thu"),
-                TietBatDau = reader.GetInt32("TietBatDau"),
-                TuNgay = reader.GetDateTime("TuNgay"),
-                DenNgay = reader.GetDateTime("DenNgay"),
-                TietKetThuc = reader.GetInt32("TietKetThuc"),
-                SoTiet = reader.GetInt32("SoTiet"),
-                Type = reader.GetString("Type")
-            });
+        {
+            result.Add(MapReaderToDto(reader));
+        }
 
         return result;
     }
@@ -165,57 +168,46 @@ public class LichHocDao
     public List<LichHocDto> GetLichHocByPhongAndDate(int maPH, DateTime date)
     {
         var result = new List<LichHocDto>();
-        var thu = (int)date.DayOfWeek == 0 ? 8 : (int)date.DayOfWeek + 1;
+        
+        // Chuyển đổi ngày sang chuỗi "Thứ X" để khớp với DB
+        string thuStr = ConvertDateToThuString(date);
 
         var query = @"
-                SELECT 
-                    lh.MaLH, lh.MaPH, lh.MaNHP, lh.Thu, 
-                    lh.TietBatDau, lh.TuNgay, lh.DenNgay, lh.TietKetThuc, lh.SoTiet,
-                    ph.TenPH,
-                    hp.TenHP,
-                    gv.TenGV,
-                    nhp.SiSo
-                FROM LichHoc lh
-                INNER JOIN PhongHoc ph ON lh.MaPH = ph.MaPH
-                INNER JOIN NhomHocPhan nhp ON lh.MaNHP = nhp.MaNHP
-                INNER JOIN HocPhan hp ON nhp.MaHP = hp.MaHP
-                INNER JOIN GiangVien gv ON nhp.MaGV = gv.MaGV
-                WHERE lh.MaPH = @MaPH 
-                    AND lh.Thu = @Thu
-                    AND @CurrentDate BETWEEN lh.TuNgay AND lh.DenNgay
-                    AND lh.Status = 1
-                ORDER BY lh.TietBatDau";
+            SELECT 
+                lh.MaLH, lh.MaPH, lh.MaNHP, lh.Thu, 
+                lh.TietBatDau, lh.TuNgay, lh.DenNgay, lh.TietKetThuc, lh.SoTiet, lh.Type,
+                ph.TenPH,
+                hp.TenHP,
+                gv.TenGV,
+                nhp.SiSo
+            FROM LichHoc lh
+            JOIN PhongHoc ph ON lh.MaPH = ph.MaPH
+            JOIN NhomHocPhan nhp ON lh.MaNHP = nhp.MaNHP
+            JOIN HocPhan hp ON nhp.MaHP = hp.MaHP
+            JOIN GiangVien gv ON nhp.MaGV = gv.MaGV
+            WHERE lh.MaPH = @MaPH 
+                AND lh.Thu = @ThuStr 
+                AND @CurrentDate BETWEEN lh.TuNgay AND lh.DenNgay
+                AND lh.Status = 1
+            ORDER BY lh.TietBatDau";
 
         try
         {
-            using var connection = MyConnection.GetConnection();
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@MaPH", maPH);
-            command.Parameters.AddWithValue("@Thu", thu);
-            command.Parameters.AddWithValue("@CurrentDate", date.Date);
+            using var conn = MyConnection.GetConnection();
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@MaPH", maPH);
+            cmd.Parameters.AddWithValue("@ThuStr", thuStr); // So sánh chuỗi "Thứ 2"
+            cmd.Parameters.AddWithValue("@CurrentDate", date.Date);
 
-            using var reader = command.ExecuteReader();
+            using var reader = cmd.ExecuteReader();
             while (reader.Read())
-                result.Add(new LichHocDto
-                {
-                    MaLH = reader.GetInt32("MaLH"),
-                    MaPH = reader.GetInt32("MaPH"),
-                    MaNHP = reader.GetInt32("MaNHP"),
-                    Thu = reader.GetString("Thu"),
-                    TietBatDau = reader.GetInt32("TietBatDau"),
-                    TuNgay = reader.GetDateTime("TuNgay"),
-                    DenNgay = reader.GetDateTime("DenNgay"),
-                    TietKetThuc = reader.GetInt32("TietKetThuc"),
-                    SoTiet = reader.GetInt32("SoTiet"),
-                    TenPH = reader.GetString("TenPH"),
-                    TenHP = reader.GetString("TenHP"),
-                    TenGV = reader.GetString("TenGV"),
-                    SiSo = reader.GetInt32("SiSo")
-                });
+            {
+                result.Add(MapReaderToDto(reader));
+            }
         }
         catch (Exception ex)
         {
-            throw new Exception($"Lỗi khi lấy lịch học: {ex.Message}");
+            Console.WriteLine($"Error GetLichHocByPhongAndDate: {ex.Message}");
         }
 
         return result;
@@ -288,4 +280,54 @@ public class LichHocDao
         return Convert.ToInt32(result);
     }
 
+    
+    private LichHocDto MapReaderToDto(MySqlDataReader reader)
+        {
+            return new LichHocDto
+            {
+                MaLH = reader.GetInt32("MaLH"),
+                MaPH = reader.GetInt32("MaPH"),
+                MaNHP = reader.GetInt32("MaNHP"),
+                Thu = reader.GetString("Thu"),
+                TietBatDau = reader.GetInt32("TietBatDau"),
+                TuNgay = reader.GetDateTime("TuNgay"),
+                DenNgay = reader.GetDateTime("DenNgay"),
+                TietKetThuc = reader.GetInt32("TietKetThuc"),
+                SoTiet = reader.GetInt32("SoTiet"),
+                Type = reader.GetString("Type"),
+                
+                // Các trường JOIN (Dùng GetOrdinal để an toàn nếu cột không tồn tại trong query khác)
+                TenPH = HasColumn(reader, "TenPH") ? reader.GetString("TenPH") : "",
+                TenHP = HasColumn(reader, "TenHP") ? reader.GetString("TenHP") : "",
+                TenGV = HasColumn(reader, "TenGV") ? reader.GetString("TenGV") : "",
+                SiSo = HasColumn(reader, "SiSo") ? reader.GetInt32("SiSo") : 0
+            };
+        }
+    
+        // Helper: Chuyển đổi DateTime sang chuỗi "Thứ ..."
+        private string ConvertDateToThuString(DateTime date)
+        {
+            switch (date.DayOfWeek)
+            {
+                case DayOfWeek.Monday: return "Thứ 2";
+                case DayOfWeek.Tuesday: return "Thứ 3";
+                case DayOfWeek.Wednesday: return "Thứ 4";
+                case DayOfWeek.Thursday: return "Thứ 5";
+                case DayOfWeek.Friday: return "Thứ 6";
+                case DayOfWeek.Saturday: return "Thứ 7";
+                case DayOfWeek.Sunday: return "Chủ nhật";
+                default: return "";
+            }
+        }
+    
+        // Helper: Kiểm tra cột có tồn tại trong reader không
+        private bool HasColumn(MySqlDataReader reader, string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                if (reader.GetName(i).Equals(columnName, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
 }
