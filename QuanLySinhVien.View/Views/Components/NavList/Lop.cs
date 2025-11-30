@@ -14,6 +14,7 @@ namespace QuanLySinhVien.View.Views.Components.NavList;
 public class QuanLiLop : NavBase
 {
     private readonly string[] _headerArray = new[] { "Mã lớp", "Tên lớp", "Tên giảng viên", "Tên ngành" };
+    private List<string> _headerList;
     private readonly string _title = "Lớp";
     private readonly string ID = "Lop";
     private ChiTietQuyenController _chiTietQuyenController;
@@ -21,7 +22,7 @@ public class QuanLiLop : NavBase
     private List<object> _displayData;
 
     private GiangVienController _giangVienController;
-    private List<string> _headerList;
+
 
     private TitleButton _insertButton;
 

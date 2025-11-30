@@ -101,7 +101,7 @@ public class HocPhanController
         if (!Shared.Validate.IsValidHeSo(heSoHPText))
         {
             rs.index = 2;
-            rs.message = "Hệ số học phần không hợp lệ!";
+            rs.message = "Hệ số điểm không hợp lệ!";
             return rs;
         }
 
@@ -120,6 +120,21 @@ public class HocPhanController
         }
         
         return rs;
+    }
+
+    public List<HocPhanDto> GetListHocPhanByMaKhoa(int maKhoa)
+    {
+        _listHocPhan = _hocPhanDao.GetAll();
+        List<HocPhanDto> result = new List<HocPhanDto>();
+        foreach (var item in _listHocPhan)
+        {
+            if (item.MaKhoa == maKhoa)
+            {
+                result.Add(item);
+            }
+        }
+
+        return result;
     }
     
 

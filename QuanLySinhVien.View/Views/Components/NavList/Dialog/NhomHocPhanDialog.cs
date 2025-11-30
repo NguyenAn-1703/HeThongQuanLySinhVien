@@ -3,15 +3,13 @@ using QuanLySinhVien.Shared;
 using QuanLySinhVien.Shared.DTO;
 using QuanLySinhVien.Shared.Enums;
 using QuanLySinhVien.View.Views.Components.CommonUse;
+using QuanLySinhVien.View.Views.Components;
 using QuanLySinhVien.View.Views.Components.ViewComponents;
 
 namespace QuanLySinhVien.View.Views.Components.NavList.Dialog;
 
 public class NhomHocPhanDialog : Form
 {
-    private readonly List<NhomHocPhanDto>
-        _currentListNhp; // list nhoms học phần bên ngoài để check trùng lịch các nhóm học phần bên ngoài
-
     private readonly DialogType _dialogType;
 
     private readonly string _hocKy;
@@ -22,7 +20,8 @@ public class NhomHocPhanDialog : Form
 
     private readonly List<LabelTextField> listField;
 
-    private readonly List<LichHocDto> listLichTam;
+    private readonly List<LichHocDto> listLichHocTam;
+    private List<LichSuDungDto> listLichSuDungTam;
     protected TitleButton _btnLuu;
 
     private MyTLP _contentPanel;
@@ -42,26 +41,37 @@ public class NhomHocPhanDialog : Form
     private MyTLP _mainLayout;
     private NhomHocPhanController _nhomHocPhanController;
     private PhongHocController _phongHocController;
+    private KhoaController _khoaController;
+    private DotDangKyController _dotDangKyController;
     private CustomTable _tableLichHoc;
-    
-    public NhomHocPhanDialog(string title, DialogType dialogType, string hocKy, string nam,
-        List<NhomHocPhanDto> currentListNhp, int index = -1)
+    private LichSD_NhomHPController _lichSD_NhomHPController;
+
+    private LichSuDungController _lichSuDungController;
+    private int _maDotDK;
+
+
+    public NhomHocPhanDialog(string title, DialogType dialogType, string hocKy, string nam, int maDotDK, int index = -1)
     {
         _lichDisplay = new List<object>();
         listField = new List<LabelTextField>();
-        listLichTam = new List<LichHocDto>();
+        listLichHocTam = new List<LichHocDto>();
+        listLichSuDungTam = new List<LichSuDungDto>();
         _lichHocController = LichHocController.GetInstance();
         _hocPhanController = HocPhanController.GetInstance();
         _giangVienController = GiangVienController.GetInstance();
         _phongHocController = PhongHocController.getInstance();
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
+        _khoaController = KhoaController.GetInstance();
         _lopController = LopController.GetInstance();
+        _lichSuDungController = LichSuDungController.GetInstance();
+        _dotDangKyController = DotDangKyController.GetInstance();
+        _lichSD_NhomHPController = LichSD_NhomHPController.GetInstance();
         _title = title;
         _dialogType = dialogType;
         _hocKy = hocKy;
         _nam = nam;
         _selectedId = index;
-        _currentListNhp = currentListNhp;
+        _maDotDK = maDotDK;
         Init();
     }
 
@@ -69,7 +79,7 @@ public class NhomHocPhanDialog : Form
 
     private void Init()
     {
-        Size = new Size(1300, 700);
+        Size = new Size(900, 900);
 
         BackColor = MyColor.White;
         StartPosition = FormStartPosition.CenterScreen;
@@ -99,6 +109,7 @@ public class NhomHocPhanDialog : Form
         if (_dialogType == DialogType.Sua)
             SetupUpdate();
         else if (_dialogType == DialogType.ChiTiet) SetupDetail();
+        else if (_dialogType == DialogType.Them) SetupInsert();
     }
 
 
@@ -107,89 +118,191 @@ public class NhomHocPhanDialog : Form
         _contentPanel = new MyTLP
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 2
+            RowCount = 5,
+            Padding = new Padding(5),
         };
 
-        _contentPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
-        _contentPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60));
+        _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _contentPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        _contentPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
+        SetHkyNamContainer();
+        SetFieldKhoa();
+        SetHocPhanContainer();
         SetFieldContainer();
         SetLichHocContainer();
 
         _mainLayout.Controls.Add(_contentPanel);
     }
 
-    private void SetFieldContainer()
+    void SetHkyNamContainer()
     {
-        listField.Add(new LabelTextField("Học kỳ", TextFieldType.NormalText));
-        listField.Add(new LabelTextField("Năm", TextFieldType.NormalText));
-        listField.Add(new LabelTextField("Học phần", TextFieldType.ListBoxHP));
-        listField.Add(new LabelTextField("Giảng viên", TextFieldType.ListBoxGV));
-        listField.Add(new LabelTextField("Lớp", TextFieldType.ListBoxLop));
-
-
-        var panel = new RoundTLP
+        MyTLP panel = new MyTLP
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 1,
-            Border = true,
-            Margin = new Padding(7),
-            Padding = new Padding(7)
+            ColumnCount = 2,
+            AutoSize = true,
+            Margin = new Padding(3, 3, 3, 15)
         };
-
-        foreach (var field in listField) panel.Controls.Add(field);
-
-        listField[0].SetText(_hocKy + "");
-        listField[1].SetText(_nam + "");
-
-        listField[0]._field.Enable = false;
-        listField[1]._field.Enable = false;
+        LabelValue lblnam = new LabelValue("Năm:", "2025");
+        LabelValue lblhky = new LabelValue("Học kỳ:", "1");
+        lblnam.lblTitle.Font = GetFont.GetFont.GetMainFont(11, FontType.SemiBold);
+        lblnam.lblValue.Font = GetFont.GetFont.GetMainFont(11, FontType.SemiBold);
+        lblhky.lblTitle.Font = GetFont.GetFont.GetMainFont(11, FontType.SemiBold);
+        lblhky.lblValue.Font = GetFont.GetFont.GetMainFont(11, FontType.SemiBold);
+        lblhky.Margin = new Padding(15, 3, 3, 3);
+        panel.Controls.Add(lblnam);
+        panel.Controls.Add(lblhky);
         _contentPanel.Controls.Add(panel);
     }
 
+    private LabelTextField fieldKhoa;
+
+    void SetFieldKhoa()
+    {
+        MyTLP panel = new MyTLP
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            Padding = new Padding(5)
+        };
+
+        List<KhoaDto> listKhoa = _khoaController.GetDanhSachKhoa();
+        listKhoa.RemoveAt(0);
+        List<string> listCbxKhoa = listKhoa.Select(x => x.TenKhoa).ToList();
+        fieldKhoa = new LabelTextField("Khoa", TextFieldType.Combobox) { Dock = DockStyle.None };
+        fieldKhoa._combobox.combobox.Width = 410;
+        fieldKhoa.SetComboboxList(listCbxKhoa);
+        fieldKhoa.SetComboboxSelection(listCbxKhoa[0]);
+        _contentPanel.Controls.Add(fieldKhoa);
+    }
+
+    private LabelTextField _hocPhanField;
+    private LabelValue lblTinChi;
+    private LabelValue lblHsHp;
+    private LabelValue lblLT;
+    private LabelValue lblTH;
+
+    private void SetHocPhanContainer()
+    {
+        _hocPhanField = new LabelTextField("Học phần", TextFieldType.ListBoxHP) { Dock = DockStyle.None };
+        _hocPhanField.tb.contentTextBox.Width = 400;
+
+        lblTinChi = new LabelValue("Số tín chỉ:", "0");
+        lblHsHp = new LabelValue("Hệ số học phần:", "0");
+        lblLT = new LabelValue("Số tiết LT:", "0");
+        lblTH = new LabelValue("Số tiết TH:", "0");
+
+
+        RoundTLP panel = new RoundTLP
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            Border = true,
+            ColumnCount = 2,
+            RowCount = 3,
+            Padding = new Padding(5)
+        };
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+
+        panel.Controls.Add(_hocPhanField);
+        panel.SetColumnSpan(_hocPhanField, 2);
+        panel.Controls.Add(lblTinChi);
+        panel.Controls.Add(lblHsHp);
+        panel.Controls.Add(lblLT);
+        panel.Controls.Add(lblTH);
+        _contentPanel.Controls.Add(panel);
+    }
+
+    private LabelTextField fieldGV;
+    private LabelTextField fieldLop;
+    private LabelTextField fieldSiSoToiDa;
+
+    private void SetFieldContainer()
+    {
+        MyTLP panel = new MyTLP
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            ColumnCount = 2,
+            RowCount = 2,
+        };
+
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        fieldGV = new LabelTextField("Giảng viên", TextFieldType.ListBoxGV) { Dock = DockStyle.None };
+        fieldLop = new LabelTextField("Lớp", TextFieldType.ListBoxLop) { Dock = DockStyle.None };
+        fieldSiSoToiDa = new LabelTextField("Sĩ số tối đa", TextFieldType.Number) { Dock = DockStyle.None };
+
+        fieldGV.tbGV.contentTextBox.Width = 300;
+        fieldLop.tbLop.contentTextBox.Width = 300;
+        fieldSiSoToiDa._numberField.contentTextBox.Width = 300;
+
+        panel.Controls.Add(fieldGV);
+        panel.Controls.Add(fieldLop);
+        panel.Controls.Add(fieldSiSoToiDa);
+        _contentPanel.Controls.Add(panel);
+    }
+
+
     private void SetLichHocContainer()
     {
-        _lichContainer = new RoundTLP
+        SetTableLichHoc();
+
+        Label titleLich = new Label
+        {
+            Text = "Lịch học",
+            Font = GetFont.GetFont.GetMainFont(11, FontType.ExtraBold),
+            AutoSize = true,
+        };
+
+        _insertButton = new TitleButton("Thêm", "plus.svg");
+        _insertButton.Margin = new Padding(3, 3, 20, 3);
+        _insertButton._label.Font = GetFont.GetFont.GetMainFont(12, FontType.ExtraBold);
+        _insertButton.Anchor = AnchorStyles.Right;
+
+        RoundTLP panel = new RoundTLP
         {
             Border = true,
             Dock = DockStyle.Fill,
-            Margin = new Padding(7),
-            RowCount = 3,
-            Padding = new Padding(7),
+            RowCount = 2,
+            ColumnCount = 2,
+            Padding = new Padding(10),
+            Margin = new Padding(3, 30, 3, 3),
         };
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-        var lblLich = new Label
-        {
-            Text = "Lịch học",
-            AutoSize = true,
-            Font = GetFont.GetFont.GetMainFont(13, FontType.Black),
-            Anchor = AnchorStyles.None,
-            Margin = new Padding(0, 10, 0, 0)
-        };
-
-        _lichContainer.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        _lichContainer.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        _lichContainer.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-
-        _lichContainer.Controls.Add(lblLich);
-
-        _insertButton = new TitleButton("Thêm", "plus.svg");
-        // _insertButton.Margin = new Padding(3, 3, 10, 3);
-        _insertButton._label.Font = GetFont.GetFont.GetMainFont(11, FontType.ExtraBold);
-        _insertButton.Anchor = AnchorStyles.Right;
-        _insertButton.Enabled = false;
-        _lichContainer.Controls.Add(_insertButton);
-
-        if (_dialogType == DialogType.ChiTiet) _insertButton.Visible = false;
-
-        SetTableLichHoc();
+        panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
 
-        _contentPanel.Controls.Add(_lichContainer);
+        panel.Controls.Add(titleLich);
+        panel.Controls.Add(_insertButton);
+        panel.Controls.Add(_tableLichHoc);
+        panel.SetColumnSpan(_tableLichHoc, 2);
+
+        _contentPanel.Controls.Add(panel);
     }
+
+    private List<LichHocDto> listLichHoc;
 
     private void SetTableLichHoc()
     {
+        listLichHoc = new List<LichHocDto>();
+        _lichDisplay = listLichHoc.Cast<object>().ToList();
+
         var header = new[] { "ID", "Thứ", "Tiết BD", "Tiết KT", "Phòng" };
         var columnNames = new[] { "ID", "Thu", "TietBatDau", "TietKetThuc", "TenPH" };
         var columnNamesList = columnNames.ToList();
@@ -197,24 +310,24 @@ public class NhomHocPhanDialog : Form
         if (_dialogType == DialogType.ChiTiet)
         {
             _tableLichHoc = new CustomTable(header.ToList(), columnNamesList, _lichDisplay);
-            _lichContainer.Controls.Add(_tableLichHoc, 0, 2);
-
         }
         else
         {
             _tableLichHoc = new CustomTable(header.ToList(), columnNamesList, _lichDisplay, true, true, true);
-            _lichContainer.Controls.Add(_tableLichHoc);
-
         }
-
     }
 
-    private void UpdateDisplayDataLich(List<LichHocDto> dtos)
+    private void UpdateDisplayDataLich()
     {
         var index = 1;
-        _lichDisplay = ConvertObject.ConvertToDisplay(dtos, x => new
+        foreach (LichHocDto dto in listLichHocTam)
         {
-            ID = index++,
+            dto.MaLH = index++;
+        }
+
+        _lichDisplay = ConvertObject.ConvertToDisplay(listLichHocTam, x => new
+        {
+            ID = x.MaLH,
             x.Thu,
             x.TietBatDau,
             x.TietKetThuc,
@@ -336,19 +449,70 @@ public class NhomHocPhanDialog : Form
         _tableLichHoc.OnDetail += i => DetailLich(i);
         _tableLichHoc.OnEdit += i => UpdateLich(i);
         _tableLichHoc.OnDelete += i => DeleteLich(i);
-
+        //
         if (_dialogType == DialogType.Them || _dialogType == DialogType.Sua)
             _btnLuu._mouseDown += () => OnClickBtnLuu();
 
-        listField[2].tb.contentTextBox.TextChanged += (sender, args) => OnChangeHP();
+        // listField[2].tb.contentTextBox.TextChanged += (sender, args) => OnChangeHP();
+
+        _hocPhanField.tb.contentTextBox.TextChanged += (sender, args) => OnChangeHP();
+        fieldKhoa._combobox.combobox.SelectedIndexChanged += (sender, args) => OnChangeKhoa();
+
+        fieldSiSoToiDa._numberField.contentTextBox.TextChanged += (sender, args) => OnChangeSiSoToiDa();
+    }
+
+    void SetSiSoMax()
+    {
+        fieldSiSoToiDa._numberField.contentTextBox.Text = GetSiSoPhongMax() + "";
+    }
+
+    void OnChangeSiSoToiDa()
+    {
+        string sisotoidas = fieldSiSoToiDa._numberField.contentTextBox.Text;
+        if (sisotoidas.Equals("")) return;
+        int sisotoida = int.Parse(sisotoidas);
+        int sisotoidaphong = GetSiSoPhongMax();
+
+        if (sisotoida > sisotoidaphong)
+        {
+            fieldSiSoToiDa._numberField.contentTextBox.Text = sisotoidaphong + "";
+        }
+    }
+
+    int GetSiSoPhongMax()
+    {
+        if (listLichHocTam.Count == 0) return 0;
+
+        int max = 0;
+        foreach (var item in listLichHocTam)
+        {
+            PhongHocDto phong = _phongHocController.GetPhongHocById(item.MaPH);
+            if (max < phong.SucChua)
+            {
+                max = phong.SucChua;
+            }
+        }
+
+        return max;
+    }
+
+    void OnChangeKhoa()
+    {
+        string tenKhoa = fieldKhoa.GetSelectionCombobox();
+        KhoaDto khoa = _khoaController.GetByTen(tenKhoa);
+        //getListHocPhanByMaKhoa
+        List<HocPhanDto> listHp = _hocPhanController.GetListHocPhanByMaKhoa(khoa.MaKhoa);
+        _hocPhanField.tb.UpdateList(listHp);
     }
 
     void OnChangeHP()
     {
-        string tenHP = listField[2].tb.contentTextBox.Text;
+        string tenHP = _hocPhanField.tb.contentTextBox.Text;
         if (_hocPhanController.ExistByTen(tenHP))
         {
             _insertButton.Enabled = true;
+            HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHP);
+            UpdateDataHP(hocPhan);
         }
         else
         {
@@ -356,43 +520,70 @@ public class NhomHocPhanDialog : Form
         }
     }
 
+    void UpdateDataHP(HocPhanDto hocPhan)
+    {
+        lblTinChi.lblValue.Text = hocPhan.SoTinChi + "";
+        lblHsHp.lblValue.Text = hocPhan.HeSoHocPhan + "";
+        lblLT.lblValue.Text = hocPhan.SoTietLyThuyet + "";
+        lblTH.lblValue.Text = hocPhan.SoTietThucHanh + "";
+    }
+
 
     /// //////////////////////LICH/////////////////////////
     private void InsertLich()
     {
-        string tenHp =  listField[2].tb.contentTextBox.Text;
-        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
-        
-        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them,hocPhan, listLichTam, _currentListNhp);
-        _lichDialog.Finish += dto =>
+        string tenHP = _hocPhanField.tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHP);
+        _lichDialog = new LichHocDialog("Thêm lịch học", DialogType.Them, hocPhan, new LichHocDto(), listLichSuDungTam, listLichHocTam);
+        _lichDialog.Finish += (dto, listLichSuDung) =>
         {
-            listLichTam.Add(dto);
-            UpdateDisplayDataLich(listLichTam);
+            listLichSuDungTam.AddRange(listLichSuDung);
+            listLichHocTam.Add(dto);
+            UpdateDisplayDataLich();
+            _hocPhanField.tb.Enable = false;
+
+            Console.WriteLine("--------lich su dung hien tai cua nhom hoc phan---------");
+            for (int i = 0; i < listLichSuDungTam.Count; i++)
+            {
+                Console.WriteLine(
+                    $"lichsd {i} : phong {listLichSuDungTam[i].MaPH} {listLichSuDungTam[i].ThoiGianBatDau} {listLichSuDungTam[i].ThoiGianKetThuc}");
+            }
+
+            SetSiSoMax();
         };
         _lichDialog.ShowDialog();
-        
-        listField[2].tb.Enable = false;
     }
 
     private void DetailLich(int index)
     {
-        string tenHp =  listField[2].tb.contentTextBox.Text;
-        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
+        string tenHP = _hocPhanField.tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHP);
         var lich = GetLichById(index);
-        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet,hocPhan, listLichTam, _currentListNhp, lich);
+        _lichDialog = new LichHocDialog("Chi tiết lịch học", DialogType.ChiTiet, hocPhan, lich,
+            new List<LichSuDungDto>(), listLichHocTam);
         _lichDialog.ShowDialog();
     }
 
     private void UpdateLich(int index)
     {
-        string tenHp =  listField[2].tb.contentTextBox.Text;
-        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
+        string tenHP = _hocPhanField.tb.contentTextBox.Text;
+        HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHP);
         var lich = GetLichById(index);
-        _lichDialog = new LichHocDialog("Sửa lịch học", DialogType.Sua,hocPhan, listLichTam, _currentListNhp, lich);
 
-        _lichDialog.Finish += dto =>
+        //nếu update thì không cần check lại lịch sử dụng hiện có của lịch học nữa
+        //xóa lịch sử dụng của lịch học được chọn trước khi truyền tham số
+
+        List<LichSuDungDto> listLichThem = GetListLichSdThemForUpdate(lich);
+        _lichDialog = new LichHocDialog("Sửa lịch học", DialogType.Sua, hocPhan, lich, listLichThem, listLichHocTam);
+
+        _lichDialog.Finish += (dto, listLichSuDung) =>
         {
-            foreach (var item in listLichTam)
+            //update LichSd
+            DeleteLichSdOfLh(lich);
+            listLichSuDungTam.AddRange(listLichSuDung);
+
+            //update LichHoc
+            foreach (var item in listLichHocTam)
                 if (item.MaLH == dto.MaLH)
                 {
                     item.MaPH = dto.MaPH;
@@ -406,9 +597,44 @@ public class NhomHocPhanDialog : Form
                     break;
                 }
 
-            UpdateDisplayDataLich(listLichTam);
+            UpdateDisplayDataLich();
+            SetSiSoMax();
         };
         _lichDialog.ShowDialog();
+    }
+
+    List<LichSuDungDto> GetListLichSdThemForUpdate(LichHocDto lich)
+    {
+        //copy list
+        List<LichSuDungDto> rs = listLichSuDungTam
+            .Select(x => new LichSuDungDto
+            {
+                MaLSD = x.MaLSD,
+                MaPH = x.MaPH,
+                ThoiGianBatDau = x.ThoiGianBatDau,
+                ThoiGianKetThuc = x.ThoiGianKetThuc,
+                GhiChu = x.GhiChu
+            })
+            .ToList();
+
+        List<LichSuDungDto> lichSdOfLh = GetListLichSd(
+            lich.Thu,
+            lich.TietBatDau,
+            lich.TietKetThuc,
+            lich.TuNgay,
+            lich.DenNgay,
+            lich.MaPH
+        );
+
+        foreach (LichSuDungDto x in lichSdOfLh)
+        {
+            rs.RemoveAll(item => item.ThoiGianBatDau == x.ThoiGianBatDau
+                                 && item.ThoiGianKetThuc == x.ThoiGianKetThuc
+                                 && item.MaPH == x.MaPH
+            );
+        }
+
+        return rs;
     }
 
     public void DeleteLich(int index)
@@ -419,65 +645,157 @@ public class NhomHocPhanDialog : Form
             MessageBoxIcon.Information);
         if (select == DialogResult.No) return;
 
-        foreach (var item in listLichTam)
+
+        //xóa lịch sử dụng ứng vs lịch học
+        DeleteLichSdOfLh(lich);
+
+        //xóa lịch học
+        foreach (var item in listLichHocTam)
             if (item.MaLH == lich.MaLH)
             {
-                listLichTam.Remove(item);
+                listLichHocTam.Remove(item);
                 break;
             }
 
-        UpdateDisplayDataLich(listLichTam);
+        UpdateDisplayDataLich();
+        SetSiSoMax();
+    }
+
+    void DeleteLichSdOfLh(LichHocDto lich)
+    {
+        List<LichSuDungDto> lichSdOfLh = GetListLichSd(
+            lich.Thu,
+            lich.TietBatDau,
+            lich.TietKetThuc,
+            lich.TuNgay,
+            lich.DenNgay,
+            lich.MaPH
+        );
+
+        foreach (LichSuDungDto x in lichSdOfLh)
+        {
+            listLichSuDungTam.RemoveAll(item => item.ThoiGianBatDau == x.ThoiGianBatDau
+                                                && item.ThoiGianKetThuc == x.ThoiGianKetThuc
+                                                && item.MaPH == x.MaPH
+            );
+        }
+
+        Console.WriteLine("--------lich su dung hien tai cua nhom hoc phan---------");
+        for (int i = 0; i < listLichSuDungTam.Count; i++)
+        {
+            Console.WriteLine(
+                $"lichsd {i} : phong {listLichSuDungTam[i].MaPH} {listLichSuDungTam[i].ThoiGianBatDau} {listLichSuDungTam[i].ThoiGianKetThuc}");
+        }
+    }
+
+    public List<LichSuDungDto> GetListLichSd(
+        string thu,
+        int tietBatDau,
+        int tietKetThuc,
+        DateTime ngayBatDau,
+        DateTime ngayKetThuc,
+        int maPhong)
+    {
+        List<LichSuDungDto> list = new List<LichSuDungDto>();
+
+        DayOfWeek targetDay = ConvertThu.ConvertToDayOfWeek(thu);
+
+        // Tìm ngày đầu tiên trùng với thứ
+        DateTime current = ngayBatDau;
+        while (current.DayOfWeek != targetDay)
+            current = current.AddDays(1);
+
+        // Mỗi tiết sẽ add riêng 1 lịch luôn
+        while (current <= ngayKetThuc)
+        {
+            for (int tiet = tietBatDau; tiet <= tietKetThuc; tiet++)
+            {
+                var tg = ConvertTietToGio.GetThoiGianTiet(tiet, current);
+
+                list.Add(new LichSuDungDto
+                {
+                    MaPH = maPhong,
+                    ThoiGianBatDau = tg.Start,
+                    ThoiGianKetThuc = tg.End,
+                });
+            }
+
+            current = current.AddDays(7);
+        }
+
+        return list;
     }
 
     /// //////////////////////LICH/////////////////////////
     /// //////////////////////NHOMHOCPHAN/////////////////////////
+    private void SetupInsert()
+    {
+        _insertButton.Enabled = false;
+    }
+
     private void SetupUpdate()
     {
         //Không cho sửa học phần do ảnh hưởng lịch
-        listField[2].tb.Enable = false;
+        _hocPhanField.tb.Enable = false;
         
         NhomHocPhanDto nhomHP = _nhomHocPhanController.GetById(_selectedId);
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(nhomHP.MaHP);
         GiangVienDto giangVien = _giangVienController.GetById(nhomHP.MaGV);
         LopDto lop = _lopController.GetLopById(nhomHP.MaLop);
-
-        listField[2].tb.contentTextBox.Text = hocPhan.TenHP;
-        listField[3].tbGV.contentTextBox.Text = giangVien.TenGV;
-        listField[4].tbLop.contentTextBox.Text = lop.TenLop;
+        
+        _hocPhanField.tb.contentTextBox.Text = hocPhan.TenHP;
+        fieldGV.tbGV.contentTextBox.Text = giangVien.TenGV;
+        fieldLop.tbLop.contentTextBox.Text = lop.TenLop;
 
         SetupListLich();
+        fieldSiSoToiDa._numberField.contentTextBox.Text = nhomHP.SiSoToiDa + "";
     }
 
     private void SetupDetail()
     {
+        _hocPhanField.tb.Enable = false;
+        
         NhomHocPhanDto nhomHP = _nhomHocPhanController.GetById(_selectedId);
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(nhomHP.MaHP);
         GiangVienDto giangVien = _giangVienController.GetById(nhomHP.MaGV);
         LopDto lop = _lopController.GetLopById(nhomHP.MaLop);
+        
+        _hocPhanField.tb.contentTextBox.Text = hocPhan.TenHP;
+        fieldGV.tbGV.contentTextBox.Text = giangVien.TenGV;
+        fieldLop.tbLop.contentTextBox.Text = lop.TenLop;
 
-        listField[2].tb.contentTextBox.Text = hocPhan.TenHP;
-        listField[3].tbGV.contentTextBox.Text = giangVien.TenGV;
-        listField[4].tbLop.contentTextBox.Text = lop.TenLop;
-
-        listField[2].tb.Enable = false;
-        listField[3].tbGV.Enable = false;
-        listField[4].tbLop.Enable = false;
-
+        fieldKhoa._combobox.Enable = false;
+        _hocPhanField.tb.Enable = false;
+        fieldGV.tbGV.Enable = false;
+        fieldLop.tbLop.Enable = false;
+        fieldSiSoToiDa._numberField.Enable = false;
+        
+        _insertButton.Enabled = false;
+        
         SetupListLich();
+        fieldSiSoToiDa._numberField.contentTextBox.Text = nhomHP.SiSoToiDa + "";
     }
 
     private void SetupListLich()
     {
         List<LichHocDto> listLich = _lichHocController.GetByMaNhp(_selectedId);
-        foreach (var item in listLich) listLichTam.Add(item);
-        UpdateDisplayDataLich(listLichTam);
+        foreach (var item in listLich) listLichHocTam.Add(item);
+        UpdateDisplayDataLich();
     }
 
 
     /// //////////////////////NHOMHOCPHAN/////////////////////////
     private LichHocDto GetLichById(int ID)
     {
-        return listLichTam[ID - 1];
+        foreach (LichHocDto lichHoc in listLichHocTam)
+        {
+            if (lichHoc.MaLH == ID)
+            {
+                return lichHoc;
+            }
+        }
+
+        return new LichHocDto();
     }
 
     private void OnClickBtnLuu()
@@ -489,28 +807,31 @@ public class NhomHocPhanDialog : Form
 
     private void Insert()
     {
-        var tenHp = listField[2].tb.contentTextBox.Text;
-        var tenGv = listField[3].tbGV.contentTextBox.Text;
-        var tenLop = listField[4].tbLop.contentTextBox.Text;
-
-        if (!Validate(tenHp, tenGv, tenLop, listLichTam)) return;
+        var tenHp = _hocPhanField.tb.contentTextBox.Text;
+        var tenGv = fieldGV.tbGV.contentTextBox.Text;
+        var tenLop = fieldLop.tbLop.contentTextBox.Text;
+        var siSoToiDa = fieldSiSoToiDa._numberField.contentTextBox.Text;
+        if (!Validate(tenHp, tenGv, tenLop, siSoToiDa, listLichHocTam)) return;
 
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         GiangVienDto giangVien = _giangVienController.GetByTen(tenGv);
         LopDto lop = _lopController.GetByTen(tenLop);
+        int sisotd = int.Parse(siSoToiDa);
 
-        var hocKy = int.Parse(_hocKy.Split(" ")[2]);
+        var hocKy = int.Parse(_hocKy);
         var nam = _nam;
-
+        
         var nhomHP = new NhomHocPhanDto
         {
+            MaDotDK = _maDotDK,
             MaGV = giangVien.MaGV,
             MaHP = hocPhan.MaHP,
             MaLop = lop.MaLop,
             HocKy = hocKy,
             Nam = nam,
+            SiSoToiDa = sisotd
         };
-
+        //
         if (!_nhomHocPhanController.Insert(nhomHP))
         {
             MessageBox.Show("Thêm thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -520,7 +841,7 @@ public class NhomHocPhanDialog : Form
         List<NhomHocPhanDto> listnhp = _nhomHocPhanController.GetAll();
         var manhp = listnhp[listnhp.Count - 1].MaNHP;
 
-        foreach (var item in listLichTam)
+        foreach (var item in listLichHocTam)
         {
             var lich = new LichHocDto
             {
@@ -541,73 +862,166 @@ public class NhomHocPhanDialog : Form
             }
         }
 
+        //insert lichsd
+        foreach (LichSuDungDto item in listLichSuDungTam)
+        {
+            LichSuDungDto lich = new LichSuDungDto
+            {
+                MaPH = item.MaPH,
+                ThoiGianBatDau = item.ThoiGianBatDau,
+                ThoiGianKetThuc = item.ThoiGianKetThuc,
+                GhiChu = $"Nhóm học phần {manhp} sử dụng"
+            };
+            if (!_lichSuDungController.Insert(lich))
+            {
+                MessageBox.Show("Thêm lịch sử dụng thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int maLSD = _lichSuDungController.GetLastId();
+            LichSD_NhomHPDto lisd_nhomhp = new()
+            {
+                MaLSD = maLSD,
+                MaNHP = manhp
+            };
+            if (!_lichSD_NhomHPController.Add(lisd_nhomhp))
+            {
+                MessageBox.Show("Thêm lịch sử dụng nhóm hp thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+        }
+
         MessageBox.Show("Thêm thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
         Finish?.Invoke();
         Close();
     }
 
+    //
     private void Update()
     {
-        var tenHp = listField[2].tb.contentTextBox.Text;
-        var tenGv = listField[3].tbGV.contentTextBox.Text;
-        var tenLop = listField[4].tbLop.contentTextBox.Text;
-
-        if (!Validate(tenHp, tenGv, tenLop, listLichTam)) return;
+        var tenHp = _hocPhanField.tb.contentTextBox.Text;
+        var tenGv = fieldGV.tbGV.contentTextBox.Text;
+        var tenLop = fieldLop.tbLop.contentTextBox.Text;
+        var siSoToiDa = fieldSiSoToiDa._numberField.contentTextBox.Text;
+        if (!Validate(tenHp, tenGv, tenLop, siSoToiDa, listLichHocTam)) return;
 
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
         GiangVienDto giangVien = _giangVienController.GetByTen(tenGv);
         LopDto lop = _lopController.GetByTen(tenLop);
+        int sisotd = int.Parse(siSoToiDa);
 
-        var hocKy = int.Parse(_hocKy.Split(" ")[2]);
+        var hocKy = int.Parse(_hocKy);
         var nam = _nam;
 
+        List<DotDangKyDto> listDotDk = _dotDangKyController.GetAll();
+        DotDangKyDto dotDk = listDotDk[listDotDk.Count - 1];
+        
         var nhomHP = new NhomHocPhanDto
         {
             MaNHP = _selectedId,
+            MaDotDK = _maDotDK,
             MaGV = giangVien.MaGV,
             MaHP = hocPhan.MaHP,
             MaLop = lop.MaLop,
             HocKy = hocKy,
             Nam = nam,
+            SiSoToiDa = sisotd
         };
-
+        
         if (!_nhomHocPhanController.Update(nhomHP))
         {
             MessageBox.Show("Sửa thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
-
+        
         //Xóa hết lịch cũ để cập nhật lại
         List<LichHocDto> listLich = _lichHocController.GetByMaNhp(_selectedId);
-        foreach (var item in listLich) _lichHocController.HardDelete(item.MaLH);
-
-        foreach (var item in listLichTam)
+        if (listLich.Count != 0)
         {
-            var lich = new LichHocDto
+            foreach (var item in listLich) _lichHocController.HardDelete(item.MaLH);
+        
+            foreach (var item in listLichHocTam)
+            {
+                var lich = new LichHocDto
+                {
+                    MaPH = item.MaPH,
+                    MaNHP = _selectedId,
+                    Thu = item.Thu,
+                    TietBatDau = item.TietBatDau,
+                    TietKetThuc = item.TietKetThuc,
+                    TuNgay = item.TuNgay,
+                    DenNgay = item.DenNgay,
+                    SoTiet = item.SoTiet,
+                    Type = item.Type
+                };
+                if (!_lichHocController.Insert(lich))
+                {
+                    MessageBox.Show("Sửa lịch thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+        }
+        
+        List<LichSD_NhomHPDto> listLichSd_NhomHP = _lichSD_NhomHPController.GetByMaNHP(_selectedId);
+        if (listLichSd_NhomHP.Count != 0)
+        {
+            foreach (LichSD_NhomHPDto lsdnhp in listLichSd_NhomHP)
+            {
+                if (!_lichSD_NhomHPController.Delete(lsdnhp.MaLSD, lsdnhp.MaNHP))
+                {
+                    MessageBox.Show("Xóa lichsdnhp thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            
+            foreach (LichSD_NhomHPDto lsdnhp in listLichSd_NhomHP)
+            {
+                if (!_lichSuDungController.Delete(lsdnhp.MaLSD))
+                {
+                    MessageBox.Show("Xóa lichsd thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+        }
+        
+        foreach (LichSuDungDto item in listLichSuDungTam)
+        {
+            LichSuDungDto lich = new LichSuDungDto
             {
                 MaPH = item.MaPH,
-                MaNHP = _selectedId,
-                Thu = item.Thu,
-                TietBatDau = item.TietBatDau,
-                TietKetThuc = item.TietKetThuc,
-                TuNgay = item.TuNgay,
-                DenNgay = item.DenNgay,
-                SoTiet = item.SoTiet,
-                Type = item.Type
+                ThoiGianBatDau = item.ThoiGianBatDau,
+                ThoiGianKetThuc = item.ThoiGianKetThuc,
+                GhiChu = $"Nhóm học phần {_selectedId} sử dụng"
             };
-            if (!_lichHocController.Insert(lich))
+            if (!_lichSuDungController.Insert(lich))
             {
-                MessageBox.Show("Sửa lịch thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Thêm lịch sử dụng thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int maLSD = _lichSuDungController.GetLastId();
+            LichSD_NhomHPDto lisd_nhomhp = new()
+            {
+                MaLSD = maLSD,
+                MaNHP = _selectedId
+            };
+            if (!_lichSD_NhomHPController.Add(lisd_nhomhp))
+            {
+                MessageBox.Show("Thêm lịch sử dụng nhóm hp thất bại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
         }
-
+        
+        
+        //Xóa hết lịch cũ để cập nhật lại
+        
+        
         MessageBox.Show("Sửa thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
         Finish?.Invoke();
         Close();
     }
 
-    private bool Validate(string tenHP, string tenGV, string tenLop, List<LichHocDto> listLich)
+    private bool Validate(string tenHP, string tenGV, string tenLop, string siSoToiDa, List<LichHocDto> listLich)
     {
         if (tenHP.Equals(""))
         {
@@ -645,33 +1059,46 @@ public class NhomHocPhanDialog : Form
             return false;
         }
 
-        if (listLichTam.Count == 0)
+        if (siSoToiDa.Equals(""))
+        {
+            MessageBox.Show("Sĩ số tối đa không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+
+        if (listLichHocTam.Count == 0)
         {
             MessageBox.Show("Vui lòng thêm lịch học!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
-        
-        string tenHp =  listField[2].tb.contentTextBox.Text;
+
+        string tenHp = _hocPhanField.tb.contentTextBox.Text;
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanByTen(tenHp);
-                
-        if (hocPhan.SoTietThucHanh != 0)
+
+        if (!listLich.Any(x => x.Type.Equals("Lý thuyết + Thực hành")))
         {
-            if (!listLich.Any(x => x.Type.Equals("Thực hành")))
+            if (hocPhan.SoTietThucHanh != 0)
             {
-                MessageBox.Show($"Chưa đủ tiết học, vui lòng thêm lịch học \nSố tiết thực hành học phần {tenHp} là {hocPhan.SoTietThucHanh} tiết", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
+                if (!listLich.Any(x => x.Type.Equals("Thực hành")))
+                {
+                    MessageBox.Show(
+                        $"Chưa đủ tiết học, vui lòng thêm lịch học \nSố tiết thực hành học phần {tenHp} là {hocPhan.SoTietThucHanh} tiết",
+                        "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+            }
+
+            if (hocPhan.SoTietLyThuyet != 0)
+            {
+                if (!listLich.Any(x => x.Type.Equals("Lý thuyết")))
+                {
+                    MessageBox.Show(
+                        $"Chưa đủ tiết học, vui lòng thêm lịch học \nSố tiết lý thuyết học phần{tenHp} là {hocPhan.SoTietLyThuyet} tiết",
+                        "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
             }
         }
-        
-        if (hocPhan.SoTietLyThuyet != 0)
-        {
-            if (!listLich.Any(x => x.Type.Equals("Lý thuyết")))
-            {
-                MessageBox.Show($"Chưa đủ tiết học, vui lòng thêm lịch học \nSố tiết lý thuyết học phần{tenHp} là {hocPhan.SoTietLyThuyet} tiết", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-        }
-        
+
         return true;
     }
 }

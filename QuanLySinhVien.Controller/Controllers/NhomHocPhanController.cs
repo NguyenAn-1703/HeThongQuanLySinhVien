@@ -13,9 +13,11 @@ public class NhomHocPhanController
     private HocPhanController _hocPhanController;
     private GiangVienController _giangVienController;
     private DangKyController _dangKyController;
+    private KhoaController _khoaController;
     
-    private Dictionary<int, string> hocPhanDic;
+    private Dictionary<int, HocPhanDto> hocPhanDic;
     private Dictionary<int, string> giangVienDic;
+    private Dictionary<int, string> khoaDic;
 
     private NhomHocPhanController()
     {
@@ -23,6 +25,7 @@ public class NhomHocPhanController
         _listNhomHocPhan = _nhomHocPhanDao.GetAll();
         _hocPhanController = HocPhanController.GetInstance();
         _giangVienController = GiangVienController.GetInstance();
+        _khoaController = KhoaController.GetInstance();
         InitLookUpData();
     }
 
@@ -30,9 +33,12 @@ public class NhomHocPhanController
     {
         List<HocPhanDto> listHocPhan = _hocPhanController.GetAll();
         List<GiangVienDto> listGiangVien = _giangVienController.GetAll();
+        List<KhoaDto> listKhoa = _khoaController.GetDanhSachKhoa();
         
-        hocPhanDic = listHocPhan.ToDictionary(x => x.MaHP, x => x.TenHP);
+        hocPhanDic = listHocPhan.ToDictionary(x => x.MaHP, x => x);
         giangVienDic = listGiangVien.ToDictionary(x => x.MaGV, x => x.TenGV);
+        khoaDic = listKhoa.ToDictionary(x => x.MaKhoa, x => x.TenKhoa);
+
     }
 
     public static NhomHocPhanController GetInstance()
@@ -86,14 +92,14 @@ public class NhomHocPhanController
         return _nhomHocPhanDao.GetByHkyNamMaGV(hky, nam, maGV);
     }
     
-    
+    //tuongw lai suar :<
     public List<NhomHocPhanDisplay> ConvertDtoToDisplayNhapDiem(List<NhomHocPhanDto> input)
     {
         List<NhomHocPhanDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new NhomHocPhanDisplay
         {
             MaNHP = x.MaNHP,
-            TenHP = hocPhanDic.TryGetValue(x.MaHP, out var  ten) ? ten : "",
-            Siso = x.SiSo,
+            TenHP = hocPhanDic.TryGetValue(x.MaHP, out var  hp) ? hp.TenHP : "",
+            Siso = x.SiSo + "/" + x.SiSoToiDa,
             TenGiangVien = giangVienDic.TryGetValue(x.MaGV, out var teng) ? teng : ""
         });
         return rs;
@@ -114,5 +120,32 @@ public class NhomHocPhanController
                 throw new Exception("Sua nhp that bai");
             }
         }
+    }
+
+    public List<NhomHocPhanDto> GetByMaDotDky(int maDot)
+    {
+        _listNhomHocPhan = _nhomHocPhanDao.GetAll();
+
+        List<NhomHocPhanDto> rs = new List<NhomHocPhanDto>();
+        foreach (var item in _listNhomHocPhan)
+        {
+            if (item.MaDotDK == maDot) rs.Add(item);
+        }
+
+        return rs;
+    }
+
+    public List<NhomHocPhanDisplay> ConvertDtoToDisplay(List<NhomHocPhanDto> input)
+    {
+        List<NhomHocPhanDisplay> rs = ConvertObject.ConvertDtoToDto(input, x => new NhomHocPhanDisplay
+        {
+            MaNHP = x.MaNHP,
+            TenHP = hocPhanDic.TryGetValue(x.MaHP, out var  hp) ? hp.TenHP : "",
+            MaHP = x.MaHP,
+            TenKhoa = khoaDic.TryGetValue(hocPhanDic.TryGetValue(x.MaHP, out var hp1) ? hp1.MaKhoa : 0, out var tenkh) ? tenkh : "",
+            Siso = x.SiSo + "/" + x.SiSoToiDa,
+            TenGiangVien = giangVienDic.TryGetValue(x.MaGV, out var teng) ? teng : "",
+        });
+        return rs;
     }
 }

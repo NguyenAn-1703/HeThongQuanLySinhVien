@@ -22,7 +22,7 @@ public class DangKyHocPhan : NavBase
     private readonly string _title = "Đăng ký học phần";
 
     private MyTLP _contentLayout;
-    private LichDangKyDto _currentLichDangKy;
+    private DotDangKyDto _currentDotDangKy;
     private List<NhomHocPhanDto> _currentListNhp;
     private DangKyController _dangKyController;
     private List<object> _displayDataDangKy;
@@ -46,7 +46,7 @@ public class DangKyHocPhan : NavBase
     private HocPhiHocPhanController _hocPhiHocPhanController;
     private HocPhiTinChiController _hocPhiTinChiController;
     private KetQuaController _ketQuaController;
-    private LichDangKyController _lichDangKyController;
+    private DotDangKyController _dotDangKyController;
     private LichHocController _lichHocController;
     private LopController _lopController;
 
@@ -88,7 +88,7 @@ public class DangKyHocPhan : NavBase
         _rawDataDangKy = new List<NhomHocPhanDto>();
         _displayDataDangKy = new List<object>();
         _nhomHocPhanController = NhomHocPhanController.GetInstance();
-        _lichDangKyController = LichDangKyController.GetInstance();
+        _dotDangKyController = DotDangKyController.GetInstance();
         _hocPhanController = HocPhanController.GetInstance();
         _lopController = LopController.GetInstance();
         _nganhController = NganhController.GetInstance();
@@ -678,13 +678,13 @@ public class DangKyHocPhan : NavBase
 
     private void SetLich()
     {
-        List<LichDangKyDto> listLich = _lichDangKyController.GetAll();
+        List<DotDangKyDto> listLich = _dotDangKyController.GetAll();
         var now = DateTime.Now;
         foreach (var lich in listLich)
             if (now >= lich.ThoiGianBatDau && now <= lich.ThoiGianKetThuc)
             {
-                _currentLichDangKy = lich;
-                _currentListNhp = _nhomHocPhanController.GetByLichMaDangKy(lich.MaLichDK);
+                _currentDotDangKy = lich;
+                _currentListNhp = _nhomHocPhanController.GetByLichMaDangKy(lich.MaDotDK);
                 _hocKy = _currentListNhp[0].HocKy;
                 _nam = _currentListNhp[0].Nam;
                 Console.WriteLine(_hocKy + "  " + _nam);

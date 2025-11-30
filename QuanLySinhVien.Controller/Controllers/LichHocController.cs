@@ -55,4 +55,9 @@ public class LichHocController
     {
         return _lichHocDao.HardDelete(maLH);
     }
+
+    public int GetAutoIncrement()
+    {
+        return _lichHocDao.GetAutoIncrement();
+    }
 }

@@ -115,7 +115,7 @@ public class KetQuaController
                 : new DiemQuaTrinhDto();
             
             
-            string[] heso = hocPhan.HeSoHocPhan.Split(':');
+            string[] heso = hocPhan.HeSoDiem.Split(':');
 
             double diemQuaTrinh = diemQuaTrinhDto.DiemSo;
             double diemThi = ketQua.DiemThi;
@@ -176,7 +176,7 @@ public class KetQuaController
                         ? _diemQuaTrinhController.GetByMaKQ(ketQua.MaKQ)
                         : new DiemQuaTrinhDto();
                     
-                    string[] heso = hp.HeSoHocPhan.Split(':');
+                    string[] heso = hp.HeSoDiem.Split(':');
 
                     double diemQuaTrinh = diemQuaTrinhDto.DiemSo;
                     double diemThi = ketQua.DiemThi;

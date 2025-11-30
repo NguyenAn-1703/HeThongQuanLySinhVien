@@ -8,7 +8,7 @@ public class CustomSearchFieldHP : CustomTextBox
 {
     private readonly CustomPopup _popup;
 
-    private readonly List<HocPhanDto> listHP;
+    private List<HocPhanDto> listHP;
     private List<object> _cellDatas;
 
     private List<string> _columnNames;
@@ -124,5 +124,10 @@ public class CustomSearchFieldHP : CustomTextBox
 
         _parent.Controls.Add(_popup);
         _popup.BringToFront();
+    }
+
+    public void UpdateList(List<HocPhanDto> input)
+    {
+        listHP = input;
     }
 }

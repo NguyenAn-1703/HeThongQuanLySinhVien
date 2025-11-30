@@ -257,12 +257,12 @@ public class MyHome : Form
 
     void UpdateStartUpData()
     {
-        _ketQuaController = KetQuaController.GetInstance();
-        _ketQuaController.UpdateAllDiemHeSoSV();
-        _sinhVienController.UpdateTrangThaiSv();
-        
-        _nhomHocPhanController = NhomHocPhanController.GetInstance();
-        _nhomHocPhanController.UpdateSiso();
+        // _ketQuaController = KetQuaController.GetInstance();
+        // _ketQuaController.UpdateAllDiemHeSoSV();
+        // _sinhVienController.UpdateTrangThaiSv();
+        //
+        // _nhomHocPhanController = NhomHocPhanController.GetInstance();
+        // _nhomHocPhanController.UpdateSiso();
     }
 
     //update khi 1 item khác được chọn

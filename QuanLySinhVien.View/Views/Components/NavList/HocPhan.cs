@@ -13,7 +13,7 @@ namespace QuanLySinhVien.View.Views.Components.NavList;
 public class HocPhan : NavBase
 {
     private readonly string[] _headerArray = new[]
-        { "Mã HP", "Mã HP Trước", "Tên HP", "Số Tín Chỉ", "Hệ Số", "Số Tiết LT", "Số Tiết TH" };
+        { "Mã HP", "Mã HP Trước", "Tên HP", "Số Tín Chỉ","Hệ Số Điểm", "Hệ Số HP", "Số Tiết LT", "Số Tiết TH" };
 
     private readonly string _title = "Học phần";
 
@@ -180,7 +180,7 @@ public class HocPhan : NavBase
         SetDisplayData();
 
         columnNames = new List<string>
-            { "MaHP", "MaHPTruoc", "TenHP", "SoTinChi", "HeSoHocPhan", "SoTietLyThuyet", "SoTietThucHanh" };
+            { "MaHP", "MaHPTruoc", "TenHP", "SoTinChi","HeSoDiem", "HeSoHocPhan", "SoTietLyThuyet", "SoTietThucHanh" };
 
         _table = new CustomTable(_headerList, columnNames, _displayData, sua || xoa, sua, xoa)
         {
@@ -196,6 +196,7 @@ public class HocPhan : NavBase
             x.MaHPTruoc,
             x.TenHP,
             x.SoTinChi,
+            x.HeSoDiem,
             x.HeSoHocPhan,
             x.SoTietLyThuyet,
             x.SoTietThucHanh
@@ -242,6 +243,7 @@ public class HocPhan : NavBase
             x.MaHPTruoc,
             x.TenHP,
             x.SoTinChi,
+            x.HeSoDiem,
             x.HeSoHocPhan,
             x.SoTietLyThuyet,
             x.SoTietThucHanh
@@ -254,7 +256,8 @@ public class HocPhan : NavBase
         {
             dialog.Finish += () =>
             {
-                UpdateDataDisplay(hocPhanDAO.GetAll());
+                _rawData = hocPhanDAO.GetAll();
+                UpdateDataDisplay(_rawData);
                 _table.UpdateData(_displayData);
             };
             dialog.ShowDialog();
@@ -269,7 +272,8 @@ public class HocPhan : NavBase
             {
                 dialog.Finish += () =>
                 {
-                    UpdateDataDisplay(hocPhanDAO.GetAll());
+                    _rawData = hocPhanDAO.GetAll();
+                    UpdateDataDisplay(_rawData);
                     _table.UpdateData(_displayData);
                 };
                 dialog.ShowDialog();

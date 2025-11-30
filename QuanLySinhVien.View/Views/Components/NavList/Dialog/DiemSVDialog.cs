@@ -46,7 +46,7 @@ public class DiemSVDialog : CustomDialog
     {
         HocPhanDto hocPhan = _hocPhanController.GetHocPhanById(_maHp);
         string tenHp = hocPhan.TenHP;
-        string heSo = hocPhan.HeSoHocPhan;
+        string heSo = hocPhan.HeSoDiem;
         MyTLP panel = new MyTLP
         {
             Dock = DockStyle.Fill,

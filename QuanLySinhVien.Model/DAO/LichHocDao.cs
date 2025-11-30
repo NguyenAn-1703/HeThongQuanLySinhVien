@@ -268,4 +268,24 @@ public class LichHocDao
 
         return rowAffected > 0;
     }
+    
+    public int GetAutoIncrement()
+    {
+        using var conn = MyConnection.GetConnection();
+
+        var query = @"
+        SELECT AUTO_INCREMENT 
+        FROM information_schema.TABLES 
+        WHERE TABLE_SCHEMA = @DbName 
+          AND TABLE_NAME = 'LichHoc'
+    ";
+
+        using var cmd = new MySqlCommand(query, conn);
+        cmd.Parameters.AddWithValue("@DbName", conn.Database);
+
+        var result = cmd.ExecuteScalar();
+
+        return Convert.ToInt32(result);
+    }
+
 }

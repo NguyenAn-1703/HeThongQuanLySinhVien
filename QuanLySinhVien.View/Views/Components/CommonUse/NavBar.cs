@@ -17,7 +17,7 @@ public class NavBar : Panel
     private ChiTietQuyenController _chiTietQuyenController;
     private ChucNangController _chucNangController;
 
-    private LichDangKyController _lichDangKyController;
+    private DotDangKyController _dotDangKyController;
 
     public MyTLP _mainLayout;
 
@@ -34,7 +34,7 @@ public class NavBar : Panel
     {
         _chiTietQuyenController = ChiTietQuyenController.getInstance();
         _chucNangController = ChucNangController.getInstance();
-        _lichDangKyController = LichDangKyController.GetInstance();
+        _dotDangKyController = DotDangKyController.GetInstance();
         _nhomQuyen = nhomQuyen;
 
         //     "Trang chủ", "Sinh viên", "Giảng viên", "Khoa", "Ngành", "Chương trình đào tạo", "Học phần", "Phòng học", "Chu kỳ đào tạo","Khóa học",
@@ -172,12 +172,12 @@ public class NavBar : Panel
 
     private bool ValidateDangKyHP()
     {
-        List<LichDangKyDto> listLichDk = _lichDangKyController.GetAll();
+        List<DotDangKyDto> listLichDk = _dotDangKyController.GetAll();
         var now = DateTime.Now;
         foreach (var lich in listLichDk)
             if (now >= lich.ThoiGianBatDau && now <= lich.ThoiGianKetThuc)
             {
-                Console.WriteLine(lich.MaLichDK + " " + lich.ThoiGianBatDau + " " + lich.ThoiGianKetThuc);
+                Console.WriteLine(lich.MaDotDK + " " + lich.ThoiGianBatDau + " " + lich.ThoiGianKetThuc);
                 Console.WriteLine(now);
                 return true;
             }
