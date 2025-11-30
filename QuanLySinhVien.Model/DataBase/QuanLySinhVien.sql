@@ -16,7 +16,7 @@ CREATE TABLE `SinhVien`
     `SoDienThoaiSV` VARCHAR(255),
     `NgaySinhSV`    VARCHAR(255),
     `QueQuanSV`     VARCHAR(255),
-    `TrangThaiSV`   VARCHAR(255) DEFAULT "Đang học",
+    `TrangThaiSV`   VARCHAR(255),
     `GioiTinhSV`    VARCHAR(255),
     `EmailSV`       VARCHAR(255),
     `CCCDSV`        VARCHAR(255),
@@ -137,11 +137,12 @@ CREATE TABLE `NhomHocPhan`
     `MaNHP`    INT AUTO_INCREMENT PRIMARY KEY,
     `MaGV`     INT,
     `MaHP`     INT,
-    `MaLichDK` INT     DEFAULT 1,
+    `MaDotDK` INT     DEFAULT 1,
     `MaLop`    INT,
     `HocKy`    INT,
     `Nam`      VARCHAR(255),
     `SiSo`     INT,
+	`SiSoToiDa`INT,
     Status     TINYINT DEFAULT 1
 );
 
@@ -180,9 +181,11 @@ CREATE TABLE `HocPhan`
     `MaHPTruoc`      INT,
     `TenHP`          VARCHAR(255),
     `SoTinChi`       INT,
-    `HeSoHocPhan`    VARCHAR(255),
+    `HeSoDiem`    VARCHAR(255),
+	`HeSoHocPhan` 	 FLOAT,
     `SoTietLyThuyet` INT,
     `SoTietThucHanh` INT,
+	`MaKhoa`		 INT,
     Status           TINYINT DEFAULT 1
 );
 
@@ -317,12 +320,40 @@ CREATE TABLE ChucNang
 );
 
 -- 30
-CREATE TABLE LichDangKy
+CREATE TABLE DotDangKy
 (
-    MaLichDK        INT AUTO_INCREMENT PRIMARY KEY,
+    MaDotDK        	INT AUTO_INCREMENT PRIMARY KEY,
+	HocKy			INT,
+	Nam				VARCHAR(255),
     ThoiGianBatDau  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ThoiGianKetThuc TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Status          TINYINT   DEFAULT 1
+);
+
+CREATE TABLE LichSuDung
+(
+    MaLSD        	INT AUTO_INCREMENT PRIMARY KEY,
+	MaPH			INT,
+    ThoiGianBatDau  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ThoiGianKetThuc TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	GhiChu			VARCHAR(255),
+    Status          TINYINT   DEFAULT 1
+);
+
+CREATE TABLE LichSD_NhomHP
+(
+	MaLSD	INT,
+	MaNHP 	INT,
+	PRIMARY KEY (`MaLSD`, `MaNHP`),
+    Status  TINYINT DEFAULT 1
+);
+
+CREATE TABLE LichSD_CaThi
+(
+	MaLSD	INT,
+	MaCT INT,
+	PRIMARY KEY (`MaLSD`, `MaCT`),
+    Status  TINYINT DEFAULT 1
 );
 
 
@@ -548,36 +579,37 @@ VALUES (1, 1, 'CNTT01', 50),
 -- 3
 INSERT INTO GiangVien
 (MaTK, MaKhoa, TenGV, NgaySinhGV, GioiTinhGV, SoDienThoai, Email, AnhDaiDienGV)
-VALUES (1, 1, 'Nguyễn Văn An', '15/03/1980', 'Nam', '0912345678', 'an.nguyen@univ.edu.vn', 'img/portrait/default.jpg'),
-       (4, 1, 'Nguyễn Ân GV', '22/07/1982', 'Nữ', '0923456789', 'nguyen.an.gv@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 1, 'Lê Quang Huy', '10/05/1985', 'Nam', '0934567890', 'huy.le@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 1, 'Phạm Minh Châu', '30/09/1983', 'Nữ', '0945678901', 'chau.pham@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 1, 'Đỗ Thị Thu Hà', '25/01/1987', 'Nữ', '0956789012', 'ha.do@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 2, 'Ngô Văn Dũng', '12/11/1979', 'Nam', '0967890123', 'dung.ngo@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 2, 'Vũ Thị Mai', '18/04/1986', 'Nữ', '0978901234', 'mai.vu@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 2, 'Bùi Anh Tuấn', '05/08/1984', 'Nam', '0989012345', 'tuan.bui@univ.edu.vn', 'img/portrait/default.jpg'),
-       (2, 2, 'Hoàng Lan Phương', '14/02/1988', 'Nữ', '0990123456', 'phuong.hoang@univ.edu.vn',
+VALUES (1, 2, 'Nguyễn Văn An', '15/03/1980', 'Nam', '0912345678', 'an.nguyen@univ.edu.vn', 'img/portrait/default.jpg'),
+       (4, 2, 'Nguyễn Ân GV', '22/07/1982', 'Nữ', '0923456789', 'nguyen.an.gv@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 2, 'Lê Quang Huy', '10/05/1985', 'Nam', '0934567890', 'huy.le@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 2, 'Phạm Minh Châu', '30/09/1983', 'Nữ', '0945678901', 'chau.pham@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 2, 'Đỗ Thị Thu Hà', '25/01/1987', 'Nữ', '0956789012', 'ha.do@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 3, 'Ngô Văn Dũng', '12/11/1979', 'Nam', '0967890123', 'dung.ngo@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 3, 'Vũ Thị Mai', '18/04/1986', 'Nữ', '0978901234', 'mai.vu@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 3, 'Bùi Anh Tuấn', '05/08/1984', 'Nam', '0989012345', 'tuan.bui@univ.edu.vn', 'img/portrait/default.jpg'),
+       (2, 3, 'Hoàng Lan Phương', '14/02/1988', 'Nữ', '0990123456', 'phuong.hoang@univ.edu.vn',
         'img/portrait/default.jpg'),
-       (2, 2, 'Phan Văn Khánh', '20/12/1978', 'Nam', '0901234567', 'khanh.phan@univ.edu.vn',
+       (2, 3, 'Phan Văn Khánh', '20/12/1978', 'Nam', '0901234567', 'khanh.phan@univ.edu.vn',
         'img/portrait/default.jpg');
 
 
 -- 4
 INSERT INTO Khoa (TenKHoa, Email, DiaChi)
-VALUES ('Công nghệ thông tin', 'cntt@khoa.edu', '123 Duong 1'),
-       ('Kinh tế', 'kinhte@khoa.edu', '456 Duong 2');
+VALUES 	('', 'Default', 'Default'),
+	    ('Công nghệ thông tin', 'cntt@khoa.edu', '123 Duong 1'),
+		('Kinh tế', 'kinhte@khoa.edu', '456 Duong 2');
 -- 5
 INSERT INTO Nganh (MaKhoa, TenNganh)
-VALUES (1, 'Hệ thống thông tin'),
-       (1, 'Mạng máy tính'),
-       (1, 'Trí tuệ nhân tạo'),
-       (1, 'Khoa học dữ liệu'),
-       (1, 'An toàn thông tin'),
-       (2, 'Tài chính'),
-       (2, 'Kinh tế quốc tế'),
-       (2, 'Quản lý kinh tế'),
-       (2, 'Kế toán'),
-       (2, 'Ngân hàng');
+VALUES (2, 'Hệ thống thông tin'),
+       (2, 'Mạng máy tính'),
+       (2, 'Trí tuệ nhân tạo'),
+       (2, 'Khoa học dữ liệu'),
+       (2, 'An toàn thông tin'),
+       (3, 'Tài chính'),
+       (3, 'Kinh tế quốc tế'),
+       (3, 'Quản lý kinh tế'),
+       (3, 'Kế toán'),
+       (3, 'Ngân hàng');
 
 -- 6
 INSERT INTO ChuyenNganh (MaNganh, TenCN)
@@ -832,22 +864,22 @@ VALUES (6, 1),
 
 
 -- 12
-INSERT INTO NhomHocPhan (MaGV, MaHP, MaLichDK, MaLop, HocKy, Nam, SiSo)
-VALUES (2, 1, 3, 1, 1, 2025, 50),
-       (2, 2, 3, 2, 1, 2025, 45),
-       (2, 3, 3, 3, 1, 2025, 55),
-       (2, 4, 3, 4, 1, 2025, 60),
-       (2, 5, 3, 5, 1, 2025, 40),
-       (2, 6, 3, 6, 1, 2025, 50),
-       (2, 7, 3, 7, 1, 2025, 48),
-       (2, 8, 3, 8, 1, 2025, 52),
-       (2, 9, 3, 9, 1, 2025, 47),
-       (2, 10, 3, 10, 1, 2025, 53),
-       (2, 11, 3, 2, 1, 2025, 60),
-       (2, 12, 3, 3, 1, 2025, 58),
-       (2, 13, 3, 4, 1, 2025, 42),
-       (2, 14, 3, 5, 1, 2025, 50),
-       (2, 15, 3, 1, 1, 2025, 45);
+INSERT INTO NhomHocPhan (MaGV, MaHP, MaDotDK, MaLop, HocKy, Nam, SiSo, SiSoToiDa)
+VALUES (2, 1, 3, 1, 1, 2025, 50, 120),
+       (2, 2, 3, 2, 1, 2025, 45, 120),
+       (2, 3, 3, 3, 1, 2025, 55, 120),
+       (2, 4, 3, 4, 1, 2025, 60, 120),
+       (2, 5, 3, 5, 1, 2025, 40, 120),
+       (2, 6, 3, 6, 1, 2025, 50, 120),
+       (2, 7, 3, 7, 1, 2025, 48, 120),
+       (2, 8, 3, 8, 1, 2025, 52, 120),
+       (2, 9, 3, 9, 1, 2025, 47, 120),
+       (2, 10, 3, 10, 1, 2025, 53, 120),
+       (2, 11, 3, 2, 1, 2025, 60, 120),
+       (2, 12, 3, 3, 1, 2025, 58, 120),
+       (2, 13, 3, 4, 1, 2025, 42, 120),
+       (2, 14, 3, 5, 1, 2025, 50, 120),
+       (2, 15, 3, 1, 1, 2025, 45, 120);
 
 
 -- 13
@@ -871,43 +903,45 @@ VALUES (1, 1, 1, 'Thứ 2', 1, '2025-02-17', '2025-06-01', 3, 3),
 
 -- 14
 INSERT INTO PhongHoc (TenPH, LoaiPH, CoSo, SucChua, TinhTrang)
-VALUES ('A101', 'Lý thuyết', 'Cơ sở A', 60, 'Sẵn sàng'),
-       ('A102', 'Lý thuyết', 'Cơ sở A', 50, 'Sẵn sàng'),
-       ('A103', 'Thực hành', 'Cơ sở A', 45, 'Sẵn sàng'),
-       ('A104', 'Thực hành', 'Cơ sở A', 40, 'Bảo trì'),
-       ('A201', 'Lý thuyết', 'Cơ sở A', 70, 'Sẵn sàng'),
-       ('A202', 'Thực hành', 'Cơ sở A', 50, 'Sẵn sàng'),
-       ('A203', 'Lý thuyết', 'Cơ sở A', 80, 'Sẵn sàng'),
-       ('A204', 'Thực hành', 'Cơ sở A', 45, 'Sẵn sàng'),
+VALUES 
+('A101', 'Lý thuyết', 'Cơ sở A', 120, 'Trống'),
+('A102', 'Lý thuyết', 'Cơ sở A', 120, 'Trống'),
+('A103', 'Thực hành', 'Cơ sở A', 120, 'Trống'),
+('A104', 'Thực hành', 'Cơ sở A', 120, 'Trống'),
+('A201', 'Lý thuyết', 'Cơ sở A', 120, 'Trống'),
+('A202', 'Thực hành', 'Cơ sở A', 120, 'Trống'),
+('A203', 'Lý thuyết', 'Cơ sở A', 120, 'Trống'),
+('A204', 'Thực hành', 'Cơ sở A', 120, 'Trống'),
 
-       ('B101', 'Lý thuyết', 'Cơ sở B', 60, 'Sẵn sàng'),
-       ('B102', 'Thực hành', 'Cơ sở B', 50, 'Sẵn sàng'),
-       ('B103', 'Lý thuyết', 'Cơ sở B', 70, 'Sẵn sàng'),
-       ('B104', 'Thực hành', 'Cơ sở B', 40, 'Bảo trì'),
-       ('B201', 'Lý thuyết', 'Cơ sở B', 80, 'Sẵn sàng'),
-       ('B202', 'Thực hành', 'Cơ sở B', 55, 'Sẵn sàng'),
-       ('B203', 'Lý thuyết', 'Cơ sở B', 60, 'Sẵn sàng'),
-       ('B204', 'Thực hành', 'Cơ sở B', 50, 'Sẵn sàng');
+('B101', 'Lý thuyết', 'Cơ sở B', 100, 'Trống'),
+('B102', 'Thực hành', 'Cơ sở B', 100, 'Trống'),
+('B103', 'Lý thuyết', 'Cơ sở B', 100, 'Trống'),
+('B104', 'Thực hành', 'Cơ sở B', 100, 'Trống'),
+('B201', 'Lý thuyết', 'Cơ sở B', 100, 'Trống'),
+('B202', 'Thực hành', 'Cơ sở B', 100, 'Trống'),
+('B203', 'Lý thuyết', 'Cơ sở B', 100, 'Trống'),
+('B204', 'Thực hành', 'Cơ sở B', 100, 'Trống');
+
 
 -- 15
-INSERT INTO HocPhan (MaHPTruoc, TenHP, SoTinChi, HeSoHocPhan, SoTietLyThuyet, SoTietThucHanh)
+INSERT INTO HocPhan (MaHPTruoc, TenHP, SoTinChi, HeSoDiem, HeSoHocPhan, SoTietLyThuyet, SoTietThucHanh, MaKhoa)
 VALUES 
-    (NULL, 'Lập trình hướng đối tượng', 3, '5:5', 30, 15),    -- Công nghệ phần mềm
-    (NULL, 'Kỹ thuật vi điều khiển', 3, '5:5', 30, 15),       -- Hệ thống nhúng
-    (NULL, 'Khai phá dữ liệu', 3, '5:5', 30, 15),             -- Khoa học dữ liệu
-    (NULL, 'Phân tích dữ liệu với Python', 3, '5:5', 30, 15), -- Phân tích dữ liệu lớn
-    (NULL, 'An toàn hệ thống mạng', 3, '5:5', 30, 15),        -- An ninh mạng
-    (NULL, 'Quản lý ngân sách công', 3, '5:5', 45, 0),        -- Tài chính công
-    (NULL, 'Thương mại quốc tế', 3, '5:5', 45, 0),            -- Kinh tế đối ngoại
-    (NULL, 'Quản trị chiến lược', 3, '5:5', 45, 0),           -- Quản trị kinh doanh
-    (NULL, 'Nguyên lý kế toán', 3, '5:5', 45, 0),             -- Kế toán kiểm toán
-    (NULL, 'Nghiệp vụ ngân hàng', 3, '5:5', 45, 0),           -- Ngân hàng đầu tư
+    (NULL, 'Lập trình hướng đối tượng', 4, '5:5', 0.8, 45, 15, 2),    -- Công nghệ phần mềm
+    (NULL, 'Kỹ thuật vi điều khiển', 4, '5:5', 0.8, 45, 15, 2),       -- Hệ thống nhúng
+    (NULL, 'Khai phá dữ liệu', 4, '5:5', 0.8, 45, 15, 2),             -- Khoa học dữ liệu
+    (NULL, 'Phân tích dữ liệu với Python', 4, '5:5', 0.8, 45, 15, 2), -- Phân tích dữ liệu lớn
+    (NULL, 'An toàn hệ thống mạng', 4, '5:5', 0.8, 45, 15, 2),        -- An ninh mạng
+    (NULL, 'Quản lý ngân sách công', 4, '5:5', 1, 45, 0, 3),        -- Tài chính công
+    (NULL, 'Thương mại quốc tế', 4, '5:5', 1, 45, 0, 3),            -- Kinh tế đối ngoại
+    (NULL, 'Quản trị chiến lược', 4, '5:5', 1, 45, 0, 3),           -- Quản trị kinh doanh
+    (NULL, 'Nguyên lý kế toán', 4, '5:5', 1, 45, 0, 3),             -- Kế toán kiểm toán
+    (NULL, 'Nghiệp vụ ngân hàng', 4, '5:5', 1, 45, 0, 3),           -- Ngân hàng đầu tư
 
-    (NULL, 'Triết học Mác – Lênin', 2, '6:4', 30, 0),
-    (11, 'Kinh tế chính trị Mác – Lênin', 2, '6:4', 30, 0),
-    (12, 'Chủ nghĩa xã hội khoa học', 2, '6:4', 30, 0),
-    (13, 'Lịch sử Đảng Cộng sản Việt Nam', 2, '6:4', 30, 0),
-    (14, 'Tư tưởng Hồ Chí Minh', 2, '6:4', 30, 0);
+    (NULL, 'Triết học Mác – Lênin', 2, '6:4', 1, 30, 0, 1),
+    (11, 'Kinh tế chính trị Mác – Lênin', 2, '6:4', 1, 30,0, 1),
+    (12, 'Chủ nghĩa xã hội khoa học', 2, '6:4', 1, 30, 0, 1),
+    (13, 'Lịch sử Đảng Cộng sản Việt Nam', 2, '6:4', 1, 30, 0, 1),
+    (14, 'Tư tưởng Hồ Chí Minh', 2, '6:4', 1, 30, 0, 1);
 
 
 
@@ -1703,15 +1737,14 @@ VALUES ('SINHVIEN'),
        ('THONGKE');
 
 -- 30
-INSERT INTO LichDangKy (ThoiGianBatDau, ThoiGianKetThuc, Status)
-VALUES ('1990-01-01 08:00:00', '1990-01-03 08:00:00', 1), -- Lịch ở năm 1990
-       ('2024-12-15 10:00:00', '2024-12-17 10:00:00', 1), -- Lịch cuối năm 2024
-       ('2025-06-05 09:00:00', '2025-06-07 09:00:00', 1);
+INSERT INTO DotDangKy (HocKy, Nam, ThoiGianBatDau, ThoiGianKetThuc, Status)
+VALUES (1, '2025', '1990-01-01 08:00:00', '1990-01-03 08:00:00', 1), -- Lịch ở năm 1990
+       (2, '2024', '2024-12-15 10:00:00', '2024-12-17 10:00:00', 1), -- Lịch cuối năm 2024
+       (1, '2025', '2025-06-05 09:00:00', '2025-06-07 09:00:00', 1);
 -- Lịch giữa năm 2025
 
 
 -- TKSV
-
 INSERT INTO `TaiKhoan` (`MaNQ`, `TenDangNhap`, `MatKhau`, `Type`)
 VALUES (1, 'sv1', '123456', 'Sinh viên'),
        (1, 'sv2', '123456', 'Sinh viên'),
@@ -1815,6 +1848,13 @@ VALUES (1, 'sv1', '123456', 'Sinh viên'),
        (1, 'sv100', '123456', 'Sinh viên'),
        (2, 'myadmin', '123456', 'Quản trị viên');
 
+INSERT INTO LichSuDung (MaPH, ThoiGianBatDau, ThoiGianKetThuc, Status)
+VALUES
+(1, '2025-11-28 07:00:00', '2025-11-28 08:40:00', 1),
+(1, '2025-11-28 13:00:00', '2025-11-28 14:40:00', 1),
+(1, '2025-11-29 07:00:00', '2025-11-29 08:40:00', 1),
+(1, '2025-11-29 13:00:00', '2025-11-29 14:40:00', 1);
+
 
 -- ---------------------Khóa Ngoại ---------------------------
 
@@ -1916,14 +1956,25 @@ ALTER TABLE `ChuongTrinhDaoTao`
     ADD CONSTRAINT `ChuongTrinhDaoTao_Nganh` FOREIGN KEY (MaNganh) REFERENCES `Nganh`(MaNganh);
 
 ALTER TABLE `NhomHocPhan`
-    ADD CONSTRAINT `NhomHocPhan_LichDangky` FOREIGN KEY (MaLichDK) REFERENCES `LichDangky` (MaLichDK);
+    ADD CONSTRAINT `NhomHocPhan_DotDangKy` FOREIGN KEY (MaDotDK) REFERENCES `DotDangKy` (MaDotDK);
 
 ALTER TABLE `NhomHocPhan`
     ADD CONSTRAINT `NhomHocPhan_Lop` FOREIGN KEY (MaLop) REFERENCES `Lop` (MaLop);
 	
-
-
-
+ALTER TABLE `HocPhan`
+    ADD CONSTRAINT `HocPhan_Khoa` FOREIGN KEY (MaKhoa) REFERENCES `Khoa` (MaKhoa);
+	
+ALTER TABLE `LichSuDung`
+    ADD CONSTRAINT `LichSuDung_PhongHoc` FOREIGN KEY (MaPH) REFERENCES `PhongHoc` (MaPH);
+	
+ALTER TABLE `LichSD_CaThi`
+    ADD CONSTRAINT `LichSD_CaThi_LichSD` FOREIGN KEY (MaLSD) REFERENCES `LichSuDung` (MaLSD),
+	ADD CONSTRAINT `LichSD_CaThi_CaThi` FOREIGN KEY (MaCT) REFERENCES `CaThi` (MaCT);
+	
+ALTER TABLE `LichSD_NhomHP`
+    ADD CONSTRAINT `LichSD_NhomHP_LichSD` FOREIGN KEY (MaLSD) REFERENCES `LichSuDung` (MaLSD),
+	ADD CONSTRAINT `LichSD_NhomHP_NhomHP` FOREIGN KEY (MaNHP) REFERENCES `NhomHocPhan` (MaNHP);
+	
 
 SELECT *
 FROM SinhVien;
