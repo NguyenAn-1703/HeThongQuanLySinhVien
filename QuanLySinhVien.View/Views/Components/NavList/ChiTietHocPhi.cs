@@ -19,6 +19,7 @@ public class ChiTietHocPhi : NavBase
 
     private SinhVienController _sinhVienController;
     private HocPhiSVController _hocPhiSVController;
+    private HocPhiHocPhanController _hocPhiHocPhanController;
     private CustomTable _table;
     private LabelTextField _semesterComboBox;
     
@@ -38,6 +39,7 @@ public class ChiTietHocPhi : NavBase
         _taiKhoan = taiKhoan;
         _sinhVienController = SinhVienController.GetInstance();
         _hocPhiSVController = HocPhiSVController.GetInstance();
+        _hocPhiHocPhanController = HocPhiHocPhanController.GetInstance();
         _sinhvien = _sinhVienController.GetByMaTK(taiKhoan.MaTK);
         _rawData = new List<HocPhiSVDto>();
         _displayData = new List<object>();
@@ -139,13 +141,14 @@ public class ChiTietHocPhi : NavBase
         _comboboxOptions.Clear();
         _comboboxOptions.Add("Tổng hợp học phí tất cả học kì");
         
-        var uniqueSemesters = _rawData
-            .GroupBy(x => new { x.HocKy, x.Nam })
-            .Select(g => new { g.Key.HocKy, g.Key.Nam })
-            .OrderBy(x => x.Nam)
-            .ThenBy(x => x.HocKy)
-            .ToList();
-        
+        // Get distinct and ordered semesters
+        var uniqueSemesters = _hocPhiHocPhanController
+            .GetNamHocKySVDaDK(maSV: _sinhvien.MaSinhVien)
+            .Distinct() // record equality is structural by default
+            .OrderBy(s => s.HocKy)
+            .ThenBy(s => s.Nam);
+
+        // Add formatted strings to combobox
         foreach (var sem in uniqueSemesters)
         {
             _comboboxOptions.Add($"Học kỳ {sem.HocKy} - Năm học {sem.Nam}");

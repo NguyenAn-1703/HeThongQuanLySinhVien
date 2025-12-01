@@ -167,17 +167,29 @@ public class HocPhiSVDao
         List<HocPhiHocPhanDetailDto> result = new();
         using var conn = MyConnection.GetConnection();
         using var cmd = new MySqlCommand(
-            @"SELECT 
-                hphp.MaHP,
-                hp.TenHP,
-                hp.SoTinChi,
-                hphp.TongTien AS SoTien
-            FROM hocphihocphan hphp
-            INNER JOIN hocphan hp ON hphp.MaHP = hp.MaHP AND hp.Status = 1
-            WHERE hphp.MaSV = @MaSV 
-                AND hphp.HocKy = @HocKy 
-                AND hphp.Nam = @Nam
-            ORDER BY hp.MaHP",
+            @"SELECT DISTINCT
+    hp.MaHP,
+    hp.TenHP,
+    hp.SoTinChi,
+    (hp.SoTinChi * hptc.SoTienMotTinChi) AS SoTien
+FROM dangky dk
+         INNER JOIN nhomhocphan nhp ON dk.MaNHP = nhp.MaNHP AND nhp.Status = 1
+         INNER JOIN hocphan hp ON nhp.MaHP = hp.MaHP AND hp.Status = 1
+         INNER JOIN sinhvien sv ON dk.MaSV = sv.MaSV AND sv.Status = 1
+         INNER JOIN lop l ON sv.MaLop = l.MaLop AND l.Status = 1
+         INNER JOIN hocphitinchi hptc ON l.MaNganh = hptc.MaNganh AND hptc.Status = 1
+WHERE dk.MaSV = @MaSV
+  AND nhp.HocKy = @HocKy
+  AND nhp.Nam = @Nam
+  AND dk.Status = 1
+  AND hptc.ThoiGianApDung = (
+    SELECT MAX(ThoiGianApDung)
+    FROM hocphitinchi
+    WHERE MaNganh = l.MaNganh
+      AND Status = 1
+)
+ORDER BY hp.MaHP
+",
             conn);
         cmd.Parameters.AddWithValue("@MaSV", maSV);
         cmd.Parameters.AddWithValue("@HocKy", hocKy);
