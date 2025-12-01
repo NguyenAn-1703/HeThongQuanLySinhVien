@@ -155,4 +155,30 @@ public class HocPhiHocPhanDao
 
         return result;
     }
+    
+    public record NamHocKy(string Nam, int HocKy);
+
+    public List<NamHocKy> GetNamHocKySVDaDK(int maSV)
+    {
+        var result = new List<NamHocKy>();
+
+        using var conn = MyConnection.GetConnection();
+        using var cmd = new MySqlCommand(
+            "SELECT DISTINCT Nam, HocKy FROM hocphihocphan WHERE Status = 1 AND MaSV = @MaSV",
+            conn
+        );
+        cmd.Parameters.AddWithValue("@MaSV", maSV);
+
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            string nam = reader.GetString("Nam");
+            int hocKy = reader.GetInt32("HocKy");
+
+            result.Add(new NamHocKy(nam, hocKy));
+        }
+
+        return result;
+    }
+
 }

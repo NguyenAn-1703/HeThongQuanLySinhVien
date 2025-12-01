@@ -50,4 +50,9 @@ public class HocPhiHocPhanController
     {
         return _hocPhiHocPhanDao.GetByMaSVHocKyNam(maSV, hocKy, nam);
     }
+    
+    public List<HocPhiHocPhanDao.NamHocKy> GetNamHocKySVDaDK(int maSV)
+    {
+        return _hocPhiHocPhanDao.GetNamHocKySVDaDK(maSV);
+    }
 }
